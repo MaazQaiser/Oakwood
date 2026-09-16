@@ -52,7 +52,7 @@ type ButtonAsLink = CommonProps & {
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 function isAppHref(href: string): boolean {
-  return href.startsWith("/") || href.startsWith("#");
+  return href.startsWith("/") && !href.startsWith("//");
 }
 
 function BusySpinner() {

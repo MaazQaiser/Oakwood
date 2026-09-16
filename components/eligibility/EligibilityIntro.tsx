@@ -65,7 +65,7 @@ export function EligibilityIntro() {
         <Button onClick={() => void start()} busy={starting} className="w-full sm:w-auto">
           Start eligibility check
         </Button>
-        <Button href="#how-it-works" variant="secondary" className="w-full sm:w-auto">
+        <Button href={routes.howItWorks} variant="secondary" className="w-full sm:w-auto">
           How it works
         </Button>
       </div>

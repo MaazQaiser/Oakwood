@@ -37,8 +37,8 @@ export function CustomerFinanceControl() {
           </Button>
         ) : (
           <Button href={financeCta.href} size="sm" className="whitespace-nowrap">
-            <span className="xl:hidden">{financeCta.anonymousShortLabel}</span>
-            <span className="hidden xl:inline">{financeCta.anonymousLabel}</span>
+            <span className="2xl:hidden">{financeCta.anonymousShortLabel}</span>
+            <span className="hidden 2xl:inline">{financeCta.anonymousLabel}</span>
           </Button>
         )}
       </div>

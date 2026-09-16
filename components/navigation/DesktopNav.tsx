@@ -27,8 +27,8 @@ export function DesktopNav() {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <nav aria-label="Primary" className="hidden min-w-0 xl:block">
-      <ul className="flex items-center gap-0.5">
+    <nav aria-label="Primary" className="hidden xl:block">
+      <ul className="flex flex-nowrap items-center gap-0.5">
         {groups.map((group) => (
           <NavDropdown
             key={group.id}
@@ -93,12 +93,12 @@ function NavDropdown({
 
   if (!hasMenu && href) {
     return (
-      <li>
+      <li className="shrink-0">
         <Link
           href={href}
           aria-current={current ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-11 items-center rounded-full px-3 text-label hover:bg-page",
+            "inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-2.5 text-label hover:bg-page 2xl:px-3",
             current ? "bg-primary-soft text-primary" : "text-ink",
           )}
         >
@@ -109,11 +109,11 @@ function NavDropdown({
   }
 
   return (
-    <li ref={rootRef} className="relative">
+    <li ref={rootRef} className="relative shrink-0">
       <button
         type="button"
         className={cn(
-          "inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label hover:bg-page",
+          "inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-label hover:bg-page 2xl:px-3",
           current ? "bg-primary-soft text-primary" : "text-ink",
         )}
         aria-expanded={open}
