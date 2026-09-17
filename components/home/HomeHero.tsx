@@ -48,8 +48,8 @@ export function HomeHero() {
           <HomeSearchBar />
         </div>
 
-        <div className="relative mx-auto mt-6 max-w-5xl">
-          <div className="relative aspect-[16/9] md:aspect-[2.1/1]">
+        <div className="relative mx-auto mt-6 w-full max-w-5xl">
+          <div className="relative aspect-[16/9] w-full md:aspect-[2.1/1]">
             <Image
               src={stockImages.coupe01}
               alt="Used car available at Oakwood Motor Company"

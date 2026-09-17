@@ -32,7 +32,7 @@ export function HomeSearchBar() {
         });
       }}
     >
-      <div className="flex flex-col gap-2 rounded-3xl bg-surface p-2 shadow-md sm:flex-row sm:items-center sm:rounded-full sm:p-1.5">
+      <div className="flex w-full flex-col gap-2 rounded-3xl bg-surface p-2 shadow-md md:flex-row md:items-center md:rounded-full md:p-1.5">
         <label className="sr-only" htmlFor="home-make">
           Make
         </label>
@@ -53,7 +53,7 @@ export function HomeSearchBar() {
             </option>
           ))}
         </select>
-        <span className="hidden h-8 w-px bg-border sm:block" aria-hidden="true" />
+        <span className="hidden h-8 w-px bg-border md:block" aria-hidden="true" />
         <label className="sr-only" htmlFor="home-model">
           Model
         </label>
@@ -72,7 +72,7 @@ export function HomeSearchBar() {
             </option>
           ))}
         </select>
-        <span className="hidden h-8 w-px bg-border sm:block" aria-hidden="true" />
+        <span className="hidden h-8 w-px bg-border md:block" aria-hidden="true" />
         <label className="sr-only" htmlFor="home-monthly">
           Monthly budget
         </label>
@@ -84,9 +84,9 @@ export function HomeSearchBar() {
             </option>
           ))}
         </select>
-        <Button type="submit" className="h-12 shrink-0 sm:h-12 sm:w-12 sm:px-0">
+        <Button type="submit" className="h-12 w-full shrink-0 md:h-12 md:w-12 md:px-0">
           <IconSearch className="text-white" />
-          <span className="sm:sr-only">Search</span>
+          <span className="md:sr-only">Search</span>
         </Button>
       </div>
     </form>

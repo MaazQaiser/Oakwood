@@ -44,6 +44,9 @@
 }
 
 html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   font-family: var(--oak-font-sans);
   background: var(--oak-page);
   color: var(--oak-ink);
@@ -55,7 +58,11 @@ html[data-oak-journey] footer {
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 100%;
+  overflow-x: clip;
   background: var(--oak-page);
   color: var(--oak-ink);
   font-family: var(--oak-font-sans);

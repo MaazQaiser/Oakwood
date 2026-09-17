@@ -27,7 +27,7 @@ export function DesktopNav() {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <nav aria-label="Primary" className="hidden xl:block">
+    <nav aria-label="Primary" className="hidden min-w-0 lg:block">
       <ul className="flex flex-nowrap items-center gap-0.5">
         {groups.map((group) => (
           <NavDropdown

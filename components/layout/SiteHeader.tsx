@@ -28,7 +28,7 @@ export function SiteHeader() {
             action={routes.search}
             method="get"
             role="search"
-            className="hidden min-w-0 2xl:block"
+            className="hidden min-w-0 xl:block"
           >
             <label htmlFor="header-search" className="sr-only">
               Search cars
@@ -43,14 +43,14 @@ export function SiteHeader() {
           <Link
             href={routes.search}
             aria-label="Search cars"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-ink hover:bg-page xl:hidden"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-ink hover:bg-page lg:hidden"
           >
             <IconSearch />
           </Link>
           <CustomerFinanceControl />
           <IconButton
             label="Open menu"
-            className="xl:hidden"
+            className="lg:hidden"
             onClick={() => setMenuOpen(true)}
           >
             <IconMenu />
