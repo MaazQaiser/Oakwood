@@ -18,7 +18,7 @@ export function LocationHeroActions({
   const phone = profile.telephone;
 
   return (
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <Button
         href={stockHref}
         size="lg"
@@ -32,7 +32,6 @@ export function LocationHeroActions({
       </Button>
       <Button
         href={directions}
-        variant="secondary"
         size="lg"
         onClick={() =>
           trackEvent(analyticsEvents.locationDirectionsClicked, {

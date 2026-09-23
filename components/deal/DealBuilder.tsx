@@ -24,9 +24,9 @@ function DealBuilderInner() {
   return (
     <>
       <JourneyChrome />
+      <DealBuilderHeader />
       <Section className="pb-[calc(7rem+var(--oak-consent-offset,0px))] lg:pb-[var(--oak-section-y)]">
         <Container width="wide">
-          <DealBuilderHeader />
           {phase === "VEHICLE_UNAVAILABLE" ? (
             <div className="mt-6">
               <DealFailureState kind="vehicle" />

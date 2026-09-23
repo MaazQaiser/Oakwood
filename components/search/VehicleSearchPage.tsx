@@ -40,9 +40,9 @@ export function VehicleSearchPage({
 
   return (
     <>
+      <SearchHeader context={context} query={query.q} />
       <Section className="overflow-x-hidden">
         <Container width="wide">
-          <SearchHeader context={context} query={query.q} />
           <SearchExperience
             context={context}
             query={applyLockedFilters(query, locked)}

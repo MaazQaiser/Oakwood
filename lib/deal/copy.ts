@@ -1,3 +1,8 @@
+export const DEAL_ENTRY_HEADING = "Build your deal";
+
+export const DEAL_ENTRY_BODY =
+  "Deal builder starts from a car. Choose a vehicle, then set finance, part exchange and extras.";
+
 export const DEAL_HEADING = "Build your deal for this car.";
 
 export const DEAL_SUPPORTING =

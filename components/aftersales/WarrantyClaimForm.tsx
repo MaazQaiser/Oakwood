@@ -385,7 +385,7 @@ export function WarrantyClaimForm({
                   setIssue(event.target.value);
                   setLocalError(undefined);
                 }}
-                className="min-h-32 w-full rounded-md border border-border bg-surface px-3 py-3 text-body"
+                className="min-h-32 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
               />
             </Field>
           </div>

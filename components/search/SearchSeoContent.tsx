@@ -20,7 +20,7 @@ export function SearchSeoContent({
   );
 
   return (
-    <Section>
+    <Section className="bg-[#ECF3F8]">
       <Container>
         <div className="max-w-3xl">
           <h2 className="text-h2">{copy.heading}</h2>
@@ -28,12 +28,12 @@ export function SearchSeoContent({
           <h3 className="text-h4 mt-8">Explore Oakwood</h3>
           <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-body-sm">
             <li>
-              <Link href={routes.usedCars} className="text-primary hover:underline">
+              <Link href={routes.usedCars} className="font-medium text-[#002852] hover:underline">
                 Used Cars
               </Link>
             </li>
             <li>
-              <Link href={routes.usedVans} className="text-primary hover:underline">
+              <Link href={routes.usedVans} className="font-medium text-[#002852] hover:underline">
                 Used Vans
               </Link>
             </li>
@@ -41,7 +41,7 @@ export function SearchSeoContent({
               <li>
                 <Link
                   href={getMakeUrl(context.locked.make, category)}
-                  className="text-primary hover:underline"
+                  className="font-medium text-[#002852] hover:underline"
                 >
                   {makeName}
                 </Link>
@@ -55,31 +55,31 @@ export function SearchSeoContent({
                     context.locked.model,
                     category,
                   )}
-                  className="text-primary hover:underline"
+                  className="font-medium text-[#002852] hover:underline"
                 >
                   {makeName} {modelName}
                 </Link>
               </li>
             ) : null}
             <li>
-              <Link href={routes.finance} className="text-primary hover:underline">
+              <Link href={routes.finance} className="font-medium text-[#002852] hover:underline">
                 Finance
               </Link>
             </li>
             <li>
-              <Link href={routes.sellMyCar} className="text-primary hover:underline">
+              <Link href={routes.sellMyCar} className="font-medium text-[#002852] hover:underline">
                 Sell My Car
               </Link>
             </li>
             <li>
-              <Link href={`${routes.locations}/bury`} className="text-primary hover:underline">
+              <Link href={`${routes.locations}/bury`} className="font-medium text-[#002852] hover:underline">
                 Bury
               </Link>
             </li>
             <li>
               <Link
                 href={`${routes.locations}/chorley`}
-                className="text-primary hover:underline"
+                className="font-medium text-[#002852] hover:underline"
               >
                 Chorley
               </Link>

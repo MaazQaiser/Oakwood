@@ -7,7 +7,6 @@ import { WhyOakwood } from "@/components/home/WhyOakwood";
 import { FinanceEducation } from "@/components/home/FinanceEducation";
 import { LocationSection } from "@/components/home/LocationSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
-import { ValuationCTA } from "@/components/home/ValuationCTA";
 import { FinalFinanceCTA } from "@/components/home/FinalFinanceCTA";
 
 export function HomePage() {
@@ -22,7 +21,6 @@ export function HomePage() {
       <FinanceEducation />
       <LocationSection />
       <ReviewsSection />
-      <ValuationCTA />
       <FinalFinanceCTA />
     </>
   );

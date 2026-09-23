@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { LocationCard } from "@/components/locations/LocationCard";
 import { Container, Grid, Section } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
+import { PageBanner, PageBannerScope } from "@/components/layout/PageBanner";
+import { LocationCard } from "@/components/locations/LocationCard";
 import { ComplaintForm } from "@/features/support/components/ComplaintForm";
 import { ContactForm } from "@/features/support/components/ContactForm";
 import { ContactOptions } from "@/features/support/components/ContactOptions";
@@ -91,16 +90,7 @@ function PageShell({
   breadcrumbs: ReturnType<typeof createBreadcrumbs>;
   children: ReactNode;
 }) {
-  return (
-    <>
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={breadcrumbs} />
-        </Container>
-      </Section>
-      {children}
-    </>
-  );
+  return <PageBannerScope breadcrumbs={breadcrumbs}>{children}</PageBannerScope>;
 }
 
 const bury = getShowroom("bury");
@@ -129,17 +119,11 @@ export function SupportContactPage({
       ])}
     >
       <SupportViewTracker page="contact" />
-      <section className="border-b border-border bg-surface">
-        <Container className="py-10 md:py-16">
-          <SectionIntro
-            eyebrow={SUPPORT_HUB_EYEBROW}
-            heading={SUPPORT_HUB_H1}
-            headingLevel="h1"
-          >
-            <p>{SUPPORT_HUB_INTRO}</p>
-          </SectionIntro>
-        </Container>
-      </section>
+      <PageBanner
+        eyebrow={SUPPORT_HUB_EYEBROW}
+        title={SUPPORT_HUB_H1}
+        description={SUPPORT_HUB_INTRO}
+      />
       <SupportHub title="Choose a topic" pathways={supportPathways} />
       <div id="contact">
         <ContactOptions telephone={telephone} directionsHref={directionsHref} />
@@ -205,13 +189,7 @@ export function SupportFaqPage() {
     >
       <JsonLd data={createFaqJsonLd(faqs)} />
       <SupportViewTracker page="faq" />
-      <section className="border-b border-border bg-surface">
-        <Container className="py-10 md:py-16">
-          <SectionIntro eyebrow="Support" heading={FAQ_H1} headingLevel="h1">
-            <p>{FAQ_INTRO}</p>
-          </SectionIntro>
-        </Container>
-      </section>
+      <PageBanner eyebrow="Support" title={FAQ_H1} description={FAQ_INTRO} />
       <FAQAccordion items={faqs} />
       <Related
         heading="Related"
@@ -248,13 +226,7 @@ export function SupportComplaintsPage({
       ])}
     >
       <SupportViewTracker page="complaint" />
-      <section className="border-b border-border bg-surface">
-        <Container className="py-10 md:py-16">
-          <SectionIntro eyebrow="Support" heading={COMPLAINTS_H1} headingLevel="h1">
-            <p>{COMPLAINTS_INTRO}</p>
-          </SectionIntro>
-        </Container>
-      </section>
+      <PageBanner eyebrow="Support" title={COMPLAINTS_H1} description={COMPLAINTS_INTRO} />
       <Section>
         <Container width="narrow">
           <h2 className="text-h2">{COMPLAINTS_HOW_TITLE}</h2>

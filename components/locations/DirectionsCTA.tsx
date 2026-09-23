@@ -24,7 +24,6 @@ export function DirectionsCTA({
       <p className="mt-4">
         <Button
           href={href}
-          variant="secondary"
           onClick={() =>
             trackEvent(analyticsEvents.locationDirectionsClicked, {
               location: location.slug,

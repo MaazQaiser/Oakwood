@@ -1,6 +1,6 @@
-import { Container } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { FinanceHeroActions } from "@/features/finance/intent/components/FinanceHeroActions";
+import type { BreadcrumbItem } from "@/lib/seo";
 import type { FinanceIntentSlug } from "@/types/finance";
 
 export function FinanceIntentHero({
@@ -10,6 +10,7 @@ export function FinanceIntentHero({
   intent,
   supporting,
   secondary,
+  breadcrumbs,
 }: {
   eyebrow: string;
   title: string;
@@ -17,18 +18,20 @@ export function FinanceIntentHero({
   intent: FinanceIntentSlug | "hub";
   supporting?: string;
   secondary?: { href: string; label: string; event: "calculator" | "browse" | "px" };
+  breadcrumbs?: BreadcrumbItem[];
 }) {
   return (
-    <section className="border-b border-border bg-surface">
-      <Container className="py-10 md:py-16">
-        <SectionIntro eyebrow={eyebrow} heading={title} headingLevel="h1">
+    <PageBanner
+      eyebrow={eyebrow}
+      title={title}
+      breadcrumbs={breadcrumbs}
+      description={
+        <>
           <p>{intro}</p>
-        </SectionIntro>
-        <FinanceHeroActions intent={intent} secondary={secondary} />
-        {supporting ? (
-          <p className="mt-4 max-w-2xl text-body-sm text-muted">{supporting}</p>
-        ) : null}
-      </Container>
-    </section>
+          {supporting ? <p className="mt-3">{supporting}</p> : null}
+        </>
+      }
+      actions={<FinanceHeroActions intent={intent} secondary={secondary} />}
+    />
   );
 }

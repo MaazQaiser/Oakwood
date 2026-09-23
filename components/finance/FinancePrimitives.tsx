@@ -1,3 +1,4 @@
+import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
 import { cn } from "@/lib/cn";
 import { formatApr, formatPounds, formatTerm } from "@/lib/format/money";
 import { Skeleton } from "@/components/ui/Loading";
@@ -18,15 +19,17 @@ export function FinancialNumber({
 }: {
   value: string;
   suffix?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "compact" | "md" | "lg";
   className?: string;
 }) {
   const sizeClass =
     size === "lg"
       ? "financial-number financial-number--lg"
-      : size === "sm"
-        ? "financial-number financial-number--sm"
-        : "financial-number";
+      : size === "compact"
+        ? "financial-number financial-number--compact"
+        : size === "sm"
+          ? "financial-number financial-number--sm"
+          : "financial-number";
 
   return (
     <span className={cn(sizeClass, className)}>
@@ -49,7 +52,7 @@ export function MonthlyPayment({
   amount?: number;
   state?: FinanceDisplayState;
   gapAmount?: number;
-  size?: "md" | "lg";
+  size?: "compact" | "md" | "lg";
 }) {
   if (state === "loading") {
     return (
@@ -86,7 +89,11 @@ export function MonthlyPayment({
         />
       </p>
       {state === "representative" ? (
-        <p className="mt-1 text-caption text-muted">Representative example</p>
+        <p className="mt-1 text-caption text-muted">
+          Representative example
+          {" · "}
+          <StatusDisclosureLink />
+        </p>
       ) : null}
       {state === "ineligible" ? (
         <p className="mt-1 text-caption text-warning">

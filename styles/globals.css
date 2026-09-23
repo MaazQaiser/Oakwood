@@ -27,6 +27,7 @@
   --color-info-soft: var(--oak-info-soft);
   --color-header: var(--oak-header);
   --font-sans: var(--oak-font-sans);
+  --font-serif: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
   --font-mono: var(--oak-font-numeric);
   --radius-sm: var(--oak-radius-sm);
   --radius-md: var(--oak-radius-md);
@@ -74,6 +75,32 @@ body {
 :focus-visible {
   outline: var(--oak-border-width-strong) solid var(--oak-focus);
   outline-offset: 2px;
+}
+
+input:not(
+  [type="checkbox"],
+  [type="radio"],
+  [type="range"],
+  [type="file"],
+  [type="hidden"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"]
+),
+textarea,
+select {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.select-field {
+  appearance: none;
+  border-radius: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23002852' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 1rem 1rem;
+  padding-right: 2.5rem;
 }
 
 ::selection {
@@ -175,6 +202,10 @@ body {
   font-size: var(--oak-size-body);
 }
 
+.financial-number--compact {
+  font-size: 1.5rem;
+}
+
 .tabular-number {
   font-family: var(--oak-font-numeric);
   font-variant-numeric: tabular-nums lining-nums;
@@ -202,6 +233,7 @@ body {
 }
 
 .vdp-hero__gallery { grid-area: gallery; }
+.vdp-hero__aside { display: contents; }
 .vdp-hero__header { grid-area: header; }
 .vdp-hero__price { grid-area: price; }
 .vdp-hero__specs { grid-area: specs; }
@@ -213,15 +245,26 @@ body {
     gap: 1.75rem 2rem;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     grid-template-areas:
-      "gallery header"
-      "gallery price"
-      "gallery deal"
+      "gallery aside"
       "specs specs";
   }
 
+  .vdp-hero__aside {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1.75rem;
+    grid-area: aside;
+  }
+
   .vdp-hero__gallery {
+    align-self: stretch;
+  }
+
+  .vdp-hero__gallery-sticky {
     position: sticky;
     top: calc(var(--oak-header-height) + 1rem);
+    height: fit-content;
   }
 }
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Container, Grid, Section, Stack } from "@/components/layout/Container";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner, PageBannerScope } from "@/components/layout/PageBanner";
 import { AftersalesFaq } from "@/components/aftersales/AftersalesFaq";
 import { AftersalesHero } from "@/components/aftersales/AftersalesHero";
 import { AftersalesHubHero } from "@/components/aftersales/AftersalesHero";
@@ -55,16 +55,7 @@ function PageShell({
   breadcrumbs: BreadcrumbItem[];
   children: ReactNode;
 }) {
-  return (
-    <>
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={breadcrumbs} />
-        </Container>
-      </Section>
-      {children}
-    </>
-  );
+  return <PageBannerScope breadcrumbs={breadcrumbs}>{children}</PageBannerScope>;
 }
 
 export function AftersalesHubPage() {
@@ -346,16 +337,14 @@ export function BookingEnquiryPage() {
 
   return (
     <PageShell breadcrumbs={breadcrumbs}>
+      <PageBanner
+        eyebrow="Aftersales"
+        title="Request a callback"
+        description="If we can't show appointments online, leave your details and Oakwood will call you back."
+      />
       <Section>
         <Container width="narrow">
-          <h1 className="text-h1">Request a callback</h1>
-          <p className="mt-3 text-body text-muted">
-            If we can&apos;t show appointments online, leave your details and Oakwood
-            will call you back.
-          </p>
-          <div className="mt-8">
-            <CallbackEnquiryForm />
-          </div>
+          <CallbackEnquiryForm />
           <div className="mt-12">
             <AftersalesRelatedLinks current={routes.bookingEnquiry} />
           </div>

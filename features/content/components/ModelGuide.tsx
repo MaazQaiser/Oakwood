@@ -7,7 +7,7 @@ import { ContentJourneyLinks } from "@/features/content/components/ContentJourne
 import { ContentMissingNotice } from "@/features/content/components/ContentMissingNotice";
 import { ContentStockSection } from "@/features/content/components/ContentStockSection";
 import { RelatedContent } from "@/features/content/components/RelatedContent";
-import { getModelUrl, getSearchUrl, getUsedCarsUrl } from "@/config/routes";
+import { getModelUrl, getSearchUrl, getUsedCarsUrl, routes } from "@/config/routes";
 import {
   CONTENT_FAQ_HEADING,
   CONTENT_FINANCE_HEADING,
@@ -88,7 +88,12 @@ export function ModelGuide({
           {CONTENT_FINANCE_HEADING}
         </h2>
         <p className="mt-3 text-body text-muted">{INDICATIVE_DISCLAIMER}</p>
-        <p className="mt-3 text-body text-muted">{statusDisclosureCopy.description}</p>
+        <p className="mt-3 text-body text-muted">
+          {statusDisclosureCopy.description}{" "}
+          <Button href={routes.statusDisclosure} variant="text" className="px-0">
+            Status disclosure
+          </Button>
+        </p>
         <p className="mt-3 text-body text-muted">
           {whatToExpectSections[2]?.body}
         </p>

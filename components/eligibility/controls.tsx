@@ -98,7 +98,7 @@ function PrefixInput({
 }) {
   return (
     <div className="flex min-h-12 items-stretch overflow-hidden rounded-md border border-border bg-surface">
-      <span className="flex items-center bg-page px-3 text-body text-muted" aria-hidden>
+      <span className="flex items-center bg-page px-3 text-sm text-muted" aria-hidden>
         {prefix}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -139,7 +139,7 @@ export function EligibilityCurrencyInput({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={error ? true : undefined}
-          className="financial-number h-12 w-full border-0 bg-transparent px-3 text-body outline-none"
+          className="h-12 w-full border-0 bg-transparent px-3 text-sm text-ink outline-none"
         />
       </PrefixInput>
     </Field>

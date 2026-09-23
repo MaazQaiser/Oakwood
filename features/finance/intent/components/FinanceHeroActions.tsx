@@ -39,7 +39,7 @@ export function FinanceHeroActions({
       : FINANCE_INTENT_ELIGIBILITY_CTA;
 
   return (
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <Button
         href={primaryHref}
         size="lg"

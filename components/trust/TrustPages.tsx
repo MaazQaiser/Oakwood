@@ -11,7 +11,7 @@ import { TrustViewTracker } from "@/components/trust/TrustViewTracker";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Container, Grid, Section, Stack } from "@/components/layout/Container";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBannerScope } from "@/components/layout/PageBanner";
 import { showroomProfiles } from "@/config/locations";
 import {
   getEligibilityUrl,
@@ -51,14 +51,7 @@ function PageShell({
   children: ReactNode;
 }) {
   return (
-    <>
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={createBreadcrumbs(breadcrumbs)} />
-        </Container>
-      </Section>
-      {children}
-    </>
+    <PageBannerScope breadcrumbs={createBreadcrumbs(breadcrumbs)}>{children}</PageBannerScope>
   );
 }
 
@@ -71,6 +64,13 @@ function ContentSections({ sections }: { sections: TrustSection[] }) {
             {section.title}
           </h2>
           <p className="mt-3 text-body text-muted">{section.body}</p>
+          {section.title === "Finance" ? (
+            <p className="mt-3">
+              <Button href={routes.statusDisclosure} variant="text" className="px-0">
+                Status disclosure
+              </Button>
+            </p>
+          ) : null}
         </section>
       ))}
     </Stack>

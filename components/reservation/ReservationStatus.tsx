@@ -102,7 +102,7 @@ function LookupForm({ stockId }: { stockId?: string }) {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="mt-2 w-full rounded-md border border-border px-3 py-3"
+          className="mt-2 w-full rounded-md border border-border px-3 py-3 text-sm"
         />
       </div>
       <div>
@@ -114,7 +114,7 @@ function LookupForm({ stockId }: { stockId?: string }) {
           required
           value={reference}
           onChange={(event) => setReference(event.target.value)}
-          className="mt-2 w-full rounded-md border border-border px-3 py-3"
+          className="mt-2 w-full rounded-md border border-border px-3 py-3 text-sm"
         />
       </div>
       {error ? <Alert title={error} tone="warning" /> : null}

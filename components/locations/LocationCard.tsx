@@ -58,7 +58,7 @@ export function LocationCard({
             : "Current stock for this location is listed on the used cars page."}
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Button href={href} variant="secondary">
+          <Button href={href}>
             {cta ?? `View ${profile.name}`}
           </Button>
           <Button href={directions} variant="text">

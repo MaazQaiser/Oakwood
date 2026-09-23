@@ -5,6 +5,7 @@ import type {
   MouseEventHandler,
   ReactNode,
 } from "react";
+import { IconArrow } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 
 export type ButtonVariant =
@@ -19,10 +20,10 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white hover:bg-primary-hover border border-transparent",
+    "rounded-[14px]! border border-transparent bg-[#002852] text-white hover:bg-[#001c3d]",
   secondary:
-    "bg-surface text-ink border border-border-strong hover:bg-page",
-  tertiary: "bg-primary-soft text-primary border border-transparent hover:bg-primary-soft",
+    "min-h-14! rounded-[14px]! border border-transparent bg-white px-5! text-[#002852] hover:bg-[#E7F1F8]",
+  tertiary: "rounded-[14px]! bg-[#E7F1F8] text-[#002852] border border-transparent hover:bg-white",
   destructive: "bg-danger text-white hover:bg-danger/90 border border-transparent",
   text: "bg-transparent text-primary border border-transparent hover:underline underline-offset-4 px-2",
   icon: "bg-transparent text-ink border border-transparent hover:bg-page",
@@ -64,6 +65,14 @@ function BusySpinner() {
   );
 }
 
+function isIconOnly(className?: string) {
+  return Boolean(className && /(?:^|\s)(?:px-0!?|w-11)\b/.test(className));
+}
+
+function isCompact(className?: string) {
+  return Boolean(className && /(?:^|\s)btn-compact\b/.test(className));
+}
+
 export function Button({
   variant = "primary",
   size = "md",
@@ -73,20 +82,42 @@ export function Button({
   busy = false,
   ...props
 }: ButtonProps) {
+  const compact = isCompact(className);
+  const withArrow = variant === "primary" && size !== "sm" && !isIconOnly(className);
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full text-button",
+    "inline-flex items-center text-button",
     "transition-colors duration-[var(--oak-motion-fast)] ease-[var(--oak-ease)]",
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
     "disabled:cursor-not-allowed disabled:opacity-50",
     "active:translate-y-px",
-    variant === "icon" ? "min-h-11 min-w-11 px-0" : sizeClass[size],
-    variantClass[variant],
+    compact && variant === "primary"
+      ? "h-11 min-h-11 justify-between gap-2 rounded-[14px] bg-[#002852] py-1 pl-4 pr-1 text-white hover:bg-[#001c3d]"
+      : compact && variant === "secondary"
+        ? "h-11 min-h-11 justify-center rounded-[14px] border border-transparent bg-white px-4 text-[#002852] hover:bg-[#E7F1F8]"
+        : withArrow
+          ? "min-h-14 justify-between gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white hover:bg-[#001c3d]"
+          : cn(
+              "justify-center gap-2 rounded-full",
+              variant === "icon" ? "min-h-11 min-w-11 px-0" : sizeClass[size],
+              variantClass[variant],
+            ),
     className,
   );
   const content = (
     <>
       {busy ? <BusySpinner /> : null}
-      {children}
+      {withArrow ? <span>{children}</span> : children}
+      {withArrow ? (
+        <span
+          className={
+            compact
+              ? "grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-white text-[#002852]"
+              : "grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-white text-[#002852]"
+          }
+        >
+          <IconArrow width={compact ? 16 : 20} height={compact ? 16 : 20} />
+        </span>
+      ) : null}
     </>
   );
 

@@ -51,7 +51,7 @@ export function VehicleLocation({ vehicle }: { vehicle: VehicleDetail }) {
         showroom as open or closed here.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button href={directions} variant="secondary">
+        <Button href={directions}>
           Get directions
         </Button>
         {isShowroom && location ? (

@@ -21,6 +21,7 @@ import {
   SOFT_SEARCH_DISCLAIMER,
   TOTAL_PAYABLE_DISCLAIMER,
 } from "@/lib/eligibility/copy";
+import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
 import { formatAprFloor, formatPounds, formatTerm } from "@/lib/format/money";
 import { getFinanceIntentUrl, getSearchUrl, routes } from "@/config/routes";
 import { FINANCE_INTENTS } from "@/config/finance";
@@ -33,6 +34,9 @@ function Disclaimers() {
       <li>{INDICATIVE_DISCLAIMER}</li>
       <li>{SOFT_SEARCH_DISCLAIMER}</li>
       <li>{TOTAL_PAYABLE_DISCLAIMER}</li>
+      <li>
+        <StatusDisclosureLink />
+      </li>
     </ul>
   );
 }

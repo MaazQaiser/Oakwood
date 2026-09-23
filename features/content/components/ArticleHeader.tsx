@@ -10,7 +10,13 @@ import { formatContentDate, readingMinutesFromBlocks } from "@/lib/content/readi
 import { contentFallbackHero } from "@/lib/media/stock";
 import type { ContentEntry } from "@/types/content";
 
-export function ArticleHeader({ document }: { document: ContentEntry }) {
+export function ArticleHeader({
+  document,
+  showHeading = true,
+}: {
+  document: ContentEntry;
+  showHeading?: boolean;
+}) {
   const published = formatContentDate(document.publishedAt);
   const updated = formatContentDate(document.updatedAt);
   const reading = readingMinutesFromBlocks(document.body);
@@ -18,10 +24,14 @@ export function ArticleHeader({ document }: { document: ContentEntry }) {
 
   return (
     <header className="max-w-prose">
-      <p className="text-caption text-primary">{document.category}</p>
-      <h1 className="mt-2 text-h1 md:text-display">{document.title}</h1>
-      {document.description ? (
-        <p className="mt-3 text-body text-muted">{document.description}</p>
+      {showHeading ? (
+        <>
+          <p className="text-caption text-primary">{document.category}</p>
+          <h1 className="mt-2 text-h1 md:text-display">{document.title}</h1>
+          {document.description ? (
+            <p className="mt-3 text-body text-muted">{document.description}</p>
+          ) : null}
+        </>
       ) : null}
       <p className="mt-4 text-caption text-muted">
         {published

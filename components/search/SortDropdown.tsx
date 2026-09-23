@@ -24,12 +24,14 @@ export function SortDropdown({
   );
 
   return (
-    <label className="hidden items-center gap-2 text-body-sm lg:flex">
-      <span className="text-muted">Sort</span>
+    <label className="relative hidden h-11 items-center lg:flex">
+      <span className="pointer-events-none absolute left-4 text-sm text-[#667085]">
+        Sort
+      </span>
       <Select
         aria-label="Sort vehicles"
         value={sort}
-        className="min-h-11 w-auto min-w-56"
+        className="h-11! min-h-11! w-[22rem]! appearance-none rounded-[14px]! border border-[#d0d5dd] bg-white py-0 pr-10 pl-[3.4rem] text-sm! font-medium text-[#101828]"
         onChange={(event) => onChange(event.target.value as SearchSort)}
       >
         {options.map((option) => (
@@ -62,7 +64,7 @@ export function MobileSortButton({
     <>
       <Button
         variant="secondary"
-        className="flex-1 lg:hidden"
+        className="h-11! min-h-11! flex-1 rounded-[14px]! px-4! lg:hidden"
         onClick={() => setOpen(true)}
       >
         Sort

@@ -42,7 +42,7 @@ export function LocationStock({
           actions={
             <>
               <Button href={getUsedCarsUrl()}>Browse all cars</Button>
-              <Button href={routes.getAQuote} variant="secondary">
+              <Button href={routes.getAQuote}>
                 Request a car
               </Button>
             </>

@@ -22,51 +22,40 @@ export const primaryNavigation: NavigationGroup[] = [
     href: routes.usedCars,
     children: [
       { id: "used-cars", label: "Used cars", href: routes.usedCars },
+      { id: "used-vans", label: "Used vans", href: routes.usedVans },
       { id: "search", label: "Search cars", href: routes.search },
     ],
-  },
-  {
-    id: "vans",
-    label: "Vans",
-    href: routes.usedVans,
-    children: [{ id: "used-vans", label: "Used vans", href: routes.usedVans }],
   },
   {
     id: "finance",
     label: "Finance",
     href: routes.finance,
     children: [
-      { id: "finance-hub", label: "Car finance", href: routes.finance },
-      {
-        id: "finance-calculator",
-        label: "Calculator",
-        href: routes.financeCalculator,
-      },
       {
         id: "eligibility",
         label: "Check my eligibility",
         href: routes.eligibility,
       },
       {
-        id: "hp",
-        label: "How HP works",
-        href: getFinanceIntentUrl("hp"),
+        id: "deal",
+        label: "Build my deal",
+        href: routes.deal,
       },
       {
-        id: "pcp",
-        label: "How PCP works",
-        href: getFinanceIntentUrl("pcp"),
+        id: "reserve",
+        label: "Reserve a car",
+        href: routes.reserve,
       },
       {
-        id: "bad-credit",
-        label: "Bad credit",
-        href: getFinanceIntentUrl("bad-credit"),
+        id: "finance-calculator",
+        label: "Calculator",
+        href: routes.financeCalculator,
       },
     ],
   },
   {
     id: "sell",
-    label: "Sell My Car",
+    label: "Sell",
     href: routes.sellMyCar,
     children: [
       { id: "sell-my-car", label: "Sell my car", href: routes.sellMyCar },
@@ -79,13 +68,8 @@ export const primaryNavigation: NavigationGroup[] = [
     label: "Aftersales",
     href: routes.aftersales,
     children: [
-      { id: "aftersales-hub", label: "Aftersales", href: routes.aftersales },
+      { id: "booking", label: "Book a service", href: routes.booking },
       { id: "service", label: "Service", href: routes.service },
-      {
-        id: "servicing-audi",
-        label: "Manufacturer servicing",
-        href: routes.servicingAudi,
-      },
       { id: "mot", label: "MOT", href: routes.mot },
       { id: "warranty", label: "Warranty", href: routes.warranty },
       {
@@ -93,17 +77,6 @@ export const primaryNavigation: NavigationGroup[] = [
         label: "Warranty claims",
         href: routes.warrantyClaims,
       },
-      { id: "booking", label: "Book a service", href: routes.booking },
-    ],
-  },
-  {
-    id: "locations",
-    label: "Locations",
-    href: routes.locations,
-    children: [
-      { id: "locations-hub", label: "Locations", href: routes.locations },
-      { id: "bury", label: "Bury", href: `${routes.locations}/bury` },
-      { id: "chorley", label: "Chorley", href: `${routes.locations}/chorley` },
     ],
   },
   {
@@ -113,22 +86,10 @@ export const primaryNavigation: NavigationGroup[] = [
     children: [
       { id: "about", label: "About us", href: routes.about },
       { id: "how-it-works", label: "How it works", href: routes.howItWorks },
-      { id: "what-to-expect", label: "What to expect", href: routes.whatToExpect },
-      { id: "our-garage", label: "Our garage", href: routes.ourGarage },
-      {
-        id: "reviews",
-        label: "Reviews",
-        href: routes.ourOnlineReviews,
-      },
-      { id: "aa-standards", label: "AA standards", href: routes.aaStandards },
-      {
-        id: "delivery",
-        label: "Delivery and collection",
-        href: routes.deliveryAndCollection,
-      },
+      { id: "bury", label: "Bury", href: `${routes.locations}/bury` },
+      { id: "chorley", label: "Chorley", href: `${routes.locations}/chorley` },
       { id: "contact", label: "Contact", href: routes.contact },
       { id: "faq", label: "FAQs", href: routes.faq },
-      { id: "complaints", label: "Complaints", href: routes.complaints },
     ],
   },
 ];
@@ -171,6 +132,8 @@ export const footerNavigation: NavigationGroup[] = [
     children: [
       { id: "finance-hub", label: "Car finance", href: routes.finance },
       { id: "eligibility", label: "Finance eligibility", href: routes.eligibility },
+      { id: "deal", label: "Build my deal", href: routes.deal },
+      { id: "reserve", label: "Reserve a car", href: routes.reserve },
       { id: "calculator", label: "Finance calculator", href: routes.financeCalculator },
       { id: "hp-pcp", label: "HP vs PCP", href: getFinanceIntentUrl("pcp") },
       { id: "hp", label: "How HP works", href: getFinanceIntentUrl("hp") },
@@ -189,6 +152,7 @@ export const footerNavigation: NavigationGroup[] = [
     children: [
       { id: "sell-my-car", label: "Sell my car", href: routes.sellMyCar },
       { id: "part-exchange", label: "Part exchange", href: routes.partExchange },
+      { id: "valuation", label: "Valuation", href: routes.valuation },
     ],
   },
   {
@@ -200,6 +164,12 @@ export const footerNavigation: NavigationGroup[] = [
       { id: "servicing", label: "Servicing", href: routes.service },
       { id: "mot", label: "MOT", href: routes.mot },
       { id: "warranty", label: "Warranty", href: routes.warranty },
+      { id: "warranty-claims", label: "Warranty claims", href: routes.warrantyClaims },
+      {
+        id: "servicing-audi",
+        label: "Manufacturer servicing",
+        href: routes.servicingAudi,
+      },
       { id: "booking", label: "Book a service", href: routes.booking },
     ],
   },
@@ -211,7 +181,14 @@ export const footerNavigation: NavigationGroup[] = [
       { id: "about", label: "About", href: routes.about },
       { id: "how-it-works", label: "How it works", href: routes.howItWorks },
       { id: "what-to-expect", label: "What to expect", href: routes.whatToExpect },
+      { id: "our-garage", label: "Our garage", href: routes.ourGarage },
       { id: "reviews", label: "Reviews", href: routes.ourOnlineReviews },
+      { id: "aa-standards", label: "AA standards", href: routes.aaStandards },
+      {
+        id: "delivery",
+        label: "Delivery and collection",
+        href: routes.deliveryAndCollection,
+      },
       { id: "locations-bury", label: "Bury", href: `${routes.locations}/bury` },
       { id: "locations-chorley", label: "Chorley", href: `${routes.locations}/chorley` },
       { id: "contact", label: "Contact", href: routes.contact },
@@ -232,7 +209,7 @@ export const legalNavigation: NavigationItem[] = [
   { id: "cancellation", label: "Cancellation and refund", href: routes.cancellationRefund },
   { id: "delivery-terms", label: "Delivery", href: routes.deliveryTerms },
   { id: "distance-selling", label: "Distance selling", href: routes.distanceSelling },
-  { id: "status-disclosure", label: "Regulatory", href: routes.statusDisclosure },
+  { id: "status-disclosure", label: "Status disclosure", href: routes.statusDisclosure },
   { id: "accessibility", label: "Accessibility", href: routes.accessibility },
   { id: "complaints", label: "Complaints", href: routes.complaints },
 ];

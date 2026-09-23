@@ -52,7 +52,7 @@ export function Field({
 }
 
 const controlClass =
-  "min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-body text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:bg-page disabled:text-subtle";
+  "min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:bg-page disabled:text-subtle";
 
 export function Input({
   className,
@@ -76,7 +76,7 @@ export function Select({
 }: SelectHTMLAttributes<HTMLSelectElement> & { error?: boolean }) {
   return (
     <select
-      className={cn(controlClass, error && "border-danger", className)}
+      className={cn(controlClass, "select-field", error && "border-danger", className)}
       aria-invalid={error || undefined}
       {...props}
     >

@@ -91,7 +91,7 @@ export function FinanceCTA({
         <Container>
           <PromoPanel className="py-8">
             <h2 className="text-h2">{FINANCE_INTENT_PERSONALISED_HEADING}</h2>
-            <p className="mt-3 max-w-2xl text-body text-muted">
+            <p className="mt-3 max-w-2xl text-body">
               {FINANCE_INTENT_PERSONALISED_BODY}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -109,7 +109,6 @@ export function FinanceCTA({
               </Button>
               <Button
                 href={getFinanceCalculatorUrl()}
-                variant="secondary"
                 size="lg"
                 onClick={() => {
                   trackCta("calculator");
@@ -133,7 +132,7 @@ export function FinanceCTA({
         <Container>
           <PromoPanel className="py-8">
             <h2 className="text-h2">{FINANCE_INTENT_INELIGIBLE_HEADING}</h2>
-            <p className="mt-3 max-w-2xl text-body text-muted">
+            <p className="mt-3 max-w-2xl text-body">
               {FINANCE_INTENT_INELIGIBLE_BODY}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -151,7 +150,6 @@ export function FinanceCTA({
               </Button>
               <Button
                 href={getEligibilityUrl()}
-                variant="secondary"
                 size="lg"
                 onClick={() => {
                   trackCta("eligibility");
@@ -181,7 +179,7 @@ export function FinanceCTA({
       <Container>
         <PromoPanel className="py-8">
           <h2 className="text-h2">{FINANCE_INTENT_ELIGIBILITY_CTA}</h2>
-          <p className="mt-3 max-w-2xl text-body text-muted">{supporting}</p>
+          <p className="mt-3 max-w-2xl text-body">{supporting}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button
               href={getEligibilityUrl()}
@@ -198,7 +196,6 @@ export function FinanceCTA({
             {secondary ? (
               <Button
                 href={secondary.href}
-                variant="secondary"
                 size="lg"
                 onClick={() => {
                   trackCta(secondary.event);
@@ -219,7 +216,6 @@ export function FinanceCTA({
             ) : (
               <Button
                 href={getFinanceCalculatorUrl()}
-                variant="secondary"
                 size="lg"
                 onClick={() => {
                   trackCta("calculator");

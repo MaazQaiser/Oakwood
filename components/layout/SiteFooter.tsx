@@ -13,32 +13,47 @@ import { routes } from "@/config/routes";
 import { showrooms } from "@/config/locations";
 import { PrivacySettingsButton } from "@/features/legal/components/PrivacySettings";
 
+const linkClass =
+  "inline-flex py-1 text-sm text-muted no-underline hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+
 export function SiteFooter() {
   const groups = visibleGroups(footerNavigation);
   const legal = visibleItems(legalNavigation);
   const phone = showrooms.find((item) => item.telephone)?.telephone;
 
   return (
-    <footer className="mt-auto border-t border-border/70 bg-page">
-      <Container className="py-10 md:py-14">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          <div className="col-span-2 min-w-0 md:col-span-3 xl:col-span-1">
-            <Logo />
-            <p className="mt-3 text-body-sm text-muted">
-              Oakwood Motor Company
-            </p>
+    <footer className="mt-auto bg-[#d4e4ff]">
+      <Container width="wide" className="py-10 md:py-12">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <Logo />
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
+            {showrooms.map((location) => (
+              <Link
+                key={location.slug}
+                href={`${routes.locations}/${location.slug}`}
+                className="hover:text-ink"
+              >
+                {location.name}
+                {location.postcode ? ` · ${location.postcode}` : ""}
+              </Link>
+            ))}
+            {phone ? (
+              <a href={`tel:${phone.replace(/\s+/g, "")}`} className="font-medium text-ink hover:underline">
+                {phone}
+              </a>
+            ) : null}
           </div>
+        </div>
+
+        <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
           {groups.map((group) => (
             <div key={group.id} className="min-w-0">
-              <h2 className="text-label">{group.label}</h2>
+              <h2 className="text-label text-ink">{group.label}</h2>
               <ul className="mt-3">
                 {visibleItems(group.children).map((item) =>
                   item.href ? (
                     <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className="flex min-h-11 items-center text-body-sm text-muted hover:text-ink"
-                      >
+                      <Link href={item.href} className={linkClass}>
                         {item.label}
                       </Link>
                     </li>
@@ -48,77 +63,44 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
+
         <Divider className="my-8" />
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <h2 className="text-label">Contact</h2>
-            <ul className="mt-3 text-body-sm text-muted">
-              {showrooms.map((location) => (
-                <li key={location.slug}>
-                  <Link
-                    href={`${routes.locations}/${location.slug}`}
-                    className="inline-flex min-h-11 items-center hover:text-ink"
-                  >
-                    {location.name}
-                    {location.postcode ? ` · ${location.postcode}` : ""}
-                  </Link>
-                </li>
-              ))}
-              {phone ? (
-                <li>
-                  <a
-                    href={`tel:${phone.replace(/\s+/g, "")}`}
-                    className="inline-flex min-h-11 items-center hover:text-ink"
-                  >
-                    {phone}
+
+        <ul className="flex flex-wrap gap-x-4 gap-y-1">
+          {legal.map((item) =>
+            item.href ? (
+              <li key={item.id}>
+                <Link href={item.href} className={linkClass}>
+                  {item.label}
+                </Link>
+              </li>
+            ) : null,
+          )}
+          <li>
+            <PrivacySettingsButton className={linkClass} />
+          </li>
+        </ul>
+
+        {socialLinks.length > 0 ? (
+          <ul className="mt-4 flex flex-wrap gap-x-4">
+            {socialLinks.map((item) =>
+              item.href ? (
+                <li key={item.id}>
+                  <a href={item.href} className={linkClass}>
+                    {item.label}
                   </a>
                 </li>
-              ) : null}
-            </ul>
-          </div>
-          <div>
-            <h2 className="text-label">Legal</h2>
-            <ul className="mt-3 flex flex-col md:flex-row md:flex-wrap md:gap-x-4">
-              {legal.map((item) =>
-                item.href ? (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className="inline-flex min-h-11 items-center text-body-sm text-muted hover:text-ink"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ) : null,
-              )}
-              <li>
-                <PrivacySettingsButton />
-              </li>
-            </ul>
-            {socialLinks.length > 0 ? (
-              <div className="mt-6">
-                <h2 className="text-label">Social</h2>
-                <ul className="mt-3">
-                  {socialLinks.map((item) =>
-                    item.href ? (
-                      <li key={item.id}>
-                        <a
-                          href={item.href}
-                          className="inline-flex min-h-11 items-center text-body-sm text-muted hover:text-ink"
-                        >
-                          {item.label}
-                        </a>
-                      </li>
-                    ) : null,
-                  )}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        </div>
-        <p className="mt-8 max-w-3xl text-caption">
-          © 2026 Oakwood Motor Company. Oakwood Motor Company is a credit
-          broker, not a lender. Finance is subject to status.
+              ) : null,
+            )}
+          </ul>
+        ) : null}
+
+        <p className="mt-6 max-w-3xl text-caption">
+          © 2026 Oakwood Motor Company. Oakwood Motor Company is a credit{" "}
+          <Link href={routes.statusDisclosure} className="underline-offset-4 hover:text-ink hover:underline">
+            broker, not a lender
+          </Link>
+          . Finance is subject to status.
         </p>
       </Container>
     </footer>

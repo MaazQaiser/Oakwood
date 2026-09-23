@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
 import { Button } from "@/components/ui/Button";
 import { Field, Select } from "@/components/forms/FormControls";
 import { Card } from "@/components/cards/Card";
@@ -13,9 +14,9 @@ export function FinanceEligibilityCard() {
   const [term, setTerm] = useState(48);
 
   return (
-    <Card className="border-0 p-5 shadow-sm md:p-6">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end">
-        <div className="lg:max-w-xs">
+    <Card className="border-0 p-6 shadow-sm md:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-12">
+        <div className="lg:w-72 lg:shrink-0">
           <p className="text-h5">What could you afford?</p>
           <p className="mt-2 text-body-sm text-muted">
             Set a starting point, then check eligibility. This does not calculate a
@@ -27,8 +28,12 @@ export function FinanceEligibilityCard() {
             <span className="financial-number">From {formatPounds(monthly)}</span>
             <span className="text-body-sm text-muted">/month</span>
           </p>
+          <p className="mt-2 text-caption">
+            <StatusDisclosureLink />
+          </p>
         </div>
-        <div className="grid flex-1 gap-4 sm:grid-cols-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="grid flex-1 gap-4 sm:grid-cols-3">
           <Field htmlFor="hero-monthly" label="Monthly budget">
             <Select
               id="hero-monthly"
@@ -70,10 +75,14 @@ export function FinanceEligibilityCard() {
               <option value={60}>60 months</option>
             </Select>
           </Field>
+          </div>
+          <Button
+            href={routes.eligibility}
+            className="h-11 w-full shrink-0 rounded-[14px]! bg-[#002852]! px-5 hover:bg-[#001c3d]! sm:w-auto"
+          >
+            Check my eligibility
+          </Button>
         </div>
-        <Button href={routes.eligibility} className="w-full shrink-0 lg:w-auto">
-          Check my eligibility
-        </Button>
       </div>
     </Card>
   );

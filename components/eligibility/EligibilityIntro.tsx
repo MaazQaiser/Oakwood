@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/Button";
 import { IconCheck } from "@/components/ui/icons";
 import {
-  EligibilityHeader,
   EligibilityLayout,
   EligibilityMockNotice,
   EligibilityTrustMessage,
@@ -42,14 +42,23 @@ export function EligibilityIntro() {
   }
 
   return (
-    <EligibilityLayout>
-      <EligibilityHeader />
-      <h1 className="mt-3 text-h1">Find out what you could afford.</h1>
-      <p className="mt-3 text-body text-muted">
-        Check your finance eligibility in around 60 seconds. It won&apos;t
-        affect your credit score.
-      </p>
-
+    <>
+      <PageBanner
+        eyebrow="Finance eligibility"
+        title="Find out what you could afford."
+        description="Check your finance eligibility in around 60 seconds. It won't affect your credit score."
+        actions={
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button onClick={() => void start()} busy={starting} className="w-full sm:w-auto">
+              Start eligibility check
+            </Button>
+            <Button href={routes.howItWorks} variant="secondary" className="w-full sm:w-auto">
+              How it works
+            </Button>
+          </div>
+        }
+      />
+      <EligibilityLayout>
       <ul className="mt-6 flex flex-col gap-3">
         {TRUST_POINTS.map((point) => (
           <li key={point} className="flex items-start gap-3 text-body-sm">
@@ -60,15 +69,6 @@ export function EligibilityIntro() {
           </li>
         ))}
       </ul>
-
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button onClick={() => void start()} busy={starting} className="w-full sm:w-auto">
-          Start eligibility check
-        </Button>
-        <Button href={routes.howItWorks} variant="secondary" className="w-full sm:w-auto">
-          How it works
-        </Button>
-      </div>
 
       <p className="mt-4 text-caption text-muted">
         You can save and come back later.
@@ -96,5 +96,6 @@ export function EligibilityIntro() {
         </p>
       </section>
     </EligibilityLayout>
+    </>
   );
 }

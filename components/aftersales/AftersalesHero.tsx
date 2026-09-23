@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/Button";
-import { Container } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { getBookingUrl } from "@/config/routes";
 
 export function AftersalesHero({
@@ -17,23 +15,13 @@ export function AftersalesHero({
   secondary?: { href: string; label: string };
 }) {
   return (
-    <section className="border-b border-border bg-surface">
-      <Container className="py-10 md:py-16">
-        <SectionIntro eyebrow={eyebrow} heading={title} headingLevel="h1">
-          {description}
-        </SectionIntro>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button href={primary.href} size="lg">
-            {primary.label}
-          </Button>
-          {secondary ? (
-            <Button href={secondary.href} variant="secondary" size="lg">
-              {secondary.label}
-            </Button>
-          ) : null}
-        </div>
-      </Container>
-    </section>
+    <PageBanner
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+      primary={primary}
+      secondary={secondary}
+    />
   );
 }
 

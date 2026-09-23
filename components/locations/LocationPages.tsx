@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Container, Grid, Section, Stack } from "@/components/layout/Container";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner, PageBannerScope } from "@/components/layout/PageBanner";
 import { AftersalesHero } from "@/components/aftersales/AftersalesHero";
 import { LocationCard } from "@/components/locations/LocationCard";
 import { LocationContactCta } from "@/components/locations/LocationContactCta";
@@ -39,14 +39,7 @@ function PageShell({
   children: ReactNode;
 }) {
   return (
-    <>
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={createBreadcrumbs(breadcrumbs)} />
-        </Container>
-      </Section>
-      {children}
-    </>
+    <PageBannerScope breadcrumbs={createBreadcrumbs(breadcrumbs)}>{children}</PageBannerScope>
   );
 }
 
@@ -108,20 +101,19 @@ export function LocationShowroomPage({
     >
       <TrustViewTracker page="location" location={profile.slug} />
       <JsonLd data={createLocalBusinessJsonLd(profile, path)} />
-      <section className="border-b border-border bg-surface">
-        <Container className="py-10 md:py-16">
-          <p className="text-caption text-primary">{profile.eyebrow}</p>
-          <h1 className="mt-2 text-display">{profile.h1}</h1>
-          <p className="mt-3 max-w-2xl text-body text-muted">{profile.descriptor}</p>
-          {profile.postcode ? (
-            <p className="mt-3 text-body-sm">{profile.postcode}</p>
-          ) : null}
-          {profile.telephone ? (
-            <p className="mt-1 text-body-sm">{profile.telephone}</p>
-          ) : null}
-          <LocationHeroActions profile={profile} stockHref={stockHref} />
-        </Container>
-      </section>
+      <PageBanner
+        eyebrow={profile.eyebrow}
+        title={profile.h1}
+        description={
+          <>
+            <p>{profile.descriptor}</p>
+            {profile.postcode ? <p className="mt-2 text-[#002852]">{profile.postcode}</p> : null}
+            {profile.telephone ? <p className="text-[#002852]">{profile.telephone}</p> : null}
+          </>
+        }
+      >
+        <LocationHeroActions profile={profile} stockHref={stockHref} />
+      </PageBanner>
       <Section>
         <Container>
           <Stack gap="8">

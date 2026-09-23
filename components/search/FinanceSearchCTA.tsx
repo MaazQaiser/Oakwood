@@ -27,12 +27,12 @@ export function FinanceSearchCTA({
     return (
       <Section>
         <Container>
-          <PromoPanel>
-            <h2 className="text-h2">{copy.affordableFooterTitle}</h2>
-            <p className="mt-3 max-w-2xl text-body text-muted">
+          <PromoPanel className="bg-[#8EBFDF]!">
+            <h2 className="text-h2 text-[#002852]">{copy.affordableFooterTitle}</h2>
+            <p className="mt-3 max-w-2xl text-body text-[#002852]">
               {copy.affordableFooterBody}
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button
                 href={buildSearchHref(basePath, { affordable: "1" })}
                 onClick={() => {
@@ -45,7 +45,7 @@ export function FinanceSearchCTA({
               >
                 {copy.affordableCta}
               </Button>
-              <Button href={routes.financeCalculator} variant="secondary">
+              <Button href={routes.financeCalculator}>
                 Finance calculator
               </Button>
             </div>
@@ -58,12 +58,12 @@ export function FinanceSearchCTA({
   return (
     <Section>
       <Container>
-        <PromoPanel>
-          <h2 className="text-h2">{copy.financeFooterTitle}</h2>
-          <p className="mt-3 max-w-2xl text-body text-muted">
+        <PromoPanel className="bg-[#8EBFDF]!">
+          <h2 className="text-h2 text-[#002852]">{copy.financeFooterTitle}</h2>
+          <p className="mt-3 max-w-2xl text-body text-[#002852]">
             {copy.financeFooterBody}
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Button
               href={routes.eligibility}
               onClick={() => {
@@ -80,7 +80,7 @@ export function FinanceSearchCTA({
             >
               {copy.heroPrimary}
             </Button>
-            <Button href={routes.financeCalculator} variant="secondary">
+            <Button href={routes.financeCalculator}>
               Finance calculator
             </Button>
           </div>

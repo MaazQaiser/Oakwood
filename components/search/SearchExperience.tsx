@@ -224,9 +224,9 @@ export function SearchExperience({
         />
 
         <div className="min-w-0 flex-1" id="results">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-h3" aria-live="polite">
+              <h2 className="text-[1.375rem] font-medium leading-tight tracking-[-0.02em] sm:text-2xl" aria-live="polite">
                 {countLabel(total, copy)}
               </h2>
               <p className="mt-1 text-body-sm text-muted">

@@ -1,7 +1,7 @@
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/Button";
 import { IconCheck } from "@/components/ui/icons";
 import {
-  EligibilityHeader,
   EligibilityLayout,
 } from "@/components/eligibility/EligibilityLayout";
 import {
@@ -22,10 +22,18 @@ export function PxIntro({
   starting?: boolean;
 }) {
   return (
-    <EligibilityLayout>
-      <EligibilityHeader eyebrow={PX_EYEBROW} />
-      <h1 className="mt-3 text-h1">{PX_INTRO_HEADING}</h1>
-      <p className="mt-3 text-body text-muted">{PX_INTRO_SUPPORT}</p>
+    <>
+      <PageBanner
+        eyebrow={PX_EYEBROW}
+        title={PX_INTRO_HEADING}
+        description={PX_INTRO_SUPPORT}
+        actions={
+          <Button onClick={onStart} disabled={starting} className="w-full sm:w-auto">
+            {PX_INTRO_CTA}
+          </Button>
+        }
+      />
+      <EligibilityLayout>
       <ul className="mt-6 flex flex-col gap-3">
         {PX_INTRO_POINTS.map((point) => (
           <li key={point} className="flex items-start gap-3 text-body-sm">
@@ -36,13 +44,9 @@ export function PxIntro({
           </li>
         ))}
       </ul>
-      <div className="mt-8">
-        <Button onClick={onStart} disabled={starting} className="w-full sm:w-auto">
-          {PX_INTRO_CTA}
-        </Button>
-      </div>
       <p className="mt-4 text-caption text-muted">{PX_NO_IDENTITY_NOTICE}</p>
       <p className="mt-2 text-caption text-muted">{PX_MOCK_NOTICE}</p>
     </EligibilityLayout>
+    </>
   );
 }

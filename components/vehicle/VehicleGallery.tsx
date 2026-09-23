@@ -66,6 +66,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
 
   return (
     <div className="vdp-hero__gallery min-w-0">
+      <div className="vdp-hero__gallery-sticky">
       <div
         className="relative overflow-hidden rounded-lg bg-primary-soft"
         onTouchStart={(event) => {
@@ -212,6 +213,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           />
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

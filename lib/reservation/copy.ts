@@ -30,6 +30,8 @@ export function howItWorksSteps(amount: number, days: number): string[] {
 }
 
 export const reservationCopy = {
+  entryHeading: "Reserve a car",
+  entryBody: `Reservations start from a car. Pay ${reservationAmountLabel()} to hold a vehicle while you complete the purchase.`,
   introHeading: "Reserve this car",
   fullyRefundable: "Fully refundable",
   appliedToPurchase: "Your reservation is applied to the purchase price.",

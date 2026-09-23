@@ -453,30 +453,22 @@ export function EligibilityQuestionsFlow() {
     <EligibilityLayout
       footer={
         <>
-          <div className="mt-6">
-            <SaveAndResume answers={journey.answers} questionId={current.id} />
-          </div>
           <EligibilityNavigation
             onBack={() => void goBack()}
             onContinue={() => void goNext()}
           />
-          <EligibilityTrustMessage />
+          <EligibilityTrustMessage className="mt-4" />
+          <div className="mt-8">
+            <SaveAndResume answers={journey.answers} questionId={current.id} />
+          </div>
         </>
       }
     >
-      <Button variant="text" className="self-start px-0" onClick={() => void goBack()}>
-        Back
-      </Button>
-      <div className="mt-4">
-        <EligibilityHeader />
-        <div className="mt-3">
-          <EligibilityProgress
-            stage={current.stage}
-            step={index + 1}
-            total={visible.length}
-          />
-        </div>
-      </div>
+      <EligibilityProgress
+        stage={current.stage}
+        step={index + 1}
+        total={visible.length}
+      />
       <EligibilityQuestion
         id={headingId}
         question={current.question}

@@ -37,7 +37,7 @@ export function NaturalLanguageSearch({
         }
       }}
     >
-      <div className="flex flex-col gap-2 rounded-3xl bg-surface p-2 shadow-sm sm:flex-row sm:items-center sm:rounded-full sm:p-1.5">
+      <div className="flex flex-col gap-2 rounded-[14px] bg-white p-1.5 shadow-[0_10px_24px_rgba(16,40,72,0.06)] sm:flex-row sm:items-center">
         <div className="relative min-w-0 flex-1">
           <IconSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
           <label htmlFor={inputId} className="sr-only">
@@ -49,11 +49,11 @@ export function NaturalLanguageSearch({
             value={value}
             onChange={(event) => setValue(event.target.value)}
             placeholder="What are you looking for?"
-            className="h-12 rounded-full border-0 pl-11 shadow-none"
+            className="h-12 rounded-[14px]! border-0 bg-transparent pl-11 shadow-none"
             autoComplete="off"
           />
         </div>
-        <Button type="submit" className="h-12 sm:min-w-28">
+        <Button type="submit" className="h-12 rounded-[14px]! sm:min-w-28">
           Search
         </Button>
       </div>

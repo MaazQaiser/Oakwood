@@ -58,8 +58,8 @@ export const howItWorksSteps: ProcessStep[] = [
     number: "3",
     title: "Build your deal",
     copy: "Choose finance type, deposit, term and optional products on the deal builder. The illustration is indicative until a full application.",
-    href: routes.finance,
-    cta: "Car finance",
+    href: routes.deal,
+    cta: "Build my deal",
   },
   {
     number: "4",
@@ -72,8 +72,8 @@ export const howItWorksSteps: ProcessStep[] = [
     number: "5",
     title: "Reserve your car",
     copy: "Pay a reservation to hold the vehicle while you complete the purchase. Terms are shown before you pay.",
-    href: routes.usedCars,
-    cta: "Browse cars",
+    href: routes.reserve,
+    cta: "Reserve a car",
   },
   {
     number: "6",

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Card } from "@/components/cards/Card";
 import { Container, Grid, Section } from "@/components/layout/Container";
 import { getFinanceIntentUrl, routes } from "@/config/routes";
@@ -45,17 +44,13 @@ export function FinanceHubPage() {
     <>
       <JsonLd data={createFaqJsonLd(financeHubFaqs)} />
       <FinanceIntentViewTracker intent="hub" />
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={breadcrumbs} />
-        </Container>
-      </Section>
       <FinanceIntentHero
         eyebrow={financeHubContent.eyebrow}
         title={financeHubContent.h1}
         intro={financeHubContent.intro}
         intent="hub"
         supporting={FINANCE_INTENT_ELIGIBILITY_SUPPORTING}
+        breadcrumbs={breadcrumbs}
       />
       <FinanceStep
         title={financeHubContent.journeyTitle}

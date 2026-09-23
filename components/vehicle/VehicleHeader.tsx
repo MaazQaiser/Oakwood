@@ -13,7 +13,7 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
     <header className="vdp-hero__header min-w-0">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-h1">{heading}</h1>
+          <h2 className="text-h3">{heading}</h2>
           <p className="mt-2 text-body-sm text-muted">
             {vehicle.year} · {formatNumber(vehicle.mileage)} miles · {vehicle.fuelType} ·{" "}
             {vehicle.transmission}

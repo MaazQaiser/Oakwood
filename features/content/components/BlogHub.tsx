@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Card } from "@/components/cards/Card";
 import { Container, Grid, Section } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
 import { BlogCard } from "@/features/content/components/BlogCard";
 import { BlogHero } from "@/features/content/components/BlogHero";
 import { ContentTopicLink } from "@/features/content/components/ContentTopicLink";
@@ -53,27 +52,15 @@ export function BlogHub({ topic }: { topic?: string }) {
   return (
     <>
       <ContentViewTracker slug="hub" type="article" />
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs
-            items={createBreadcrumbs([
-              { label: "Home", href: routes.home },
-              { label: "Blog", href: routes.blog },
-            ])}
-          />
-        </Container>
-      </Section>
-      <section className="border-b border-border bg-surface">
-        <Container className="py-10 md:py-16">
-          <SectionIntro
-            eyebrow={CONTENT_HUB_EYEBROW}
-            heading={CONTENT_HUB_H1}
-            headingLevel="h1"
-          >
-            <p>{CONTENT_HUB_INTRO}</p>
-          </SectionIntro>
-        </Container>
-      </section>
+      <PageBanner
+        eyebrow={CONTENT_HUB_EYEBROW}
+        title={CONTENT_HUB_H1}
+        description={CONTENT_HUB_INTRO}
+        breadcrumbs={createBreadcrumbs([
+          { label: "Home", href: routes.home },
+          { label: "Blog", href: routes.blog },
+        ])}
+      />
       <Section>
         <Container>
           <nav aria-label={CONTENT_TOPICS_LABEL} className="mb-8">

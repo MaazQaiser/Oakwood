@@ -1,92 +1,119 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { IconSearch } from "@/components/ui/icons";
-import { MONTHLY_OPTIONS } from "@/components/search/constants";
 import { routes } from "@/config/routes";
-import { formatPounds } from "@/lib/format/money";
-import { getMakes, getModels } from "@/lib/vehicles/labels";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 
-const pillSelectClass =
-  "h-12 w-full min-w-0 appearance-none border-0 bg-transparent px-4 text-body text-ink outline-none focus-visible:outline-none disabled:text-subtle";
+const phrases = [
+  "BMW under £300 a month",
+  "Family SUV under £15,000",
+  "Audi automatic",
+  "Low mileage hatchback",
+];
 
-export function HomeSearchBar() {
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
-  const makes = getMakes("car");
-  const models = getModels(make || undefined, "car");
+export function HomeSearchBar({ className }: { className?: string }) {
+  const [value, setValue] = useState("");
+  const [focused, setFocused] = useState(false);
+  const [placeholder, setPlaceholder] = useState("");
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setPlaceholder(phrases[0]);
+      return;
+    }
+    if (focused || value) return;
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+    let timer = 0;
+
+    const tick = () => {
+      const phrase = phrases[phraseIndex];
+      if (!deleting) {
+        charIndex += 1;
+        setPlaceholder(phrase.slice(0, charIndex));
+        if (charIndex >= phrase.length) {
+          deleting = true;
+          timer = window.setTimeout(tick, 1200);
+          return;
+        }
+        timer = window.setTimeout(tick, 48);
+        return;
+      }
+
+      charIndex -= 1;
+      setPlaceholder(phrase.slice(0, Math.max(charIndex, 0)));
+      if (charIndex <= 0) {
+        deleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        timer = window.setTimeout(tick, 280);
+        return;
+      }
+      timer = window.setTimeout(tick, 28);
+    };
+
+    timer = window.setTimeout(tick, 400);
+    return () => window.clearTimeout(timer);
+  }, [focused, reducedMotion, value]);
+
+  const showGhost = !value && !focused;
 
   return (
     <form
       action={routes.search}
       method="get"
       role="search"
-      className="mx-auto w-full max-w-3xl"
+      className={className}
       onSubmit={() => {
-        trackEvent(analyticsEvents.searchSubmitted, {
-          make,
-          model,
-          category: "car",
-        });
+        trackEvent(analyticsEvents.searchSubmitted, { q: value, category: "car" });
       }}
     >
-      <div className="flex w-full flex-col gap-2 rounded-3xl bg-surface p-2 shadow-md md:flex-row md:items-center md:rounded-full md:p-1.5">
-        <label className="sr-only" htmlFor="home-make">
-          Make
-        </label>
-        <select
-          id="home-make"
-          name="make"
-          value={make}
-          onChange={(event) => {
-            setMake(event.target.value);
-            setModel("");
-          }}
-          className={pillSelectClass}
+      <label htmlFor="home-search" className="sr-only">
+        Search for a car
+      </label>
+      <div className="flex items-center gap-2 rounded-[14px] bg-white py-1.5 pl-4 pr-1.5 shadow-[0_10px_24px_rgba(16,40,72,0.06)]">
+        <div className="relative min-w-0 flex-1">
+          <input
+            id="home-search"
+            name="q"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder={focused ? "Search for a car" : ""}
+            autoComplete="off"
+            className="h-11 w-full border-0 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b95a3]"
+          />
+          {showGhost ? (
+            <span
+              className="pointer-events-none absolute inset-0 flex items-center truncate text-sm text-[#8b95a3]"
+              aria-hidden="true"
+            >
+              {placeholder}
+              {reducedMotion ? null : (
+                <span className="ml-px inline-block h-4 w-px animate-pulse bg-[#8b95a3]" />
+              )}
+            </span>
+          ) : null}
+        </div>
+        <Button
+          type="submit"
+          className="h-11 w-11 shrink-0 rounded-[14px]! bg-[#002852]! px-0! hover:bg-[#001c3d]!"
         >
-          <option value="">Any make</option>
-          {makes.map((item) => (
-            <option key={item.slug} value={item.slug}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <span className="hidden h-8 w-px bg-border md:block" aria-hidden="true" />
-        <label className="sr-only" htmlFor="home-model">
-          Model
-        </label>
-        <select
-          id="home-model"
-          name="model"
-          value={model}
-          disabled={!make}
-          onChange={(event) => setModel(event.target.value)}
-          className={pillSelectClass}
-        >
-          <option value="">Any model</option>
-          {models.map((item) => (
-            <option key={item.slug} value={item.slug}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <span className="hidden h-8 w-px bg-border md:block" aria-hidden="true" />
-        <label className="sr-only" htmlFor="home-monthly">
-          Monthly budget
-        </label>
-        <select id="home-monthly" name="monthly_max" className={pillSelectClass} defaultValue="">
-          <option value="">Any monthly</option>
-          {MONTHLY_OPTIONS.map((amount) => (
-            <option key={amount} value={amount}>
-              Up to {formatPounds(amount)}/month
-            </option>
-          ))}
-        </select>
-        <Button type="submit" className="h-12 w-full shrink-0 md:h-12 md:w-12 md:px-0">
           <IconSearch className="text-white" />
-          <span className="md:sr-only">Search</span>
+          <span className="sr-only">Search</span>
         </Button>
       </div>
     </form>

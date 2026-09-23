@@ -128,7 +128,7 @@ export function CallbackEnquiryForm({
             rows={5}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
-            className="min-h-32 w-full rounded-md border border-border bg-surface px-3 py-3 text-body"
+            className="min-h-32 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
           />
         </Field>
         {error ? (

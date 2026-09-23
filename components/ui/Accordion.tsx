@@ -23,7 +23,10 @@ export function Accordion({
   return (
     <details
       id={id}
-      className={cn("scroll-mt-24 border-b border-border py-3", className)}
+      className={cn(
+        "scroll-mt-24 border-b border-[#d0d5dd] py-4 last:border-b-0",
+        className,
+      )}
       open={open}
       onToggle={(event) => {
         const next = event.currentTarget.open;
@@ -41,7 +44,7 @@ export function Accordion({
           </span>
         </span>
       </summary>
-      <div className="space-y-2 pb-3 pt-1 text-body-sm text-muted">{children}</div>
+      <div className="space-y-2 pt-1 text-body-sm text-muted">{children}</div>
     </details>
   );
 }

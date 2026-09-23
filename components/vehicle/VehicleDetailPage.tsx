@@ -1,5 +1,5 @@
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { Button } from "@/components/ui/Button";
 import { TrustBlock } from "@/components/trust/TrustBlock";
 import { VehicleDealProvider } from "@/components/vehicle/VehicleDealProvider";
@@ -23,6 +23,7 @@ import { getUsedCarsUrl, getEligibilityUrl } from "@/config/routes";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { isReservable } from "@/lib/vehicles/sold";
+import { formatNumber } from "@/lib/format/money";
 import { createVehicleJsonLd } from "@/lib/seo/json-ld";
 import type { BreadcrumbItem } from "@/lib/seo";
 import type { Vehicle } from "@/types/vehicle";
@@ -44,6 +45,8 @@ export function VehicleDetailPage({
   const listingClosed = sold || unavailable;
   const jsonLd = createVehicleJsonLd(vehicle, breadcrumbs);
 
+  const heading = [vehicle.make, vehicle.model, vehicle.derivative].filter(Boolean).join(" ");
+
   return (
     <VehicleDealProvider vehicle={vehicle}>
       <VehicleViewTracker stockId={vehicle.stockId} />
@@ -51,10 +54,14 @@ export function VehicleDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <PageBanner
+        eyebrow="Used cars"
+        title={heading}
+        description={`${vehicle.year} · ${formatNumber(vehicle.mileage)} miles · ${vehicle.fuelType} · ${vehicle.transmission}`}
+        breadcrumbs={breadcrumbs}
+      />
       <Section className="min-w-0 pb-[calc(7rem+var(--oak-consent-offset,0px))] lg:pb-[var(--oak-section-y)]">
         <Container width="wide">
-          <Breadcrumbs items={breadcrumbs} />
-
           {sold ? (
             <div className="mt-6">
               <SoldVehicleNotice />
@@ -69,21 +76,23 @@ export function VehicleDetailPage({
             </div>
           ) : null}
 
-          <div className="vdp-hero mt-6">
+          <div className="vdp-hero">
             <VehicleGallery vehicle={vehicle} />
-            <VehicleHeader vehicle={vehicle} />
-            {listingClosed ? (
-              <div className="vdp-hero__price">
-                <p className="text-body text-muted">
-                  This listing is kept available so you can still see the car and
-                  compare similar stock.
-                </p>
-              </div>
-            ) : (
-              <VehiclePrice />
-            )}
+            <div className="vdp-hero__aside">
+              <VehicleHeader vehicle={vehicle} />
+              {listingClosed ? (
+                <div className="vdp-hero__price">
+                  <p className="text-body text-muted">
+                    This listing is kept available so you can still see the car and
+                    compare similar stock.
+                  </p>
+                </div>
+              ) : (
+                <VehiclePrice />
+              )}
+              {listingClosed ? <div className="vdp-hero__deal" /> : <VehicleDealColumn />}
+            </div>
             <VehicleSpecifications vehicle={vehicle} />
-            {listingClosed ? <div className="vdp-hero__deal" /> : <VehicleDealColumn />}
           </div>
 
           <div className="mt-12 space-y-12">
@@ -94,11 +103,11 @@ export function VehicleDetailPage({
               <VehicleLocation vehicle={vehicle} />
             </div>
             <SimilarVehicles vehicles={similar} />
-            <section aria-labelledby="vdp-final-cta-heading" className="rounded-lg border border-border bg-surface p-5">
+            <section aria-labelledby="vdp-final-cta-heading" className="rounded-3xl bg-[#8EBFDF] px-6 py-10 text-[#002852] md:px-12 md:py-14">
               <h2 id="vdp-final-cta-heading" className="text-h3">
                 {reservable ? "Ready to take the next step?" : "Find another car"}
               </h2>
-              <p className="mt-2 text-body-sm text-muted">
+              <p className="mt-2 text-body-sm">
                 {reservable
                   ? "Reserve this car, or build your deal first if you want to configure finance."
                   : reserved
@@ -109,24 +118,28 @@ export function VehicleDetailPage({
                 {reservable ? (
                   <>
                     <StartReservationButton stockId={vehicle.stockId} />
-                    <StartVehicleDealButton variant="secondary" />
+                    <StartVehicleDealButton />
                   </>
                 ) : (
-                  <Button href={getUsedCarsUrl()}>Browse all cars</Button>
+                  <>
+                    <Button href={getUsedCarsUrl()}>Browse all cars</Button>
+                    <Button href={getEligibilityUrl()}>Check my eligibility</Button>
+                  </>
                 )}
-                <Button href={getEligibilityUrl()} variant={reservable ? "tertiary" : "secondary"}>
-                  Check my eligibility
-                </Button>
               </div>
               <div className="mt-4 flex flex-col gap-3 lg:hidden">
                 {reservable ? (
-                  <StartVehicleDealButton variant="secondary" className="w-full" />
+                  <StartVehicleDealButton className="w-full" />
                 ) : (
-                  <Button href={getUsedCarsUrl()}>Browse all cars</Button>
+                  <>
+                    <Button href={getUsedCarsUrl()} className="w-full">
+                      Browse all cars
+                    </Button>
+                    <Button href={getEligibilityUrl()} className="w-full">
+                      Check my eligibility
+                    </Button>
+                  </>
                 )}
-                <Button href={getEligibilityUrl()} variant="tertiary" className="w-full">
-                  Check my eligibility
-                </Button>
               </div>
             </section>
           </div>

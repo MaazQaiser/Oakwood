@@ -122,7 +122,7 @@ export const supportPathways: SupportPathway[] = [
     body: "Get an estimated valuation and use equity towards a deposit.",
   },
   {
-    href: getUsedCarsUrl(),
+    href: routes.reserve,
     title: "Reservations",
     body: "Reserve a car online. Terms are shown before you pay.",
   },
@@ -224,7 +224,7 @@ export const supportFaqs: SupportFaqItem[] = [
     "reservation",
     `How does the ${reservationAmount} reservation work?`,
     `Pay ${reservationAmount} to hold the vehicle while you complete your purchase. ${reservationCopy.fullyRefundable}. ${reservationCopy.appliedToPurchase} The vehicle is held for ${holdPeriod}.`,
-    { href: getUsedCarsUrl(), hrefLabel: "Browse cars to reserve" },
+    { href: routes.reserve, hrefLabel: "Reserve a car" },
   ),
   faq(
     "reservation-refund",

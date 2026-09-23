@@ -1,5 +1,3 @@
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { Container, Section } from "@/components/layout/Container";
 import { FINANCE_INTENTS } from "@/config/finance";
 import { getEligibilityUrl, getFinanceCalculatorUrl, getFinanceIntentUrl, getUsedCarsUrl, getUsedVansUrl, routes } from "@/config/routes";
 import { FinanceComparison } from "@/features/finance/intent/components/FinanceComparison";
@@ -45,11 +43,6 @@ export function FinanceIntentPage({
     <>
       <JsonLd data={createFaqJsonLd(content.faqs)} />
       <FinanceIntentViewTracker intent={content.slug} />
-      <Section className="pb-0">
-        <Container>
-          <Breadcrumbs items={breadcrumbs} />
-        </Container>
-      </Section>
       <FinanceIntentHero
         eyebrow={content.eyebrow}
         title={content.h1}
@@ -57,6 +50,7 @@ export function FinanceIntentPage({
         intent={content.slug}
         supporting={FINANCE_INTENT_ELIGIBILITY_SUPPORTING}
         secondary={content.secondaryCta}
+        breadcrumbs={breadcrumbs}
       />
       <FinanceExplainer block={content.whatThisMeans} headingId="what-this-means" />
       <FinanceExplainer block={content.howOakwoodHelps} headingId="how-oakwood-helps" />

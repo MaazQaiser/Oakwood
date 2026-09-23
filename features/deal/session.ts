@@ -33,6 +33,18 @@ export async function readDealCookieId(): Promise<string | undefined> {
   return jar.get(DEAL_SESSION_COOKIE)?.value;
 }
 
+export async function getBoundDeal(): Promise<DealSessionRecord | null> {
+  const id = await readDealCookieId();
+  if (!id) {
+    return null;
+  }
+  const record = getDealRecord(id);
+  if (!record || isDealExpired(record)) {
+    return null;
+  }
+  return record;
+}
+
 export async function getDealSession(
   dealId: string,
 ): Promise<DealSessionRecord | null> {

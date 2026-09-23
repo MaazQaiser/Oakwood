@@ -1,7 +1,7 @@
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
 import { ArticleBody } from "@/features/content/components/ArticleBody";
 import { ArticleHeader } from "@/features/content/components/ArticleHeader";
-import { ContentBreadcrumbs } from "@/features/content/components/ContentBreadcrumbs";
 import { ContentCTA } from "@/features/content/components/ContentCTA";
 import { ContentJourneyLinks } from "@/features/content/components/ContentJourneyLinks";
 import { ContentMissingNotice } from "@/features/content/components/ContentMissingNotice";
@@ -61,11 +61,13 @@ export function ContentDocument({ document }: { document: ContentEntry }) {
         <JsonLd data={createFaqJsonLd(document.faqs)} />
       ) : null}
       <ContentViewTracker slug={document.slug} type={document.type} />
-      <Section className="pb-0">
-        <Container width="narrow">
-          <ContentBreadcrumbs title={document.title} href={path} />
-        </Container>
-      </Section>
+      <PageBanner
+        eyebrow={document.category}
+        title={document.title}
+        description={document.description}
+        breadcrumbs={breadcrumbs}
+        width="narrow"
+      />
       <Section>
         <Container width="narrow">
           {document.type === "model-guide" ? (
@@ -108,7 +110,7 @@ export function ContentDocument({ document }: { document: ContentEntry }) {
             <ModelComparison document={document} related={related} />
           ) : (
             <article>
-              <ArticleHeader document={document} />
+              <ArticleHeader document={document} showHeading={false} />
               <div className="mt-8">
                 <ContentMissingNotice items={document.missing} />
               </div>

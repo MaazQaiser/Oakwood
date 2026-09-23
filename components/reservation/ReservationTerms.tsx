@@ -42,6 +42,13 @@ export function ReservationTerms({
         >
           Cancellation and refund
         </Link>
+        {" · "}
+        <Link
+          href={routes.statusDisclosure}
+          className="text-body-sm text-primary underline-offset-4 hover:underline"
+        >
+          Status disclosure
+        </Link>
       </p>
       <p className="mt-2 text-caption text-muted">{reservationCopy.fullyRefundable}.</p>
     </section>

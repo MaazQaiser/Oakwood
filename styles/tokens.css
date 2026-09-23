@@ -1,32 +1,32 @@
 :root {
-  /* Colour — blue action, cool neutrals. Trustworthy, not luxury. */
+  /* Colour — charcoal action, warm neutrals. */
   --oak-page: #ffffff;
-  --oak-page-tint: #f5f8ff;
+  --oak-page-tint: #f4f5f7;
   --oak-surface: #ffffff;
   --oak-ink: #101828;
   --oak-ink-muted: #344054;
   --oak-ink-subtle: #667085;
   --oak-border: #d0d5dd;
   --oak-border-strong: #98a2b3;
-  --oak-primary: #155eef;
-  --oak-primary-hover: #004eeb;
-  --oak-primary-secondary: #2e7cf6;
-  --oak-primary-soft: #e8f1ff;
-  --oak-finance: #155eef;
-  --oak-focus: #155eef;
+  --oak-primary: #101828;
+  --oak-primary-hover: #000000;
+  --oak-primary-secondary: #344054;
+  --oak-primary-soft: #f2f4f7;
+  --oak-finance: #101828;
+  --oak-focus: #101828;
   --oak-danger: #d92d20;
   --oak-danger-soft: #fee4e2;
   --oak-warning: #f79009;
   --oak-warning-soft: #fef0c7;
   --oak-success: #12b76a;
   --oak-success-soft: #d1fadf;
-  --oak-info: #155eef;
-  --oak-info-soft: #e8f1ff;
+  --oak-info: #344054;
+  --oak-info-soft: #f2f4f7;
   --oak-overlay: rgb(16 24 40 / 0.4);
   --oak-header: #ffffff;
 
   /* Typography — Regular 400 and SemiBold 600 only */
-  --oak-font-sans: var(--font-geist-sans), "Segoe UI", system-ui, sans-serif;
+  --oak-font-sans: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
   --oak-font-numeric: var(--font-geist-mono), ui-monospace, monospace;
   --oak-size-display: 2.25rem;
   --oak-size-h1: 2.25rem;
@@ -88,7 +88,7 @@
   --oak-shadow-sm: 0 8px 24px rgb(16 24 40 / 0.04);
   --oak-shadow-md: 0 16px 40px rgb(16 24 40 / 0.06);
   --oak-shadow-lg: 0 24px 56px rgb(16 24 40 / 0.08);
-  --oak-shadow-focus: 0 0 0 3px rgb(21 94 239 / 0.28);
+  --oak-shadow-focus: 0 0 0 3px rgb(16 24 40 / 0.18);
 
   /* Layout */
   --oak-width-narrow: 40rem;

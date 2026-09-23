@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
 import { LegalMissingNotice } from "@/features/legal/components/LegalMissingNotice";
 import { LegalToc } from "@/features/legal/components/LegalToc";
 import { LegalViewTracker } from "@/features/legal/components/LegalViewTracker";
@@ -37,24 +36,20 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
   return (
     <>
       <LegalViewTracker slug={document.slug} />
-      <Section className="pb-0">
-        <Container width="narrow">
-          <Breadcrumbs items={breadcrumbs} />
-        </Container>
-      </Section>
+      <PageBanner
+        eyebrow="Legal"
+        title={document.title}
+        description={document.intro || undefined}
+        breadcrumbs={breadcrumbs}
+        width="narrow"
+      >
+        <p className="text-caption text-[#002852]">
+          {document.lastUpdated
+            ? `Last updated: ${document.lastUpdated}`
+            : LEGAL_LAST_UPDATED_UNAVAILABLE}
+        </p>
+      </PageBanner>
       <article>
-        <section className="border-b border-border bg-surface">
-          <Container width="narrow" className="py-10 md:py-16">
-            <SectionIntro eyebrow="Legal" heading={document.title} headingLevel="h1">
-              {document.intro ? <p>{document.intro}</p> : null}
-            </SectionIntro>
-            <p className="mt-4 text-caption text-muted">
-              {document.lastUpdated
-                ? `Last updated: ${document.lastUpdated}`
-                : LEGAL_LAST_UPDATED_UNAVAILABLE}
-            </p>
-          </Container>
-        </section>
         <Section>
           <Container width="narrow">
             <LegalMissingNotice items={document.missing} />

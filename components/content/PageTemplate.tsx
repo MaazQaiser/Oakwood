@@ -1,28 +1,24 @@
-import type { ReactNode } from "react";
-import { Container } from "@/components/layout/Container";
+import { PageBanner } from "@/components/layout/PageBanner";
 
 interface PageTemplateProps {
   title: string;
   route: string;
   template: string;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 export function PageTemplate({
   title,
-  route,
   template,
   children,
 }: PageTemplateProps) {
   return (
-    <Container className="py-8 md:py-12">
-      <header className="space-y-2">
-        <p className="text-caption text-muted">
-          Route: {route} · Template: {template}
-        </p>
-        <h1 className="text-h1">{title}</h1>
-      </header>
-      {children ? <section className="mt-6">{children}</section> : null}
-    </Container>
+    <>
+      <PageBanner
+        eyebrow={template.replace(/Page$/, "").replace(/([a-z])([A-Z])/g, "$1 $2")}
+        title={title}
+      />
+      {children ? <section className="mx-auto w-full max-w-[var(--oak-width-content)] px-[var(--oak-page-x)] py-10">{children}</section> : null}
+    </>
   );
 }

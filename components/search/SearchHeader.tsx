@@ -1,4 +1,4 @@
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { NaturalLanguageSearch } from "@/components/search/NaturalLanguageSearch";
 import { SearchHeroActions } from "@/components/search/SearchHeroActions";
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
@@ -14,17 +14,21 @@ export function SearchHeader({
   const copy = getSearchCopy(context.category);
 
   return (
-    <header>
-      <Breadcrumbs items={context.breadcrumbs} />
-      <h1 className="text-display mt-4">{context.title}</h1>
-      <p className="mt-3 max-w-2xl text-body text-muted">{context.description}</p>
+    <PageBanner
+      eyebrow={context.category === "van" ? "Used vans" : "Used cars"}
+      title={context.title}
+      description={context.description}
+      breadcrumbs={context.breadcrumbs}
+    >
       {copy.showHeroActions ? <SearchHeroActions copy={copy} /> : null}
-      <NaturalLanguageSearch
-        action={context.searchAction}
-        defaultValue={query}
-        hint={copy.searchHint}
-        category={copy.category}
-      />
-    </header>
+      <div className={copy.showHeroActions ? "mt-6" : undefined}>
+        <NaturalLanguageSearch
+          action={context.searchAction}
+          defaultValue={query}
+          hint={copy.searchHint}
+          category={copy.category}
+        />
+      </div>
+    </PageBanner>
   );
 }

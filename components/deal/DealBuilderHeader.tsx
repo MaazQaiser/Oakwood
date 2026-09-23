@@ -1,5 +1,6 @@
 "use client";
 
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { getFinanceCalculatorUrl, getVehicleUrl } from "@/config/routes";
@@ -13,26 +14,23 @@ export function DealBuilderHeader() {
   const { vehicle, finance } = useDealBuilder();
 
   return (
-    <header className="border-b border-border pb-6">
-      <p>
-        <Button href={getVehicleUrl(vehicle)} variant="text" className="px-0">
-          Back to vehicle
-        </Button>
-      </p>
-      <h1 className="mt-3 text-h2">{DEAL_HEADING}</h1>
-      <p className="mt-2 max-w-2xl text-body text-muted">{DEAL_SUPPORTING}</p>
-      {finance.hasProfile ? (
-        <p className="mt-2 text-caption text-muted">{DEAL_PROFILE_SUPPORTING}</p>
-      ) : null}
-      <p className="mt-3">
-        <Button
-          href={getFinanceCalculatorUrl({ stockId: vehicle.stockId })}
-          variant="text"
-          className="px-0"
-        >
-          Open the finance calculator
-        </Button>
-      </p>
-    </header>
+    <PageBanner
+      eyebrow="Your deal"
+      title={DEAL_HEADING}
+      description={
+        <>
+          <p>{DEAL_SUPPORTING}</p>
+          {finance.hasProfile ? <p className="mt-2">{DEAL_PROFILE_SUPPORTING}</p> : null}
+        </>
+      }
+      secondary={{
+        href: getFinanceCalculatorUrl({ stockId: vehicle.stockId }),
+        label: "Finance calculator",
+      }}
+    >
+      <Button href={getVehicleUrl(vehicle)} variant="text" className="px-0">
+        Back to vehicle
+      </Button>
+    </PageBanner>
   );
 }

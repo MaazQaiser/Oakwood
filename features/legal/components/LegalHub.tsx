@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
-import { SectionIntro } from "@/components/home/SectionIntro";
 import { Card } from "@/components/cards/Card";
 import { LegalViewTracker } from "@/features/legal/components/LegalViewTracker";
 import { legalHubItems } from "@/content/legal";
@@ -13,23 +12,16 @@ export function LegalHub() {
   return (
     <>
       <LegalViewTracker slug="hub" />
-      <Section className="pb-0">
-        <Container width="narrow">
-          <Breadcrumbs
-            items={createBreadcrumbs([
-              { label: "Home", href: routes.home },
-              { label: "Legal", href: routes.legal },
-            ])}
-          />
-        </Container>
-      </Section>
-      <section className="border-b border-border bg-surface">
-        <Container width="narrow" className="py-10 md:py-16">
-          <SectionIntro eyebrow="Legal" heading={LEGAL_HUB_H1} headingLevel="h1">
-            <p>{LEGAL_HUB_INTRO}</p>
-          </SectionIntro>
-        </Container>
-      </section>
+      <PageBanner
+        eyebrow="Legal"
+        title={LEGAL_HUB_H1}
+        description={LEGAL_HUB_INTRO}
+        breadcrumbs={createBreadcrumbs([
+          { label: "Home", href: routes.home },
+          { label: "Legal", href: routes.legal },
+        ])}
+        width="narrow"
+      />
       <Section>
         <Container width="narrow">
           <ul className="flex flex-col gap-3">

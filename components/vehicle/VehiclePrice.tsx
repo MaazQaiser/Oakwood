@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
+import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
 import { getEligibilityUrl, getSearchUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { formatPounds } from "@/lib/format/money";
@@ -38,11 +39,14 @@ export function VehiclePrice() {
         gapAmount={gapAmount}
       />
       {displayState === "personalised" ? (
-        <p className="mt-2 text-caption text-muted">Based on your finance profile</p>
+        <p className="mt-2 text-caption text-muted">
+          Based on your finance profile. <StatusDisclosureLink />
+        </p>
       ) : null}
       {displayState === "representative" ? (
         <p className="mt-2 text-caption text-muted">
-          {financeType === "pcp" ? "PCP" : "HP"} finance. Representative finance example.
+          {financeType === "pcp" ? "PCP" : "HP"} finance. Representative finance example.{" "}
+          <StatusDisclosureLink />
         </p>
       ) : null}
       {displayState === "ineligible" && gapAmount !== undefined ? (
@@ -59,7 +63,6 @@ export function VehiclePrice() {
         {displayState === "representative" ? (
           <Button
             href={getEligibilityUrl()}
-            variant="secondary"
             onClick={() =>
               trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
             }

@@ -316,7 +316,11 @@ export const hatchbackArticle: BlogPost = {
     },
     {
       type: "paragraph",
-      text: statusDisclosureCopy.description,
+      spans: [
+        { text: `${statusDisclosureCopy.description} ` },
+        { text: "Status disclosure", href: routes.statusDisclosure },
+        { text: "." },
+      ],
     },
     {
       type: "paragraph",

@@ -127,7 +127,7 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-body"
+          className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
         />
       </div>
 

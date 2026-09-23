@@ -7,14 +7,17 @@ export function Logo({ compact = false }: { compact?: boolean }) {
     <Link
       href={routes.home}
       className={cn(
-        "inline-flex min-h-11 items-center text-ink no-underline",
+        "inline-flex min-h-11 items-center no-underline",
         compact ? "" : "py-1",
       )}
     >
-      <span className="text-h6">
-        Oakwood
-      </span>
-      <span className="sr-only"> Motor Company</span>
+      <img
+        src="/brand/oakwood-logo.png"
+        alt="Oakwood Motor Company"
+        width={300}
+        height={55}
+        className="h-8 w-auto"
+      />
     </Link>
   );
 }

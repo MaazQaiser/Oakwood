@@ -24,7 +24,7 @@ export function PromoPanel({
   return (
     <div
       className={cn(
-        "rounded-3xl bg-primary-soft px-6 py-10 md:px-12 md:py-14",
+        "rounded-3xl bg-[#8EBFDF] px-6 py-10 text-[#002852] md:px-12 md:py-14",
         className,
       )}
     >
@@ -146,7 +146,7 @@ export function VehicleCard({
       </div>
       <div className="flex flex-1 flex-col gap-3 px-1 pb-1 pt-4">
         <div>
-          <h3 className="text-h6">
+          <h3 className="text-[1.0625rem] font-medium leading-snug tracking-[-0.02em]">
             <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
               {vehicle.make} {vehicle.model}
             </Link>
@@ -159,7 +159,7 @@ export function VehicleCard({
           amount={monthlyAmount}
           state={state}
           gapAmount={gapAmount}
-          size="md"
+          size="compact"
         />
         <p className="text-body-sm text-muted">
           <FinancialNumber
