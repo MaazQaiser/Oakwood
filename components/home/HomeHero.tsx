@@ -56,17 +56,17 @@ export function HomeHero() {
               </span>
             </Link>
         </div>
-        <div className="relative mt-8 aspect-[16/9] w-full lg:hidden">
-          <Image
-            src="/images/hero/open-sky.png"
-            alt="A smiling customer giving a thumbs up beside a car under an open sky"
-            fill
-            priority
-            quality={92}
-            sizes="100vw"
-            className="object-cover object-[16%_center]"
-          />
-        </div>
+      </div>
+      <div className="relative -mx-6 -mb-8 mt-8 aspect-[4/3] lg:hidden">
+        <Image
+          src="/images/hero/open-sky-mobile.png"
+          alt="A smiling customer giving a thumbs up beside a car under an open sky"
+          fill
+          priority
+          quality={92}
+          sizes="100vw"
+          className="object-cover object-center [mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)] [-webkit-mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)]"
+        />
       </div>
     </section>
     <div className="mx-3 pb-8 pt-6 sm:mx-4 lg:mx-6 lg:pb-10 lg:pt-8">
