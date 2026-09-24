@@ -48,11 +48,13 @@ export function MonthlyPayment({
   state = "representative",
   gapAmount,
   size = "lg",
+  noteClassName,
 }: {
   amount?: number;
   state?: FinanceDisplayState;
   gapAmount?: number;
   size?: "compact" | "md" | "lg";
+  noteClassName?: string;
 }) {
   if (state === "loading") {
     return (
@@ -89,7 +91,7 @@ export function MonthlyPayment({
         />
       </p>
       {state === "representative" ? (
-        <p className="mt-1 text-caption text-muted">
+        <p className={cn("mt-1 text-caption text-muted", noteClassName)}>
           Representative example
           {" · "}
           <StatusDisclosureLink />

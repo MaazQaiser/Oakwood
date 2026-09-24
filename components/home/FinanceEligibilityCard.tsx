@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { Field, Select } from "@/components/forms/FormControls";
 import { Card } from "@/components/cards/Card";
 import { routes } from "@/config/routes";
-import { formatPounds } from "@/lib/format/money";
 
 export function FinanceEligibilityCard() {
   const [monthly, setMonthly] = useState(200);
@@ -22,13 +21,7 @@ export function FinanceEligibilityCard() {
             Set a starting point, then check eligibility. This does not calculate a
             finance offer.
           </p>
-          <p className="mt-4 text-primary">
-            <span className="text-caption text-muted">Example starting point</span>
-            <br />
-            <span className="financial-number">From {formatPounds(monthly)}</span>
-            <span className="text-body-sm text-muted">/month</span>
-          </p>
-          <p className="mt-2 text-caption">
+          <p className="mt-4 text-caption">
             <StatusDisclosureLink />
           </p>
         </div>
@@ -78,7 +71,7 @@ export function FinanceEligibilityCard() {
           </div>
           <Button
             href={routes.eligibility}
-            className="h-11 w-full shrink-0 rounded-[14px]! bg-[#002852]! px-5 hover:bg-[#001c3d]! sm:w-auto"
+            className="btn-compact w-full shrink-0 sm:w-auto"
           >
             Check my eligibility
           </Button>

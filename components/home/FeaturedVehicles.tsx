@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/Feedback";
 import { VehicleCard } from "@/components/cards/Card";
 import { Container, Grid, Inline, ScrollRow, Section } from "@/components/layout/Container";
-import { SaveVehicleButton } from "@/components/home/SaveVehicleButton";
 import { SectionIntro } from "@/components/home/SectionIntro";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
@@ -76,7 +75,7 @@ export function FeaturedVehicles() {
             You can still browse the full Oakwood range.
           </EmptyState>
         ) : (
-        <Grid columns="featured" className="mt-8 md:grid">
+        <Grid columns="featured" className="mt-8 md:grid xl:grid-cols-3!">
           <ScrollRow className="md:contents">
             {featuredVehicles.map((vehicle) => {
               const state = getFinanceDisplayState(
@@ -93,6 +92,7 @@ export function FeaturedVehicles() {
                   className="w-[min(19.5rem,82vw)] shrink-0 md:w-auto"
                 >
                   <VehicleCard
+                    featured
                     vehicle={vehicle}
                     monthly={getIllustratedMonthly(
                       vehicle,
@@ -101,11 +101,6 @@ export function FeaturedVehicles() {
                     )}
                     state={state}
                     gapAmount={state === "ineligible" ? gapAmount : undefined}
-                    toolbar={
-                      <SaveVehicleButton
-                        vehicleName={`${vehicle.make} ${vehicle.model}`}
-                      />
-                    }
                   />
                 </div>
               );

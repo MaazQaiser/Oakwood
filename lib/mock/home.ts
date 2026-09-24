@@ -8,7 +8,7 @@ export interface FeaturedVehicle extends Vehicle {
 
 export const featuredVehicles: FeaturedVehicle[] = mockVehicles
   .filter((vehicle) => vehicle.category === "car")
-  .slice(0, 4)
+  .slice(0, 6)
   .map((vehicle) => ({
     ...vehicle,
     monthly: vehicle.monthlyPayment,

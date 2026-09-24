@@ -93,6 +93,10 @@ select {
   line-height: 1.25rem;
 }
 
+.card-lift {
+  box-shadow: 0 14px 36px rgba(16, 40, 72, 0.1);
+}
+
 .select-field {
   appearance: none;
   border-radius: 14px;

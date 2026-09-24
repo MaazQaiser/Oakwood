@@ -88,6 +88,7 @@ export function VehicleCard({
   toolbar,
   financeActions,
   imagePriority = false,
+  featured = false,
 }: {
   vehicle: Vehicle;
   monthly?: number;
@@ -97,6 +98,7 @@ export function VehicleCard({
   toolbar?: ReactNode;
   financeActions?: ReactNode;
   imagePriority?: boolean;
+  featured?: boolean;
 }) {
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
@@ -113,7 +115,11 @@ export function VehicleCard({
     <Card
       as="article"
       padded={false}
-      className="flex h-full flex-col overflow-hidden border-0 p-4 shadow-sm"
+      className={cn(
+        "flex h-full flex-col overflow-hidden border-0 p-4 shadow-sm",
+        featured &&
+          "card-lift p-3",
+      )}
       aria-label={
         availabilityLabel
           ? `${imageLabel}, ${availabilityLabel}`
@@ -121,7 +127,12 @@ export function VehicleCard({
       }
     >
       <div className="relative">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-page-tint">
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-xl bg-page-tint",
+            featured ? "aspect-[4/3]" : "aspect-[16/10]",
+          )}
+        >
           <Image
             src={vehicle.image ?? "/images/vehicle-placeholder.svg"}
             alt={imageLabel}
@@ -140,52 +151,104 @@ export function VehicleCard({
             <VehicleAvailabilityBadge availability={vehicle.availability} />
           ) : null}
         </div>
-        {toolbar ? (
+        {toolbar && !featured ? (
           <div className="absolute right-3 top-3">{toolbar}</div>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col gap-3 px-1 pb-1 pt-4">
-        <div>
-          <h3 className="text-[1.0625rem] font-medium leading-snug tracking-[-0.02em]">
-            <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
-              {vehicle.make} {vehicle.model}
-            </Link>
-          </h3>
-          {vehicle.derivative ? (
-            <p className="mt-1 text-body-sm text-muted">{vehicle.derivative}</p>
-          ) : null}
-        </div>
+      <div
+        className={cn(
+          "flex flex-1 flex-col px-1 pb-1",
+          featured ? "gap-2 pt-3" : "gap-3 pt-4",
+        )}
+      >
+        {featured ? (
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="text-[1.25rem] font-medium leading-tight tracking-[-0.02em]">
+              <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
+                {vehicle.make} {vehicle.model}
+              </Link>
+            </h3>
+            <p className="shrink-0 pt-0.5 text-right leading-none">
+              <span className="block text-[0.9375rem] font-medium text-ink">
+                {formatPounds(vehicle.cashPrice)}
+              </span>
+              <span className="mt-1 block text-caption text-muted">cash price</span>
+            </p>
+          </div>
+        ) : (
+          <div>
+            <h3 className="text-[1.0625rem] font-medium leading-snug tracking-[-0.02em]">
+              <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
+                {vehicle.make} {vehicle.model}
+              </Link>
+            </h3>
+            {vehicle.derivative ? (
+              <p className="mt-1 text-body-sm text-muted">{vehicle.derivative}</p>
+            ) : null}
+          </div>
+        )}
         <MonthlyPayment
           amount={monthlyAmount}
           state={state}
           gapAmount={gapAmount}
           size="compact"
         />
-        <p className="text-body-sm text-muted">
-          <FinancialNumber
-            value={formatPounds(vehicle.cashPrice)}
-            size="sm"
-            className="text-muted"
-          />{" "}
-          cash price
-        </p>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-caption text-muted">
-          <span>{formatNumber(vehicle.mileage)} miles</span>
-          <span>{vehicle.fuelType}</span>
-          <span>{vehicle.transmission}</span>
-        </div>
-        <p className="flex items-center gap-1.5 text-caption text-muted">
-          <IconPin className="h-3.5 w-3.5" />
-          {vehicle.locationName}
-        </p>
+        {featured ? null : (
+          <p className="text-body-sm text-muted">
+            <FinancialNumber
+              value={formatPounds(vehicle.cashPrice)}
+              size="sm"
+              className="text-muted"
+            />{" "}
+            cash price
+          </p>
+        )}
+        {featured ? (
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              `${formatNumber(vehicle.mileage)} miles`,
+              vehicle.fuelType,
+              vehicle.transmission,
+              vehicle.locationName,
+            ].map((label) => (
+              <span
+                key={label}
+                className="inline-flex items-center rounded-full bg-[#E7F1F8] px-2.5 py-1 text-caption text-[#002852]"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-caption text-muted">
+              <span>{formatNumber(vehicle.mileage)} miles</span>
+              <span>{vehicle.fuelType}</span>
+              <span>{vehicle.transmission}</span>
+            </div>
+            <p className="flex items-center gap-1.5 text-caption text-muted">
+              <IconPin className="h-3.5 w-3.5" />
+              {vehicle.locationName}
+            </p>
+          </>
+        )}
         {financeActions ? <div>{financeActions}</div> : null}
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">
-          {action ?? (
-            <Button href={getVehicleUrl(vehicle)} variant="text" className="px-0">
-              View car
-              <IconArrow />
-            </Button>
-          )}
+          {action ??
+            (featured ? (
+              <Button
+                href={getVehicleUrl(vehicle)}
+                variant="secondary"
+                className="btn-compact h-11! min-h-11! w-full border-[#002852]! bg-white text-[#002852] hover:bg-[#E7F1F8]"
+              >
+                View car
+              </Button>
+            ) : (
+              <Button href={getVehicleUrl(vehicle)} variant="text" className="px-0">
+                View car
+                <IconArrow />
+              </Button>
+            ))}
         </div>
       </div>
     </Card>
