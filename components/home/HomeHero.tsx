@@ -41,7 +41,7 @@ export function HomeHero() {
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-1 flex-col justify-center">
         <div className="max-w-md">
-            <h1 className="text-[2.55rem] font-medium leading-[0.98] tracking-[-0.03em] text-ink sm:text-[3.15rem] lg:text-[3.45rem]">
+            <h1 className="text-[2.55rem] font-medium leading-[1.22] tracking-[-0.03em] text-ink sm:text-[3.15rem] sm:leading-[1.05] lg:text-[3.45rem] lg:leading-[1.02]">
               {heading}
             </h1>
             <p className="mt-5 max-w-[17.5rem] text-[0.95rem] leading-relaxed text-[#8b95a3]">{copy}</p>

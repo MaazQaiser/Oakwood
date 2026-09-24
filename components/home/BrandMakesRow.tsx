@@ -11,6 +11,8 @@ const FEATURED_MAKE_SLUGS = [
   "toyota",
   "hyundai",
   "vauxhall",
+  "nissan",
+  "kia",
 ];
 
 export function BrandMakesRow() {

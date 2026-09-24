@@ -14,6 +14,8 @@ const MAKE_IMAGES: Record<string, string> = {
   toyota: "/images/makes/toyota.png",
   hyundai: "/images/makes/hyundai.png",
   vauxhall: "/images/makes/vauxhall.png",
+  nissan: "/images/makes/nissan.png",
+  kia: "/images/makes/kia.png",
 };
 
 const MAKE_LOGOS: Record<string, string> = {
@@ -25,6 +27,8 @@ const MAKE_LOGOS: Record<string, string> = {
   toyota: "/images/brand-logos/toyota.png",
   hyundai: "/images/brand-logos/hyundai.png",
   vauxhall: "/images/brand-logos/vauxhall.png",
+  nissan: "/images/brand-logos/nissan.png",
+  kia: "/images/brand-logos/kia.png",
 };
 
 function MakeLogo({ slug }: { slug: string }) {
