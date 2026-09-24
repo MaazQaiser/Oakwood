@@ -1,7 +1,19 @@
+import {
+  ArrowLeftRight,
+  ArrowRight,
+  BadgeCheck,
+  BadgePoundSterling,
+  CalendarPlus,
+  Car,
+  Info,
+  KeyRound,
+  MapPin,
+  ShieldCheck,
+  Van,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { IconArrow } from "@/components/ui/icons";
 import { getFinanceIntentUrl, getSearchUrl, routes } from "@/config/routes";
-import { cn } from "@/lib/cn";
 
 type MenuIcon = "car" | "van" | "finance" | "check" | "key" | "exchange" | "wrench" | "shield" | "pin" | "info";
 
@@ -166,84 +178,22 @@ export const sectionMenus: Record<string, SectionMenuContent> = {
   },
 };
 
+const menuIcons: Record<MenuIcon, LucideIcon> = {
+  car: Car,
+  van: Van,
+  finance: BadgePoundSterling,
+  check: BadgeCheck,
+  key: KeyRound,
+  exchange: ArrowLeftRight,
+  wrench: CalendarPlus,
+  shield: ShieldCheck,
+  pin: MapPin,
+  info: Info,
+};
+
 function MenuGlyph({ name }: { name: MenuIcon }) {
-  const common = {
-    viewBox: "0 0 24 24",
-    fill: "none",
-    "aria-hidden": true as const,
-    className: "h-7 w-7 text-[#002852]",
-  };
-
-  if (name === "check") {
-    return (
-      <svg {...common}>
-        <path d="M12 3.5 14.2 8l4.8.4-3.7 3.1 1.2 4.7L12 13.8 7.5 16.2 8.7 11.5 5 8.4 9.8 8 12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        <path d="m9.2 11.2 1.7 1.7 3.6-3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (name === "finance" || name === "car" || name === "van") {
-    return (
-      <svg {...common}>
-        <path d="M4 14.5h16l-1.2-4.2a2 2 0 0 0-1.9-1.4H7.1a2 2 0 0 0-1.9 1.4L4 14.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        <path d="M6.5 14.5v2.2M17.5 14.5v2.2M7.2 17.2h.1M16.7 17.2h.1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        <circle cx="16.5" cy="7" r="2.2" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M16.5 6.1v1.1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (name === "key") {
-    return (
-      <svg {...common}>
-        <circle cx="8" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.6" />
-        <path d="M11 12h9M17 12v2.4M14.2 12v1.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (name === "exchange") {
-    return (
-      <svg {...common}>
-        <path d="M7 7h10l-2.2-2.2M17 17H7l2.2 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M7 7v3.5M17 17v-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (name === "wrench") {
-    return (
-      <svg {...common}>
-        <path d="M14.5 6.2a3.2 3.2 0 0 0-4.2 4.1L5 15.6 8.4 19l5.3-5.3a3.2 3.2 0 0 0 4.1-4.2l-2.2 2.2-1.6-1.6 2.2-2.2Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (name === "shield") {
-    return (
-      <svg {...common}>
-        <path d="M12 3.8 18.5 6.2v5.2c0 3.6-2.6 6.4-6.5 8.3-3.9-1.9-6.5-4.7-6.5-8.3V6.2L12 3.8Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        <path d="m9 12 2 2 4-4.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (name === "pin") {
-    return (
-      <svg {...common}>
-        <path d="M12 20s5.5-4.6 5.5-9A5.5 5.5 0 0 0 6.5 11c0 4.4 5.5 9 5.5 9Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        <circle cx="12" cy="11" r="1.7" stroke="currentColor" strokeWidth="1.6" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg {...common}>
-      <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M12 11v5M12 8h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
+  const Icon = menuIcons[name];
+  return <Icon aria-hidden className="h-11 w-11 text-[#002852]" strokeWidth={1.75} />;
 }
 
 export function SectionMenu({
@@ -281,15 +231,12 @@ export function SectionMenu({
           key={card.href + card.title}
           href={card.href}
           onClick={onNavigate}
-          className={cn(
-            "flex h-full min-h-52 flex-col rounded-[14px] border border-[#d5deea] bg-white p-5 text-ink no-underline hover:border-[#002852]",
-            pathname === card.href && "border-[#002852]",
-          )}
+          className="flex h-full min-h-52 flex-col rounded-[14px] bg-white p-5 text-ink no-underline"
         >
           <MenuGlyph name={card.icon} />
           <span className="mt-8 inline-flex items-center gap-2 text-[1.05rem] font-semibold">
             {card.title}
-            <IconArrow className="h-4 w-4" />
+            <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.75} />
           </span>
           <span className="mt-2 text-[0.92rem] leading-relaxed text-[#5c6b7a]">{card.description}</span>
         </Link>

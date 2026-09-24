@@ -3,8 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconButton } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Dialogs";
-import { IconArrow, IconPlay } from "@/components/ui/icons";
+import { IconArrow, IconClose, IconPlay, IconSearch } from "@/components/ui/icons";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { getVehicleGallery } from "@/lib/mock/vehicle-detail";
 import { cn } from "@/lib/cn";
@@ -43,6 +42,9 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setLightbox(false);
+      }
       if (event.key === "ArrowRight") {
         goTo(index + 1);
       }
@@ -154,13 +156,13 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
         </div>
 
         {current.kind === "image" ? (
-          <button
-            type="button"
-            className="absolute right-3 top-3 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md bg-surface/95 px-3 text-caption text-ink shadow-sm"
+          <IconButton
+            label="Zoom"
+            className="absolute right-3 top-3 bg-surface/95 shadow-sm"
             onClick={() => setLightbox(true)}
           >
-            Zoom
-          </button>
+            <IconSearch />
+          </IconButton>
         ) : null}
       </div>
 
@@ -196,23 +198,32 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
         ))}
       </ul>
 
-      <Modal
-        open={lightbox && current.kind === "image"}
-        title={current.alt}
-        onClose={() => setLightbox(false)}
-        size="wide"
-      >
-        <div className="relative aspect-[16/10] overflow-hidden rounded-md bg-page">
-          <Image
-            src={current.src}
-            alt={current.alt}
-            fill
-            sizes="90vw"
-            unoptimized={isSvg(current.src)}
-            className="object-contain"
-          />
+      {lightbox && current.kind === "image" ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={current.alt}
+        >
+          <IconButton
+            label="Close"
+            className="absolute right-3 top-3 text-white hover:bg-white/10"
+            onClick={() => setLightbox(false)}
+          >
+            <IconClose />
+          </IconButton>
+          <div className="relative h-full w-full">
+            <Image
+              src={current.src}
+              alt={current.alt}
+              fill
+              sizes="100vw"
+              unoptimized={isSvg(current.src)}
+              className="object-contain"
+            />
+          </div>
         </div>
-      </Modal>
+      ) : null}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Container, Section } from "@/components/layout/Container";
+import { Section } from "@/components/layout/Container";
 import { MakeCarousel } from "@/components/home/MakeCarousel";
 import { getMakes } from "@/lib/vehicles/labels";
 
@@ -25,9 +25,9 @@ export function BrandMakesRow() {
 
   return (
     <Section>
-      <Container>
+      <div className="mx-3 sm:mx-4 lg:mx-6">
         <MakeCarousel makes={featured} />
-      </Container>
+      </div>
     </Section>
   );
 }

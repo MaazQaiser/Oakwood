@@ -81,10 +81,10 @@ export function MakeCarousel({
       </div>
       <ul
         ref={scroller}
-        className="mt-8 flex gap-2 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mt-8 flex gap-2 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
       >
         {makes.map((make) => (
-            <li key={make.slug} className="w-[9.5rem] shrink-0 sm:w-[10.5rem]">
+            <li key={make.slug} className="w-[9.5rem] shrink-0 sm:w-[10.5rem] lg:w-auto lg:min-w-0 lg:flex-1">
             <Link
               href={getMakeUrl(make.name)}
               className="flex flex-col items-center px-2 py-3 text-center no-underline"

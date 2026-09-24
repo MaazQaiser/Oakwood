@@ -11,12 +11,12 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
   }
 
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-muted">
+    <nav aria-label="Breadcrumb" className="max-w-full">
+      <ol className="flex flex-nowrap items-center gap-x-2 overflow-x-auto text-caption text-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item, index) => {
           const last = index === items.length - 1;
           return (
-            <li key={`${item.href}-${item.label}`} className="flex min-h-11 items-center gap-2">
+            <li key={`${item.href}-${item.label}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap">
               {index > 0 ? <span aria-hidden="true">/</span> : null}
               {last ? (
                 <span aria-current="page" className="text-ink">
