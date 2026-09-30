@@ -66,6 +66,7 @@ export function SimilarVehicles({ vehicles }: { vehicles: Vehicle[] }) {
                 state={state}
                 gapAmount={gapAmount}
                 imagePriority={false}
+                term={finance.term}
                 toolbar={
                   <SaveVehicleButton
                     vehicleName={`${vehicle.make} ${vehicle.model}`}

@@ -32,7 +32,7 @@ const KNOWN: Record<string, Omit<PxIdentifiedVehicle, "source">> = {
   },
 };
 
-const CATALOGUE: Omit<PxIdentifiedVehicle, "source">[] = [
+export const PX_CATALOGUE: Omit<PxIdentifiedVehicle, "source">[] = [
   {
     year: 2018,
     make: "Ford",
@@ -115,9 +115,40 @@ export function lookupPartExchangeVehicle(registration: string): PxLookupResult 
     return { ok: true, vehicle: { ...known, source: "lookup" } };
   }
 
-  const sample = CATALOGUE[hashRegistration(cleaned) % CATALOGUE.length];
+  const sample = PX_CATALOGUE[hashRegistration(cleaned) % PX_CATALOGUE.length];
   return {
     ok: true,
     vehicle: { ...sample, source: "lookup" },
   };
+}
+
+export function pxVehicleKey(
+  vehicle: Pick<PxIdentifiedVehicle, "year" | "make" | "model" | "variant">,
+): string {
+  return [vehicle.year, vehicle.make, vehicle.model, vehicle.variant ?? ""]
+    .join("|")
+    .toLowerCase();
+}
+
+export function listPartExchangeCatalogue(
+  suggested?: PxIdentifiedVehicle,
+): PxIdentifiedVehicle[] {
+  const seen = new Set<string>();
+  const list: PxIdentifiedVehicle[] = [];
+
+  if (suggested) {
+    seen.add(pxVehicleKey(suggested));
+    list.push({ ...suggested, source: suggested.source ?? "lookup" });
+  }
+
+  for (const item of PX_CATALOGUE) {
+    const key = pxVehicleKey(item);
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    list.push({ ...item, source: "lookup" });
+  }
+
+  return list;
 }

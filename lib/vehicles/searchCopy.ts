@@ -49,7 +49,7 @@ const CAR_COPY: SearchCopy = {
   landingTitle: "Used Cars for Sale",
   landingDescription:
     "Explore our used cars and find one that fits your budget, lifestyle and finance options.",
-  searchHint: "Try “BMW automatic under £300 a month” or “Family SUV under £15,000”.",
+  searchHint: "Try “BMW automatic under £300 a month” or “Family SUV under £400 a month”.",
   emptyHeading: "No cars match those filters.",
   emptyFallback: "Try removing a filter or broaden your search.",
   browseAllLabel: "Browse all cars",

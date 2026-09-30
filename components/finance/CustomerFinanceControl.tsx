@@ -6,7 +6,7 @@ import { Slider } from "@/components/forms/FormControls";
 import { PersonalisedPricingIndicator } from "@/components/finance/FinancePrimitives";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { financeCta } from "@/config/navigation";
-import { routes } from "@/config/routes";
+import { getEligibilityUrl } from "@/config/routes";
 import { formatApr, formatPounds } from "@/lib/format/money";
 
 export function CustomerFinanceControl() {
@@ -21,10 +21,13 @@ export function CustomerFinanceControl() {
     setAssumptionsOpen,
   } = useCustomerFinance();
   const personalised = mode === "personalised" || mode === "ineligible";
+  const eligibilityHref = personalised
+    ? getEligibilityUrl("result")
+    : getEligibilityUrl("questions");
 
   return (
     <>
-      <div className="hidden shrink-0 md:block">
+      <div className="hidden shrink-0 lg:block">
         {personalised ? (
           <Button
             variant="secondary"
@@ -51,7 +54,13 @@ export function CustomerFinanceControl() {
         onClose={() => setAssumptionsOpen(false)}
       >
         <PersonalisedPricingIndicator
-          state={mode === "ineligible" ? "ineligible" : "personalised"}
+          state={
+            mode === "ineligible"
+              ? "ineligible"
+              : mode === "personalised"
+                ? "personalised"
+                : "anonymous"
+          }
         />
         <div className="mt-6 flex flex-col gap-6">
           <Slider
@@ -65,14 +74,19 @@ export function CustomerFinanceControl() {
           />
           <Slider
             name="term"
-            label={`Term ${term} months`}
+            label="Term"
+            valueLabel={`${term} months`}
             min={24}
             max={60}
             step={6}
             value={term}
             onChange={(event) => setTerm(Number(event.target.value))}
           />
-          <Button href={routes.eligibility} variant="secondary">
+          <Button
+            href={eligibilityHref}
+            variant="secondary"
+            onClick={() => setAssumptionsOpen(false)}
+          >
             Check my eligibility
           </Button>
           <p className="text-caption">

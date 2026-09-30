@@ -48,7 +48,8 @@ export function BrowseByNeed() {
       <Container>
         <SectionIntro
           align="center"
-          eyebrow="Find the right fit"
+          eyebrowVariant="pill"
+          eyebrow="Cars that fit your life"
           heading="Shop by what you need."
         >
           Start with the type of car that suits your everyday life.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { BreadcrumbItem } from "@/lib/seo";
+import { cn } from "@/lib/cn";
 
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
@@ -11,19 +12,32 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
   }
 
   return (
-    <nav aria-label="Breadcrumb" className="max-w-full">
-      <ol className="flex flex-nowrap items-center gap-x-2 overflow-x-auto text-caption text-muted [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav aria-label="Breadcrumb" className="min-w-0 max-w-full">
+      <ol className="flex min-w-0 flex-nowrap items-center gap-x-1.5 overflow-hidden text-caption text-muted">
         {items.map((item, index) => {
           const last = index === items.length - 1;
           return (
-            <li key={`${item.href}-${item.label}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap">
-              {index > 0 ? <span aria-hidden="true">/</span> : null}
+            <li
+              key={`${item.href}-${item.label}`}
+              className={cn(
+                "flex min-w-0 items-center gap-1.5",
+                last ? "shrink" : "shrink-0",
+              )}
+            >
+              {index > 0 ? (
+                <span aria-hidden="true" className="shrink-0">
+                  /
+                </span>
+              ) : null}
               {last ? (
-                <span aria-current="page" className="text-ink">
+                <span aria-current="page" className="truncate text-ink">
                   {item.label}
                 </span>
               ) : (
-                <Link href={item.href} className="inline-flex min-h-11 items-center hover:text-primary">
+                <Link
+                  href={item.href}
+                  className="whitespace-nowrap py-1 hover:text-primary"
+                >
                   {item.label}
                 </Link>
               )}

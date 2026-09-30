@@ -7,6 +7,7 @@ export {
   getClaimUiState,
   goToBookingStep,
   goToClaimStep,
+  listBookingHistory,
   lookupBookingVehicle,
   lookupClaimVehicle,
   refreshBookingAvailability,

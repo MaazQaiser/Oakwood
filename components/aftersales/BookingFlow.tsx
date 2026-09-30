@@ -10,6 +10,7 @@ import { AftersalesErrorState } from "@/components/aftersales/AftersalesErrorSta
 import { AftersalesProgress } from "@/components/aftersales/AftersalesProgress";
 import { BookingConfirmation } from "@/components/aftersales/BookingConfirmation";
 import { BookingDatePicker } from "@/components/aftersales/BookingDatePicker";
+import { BookingRecord } from "@/components/aftersales/BookingRecord";
 import { BookingSummary } from "@/components/aftersales/BookingSummary";
 import { BookingTimePicker } from "@/components/aftersales/BookingTimePicker";
 import { LocationSelector } from "@/components/aftersales/LocationSelector";
@@ -45,6 +46,7 @@ import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import {
   AFTERSALES_MOCK_NOTICE,
   BOOKING_PREFERRED,
+  BOOKING_RECORD_HASH,
   LOOKUP_NOTICE,
 } from "@/lib/aftersales/copy";
 import type { AftersalesVehicle, AftersalesVehicleContext } from "@/types/aftersales";
@@ -126,6 +128,15 @@ export function BookingFlow({
   const [viewing, setViewing] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const started = useRef(false);
+
+  useEffect(() => {
+    const syncView = () => {
+      setViewing(window.location.hash.replace(/^#/, "") === BOOKING_RECORD_HASH);
+    };
+    syncView();
+    window.addEventListener("hashchange", syncView);
+    return () => window.removeEventListener("hashchange", syncView);
+  }, []);
 
   useEffect(() => {
     if (started.current) {
@@ -253,21 +264,38 @@ export function BookingFlow({
   }
 
   if (state.step === "confirmation" && state.confirmation) {
-    if (!viewing) {
+    if (viewing) {
       return (
         <EligibilityLayout>
           <EligibilityHeader eyebrow="Booking" />
           <div className="mt-6">
-            <BookingConfirmation
+            <BookingRecord
               booking={state.confirmation}
               vehicle={state.vehicle}
-              onView={() => setViewing(true)}
+              contactTelephone={state.contactTelephone}
+              contactEmail={state.contactEmail}
+              onBack={() => {
+                window.history.replaceState(null, "", routes.booking);
+                setViewing(false);
+              }}
             />
           </div>
           <p className="mt-6 text-caption text-muted">{AFTERSALES_MOCK_NOTICE}</p>
         </EligibilityLayout>
       );
     }
+    return (
+      <EligibilityLayout>
+        <EligibilityHeader eyebrow="Booking" />
+        <div className="mt-6">
+          <BookingConfirmation
+            booking={state.confirmation}
+            vehicle={state.vehicle}
+          />
+        </div>
+        <p className="mt-6 text-caption text-muted">{AFTERSALES_MOCK_NOTICE}</p>
+      </EligibilityLayout>
+    );
   }
 
   const questionId = "booking-question";
@@ -409,11 +437,6 @@ export function BookingFlow({
     question = "Sending your booking request";
     support = undefined;
     onContinue = undefined;
-  } else if (state.step === "confirmation" && viewing) {
-    question = "Your booking";
-    support = undefined;
-    onContinue = undefined;
-    onBack = undefined;
   }
 
   const body = (
@@ -618,11 +641,6 @@ export function BookingFlow({
           <LoadingState label="Sending your booking request" />
         </div>
       ) : null}
-      {state.step === "confirmation" && viewing && state.confirmation ? (
-        <div className="mt-6">
-          <BookingConfirmation booking={state.confirmation} vehicle={state.vehicle} />
-        </div>
-      ) : null}
       {state.error === "not_found" && state.step === "vehicle" ? (
         <div className="mt-4">
           <AftersalesErrorState
@@ -654,7 +672,7 @@ export function BookingFlow({
   return (
     <EligibilityLayout
       footer={
-        state.step === "confirmation" && viewing ? undefined : (
+        state.step === "confirmation" ? undefined : (
           <EligibilityNavigation
             onBack={onBack}
             onContinue={onContinue}

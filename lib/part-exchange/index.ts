@@ -5,7 +5,11 @@ export {
   PX_INTRO_HEADING,
   PX_INTRO_SUPPORT,
 } from "./copy";
-export { lookupPartExchangeVehicle } from "./lookup";
+export {
+  listPartExchangeCatalogue,
+  lookupPartExchangeVehicle,
+  pxVehicleKey,
+} from "./lookup";
 export { valuePartExchangeVehicle } from "./valuation";
 export {
   formatRegistration,

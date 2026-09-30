@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import {
   AFTERSALES_SESSION_TTL_MS,
+  BOOKING_HISTORY_COOKIE,
   BOOKING_SESSION_COOKIE,
   CLAIM_SESSION_COOKIE,
   createAftersalesOpaqueId,
@@ -8,12 +9,17 @@ import {
   createClaimRecord,
   getBookingRecord,
   getClaimRecord,
+  hydrateBookingHistory,
   isBookingExpired,
   isClaimExpired,
+  listRememberedBookings,
+  rememberBooking,
+  toBookingListEntry,
   type BookingSessionRecord,
   type WarrantyClaimRecord,
 } from "@/features/aftersales/store";
 import type { AftersalesBookingSource } from "@/types/aftersales";
+import type { BookingListEntry } from "@/types/booking";
 
 function cookieOptions() {
   return {
@@ -28,6 +34,52 @@ function cookieOptions() {
 export async function writeBookingCookie(id: string): Promise<void> {
   const jar = await cookies();
   jar.set(BOOKING_SESSION_COOKIE, id, cookieOptions());
+}
+
+function parseHistory(value?: string): BookingListEntry[] {
+  if (!value) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter((item): item is BookingListEntry => {
+      return (
+        typeof item === "object" &&
+        item !== null &&
+        typeof (item as BookingListEntry).reference === "string" &&
+        typeof (item as BookingListEntry).serviceType === "string" &&
+        typeof (item as BookingListEntry).locationName === "string"
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function readBookingHistory(): Promise<BookingListEntry[]> {
+  const jar = await cookies();
+  const stored = parseHistory(jar.get(BOOKING_HISTORY_COOKIE)?.value);
+  hydrateBookingHistory(stored.slice().reverse());
+  return listRememberedBookings();
+}
+
+export async function writeBookingHistory(entries: BookingListEntry[]): Promise<void> {
+  const jar = await cookies();
+  jar.set(BOOKING_HISTORY_COOKIE, JSON.stringify(entries), cookieOptions());
+}
+
+export async function archiveBooking(record: BookingSessionRecord): Promise<BookingListEntry[]> {
+  const entry = toBookingListEntry(record);
+  if (!entry) {
+    return readBookingHistory();
+  }
+  await readBookingHistory();
+  const next = rememberBooking(entry);
+  await writeBookingHistory(next);
+  return next;
 }
 
 export async function readBookingCookieId(): Promise<string | undefined> {

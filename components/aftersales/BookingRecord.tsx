@@ -1,35 +1,44 @@
 import { Button } from "@/components/ui/Button";
 import { BookingSummary } from "@/components/aftersales/BookingSummary";
 import { showrooms } from "@/config/locations";
-import { getBookingListUrl, routes } from "@/config/routes";
+import { routes } from "@/config/routes";
 import { toTelHref } from "@/lib/format/phone";
 import {
   BOOKING_BACK,
-  BOOKING_CONFIRMED,
-  BOOKING_VIEW,
+  BOOKING_RECORD_BACK,
+  BOOKING_RECORD_HASH,
+  BOOKING_RECORD_HEADING,
 } from "@/lib/aftersales/copy";
 import { formatBookingDate, formatTimeWindow } from "@/lib/aftersales/format";
 import type { BookingRecordView } from "@/types/booking";
 import type { AftersalesVehicle } from "@/types/aftersales";
 
-export function BookingConfirmation({
+export function BookingRecord({
   booking,
   vehicle,
+  contactTelephone,
+  contactEmail,
+  onBack,
 }: {
   booking: BookingRecordView;
   vehicle?: AftersalesVehicle;
+  contactTelephone?: string;
+  contactEmail?: string;
+  onBack: () => void;
 }) {
-  const telephone = showrooms[0]?.telephone;
   const location = showrooms.find((item) => item.slug === booking.locationSlug);
+  const telephone = location?.telephone ?? showrooms[0]?.telephone;
 
   return (
-    <div>
-      <h1 className="text-h2">{BOOKING_CONFIRMED}</h1>
-      <p className="mt-2 text-body-sm text-muted">{booking.instructions}</p>
-      <p className="mt-4 text-label">Reference {booking.reference}</p>
-      <p className="mt-2 text-body-sm text-muted">
-        This request is also listed on Aftersales, under Your bookings.
+    <article id={BOOKING_RECORD_HASH} className="scroll-mt-28">
+      <p className="text-caption font-semibold uppercase tracking-[0.08em] text-muted">
+        Booking record
       </p>
+      <h1 className="mt-2 text-h2">{BOOKING_RECORD_HEADING}</h1>
+      <p className="mt-2 text-body-sm text-muted">
+        Keep this reference if you need to speak to Oakwood about the appointment.
+      </p>
+      <p className="mt-4 text-label">Reference {booking.reference}</p>
       <BookingSummary
         registration={booking.registration}
         vehicle={vehicle}
@@ -38,9 +47,11 @@ export function BookingConfirmation({
         preferredDate={booking.preferredDate}
         timeWindow={booking.preferredTime}
         contactName={booking.contactName}
+        contactTelephone={contactTelephone}
+        contactEmail={contactEmail}
       />
-      <section className="mt-8" aria-labelledby="booking-next-heading">
-        <h2 id="booking-next-heading" className="text-h4">
+      <section className="mt-8" aria-labelledby="booking-record-next">
+        <h2 id="booking-record-next" className="text-h4">
           What happens next
         </h2>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-body-sm text-muted">
@@ -49,8 +60,8 @@ export function BookingConfirmation({
           ))}
         </ol>
       </section>
-      <section className="mt-6" aria-labelledby="booking-instructions-heading">
-        <h2 id="booking-instructions-heading" className="text-h4">
+      <section className="mt-6" aria-labelledby="booking-record-instructions">
+        <h2 id="booking-record-instructions" className="text-h4">
           Important instructions
         </h2>
         <p className="mt-2 text-body-sm text-muted">
@@ -58,19 +69,17 @@ export function BookingConfirmation({
             booking.preferredTime
               ? `, ${formatTimeWindow(booking.preferredTime).toLowerCase()}`
               : ""
-          }. Bring any service history you have. Oakwood will confirm the appointment before you attend.`}
+          }. ${booking.instructions}`}
         </p>
-        {location?.telephone ? (
-          <p className="mt-2 text-body-sm text-muted">
-            {location.name}: {location.telephone}
-          </p>
-        ) : telephone ? (
+        {telephone ? (
           <p className="mt-2 text-body-sm text-muted">Call {telephone}</p>
         ) : null}
       </section>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button href={getBookingListUrl()}>{BOOKING_VIEW}</Button>
-        <Button href={routes.home} variant="secondary">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button variant="secondary" onClick={onBack}>
+          {BOOKING_RECORD_BACK}
+        </Button>
+        <Button href={routes.home} variant="text">
           {BOOKING_BACK}
         </Button>
         {telephone ? (
@@ -79,6 +88,6 @@ export function BookingConfirmation({
           </Button>
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }

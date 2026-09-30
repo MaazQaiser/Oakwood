@@ -29,9 +29,11 @@ export function FeaturedVehicles() {
           }
           action={
             featuredVehicles.length > 0 ? (
-              <Button href={routes.usedCars} variant="text" className="hidden md:inline-flex">
-                View all cars
-              </Button>
+              <div className="hidden md:block">
+                <Button href={routes.usedCars} variant="text">
+                  View all cars
+                </Button>
+              </div>
             ) : undefined
           }
         >
@@ -101,6 +103,7 @@ export function FeaturedVehicles() {
                     )}
                     state={state}
                     gapAmount={state === "ineligible" ? gapAmount : undefined}
+                    term={term}
                   />
                 </div>
               );

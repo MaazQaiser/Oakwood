@@ -360,6 +360,10 @@ export function getBookingUrl(options?: {
   return query ? `${routes.booking}?${query}` : routes.booking;
 }
 
+export function getBookingListUrl(): string {
+  return `${routes.aftersales}#your-bookings`;
+}
+
 export const legalRoutes = {
   hub: routes.legal,
   termsOfUse: routes.termsOfUse,

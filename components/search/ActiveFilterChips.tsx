@@ -182,7 +182,9 @@ export function ActiveFilterChips({
   chips: FilterChip[];
   onClearAll: () => void;
 }) {
-  if (chips.length === 0) {
+  const canClear = chips.some((chip) => Boolean(chip.onRemove));
+
+  if (chips.length === 0 || !canClear) {
     return null;
   }
 

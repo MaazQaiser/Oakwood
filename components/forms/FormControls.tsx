@@ -52,7 +52,7 @@ export function Field({
 }
 
 const controlClass =
-  "min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:bg-page disabled:text-subtle";
+  "min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm font-medium text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:border-border disabled:bg-surface disabled:text-ink disabled:opacity-100";
 
 export function Input({
   className,
@@ -160,10 +160,12 @@ export function Toggle({
 export function Slider({
   label,
   value,
+  valueLabel,
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   value: number;
+  valueLabel?: string;
 }) {
   const id = props.id ?? props.name;
   return (
@@ -173,7 +175,7 @@ export function Slider({
           {label}
         </label>
         <output htmlFor={id} className="financial-number financial-number--sm text-primary">
-          {value}
+          {valueLabel ?? value}
         </output>
       </div>
       <input

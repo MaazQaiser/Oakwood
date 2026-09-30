@@ -3,7 +3,7 @@ export const PX_EYEBROW = "Part exchange";
 export const PX_INTRO_HEADING = "Find out what your car is worth";
 
 export const PX_INTRO_SUPPORT =
-  "See how much your car could contribute to your deposit, using just your registration and mileage.";
+  "Value the car you want to part-exchange, then put that estimate towards an Oakwood listing.";
 
 export const PX_VDP_SUPPORT =
   "See how much your car could contribute to your deposit.";
@@ -17,11 +17,25 @@ export const PX_EQUITY_ADDED = (amount: string) =>
 export const PX_INTRO_CTA = "Get my valuation";
 
 export const PX_INTRO_POINTS = [
-  "Quick online valuation",
+  "Choose which car you are exchanging",
   "Registration and mileage to start",
-  "No commitment",
+  "Use the estimate towards an Oakwood listing",
   "Final offer may depend on vehicle inspection",
 ] as const;
+
+export const PX_CHOOSE_HEADING = "Which car are you exchanging?";
+
+export const PX_CHOOSE_SUPPORT =
+  "Select the car that matches yours. We value that vehicle, rather than treating every part-exchange as the same car.";
+
+export const PX_LISTING_EYEBROW = "Oakwood stock";
+
+export const PX_LISTING_HEADING = "Cars you can put a part-exchange towards";
+
+export const PX_LISTING_SUPPORT =
+  "This is the used-car listing. Open a car to add your valuation to that deal.";
+
+export const PX_LISTING_ACTION = "Part-exchange towards this";
 
 export const PX_REGISTRATION_QUESTION = "What's your registration?";
 

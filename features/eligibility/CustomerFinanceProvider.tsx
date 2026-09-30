@@ -12,6 +12,10 @@ import {
 } from "react";
 import { getEligibilityUiState } from "@/features/eligibility/actions";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import {
+  ILLUSTRATION_BASE_DEPOSIT,
+  ILLUSTRATION_BASE_TERM,
+} from "@/lib/finance/illustration";
 
 export type CustomerFinanceMode =
   | "anonymous"
@@ -42,12 +46,30 @@ interface CustomerFinanceUi {
 
 const CustomerFinanceContext = createContext<CustomerFinanceUi | null>(null);
 
+const ASSUMPTION_TERM_MIN = 24;
+const ASSUMPTION_TERM_MAX = 60;
+const ASSUMPTION_TERM_STEP = 6;
+
+function normaliseAssumptionTerm(months: number): number {
+  const fallback = ILLUSTRATION_BASE_TERM;
+  const value = Number.isFinite(months) && months > 0 ? months : fallback;
+  const clamped = Math.min(
+    ASSUMPTION_TERM_MAX,
+    Math.max(ASSUMPTION_TERM_MIN, Math.round(value)),
+  );
+  const stepped =
+    Math.round((clamped - ASSUMPTION_TERM_MIN) / ASSUMPTION_TERM_STEP) *
+      ASSUMPTION_TERM_STEP +
+    ASSUMPTION_TERM_MIN;
+  return Math.min(ASSUMPTION_TERM_MAX, stepped);
+}
+
 export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<CustomerFinanceMode>("anonymous");
   const [apr, setApr] = useState(16.9);
   const [maxAdvance, setMaxAdvance] = useState(26500);
-  const [deposit, setDeposit] = useState(1000);
-  const [term, setTerm] = useState(48);
+  const [deposit, setDeposit] = useState(ILLUSTRATION_BASE_DEPOSIT);
+  const [term, setTerm] = useState(ILLUSTRATION_BASE_TERM);
   const [assumptionsOpen, setAssumptionsOpen] = useState(false);
   const hydrated = useRef(false);
 
@@ -59,8 +81,8 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
     setMode(input.mode);
     setApr(input.apr);
     setMaxAdvance(input.maxAdvance);
-    setDeposit(input.deposit);
-    setTerm(input.term);
+    setDeposit(input.deposit || ILLUSTRATION_BASE_DEPOSIT);
+    setTerm(normaliseAssumptionTerm(input.term));
     trackEvent(analyticsEvents.financeProfileUpdated);
   }, []);
 

@@ -8,7 +8,7 @@ import { analyticsEvents, trackEvent } from "@/lib/analytics";
 
 const phrases = [
   "BMW under £300 a month",
-  "Family SUV under £15,000",
+  "Family SUV under £400 a month",
   "Audi automatic",
   "Low mileage hatchback",
 ];

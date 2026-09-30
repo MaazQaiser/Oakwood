@@ -12,7 +12,7 @@ import type { VehicleCategory } from "@/types/vehicle";
 export function NaturalLanguageSearch({
   action = routes.search,
   defaultValue,
-  hint = "Try “BMW automatic under £300 a month” or “Family SUV under £15,000”.",
+  hint = "Try “BMW automatic under £300 a month” or “Family SUV under £400 a month”.",
   category = "car",
 }: {
   action?: string;
@@ -37,7 +37,7 @@ export function NaturalLanguageSearch({
         }
       }}
     >
-      <div className="flex flex-col gap-2 rounded-[14px] bg-white p-1.5 shadow-[0_10px_24px_rgba(16,40,72,0.06)] sm:flex-row sm:items-center">
+      <div className="flex min-w-0 flex-col gap-2 rounded-[14px] bg-white p-1.5 shadow-[0_10px_24px_rgba(16,40,72,0.06)] md:flex-row md:items-center">
         <div className="relative min-w-0 flex-1">
           <IconSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
           <label htmlFor={inputId} className="sr-only">
@@ -53,7 +53,7 @@ export function NaturalLanguageSearch({
             autoComplete="off"
           />
         </div>
-        <Button type="submit" className="h-12 rounded-[14px]! sm:min-w-28">
+        <Button type="submit" className="btn-compact h-12 w-full shrink-0 md:w-auto">
           Search
         </Button>
       </div>

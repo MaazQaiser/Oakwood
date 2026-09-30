@@ -58,7 +58,7 @@ export function PageBanner({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="mt-3 max-w-3xl text-[2.15rem] font-medium leading-[1.05] tracking-[-0.03em] text-ink sm:text-[2.75rem]">
+        <h1 className="mt-3 max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]">
           {title}
         </h1>
         {description ? (
@@ -81,9 +81,12 @@ export function PageBanner({
             {secondary ? (
               <Link
                 href={secondary.href}
-                className="inline-flex h-14 items-center self-start rounded-[14px] bg-white px-5 text-button text-[#002852] no-underline hover:bg-[#E7F1F8]"
+                className="inline-flex min-h-14 items-center gap-3 self-start rounded-[14px] bg-white py-1.5 pl-5 pr-1.5 text-[#002852] no-underline hover:bg-[#E7F1F8]"
               >
-                {secondary.label}
+                <span className="text-button">{secondary.label}</span>
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-[#E7F1F8] text-[#002852]">
+                  <IconArrow width={20} height={20} />
+                </span>
               </Link>
             ) : null}
           </div>

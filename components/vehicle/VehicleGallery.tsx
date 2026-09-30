@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { IconButton } from "@/components/ui/Button";
 import { IconArrow, IconClose, IconPlay, IconSearch } from "@/components/ui/icons";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -18,6 +19,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const touchStart = useRef<number | null>(null);
   const current = items[index];
 
@@ -41,9 +43,27 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
   );
 
   useEffect(() => {
+    setPortalReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!lightbox) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [lightbox]);
+
+  useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (lightbox && event.key === "Escape") {
         setLightbox(false);
+        return;
       }
       if (event.key === "ArrowRight") {
         goTo(index + 1);
@@ -55,7 +75,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo, index]);
+  }, [goTo, index, lightbox]);
 
   if (!current) {
     return null;
@@ -198,32 +218,37 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
         ))}
       </ul>
 
-      {lightbox && current.kind === "image" ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#101828]"
-          role="dialog"
-          aria-modal="true"
-          aria-label={current.alt}
-        >
-          <IconButton
-            label="Close"
-            className="absolute right-3 top-3 text-white hover:bg-white/10"
-            onClick={() => setLightbox(false)}
-          >
-            <IconClose />
-          </IconButton>
-          <div className="relative h-full w-full">
-            <Image
-              src={current.src}
-              alt={current.alt}
-              fill
-              sizes="100vw"
-              unoptimized={isSvg(current.src)}
-              className="object-contain"
-            />
-          </div>
-        </div>
-      ) : null}
+      {lightbox && current.kind === "image" && portalReady
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[var(--oak-z-lightbox)] flex h-dvh w-screen flex-col bg-[#101828]"
+              role="dialog"
+              aria-modal="true"
+              aria-label={current.alt}
+            >
+              <div className="flex shrink-0 justify-end px-3 pb-2 pt-[calc(0.75rem+var(--oak-header-height)+0.5rem)] sm:px-4 lg:pt-[calc(1rem+var(--oak-header-height)+0.5rem)]">
+                <IconButton
+                  label="Close"
+                  className="bg-white/10 text-white hover:bg-white/20"
+                  onClick={() => setLightbox(false)}
+                >
+                  <IconClose />
+                </IconButton>
+              </div>
+              <div className="relative min-h-0 flex-1">
+                <Image
+                  src={current.src}
+                  alt={current.alt}
+                  fill
+                  sizes="100vw"
+                  unoptimized={isSvg(current.src)}
+                  className="object-contain"
+                />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Accordion } from "@/components/ui/Accordion";
 import {
   Checkbox,
@@ -27,6 +29,7 @@ import {
 import { getMakes, getModels, uniqueValues } from "@/lib/vehicles/labels";
 import { getSearchCopy } from "@/lib/vehicles/searchCopy";
 import { showrooms, stockLocations } from "@/config/locations";
+import { getEligibilityUrl } from "@/config/routes";
 import type { CustomerFinanceMode } from "@/features/eligibility/CustomerFinanceProvider";
 import type { VehicleCategory } from "@/types/vehicle";
 
@@ -45,10 +48,14 @@ export function FilterFields({
   idPrefix?: string;
   category?: VehicleCategory;
 }) {
+  const router = useRouter();
   const copy = getSearchCopy(category);
   const fid = (name: string) => `${idPrefix}${name}`;
   const makes = getMakes(category);
-  const models = getModels(query.make ?? locked.make, category);
+  const models =
+    query.make || locked.make
+      ? getModels(query.make ?? locked.make, category)
+      : [];
   const colours = uniqueValues((vehicle) => vehicle.colour, category);
   const bodyTypes =
     category === "van"
@@ -117,7 +124,7 @@ export function FilterFields({
             <Select
               id={fid("filter-model")}
               value={query.model ?? ""}
-              disabled={Boolean(locked.model) || !(query.make || locked.make)}
+              disabled={Boolean(locked.model)}
               onChange={(event) =>
                 onChange({ model: event.target.value || undefined })
               }
@@ -417,22 +424,34 @@ export function FilterFields({
         ))}
       </Accordion>
 
-      <Accordion title="Affordable to me" defaultOpen>
+      <div className="border-b border-[#d0d5dd] py-4 last:border-b-0">
         <Toggle
           id={fid("affordable-to-me")}
           label="Affordable to me"
-          checked={query.affordable === "1"}
-          disabled={!eligible}
-          onChange={(event) =>
+          checked={eligible && query.affordable === "1"}
+          onChange={(event) => {
+            if (!eligible) {
+              router.push(getEligibilityUrl());
+              return;
+            }
             onChange({
               affordable: event.target.checked ? "1" : undefined,
-            })
-          }
+            });
+          }}
         />
         <p className="mt-2 text-caption">
-          {eligible ? copy.affordableHintEligible : copy.affordableHintGuest}
+          {eligible ? (
+            copy.affordableHintEligible
+          ) : (
+            <>
+              <Link href={getEligibilityUrl()} className="font-medium text-[#002852] underline-offset-2 hover:underline">
+                Check eligibility
+              </Link>{" "}
+              to personalise affordability.
+            </>
+          )}
         </p>
-        {query.affordable === "1" ? (
+        {eligible && query.affordable === "1" ? (
           <button
             type="button"
             className="mt-2 min-h-11 text-left text-body-sm text-primary"
@@ -441,7 +460,7 @@ export function FilterFields({
             Clear affordable filter
           </button>
         ) : null}
-      </Accordion>
+      </div>
     </div>
   );
 }

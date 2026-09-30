@@ -13,6 +13,7 @@ import type {
   AftersalesVehicle,
 } from "@/types/aftersales";
 import type {
+  BookingListEntry,
   BookingPreference,
   BookingRecordView,
   BookingStatus,
@@ -25,8 +26,10 @@ import type {
 } from "@/types/warranty";
 
 export const BOOKING_SESSION_COOKIE = "oakwood_booking_session";
+export const BOOKING_HISTORY_COOKIE = "oakwood_booking_history";
 export const CLAIM_SESSION_COOKIE = "oakwood_claim_session";
 export const AFTERSALES_SESSION_TTL_MS = 4 * 60 * 60 * 1000;
+export const BOOKING_HISTORY_LIMIT = 8;
 
 export interface BookingSessionRecord {
   id: string;
@@ -75,6 +78,7 @@ export interface EnquiryRecord {
 }
 
 const bookings = new Map<string, BookingSessionRecord>();
+const bookingHistory = new Map<string, BookingListEntry>();
 const claims = new Map<string, WarrantyClaimRecord>();
 const enquiries = new Map<string, EnquiryRecord>();
 
@@ -248,6 +252,52 @@ export function toBookingView(record: BookingSessionRecord): BookingRecordView |
     nextSteps: bookingNextSteps,
     instructions: bookingInstructions,
   };
+}
+
+export function toBookingListEntry(record: BookingSessionRecord): BookingListEntry | null {
+  const view = toBookingView(record);
+  if (!view) {
+    return null;
+  }
+  return {
+    reference: view.reference,
+    serviceType: view.serviceType,
+    locationSlug: view.locationSlug,
+    locationName: view.locationName,
+    registration: view.registration,
+    vehicleLabel: view.vehicleLabel,
+    preferredDate: view.preferredDate,
+    preferredTime: view.preferredTime,
+    contactName: view.contactName,
+  };
+}
+
+export function rememberBooking(entry: BookingListEntry): BookingListEntry[] {
+  bookingHistory.delete(entry.reference);
+  bookingHistory.set(entry.reference, entry);
+  const items = [...bookingHistory.values()];
+  if (items.length > BOOKING_HISTORY_LIMIT) {
+    const extra = items.length - BOOKING_HISTORY_LIMIT;
+    for (let index = 0; index < extra; index += 1) {
+      const oldest = items[index];
+      if (oldest) {
+        bookingHistory.delete(oldest.reference);
+      }
+    }
+  }
+  return listRememberedBookings();
+}
+
+export function hydrateBookingHistory(entries: BookingListEntry[]): void {
+  for (const entry of entries) {
+    if (!bookingHistory.has(entry.reference)) {
+      bookingHistory.set(entry.reference, entry);
+    }
+  }
+}
+
+export function listRememberedBookings(): BookingListEntry[] {
+  return [...bookingHistory.values()].reverse();
 }
 
 export function toClaimView(record: WarrantyClaimRecord): WarrantyClaimView | null {

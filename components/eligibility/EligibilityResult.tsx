@@ -126,25 +126,24 @@ export function EligibilityAcceptedResult({
         Based on your soft search, you have an indicative finance profile to
         start shopping with.
       </p>
-      <dl className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <dt className="text-caption text-muted">Your indicative rate</dt>
-          <dd className="mt-1 text-h3">{formatAprFloor(display.apr)}</dd>
-        </div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <dt className="text-caption text-muted">Approved amount</dt>
-          <dd className="mt-1">
-            <FinancialNumber value={`Up to ${formatPounds(display.maxAdvance)}`} />
-          </dd>
-        </div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <dt className="text-caption text-muted">Term</dt>
-          <dd className="mt-1 text-h3">Up to {formatTerm(display.term)}</dd>
-        </div>
-        <div className="rounded-lg border border-border bg-surface p-4">
-          <dt className="text-caption text-muted">Finance type</dt>
-          <dd className="mt-1 text-h3">{product}</dd>
-        </div>
+      <dl className="mt-8 grid gap-3 sm:grid-cols-2">
+        {[
+          { label: "Your indicative rate", value: formatAprFloor(display.apr) },
+          {
+            label: "Approved amount",
+            value: `Up to ${formatPounds(display.maxAdvance)}`,
+          },
+          { label: "Term", value: `Up to ${formatTerm(display.term)}` },
+          { label: "Finance type", value: product },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-[14px] border border-[#d0d5dd] bg-white px-5 py-4"
+          >
+            <dt className="text-h6 text-[#002852]">{item.label}</dt>
+            <dd className="mt-2 text-body text-ink">{item.value}</dd>
+          </div>
+        ))}
       </dl>
       <EligibilityBorrowingTable rows={display.borrowingRows} />
       <Disclaimers />

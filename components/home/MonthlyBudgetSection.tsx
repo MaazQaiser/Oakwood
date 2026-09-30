@@ -56,7 +56,10 @@ export function MonthlyBudgetSection() {
           </p>
           <h2 className="text-h2 mt-4 text-ink">
             Browse by{" "}
-            <span className="rounded-md bg-[#8EBFDF] px-1.5 text-[#002852]">monthly budget</span>.
+            <span className="inline-block whitespace-nowrap rounded-md bg-[#8EBFDF] px-1.5 text-[#002852]">
+              monthly budget
+            </span>
+            .
           </h2>
         </header>
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">

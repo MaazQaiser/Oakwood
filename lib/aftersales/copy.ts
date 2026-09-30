@@ -23,8 +23,18 @@ export const CLAIM_SUCCESS = "Your warranty claim has been submitted.";
 export const CLAIM_INTRO = "Need to make a warranty claim?";
 
 export const BOOKING_CONFIRMED = "Your booking is confirmed";
-export const BOOKING_VIEW = "View booking";
+export const BOOKING_VIEW = "View bookings";
+export const BOOKING_RECORD_HEADING = "Your booking";
+export const BOOKING_RECORD_BACK = "Back to confirmation";
 export const BOOKING_BACK = "Back to Oakwood";
+export const BOOKING_RECORD_HASH = "booking";
+export const BOOKING_LIST_HASH = "your-bookings";
+export const BOOKING_LIST_EYEBROW = "Aftersales";
+export const BOOKING_LIST_HEADING = "Your bookings";
+export const BOOKING_LIST_SUPPORT =
+  "Service and MOT requests you make with Oakwood are listed here.";
+export const BOOKING_LIST_EMPTY = "You have not made a booking request yet.";
+export const BOOKING_LIST_EMPTY_CTA = "Book a service";
 
 export const LOOKUP_NOTICE =
   "Registration lookup is a preview until the live vehicle lookup is connected.";

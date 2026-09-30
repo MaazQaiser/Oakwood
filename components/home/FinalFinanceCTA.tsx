@@ -56,7 +56,7 @@ export function FinalFinanceCTA() {
         <div className="overflow-hidden rounded-[28px] bg-[linear-gradient(105deg,#001c3d_0%,#002852_48%,#0a3a6b_100%)] px-6 py-8 text-white md:px-12 md:py-10 lg:px-14">
           <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]">
             <div className="max-w-xl">
-              <h2 className="text-[1.7rem] font-semibold leading-[1.2] tracking-tight md:text-[2rem]">
+              <h2 className="text-[1.7rem] font-semibold leading-[1.2em] tracking-tight md:text-[2rem]">
                 {eligible
                   ? "Your finance profile is ready. Browse cars that fit your budget."
                   : "Know your budget before you shop, then browse cars that fit."}

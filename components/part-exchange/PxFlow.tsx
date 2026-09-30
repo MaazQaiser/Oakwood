@@ -7,6 +7,7 @@ import {
   EligibilityNavigation,
 } from "@/components/eligibility/EligibilityLayout";
 import { LoadingState } from "@/components/ui/Loading";
+import { Button } from "@/components/ui/Button";
 import { PxApplyToDeal } from "@/components/part-exchange/PxApplyToDeal";
 import { PxErrorState } from "@/components/part-exchange/PxErrorState";
 import { PxEquitySummary } from "@/components/part-exchange/PxEquitySummary";
@@ -17,21 +18,26 @@ import { PxProgress, type PxProgressStage } from "@/components/part-exchange/PxP
 import { PxRegistrationForm } from "@/components/part-exchange/PxRegistrationForm";
 import { PxSettlementForm } from "@/components/part-exchange/PxSettlementForm";
 import { PxValuationResult } from "@/components/part-exchange/PxValuationResult";
+import { PxVehicleChoice } from "@/components/part-exchange/PxVehicleChoice";
 import { PxVehicleSummary } from "@/components/part-exchange/PxVehicleSummary";
 import {
   usePartExchange,
   type PxVariant,
 } from "@/components/part-exchange/usePartExchange";
 import {
+  PX_CHOOSE_HEADING,
+  PX_CHOOSE_SUPPORT,
   PX_EYEBROW,
   PX_FINANCE_QUESTION,
   PX_MILEAGE_CTA,
   PX_MILEAGE_QUESTION,
   PX_MOCK_NOTICE,
+  PX_NOT_MY_CAR,
   PX_REGISTRATION_CTA,
   PX_REGISTRATION_QUESTION,
   PX_SETTLEMENT_QUESTION,
 } from "@/lib/part-exchange/copy";
+import { listPartExchangeCatalogue } from "@/lib/part-exchange/lookup";
 import type { DealPartExchangeInput } from "@/types/deal";
 
 function progressFor(step: string): PxProgressStage | undefined {
@@ -94,7 +100,30 @@ export function PxFlow({
   }
 
   if (flow.step === "intro") {
-    return <PxIntro onStart={() => void flow.start()} />;
+    return (
+      <PxIntro
+        registration={flow.registration}
+        mileage={flow.mileage}
+        registrationError={
+          flow.errorKind === "invalid_registration" ? flow.error : undefined
+        }
+        mileageError={
+          flow.errorKind === "invalid_mileage" ? flow.error : undefined
+        }
+        starting={flow.loading}
+        onRegistrationChange={flow.setRegistration}
+        onMileageChange={flow.setMileage}
+        onSubmit={() => void flow.startAndLookup()}
+        onManual={flow.enterManual}
+        notice={
+          flow.errorKind === "not_found" ||
+          flow.errorKind === "not_eligible" ||
+          flow.errorKind === "lookup_unavailable"
+            ? flow.error
+            : undefined
+        }
+      />
+    );
   }
 
   const questionId = "px-question";
@@ -108,7 +137,8 @@ export function PxFlow({
     question = PX_REGISTRATION_QUESTION;
     onContinue = undefined;
   } else if (flow.step === "vehicle") {
-    question = "Is this your car?";
+    question = PX_CHOOSE_HEADING;
+    support = PX_CHOOSE_SUPPORT;
     continueLabel = "Yes, continue";
     onContinue = () => void flow.confirmVehicle();
   } else if (flow.step === "manual") {
@@ -177,11 +207,17 @@ export function PxFlow({
         </div>
       ) : null}
 
-      {flow.step === "vehicle" && flow.vehicle ? (
-        <PxVehicleSummary
-          vehicle={flow.vehicle}
-          onNotMyCar={flow.notMyCar}
-        />
+      {flow.step === "vehicle" ? (
+        <>
+          <PxVehicleChoice
+            options={listPartExchangeCatalogue(flow.vehicle)}
+            selected={flow.vehicle}
+            onSelect={flow.selectVehicle}
+          />
+          <Button variant="text" className="mt-3 self-start px-0" onClick={flow.enterManual}>
+            {PX_NOT_MY_CAR}
+          </Button>
+        </>
       ) : null}
 
       {flow.step === "manual" ? (

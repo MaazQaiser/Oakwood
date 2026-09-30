@@ -7,6 +7,7 @@ import { AftersalesHubHero } from "@/components/aftersales/AftersalesHero";
 import { AftersalesLocations } from "@/components/aftersales/AftersalesLocations";
 import { AftersalesRelatedLinks } from "@/components/aftersales/AftersalesRelatedLinks";
 import { AftersalesViewTracker } from "@/components/aftersales/AftersalesViewTracker";
+import { BookingList } from "@/components/aftersales/BookingList";
 import { CallbackEnquiryForm } from "@/components/aftersales/CallbackEnquiryForm";
 import { ServiceCard } from "@/components/aftersales/ServiceCard";
 import { Alert } from "@/components/ui/Alert";
@@ -38,6 +39,7 @@ import { CMS_NOTICE, WARRANTY_ENGINE_NOTICE } from "@/lib/aftersales/copy";
 import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import { createBreadcrumbs, type BreadcrumbItem } from "@/lib/seo";
 import type { AftersalesFaqItem, AftersalesPageCopy } from "@/types/aftersales";
+import type { BookingListEntry } from "@/types/booking";
 
 function JsonLd({ data }: { data: object }) {
   return (
@@ -58,7 +60,11 @@ function PageShell({
   return <PageBannerScope breadcrumbs={breadcrumbs}>{children}</PageBannerScope>;
 }
 
-export function AftersalesHubPage() {
+export function AftersalesHubPage({
+  bookings = [],
+}: {
+  bookings?: BookingListEntry[];
+}) {
   const breadcrumbs = createBreadcrumbs([
     { label: "Home", href: routes.home },
     { label: "Aftersales", href: routes.aftersales },
@@ -68,6 +74,7 @@ export function AftersalesHubPage() {
     <PageShell breadcrumbs={breadcrumbs}>
       <AftersalesViewTracker page="aftersales" />
       <AftersalesHubHero />
+      <BookingList bookings={bookings} />
       <Section>
         <Container>
           <Grid columns="cards">
@@ -95,8 +102,10 @@ export function AftersalesHubPage() {
 
 export function ServicePage({
   variant = "service",
+  bookings = [],
 }: {
   variant?: "service" | "audi";
+  bookings?: BookingListEntry[];
 }) {
   const copy: AftersalesPageCopy =
     variant === "audi" ? audiServiceCopy : servicePageCopy;
@@ -129,6 +138,7 @@ export function ServicePage({
           label: "Request a callback",
         }}
       />
+      <BookingList bookings={bookings} filter="service" />
       <Section>
         <Container>
           <Stack gap="8">
@@ -186,7 +196,11 @@ export function ServicePage({
   );
 }
 
-export function MotPage() {
+export function MotPage({
+  bookings = [],
+}: {
+  bookings?: BookingListEntry[];
+}) {
   const breadcrumbs = createBreadcrumbs([
     { label: "Home", href: routes.home },
     { label: "Aftersales", href: routes.aftersales },
@@ -210,6 +224,7 @@ export function MotPage() {
           label: "Request a callback",
         }}
       />
+      <BookingList bookings={bookings} filter="mot" />
       <Section>
         <Container>
           <Stack gap="8">

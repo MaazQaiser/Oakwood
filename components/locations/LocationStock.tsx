@@ -58,6 +58,7 @@ export function LocationStock({
               key={vehicle.stockId}
               vehicle={vehicle}
               monthly={monthly(vehicle)}
+              term={finance.term}
               state={getFinanceDisplayState(
                 finance.mode,
                 vehicle.cashPrice,

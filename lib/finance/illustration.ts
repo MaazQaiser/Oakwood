@@ -52,7 +52,7 @@ export function getIllustratedMonthly(
   vehicle: { cashPrice: number; monthlyPayment: number },
   deposit: number,
   term: number,
-  financeType: FinanceType = "hp",
+  financeType: FinanceType = "pcp",
 ): number {
   return illustrateFinance({
     cashPrice: vehicle.cashPrice,

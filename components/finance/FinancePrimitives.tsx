@@ -49,12 +49,18 @@ export function MonthlyPayment({
   gapAmount,
   size = "lg",
   noteClassName,
+  term,
+  financeType,
+  showDisclaimer = true,
 }: {
   amount?: number;
   state?: FinanceDisplayState;
   gapAmount?: number;
   size?: "compact" | "md" | "lg";
   noteClassName?: string;
+  term?: number;
+  financeType?: "hp" | "pcp";
+  showDisclaimer?: boolean;
 }) {
   if (state === "loading") {
     return (
@@ -90,11 +96,20 @@ export function MonthlyPayment({
           size={size}
         />
       </p>
-      {state === "representative" ? (
+      {state === "representative" &&
+      ((term !== undefined && financeType) || showDisclaimer) ? (
         <p className={cn("mt-1 text-caption text-muted", noteClassName)}>
-          Representative example
-          {" · "}
-          <StatusDisclosureLink />
+          {term !== undefined && financeType
+            ? `${formatTerm(term)} ${financeType === "pcp" ? "PCP" : "HP"}`
+            : null}
+          {term !== undefined && financeType && showDisclaimer ? " · " : null}
+          {showDisclaimer ? (
+            <>
+              Representative example
+              {" · "}
+              <StatusDisclosureLink />
+            </>
+          ) : null}
         </p>
       ) : null}
       {state === "ineligible" ? (

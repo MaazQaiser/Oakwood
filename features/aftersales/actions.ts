@@ -18,10 +18,12 @@ import {
   vehicleDetailsError,
 } from "@/lib/aftersales/validation";
 import {
+  archiveBooking,
   getBookingSession,
   getClaimSession,
   getOrCreateBookingSession,
   getOrCreateClaimSession,
+  readBookingHistory,
   writeBookingCookie,
 } from "@/features/aftersales/session";
 import {
@@ -44,6 +46,7 @@ import type {
 } from "@/types/aftersales";
 import type {
   BookingAvailabilityResult,
+  BookingListEntry,
   BookingRecordView,
   BookingStep,
   BookingTimeWindow,
@@ -129,6 +132,9 @@ export async function getBookingUiState(): Promise<BookingUiState | { empty: tru
   const record = await getBookingSession();
   if (!record) {
     return { empty: true };
+  }
+  if (record.status === "requested") {
+    await archiveBooking(record);
   }
   return toBookingUi(record);
 }
@@ -345,7 +351,14 @@ export async function submitBookingRequest(): Promise<BookingUiState | { error: 
     reference,
     failureReason: undefined,
   });
+  if (patched) {
+    await archiveBooking(patched);
+  }
   return toBookingUi(patched ?? record);
+}
+
+export async function listBookingHistory(): Promise<BookingListEntry[]> {
+  return readBookingHistory();
 }
 
 export async function retryBookingSubmit(): Promise<BookingUiState | { error: string }> {

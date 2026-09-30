@@ -59,6 +59,7 @@ export function VehicleGrid({
             state={state}
             gapAmount={gapAmount}
             imagePriority={index < 4}
+            term={term}
             toolbar={
               <SaveVehicleButton
                 vehicleName={`${vehicle.make} ${vehicle.model}`}

@@ -112,6 +112,7 @@
   --oak-z-overlay: 60;
   --oak-z-modal: 70;
   --oak-z-toast: 80;
+  --oak-z-lightbox: 90;
 
   /* Motion */
   --oak-motion-fast: 150ms;

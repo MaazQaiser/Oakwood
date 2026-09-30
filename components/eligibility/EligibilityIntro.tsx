@@ -5,13 +5,10 @@ import { useRouter } from "next/navigation";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Button } from "@/components/ui/Button";
 import { IconCheck } from "@/components/ui/icons";
-import {
-  EligibilityLayout,
-  EligibilityMockNotice,
-  EligibilityTrustMessage,
-} from "@/components/eligibility/EligibilityLayout";
+import { EligibilityLayout } from "@/components/eligibility/EligibilityLayout";
 import { ensureEligibilitySession, getEligibilityUiState } from "@/features/eligibility/actions";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { MOCK_SCHEMA_NOTICE } from "@/lib/eligibility/copy";
 import { routes } from "@/config/routes";
 import { useEligibilityJourney } from "@/components/eligibility/EligibilityJourneyProvider";
 
@@ -70,11 +67,15 @@ export function EligibilityIntro() {
         ))}
       </ul>
 
-      <p className="mt-4 text-caption text-muted">
-        You can save and come back later.
-      </p>
-      <EligibilityTrustMessage className="mt-2" />
-      <EligibilityMockNotice />
+      <aside className="mt-8 rounded-[14px] bg-[#ECF3F8] px-5 py-4">
+        <p className="text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#002852]">
+          Please note
+        </p>
+        <ul className="mt-3 flex flex-col gap-2 text-body-sm text-ink">
+          <li>You can save and come back later.</li>
+          <li>{MOCK_SCHEMA_NOTICE}</li>
+        </ul>
+      </aside>
 
       <section id="how-it-works" className="mt-12 scroll-mt-24">
         <h2 className="text-h3">What happens next?</h2>
@@ -84,16 +85,29 @@ export function EligibilityIntro() {
           <li>3. See your indicative finance result</li>
           <li>4. Browse cars based on your budget</li>
         </ol>
-        <p className="mt-4 text-caption text-muted">
-          Required legal information is shown before we run the check.{" "}
-          <a className="text-primary underline-offset-4 hover:underline" href={routes.privacyPolicy}>
-            Privacy policy
-          </a>
-          {" · "}
-          <a className="text-primary underline-offset-4 hover:underline" href={routes.statusDisclosure}>
-            Status disclosure
-          </a>
-        </p>
+        <div className="mt-8 border-t border-[#d0d5dd] pt-5">
+          <p className="text-body-sm text-muted">
+            Required legal information is shown before we run the check.
+          </p>
+          <ul className="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-6">
+            <li>
+              <a
+                className="text-body-sm font-semibold text-[#002852] underline-offset-4 hover:underline"
+                href={routes.privacyPolicy}
+              >
+                Privacy policy
+              </a>
+            </li>
+            <li>
+              <a
+                className="text-body-sm font-semibold text-[#002852] underline-offset-4 hover:underline"
+                href={routes.statusDisclosure}
+              >
+                Status disclosure
+              </a>
+            </li>
+          </ul>
+        </div>
       </section>
     </EligibilityLayout>
     </>

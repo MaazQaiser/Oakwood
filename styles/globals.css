@@ -107,6 +107,12 @@ select {
   padding-right: 2.5rem;
 }
 
+.select-field:disabled {
+  color: #101828;
+  opacity: 1;
+  -webkit-text-fill-color: #101828;
+}
+
 ::selection {
   background: var(--oak-primary-soft);
   color: var(--oak-ink);

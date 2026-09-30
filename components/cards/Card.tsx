@@ -7,7 +7,7 @@ import {
   MonthlyPayment,
 } from "@/components/finance/FinancePrimitives";
 import { Button } from "@/components/ui/Button";
-import { IconArrow, IconPin } from "@/components/ui/icons";
+import { IconArrow } from "@/components/ui/icons";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import { getVehicleUrl } from "@/config/routes";
@@ -89,6 +89,8 @@ export function VehicleCard({
   financeActions,
   imagePriority = false,
   featured = false,
+  term = 48,
+  financeType = "pcp",
 }: {
   vehicle: Vehicle;
   monthly?: number;
@@ -99,6 +101,8 @@ export function VehicleCard({
   financeActions?: ReactNode;
   imagePriority?: boolean;
   featured?: boolean;
+  term?: number;
+  financeType?: "hp" | "pcp";
 }) {
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
@@ -168,11 +172,8 @@ export function VehicleCard({
                 {vehicle.make} {vehicle.model}
               </Link>
             </h3>
-            <p className="shrink-0 pt-0.5 text-right leading-none">
-              <span className="block text-[0.9375rem] font-medium text-ink">
-                {formatPounds(vehicle.cashPrice)}
-              </span>
-              <span className="mt-1 block text-caption text-muted">cash price</span>
+            <p className="shrink-0 pt-0.5 text-right text-[0.9375rem] font-medium leading-tight text-ink">
+              {formatPounds(vehicle.cashPrice)}
             </p>
           </div>
         ) : (
@@ -192,6 +193,9 @@ export function VehicleCard({
           state={state}
           gapAmount={gapAmount}
           size="compact"
+          term={term}
+          financeType={financeType}
+          showDisclaimer={false}
         />
         {featured ? null : (
           <p className="text-body-sm text-muted">
@@ -203,35 +207,21 @@ export function VehicleCard({
             cash price
           </p>
         )}
-        {featured ? (
-          <div className="flex flex-wrap gap-1.5">
-            {[
-              `${formatNumber(vehicle.mileage)} miles`,
-              vehicle.fuelType,
-              vehicle.transmission,
-              vehicle.locationName,
-            ].map((label) => (
-              <span
-                key={label}
-                className="inline-flex items-center rounded-full bg-[#E7F1F8] px-2.5 py-1 text-caption text-[#002852]"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-caption text-muted">
-              <span>{formatNumber(vehicle.mileage)} miles</span>
-              <span>{vehicle.fuelType}</span>
-              <span>{vehicle.transmission}</span>
-            </div>
-            <p className="flex items-center gap-1.5 text-caption text-muted">
-              <IconPin className="h-3.5 w-3.5" />
-              {vehicle.locationName}
-            </p>
-          </>
-        )}
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            `${formatNumber(vehicle.mileage)} miles`,
+            vehicle.fuelType,
+            vehicle.transmission,
+            vehicle.locationName,
+          ].map((label) => (
+            <span
+              key={label}
+              className="inline-flex items-center rounded-full bg-[#E7F1F8] px-2.5 py-1 text-caption text-[#002852]"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
         {financeActions ? <div>{financeActions}</div> : null}
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">
           {action ??

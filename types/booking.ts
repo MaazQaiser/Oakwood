@@ -77,3 +77,15 @@ export interface BookingRecordView {
   nextSteps: string[];
   instructions: string;
 }
+
+export interface BookingListEntry {
+  reference: string;
+  serviceType: AftersalesBookingType;
+  locationSlug: string;
+  locationName: string;
+  registration?: string;
+  vehicleLabel?: string;
+  preferredDate?: string;
+  preferredTime?: BookingTimeWindow;
+  contactName: string;
+}

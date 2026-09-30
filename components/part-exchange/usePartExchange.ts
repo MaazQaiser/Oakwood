@@ -187,51 +187,84 @@ export function usePartExchange({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const start = useCallback(() => {
+  const ensureStarted = useCallback(() => {
     if (!started.current) {
       started.current = true;
       track(analyticsEvents.pxStarted);
       void startPxSession(source);
     }
+  }, [source, track]);
+
+  const start = useCallback(() => {
+    ensureStarted();
     setError(undefined);
     setErrorKind(undefined);
     setStep("registration");
-  }, [source, track]);
+  }, [ensureStarted]);
 
-  const lookup = useCallback(async () => {
-    const issue = registrationError(registration);
-    if (issue) {
-      setError(issue);
+  const lookup = useCallback(
+    async (plate = registration, fallback: PxStep = "registration") => {
+      const issue = registrationError(plate);
+      if (issue) {
+        setError(issue);
+        setErrorKind("invalid_registration");
+        return;
+      }
+      setError(undefined);
+      setErrorKind(undefined);
+      setLoading(true);
+      if (fallback !== "intro") {
+        setStep("lookup");
+      }
+      track(analyticsEvents.pxRegistrationSubmitted);
+      const result = await lookupPxRegistration({ registration: plate, source });
+      setLoading(false);
+      if (!result.ok) {
+        track(analyticsEvents.pxRegistrationFailed, { reason: result.reason });
+        if (result.reason === "not_found") {
+          setErrorKind("not_found");
+          setError(result.message);
+          setStep(fallback);
+          return;
+        }
+        if (result.reason === "ineligible") {
+          setErrorKind("not_eligible");
+          setError(result.message);
+          setStep(fallback);
+          return;
+        }
+        setErrorKind("lookup_unavailable");
+        setError(result.message);
+        setStep(fallback);
+        return;
+      }
+      track(analyticsEvents.pxRegistrationSuccess);
+      setVehicle(result.vehicle);
+      setStep("vehicle");
+    },
+    [registration, source, track],
+  );
+
+  const startAndLookup = useCallback(async () => {
+    const plateIssue = registrationError(registration);
+    const milesIssue = mileageError(mileage);
+    if (plateIssue) {
+      setError(plateIssue);
       setErrorKind("invalid_registration");
       return;
     }
-    setError(undefined);
-    setErrorKind(undefined);
-    setLoading(true);
-    setStep("lookup");
-    track(analyticsEvents.pxRegistrationSubmitted);
-    const result = await lookupPxRegistration({ registration, source });
-    setLoading(false);
-    if (!result.ok) {
-      track(analyticsEvents.pxRegistrationFailed, { reason: result.reason });
-      if (result.reason === "not_found") {
-        setErrorKind("not_found");
-        setStep("registration");
-        return;
-      }
-      if (result.reason === "ineligible") {
-        setErrorKind("not_eligible");
-        setStep("registration");
-        return;
-      }
-      setErrorKind("lookup_unavailable");
-      setStep("registration");
+    if (milesIssue) {
+      setError(milesIssue);
+      setErrorKind("invalid_mileage");
       return;
     }
-    track(analyticsEvents.pxRegistrationSuccess);
-    setVehicle(result.vehicle);
-    setStep("vehicle");
-  }, [registration, source, track]);
+    ensureStarted();
+    await lookup(registration, "intro");
+  }, [ensureStarted, lookup, mileage, registration]);
+
+  const selectVehicle = useCallback((next: PxIdentifiedVehicle) => {
+    setVehicle({ ...next, source: next.source ?? "lookup" });
+  }, []);
 
   const confirmVehicle = useCallback(() => {
     if (!vehicle) {
@@ -481,7 +514,7 @@ export function usePartExchange({
       return;
     }
     if (step === "vehicle" || step === "manual") {
-      setStep("registration");
+      setStep(variant === "standalone" ? "intro" : "registration");
       return;
     }
     if (step === "mileage") {
@@ -533,7 +566,9 @@ export function usePartExchange({
     hasDeal: hasDeal || Boolean(onApplied),
     figures,
     start,
+    startAndLookup,
     lookup,
+    selectVehicle,
     confirmVehicle,
     saveManual,
     valueVehicle,
@@ -548,6 +583,7 @@ export function usePartExchange({
       setStep("registration");
     },
     enterManual: () => {
+      ensureStarted();
       const issue = registrationError(registration);
       if (issue) {
         setError(issue);

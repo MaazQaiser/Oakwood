@@ -11,9 +11,7 @@ export function ProcessStep({ step }: { step: ProcessStepData }) {
       <p className="mt-2 text-body-sm text-muted">{step.copy}</p>
       {step.href && step.cta ? (
         <p className="mt-4">
-          <Button href={step.href} variant="secondary">
-            {step.cta}
-          </Button>
+          <Button href={step.href}>{step.cta}</Button>
         </p>
       ) : null}
     </article>

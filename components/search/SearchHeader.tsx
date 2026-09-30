@@ -15,7 +15,6 @@ export function SearchHeader({
 
   return (
     <PageBanner
-      eyebrow={context.category === "van" ? "Used vans" : "Used cars"}
       title={context.title}
       description={context.description}
       breadcrumbs={context.breadcrumbs}
