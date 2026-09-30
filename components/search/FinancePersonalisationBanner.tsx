@@ -65,15 +65,15 @@ export function FinancePersonalisationBanner({
       aria-label="Finance eligibility"
       className="rounded-[14px] border border-border bg-primary-soft px-4 py-4 md:px-5"
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 lg:max-w-xl lg:flex-1">
           <h2 className="text-h4">{copy.bannerTitle}</h2>
           <p className="mt-1 text-body-sm text-muted">{copy.bannerBody}</p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
           <Button
             href={routes.eligibility}
-            className="btn-compact"
+            className="btn-compact w-full shrink-0 sm:w-auto"
             onClick={() => {
               trackEvent(analyticsEvents.financeEligibilityCtaClicked, {
                 source: "search_banner",
@@ -88,7 +88,11 @@ export function FinancePersonalisationBanner({
           >
             {copy.bannerCta}
           </Button>
-          <Button href={browseHref} variant="secondary" className="btn-compact">
+          <Button
+            href={browseHref}
+            variant="secondary"
+            className="btn-compact w-full shrink-0 whitespace-nowrap sm:w-auto"
+          >
             Browse without checking
           </Button>
         </div>

@@ -91,9 +91,9 @@ export function Button({
     "disabled:cursor-not-allowed disabled:opacity-50",
     "active:translate-y-px",
     compact && variant === "primary"
-      ? "h-11 min-h-11 justify-between gap-2 rounded-[14px] bg-[#002852] py-1 pl-4 pr-1 text-white hover:bg-[#001c3d]"
+      ? "h-11 min-h-11 shrink-0 justify-between gap-2 whitespace-nowrap rounded-[14px] bg-[#002852] py-1 pl-4 pr-1 text-white hover:bg-[#001c3d]"
       : compact && variant === "secondary"
-        ? "h-11 min-h-11 justify-center rounded-[14px] border border-transparent bg-white px-4 text-[#002852] hover:bg-[#E7F1F8]"
+        ? "h-11 min-h-11 shrink-0 justify-center whitespace-nowrap rounded-[14px] border border-transparent bg-white px-4 text-[#002852] hover:bg-[#E7F1F8]"
         : withArrow
           ? "min-h-14 justify-between gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white hover:bg-[#001c3d]"
           : cn(
@@ -106,7 +106,7 @@ export function Button({
   const content = (
     <>
       {busy ? <BusySpinner /> : null}
-      {withArrow ? <span>{children}</span> : children}
+      {withArrow ? <span className={cn(compact && "whitespace-nowrap")}>{children}</span> : children}
       {withArrow ? (
         <span
           className={
