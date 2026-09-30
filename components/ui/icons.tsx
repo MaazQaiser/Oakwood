@@ -136,6 +136,21 @@ export function IconMessage(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconHelp(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="20" height="20" {...props}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
+      <path
+        d="M9.75 9.25A2.25 2.25 0 0 1 12 7.5c1.45 0 2.5.95 2.5 2.15 0 1.05-.55 1.55-1.35 2.05-.75.45-1.15.95-1.15 1.8"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="16.75" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function Icon({
   children,
   className,

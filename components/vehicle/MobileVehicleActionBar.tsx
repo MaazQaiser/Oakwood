@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { StickyActionBar } from "@/components/ui/StickyActionBar";
-import { IconMessage, IconPhone } from "@/components/ui/icons";
+import { IconHelp, IconPhone } from "@/components/ui/icons";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { getContactUrl, getUsedCarsUrl } from "@/config/routes";
@@ -34,13 +34,13 @@ export function MobileVehicleActionBar() {
         <Button
           href={getContactUrl({ stockId: vehicle.stockId })}
           variant="icon"
-          aria-label="Message us"
+          aria-label="Support"
           className="border border-border"
           onClick={() =>
-            trackEvent(analyticsEvents.contactClicked, { channel: "message" })
+            trackEvent(analyticsEvents.contactClicked, { channel: "support" })
           }
         >
-          <IconMessage />
+          <IconHelp />
         </Button>
         {reservable ? (
           <StartReservationButton stockId={vehicle.stockId} className="min-w-0 flex-1" />
