@@ -456,6 +456,7 @@ export function EligibilityQuestionsFlow() {
           <EligibilityNavigation
             onBack={() => void goBack()}
             onContinue={() => void goNext()}
+            className="mt-6"
           />
           <EligibilityTrustMessage className="mt-4" />
           <div className="mt-8">

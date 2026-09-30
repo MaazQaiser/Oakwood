@@ -39,6 +39,7 @@ export function EligibilityNavigation({
   continueDisabled,
   backLabel = "Back",
   backHref,
+  className,
 }: {
   onBack?: () => void;
   onContinue?: () => void;
@@ -46,9 +47,15 @@ export function EligibilityNavigation({
   continueDisabled?: boolean;
   backLabel?: string;
   backHref?: string;
+  className?: string;
 }) {
   return (
-    <div className="sticky bottom-[var(--oak-consent-offset,0px)] z-10 -mx-[var(--oak-page-x)] mt-8 border-t border-border bg-page px-[var(--oak-page-x)] py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div
+      className={cn(
+        "sticky bottom-[var(--oak-consent-offset,0px)] z-10 mt-8 bg-page py-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        className,
+      )}
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {onBack ? (
           <Button variant="text" onClick={onBack} className="self-start px-0">
@@ -120,7 +127,11 @@ export function EligibilityQuestion({
 }
 
 export function EligibilityMockNotice() {
-  return <p className="mt-4 text-caption text-muted">{MOCK_SCHEMA_NOTICE}</p>;
+  return (
+    <p className="mt-10 border-t border-border pt-6 text-body-sm text-muted">
+      {MOCK_SCHEMA_NOTICE}
+    </p>
+  );
 }
 
 export function EligibilityHomeLink() {

@@ -17,7 +17,6 @@ export function EligibilityProgress({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-label text-muted">{stageLabel}</p>
       <ol className="flex items-center gap-2" aria-hidden="true">
         {ELIGIBILITY_STAGES.map((item, index) => {
           const complete = index < currentIndex;
