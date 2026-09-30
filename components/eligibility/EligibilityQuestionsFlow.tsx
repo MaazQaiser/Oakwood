@@ -16,7 +16,6 @@ import {
   EligibilityMockNotice,
   EligibilityNavigation,
   EligibilityQuestion,
-  EligibilityTrustMessage,
 } from "@/components/eligibility/EligibilityLayout";
 import { EligibilityProgress } from "@/components/eligibility/EligibilityProgress";
 import { EligibilitySummary } from "@/components/eligibility/EligibilitySummary";
@@ -421,7 +420,6 @@ export function EligibilityQuestionsFlow() {
               onContinue={() => void submit()}
               continueLabel="Check my eligibility"
             />
-            <EligibilityTrustMessage />
           </>
         }
       >
@@ -458,8 +456,7 @@ export function EligibilityQuestionsFlow() {
             onContinue={() => void goNext()}
             className="mt-6"
           />
-          <EligibilityTrustMessage className="mt-4" />
-          <div className="mt-8">
+          <div className="mt-6">
             <SaveAndResume answers={journey.answers} questionId={current.id} />
           </div>
         </>
