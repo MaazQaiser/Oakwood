@@ -4,7 +4,6 @@ import type { BreadcrumbItem } from "@/lib/seo";
 import type { FinanceIntentSlug } from "@/types/finance";
 
 export function FinanceIntentHero({
-  eyebrow,
   title,
   intro,
   intent,
@@ -12,7 +11,6 @@ export function FinanceIntentHero({
   secondary,
   breadcrumbs,
 }: {
-  eyebrow: string;
   title: string;
   intro: string;
   intent: FinanceIntentSlug | "hub";
@@ -22,7 +20,6 @@ export function FinanceIntentHero({
 }) {
   return (
     <PageBanner
-      eyebrow={eyebrow}
       title={title}
       breadcrumbs={breadcrumbs}
       description={

@@ -173,13 +173,13 @@ function HistoryVisual() {
           </span>
         </div>
       </div>
-      <div className="absolute bottom-0 right-[-8%] h-32 w-[84%]">
+      <div className="absolute inset-x-[-6%] bottom-0 h-32">
         <Image
           src="/images/promo/range-car.png"
           alt=""
           fill
-          sizes="220px"
-          className="object-contain object-right-bottom"
+          sizes="280px"
+          className="object-contain object-bottom"
         />
       </div>
     </div>

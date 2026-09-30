@@ -62,7 +62,6 @@ export function ContentDocument({ document }: { document: ContentEntry }) {
       ) : null}
       <ContentViewTracker slug={document.slug} type={document.type} />
       <PageBanner
-        eyebrow={document.category}
         title={document.title}
         description={document.description}
         breadcrumbs={breadcrumbs}

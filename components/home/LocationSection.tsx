@@ -11,11 +11,7 @@ export function LocationSection() {
   return (
     <Section>
       <Container>
-        <SectionIntro
-          align="center"
-          eyebrow="Visit Oakwood"
-          heading="Find your nearest Oakwood."
-        >
+        <SectionIntro align="center" heading="Find your nearest Oakwood.">
           Visit us in Bury or Chorley and see your next car in person.
         </SectionIntro>
         <Grid columns="two" className="mt-8">

@@ -160,7 +160,11 @@ export const footerNavigation: NavigationGroup[] = [
     label: "Aftersales",
     href: routes.aftersales,
     children: [
-      { id: "aftersales-hub", label: "Aftersales", href: routes.aftersales },
+      {
+        id: "aftersales-hub",
+        label: "Aftersales services",
+        href: routes.aftersales,
+      },
       { id: "servicing", label: "Servicing", href: routes.service },
       { id: "mot", label: "MOT", href: routes.mot },
       { id: "warranty", label: "Warranty", href: routes.warranty },

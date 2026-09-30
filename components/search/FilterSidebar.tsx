@@ -10,12 +10,14 @@ export function FilterSidebar({
   locked,
   financeMode,
   onChange,
+  onMakeChange,
   category = "car",
 }: {
   query: SearchQuery;
   locked: LockedFilters;
   financeMode: CustomerFinanceMode;
   onChange: (patch: Partial<SearchQuery>) => void;
+  onMakeChange?: (makeSlug: string | undefined) => void;
   category?: VehicleCategory;
 }) {
   return (
@@ -27,6 +29,7 @@ export function FilterSidebar({
           locked={locked}
           financeMode={financeMode}
           onChange={onChange}
+          onMakeChange={onMakeChange}
           category={category}
           idPrefix="desktop-"
         />

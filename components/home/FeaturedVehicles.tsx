@@ -21,7 +21,6 @@ export function FeaturedVehicles() {
     <Section>
       <Container>
         <SectionIntro
-          eyebrow={eligible ? "Picked for you" : "Popular right now"}
           heading={
             eligible
               ? "Cars that fit your finance profile."

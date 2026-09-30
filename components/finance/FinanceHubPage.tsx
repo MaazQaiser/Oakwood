@@ -45,7 +45,6 @@ export function FinanceHubPage() {
       <JsonLd data={createFaqJsonLd(financeHubFaqs)} />
       <FinanceIntentViewTracker intent="hub" />
       <FinanceIntentHero
-        eyebrow={financeHubContent.eyebrow}
         title={financeHubContent.h1}
         intro={financeHubContent.intro}
         intent="hub"

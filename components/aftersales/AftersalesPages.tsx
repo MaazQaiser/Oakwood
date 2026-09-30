@@ -123,7 +123,6 @@ export function ServicePage({
       <AftersalesViewTracker page="service" />
       <JsonLd data={createFaqJsonLd(faqs)} />
       <AftersalesHero
-        eyebrow={copy.eyebrow}
         title={copy.title}
         description={copy.description}
         primary={{
@@ -212,7 +211,6 @@ export function MotPage({
       <AftersalesViewTracker page="mot" />
       <JsonLd data={createFaqJsonLd(motFaqs)} />
       <AftersalesHero
-        eyebrow={motPageCopy.eyebrow}
         title={motPageCopy.title}
         description={motPageCopy.description}
         primary={{
@@ -286,7 +284,6 @@ export function WarrantyPage() {
       <AftersalesViewTracker page="warranty" />
       <JsonLd data={createFaqJsonLd(warrantyFaqs)} />
       <AftersalesHero
-        eyebrow={warrantyPageCopy.eyebrow}
         title={warrantyPageCopy.title}
         description={warrantyPageCopy.description}
         primary={{
@@ -353,7 +350,6 @@ export function BookingEnquiryPage() {
   return (
     <PageShell breadcrumbs={breadcrumbs}>
       <PageBanner
-        eyebrow="Aftersales"
         title="Request a callback"
         description="If we can't show appointments online, leave your details and Oakwood will call you back."
       />

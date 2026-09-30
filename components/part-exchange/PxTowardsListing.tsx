@@ -11,7 +11,6 @@ import { getIllustratedMonthly } from "@/lib/finance/illustration";
 import { featuredVehicles } from "@/lib/mock/home";
 import {
   PX_LISTING_ACTION,
-  PX_LISTING_EYEBROW,
   PX_LISTING_HEADING,
   PX_LISTING_SUPPORT,
 } from "@/lib/part-exchange/copy";
@@ -27,7 +26,6 @@ export function PxTowardsListing() {
     <Section>
       <Container>
         <SectionIntro
-          eyebrow={PX_LISTING_EYEBROW}
           heading={PX_LISTING_HEADING}
           action={
             <div className="hidden md:block">

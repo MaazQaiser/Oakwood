@@ -8,16 +8,8 @@ import { MOCK_SCHEMA_NOTICE } from "@/lib/eligibility/copy";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
 
-export function EligibilityHeader({
-  eyebrow = "Finance eligibility",
-}: {
-  eyebrow?: string;
-}) {
-  return (
-    <p className="text-caption font-semibold uppercase tracking-[0.08em] text-muted">
-      {eyebrow}
-    </p>
-  );
+export function EligibilityHeader(_props?: { eyebrow?: string }) {
+  return null;
 }
 
 export function EligibilityTrustMessage({

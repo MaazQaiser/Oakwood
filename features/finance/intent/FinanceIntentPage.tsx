@@ -44,7 +44,6 @@ export function FinanceIntentPage({
       <JsonLd data={createFaqJsonLd(content.faqs)} />
       <FinanceIntentViewTracker intent={content.slug} />
       <FinanceIntentHero
-        eyebrow={content.eyebrow}
         title={content.h1}
         intro={content.intro}
         intent={content.slug}

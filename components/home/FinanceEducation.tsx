@@ -17,7 +17,6 @@ export function FinanceEducation() {
       <Container width="wide">
         <SectionIntro
           align="center"
-          eyebrow="Finance made simple"
           heading="Everything you need to know about car finance."
         >
           Understand your options before you make a decision.

@@ -49,7 +49,6 @@ export function ReviewsSection() {
       <Container>
         <SectionIntro
           align="center"
-          eyebrow="Customer reviews"
           heading="Video reviews from Oakwood customers."
         >
           Watch customers on collection day, from the showroom to driving away.

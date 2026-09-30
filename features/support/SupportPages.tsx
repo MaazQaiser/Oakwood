@@ -120,7 +120,6 @@ export function SupportContactPage({
     >
       <SupportViewTracker page="contact" />
       <PageBanner
-        eyebrow={SUPPORT_HUB_EYEBROW}
         title={SUPPORT_HUB_H1}
         description={SUPPORT_HUB_INTRO}
       />
@@ -189,7 +188,7 @@ export function SupportFaqPage() {
     >
       <JsonLd data={createFaqJsonLd(faqs)} />
       <SupportViewTracker page="faq" />
-      <PageBanner eyebrow="Support" title={FAQ_H1} description={FAQ_INTRO} />
+      <PageBanner title={FAQ_H1} description={FAQ_INTRO} />
       <FAQAccordion items={faqs} />
       <Related
         heading="Related"
@@ -226,7 +225,7 @@ export function SupportComplaintsPage({
       ])}
     >
       <SupportViewTracker page="complaint" />
-      <PageBanner eyebrow="Support" title={COMPLAINTS_H1} description={COMPLAINTS_INTRO} />
+      <PageBanner title={COMPLAINTS_H1} description={COMPLAINTS_INTRO} />
       <Section>
         <Container width="narrow">
           <h2 className="text-h2">{COMPLAINTS_HOW_TITLE}</h2>

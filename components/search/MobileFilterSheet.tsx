@@ -14,6 +14,7 @@ export function MobileFilterSheet({
   financeMode,
   resultCount,
   onChange,
+  onMakeChange,
   onClose,
   onClear,
   category = "car",
@@ -25,6 +26,7 @@ export function MobileFilterSheet({
   financeMode: CustomerFinanceMode;
   resultCount: number;
   onChange: (patch: Partial<SearchQuery>) => void;
+  onMakeChange?: (makeSlug: string | undefined) => void;
   onClose: () => void;
   onClear: () => void;
   category?: VehicleCategory;
@@ -52,6 +54,7 @@ export function MobileFilterSheet({
         locked={locked}
         financeMode={financeMode}
         onChange={onChange}
+        onMakeChange={onMakeChange}
         category={category}
         idPrefix="mobile-"
       />

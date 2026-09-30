@@ -37,6 +37,7 @@ export function FilterFields({
   locked,
   financeMode,
   onChange,
+  onMakeChange,
   idPrefix = "",
   category = "car",
 }: {
@@ -44,6 +45,7 @@ export function FilterFields({
   locked: LockedFilters;
   financeMode: CustomerFinanceMode;
   onChange: (patch: Partial<SearchQuery>) => void;
+  onMakeChange?: (makeSlug: string | undefined) => void;
   idPrefix?: string;
   category?: VehicleCategory;
 }) {
@@ -104,11 +106,16 @@ export function FilterFields({
           <Field htmlFor={fid("filter-make")} label="Make">
             <Select
               id={fid("filter-make")}
-              value={query.make ?? ""}
-              disabled={Boolean(locked.make)}
-              onChange={(event) =>
-                onChange({ make: event.target.value || undefined, model: undefined })
-              }
+              value={query.make ?? locked.make ?? ""}
+              disabled={Boolean(locked.make && !onMakeChange)}
+              onChange={(event) => {
+                const value = event.target.value || undefined;
+                if (locked.make && onMakeChange) {
+                  onMakeChange(value);
+                  return;
+                }
+                onChange({ make: value, model: undefined });
+              }}
             >
               <option value="">Any make</option>
               {makes.map((make) => (

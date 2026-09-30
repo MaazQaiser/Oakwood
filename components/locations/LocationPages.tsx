@@ -53,7 +53,6 @@ export function LocationsHubPage() {
     >
       <TrustViewTracker page="hub" />
       <AftersalesHero
-        eyebrow="Locations"
         title="Find your nearest Oakwood"
         description="Oakwood has showrooms in Bury and Chorley. Choose a location to see cars, services and how to visit."
         primary={{ href: routes.usedCars, label: "View cars" }}
@@ -102,7 +101,6 @@ export function LocationShowroomPage({
       <TrustViewTracker page="location" location={profile.slug} />
       <JsonLd data={createLocalBusinessJsonLd(profile, path)} />
       <PageBanner
-        eyebrow={profile.eyebrow}
         title={profile.h1}
         description={
           <>

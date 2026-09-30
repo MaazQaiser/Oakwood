@@ -73,7 +73,7 @@ export function FinalFinanceCTA() {
                   href={routes.financeCalculator}
                   className="font-semibold text-white underline decoration-white/70 underline-offset-[5px]"
                 >
-                  Finance calculator
+                  Calculate finance
                 </Link>
               </p>
             </div>

@@ -53,7 +53,6 @@ export function BlogHub({ topic }: { topic?: string }) {
     <>
       <ContentViewTracker slug="hub" type="article" />
       <PageBanner
-        eyebrow={CONTENT_HUB_EYEBROW}
         title={CONTENT_HUB_H1}
         description={CONTENT_HUB_INTRO}
         breadcrumbs={createBreadcrumbs([

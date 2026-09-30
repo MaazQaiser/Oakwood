@@ -15,7 +15,6 @@ export function DealBuilderHeader() {
 
   return (
     <PageBanner
-      eyebrow="Your deal"
       title={DEAL_HEADING}
       description={
         <>

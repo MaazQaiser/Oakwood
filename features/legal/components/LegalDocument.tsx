@@ -37,7 +37,6 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
     <>
       <LegalViewTracker slug={document.slug} />
       <PageBanner
-        eyebrow="Legal"
         title={document.title}
         description={document.intro || undefined}
         breadcrumbs={breadcrumbs}

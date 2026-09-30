@@ -41,7 +41,6 @@ export function EligibilityIntro() {
   return (
     <>
       <PageBanner
-        eyebrow="Finance eligibility"
         title="Find out what you could afford."
         description="Check your finance eligibility in around 60 seconds. It won't affect your credit score."
         actions={
@@ -68,9 +67,7 @@ export function EligibilityIntro() {
       </ul>
 
       <aside className="mt-8 rounded-[14px] bg-[#ECF3F8] px-5 py-4">
-        <p className="text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#002852]">
-          Please note
-        </p>
+        <p className="text-sm font-semibold text-ink">Please note</p>
         <ul className="mt-3 flex flex-col gap-2 text-body-sm text-ink">
           <li>You can save and come back later.</li>
           <li>{MOCK_SCHEMA_NOTICE}</li>

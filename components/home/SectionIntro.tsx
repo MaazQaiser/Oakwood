@@ -2,25 +2,20 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 export function SectionIntro({
-  eyebrow,
   heading,
   children,
   headingLevel = "h2",
   align = "left",
   action,
-  eyebrowVariant = "caption",
 }: {
-  eyebrow: string;
   heading: string;
   children?: ReactNode;
   headingLevel?: "h2" | "h1";
   align?: "left" | "center";
   action?: ReactNode;
-  eyebrowVariant?: "caption" | "pill";
 }) {
   const HeadingTag = headingLevel;
   const centered = align === "center";
-  const pill = eyebrowVariant === "pill";
 
   return (
     <header
@@ -32,19 +27,7 @@ export function SectionIntro({
       )}
     >
       <div className={cn(centered ? "mx-auto max-w-3xl" : undefined)}>
-        <p
-          className={cn(
-            pill
-              ? "inline-flex items-center gap-2 rounded-full bg-[#E7F1F8] px-4 py-1.5 text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-[#002852] sm:text-[0.875rem]"
-              : "text-caption text-primary",
-          )}
-        >
-          {pill ? (
-            <span className="h-1.5 w-1.5 rounded-full bg-[#002852]" aria-hidden="true" />
-          ) : null}
-          {eyebrow}
-        </p>
-        <HeadingTag className={headingLevel === "h1" ? "text-display mt-3" : "text-h2 mt-3"}>
+        <HeadingTag className={headingLevel === "h1" ? "text-display" : "text-h2"}>
           {heading}
         </HeadingTag>
         {children ? (

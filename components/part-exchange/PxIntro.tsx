@@ -5,7 +5,6 @@ import { Field, Input } from "@/components/forms/FormControls";
 import { IconCheck } from "@/components/ui/icons";
 import { PxTowardsListing } from "@/components/part-exchange/PxTowardsListing";
 import {
-  PX_EYEBROW,
   PX_INTRO_CTA,
   PX_INTRO_HEADING,
   PX_INTRO_POINTS,
@@ -57,7 +56,6 @@ export function PxIntro({
   return (
     <>
       <PageBanner
-        eyebrow={PX_EYEBROW}
         title={PX_INTRO_HEADING}
         description={PX_INTRO_SUPPORT}
       >

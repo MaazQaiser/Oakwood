@@ -55,7 +55,6 @@ export function VehicleDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <PageBanner
-        eyebrow="Used cars"
         title={heading}
         description={`${vehicle.year} · ${formatNumber(vehicle.mileage)} miles · ${vehicle.fuelType} · ${vehicle.transmission}`}
         breadcrumbs={breadcrumbs}

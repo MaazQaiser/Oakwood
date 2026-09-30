@@ -50,11 +50,7 @@ export function MonthlyBudgetSection() {
     <Section className="bg-[#ECF3F8] [background-image:radial-gradient(ellipse_at_88%_0%,#ffffff_0%,transparent_46%)]">
       <Container>
         <header className="mx-auto max-w-3xl text-center">
-          <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#002852] shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#002852]" aria-hidden="true" />
-            Shop by monthly budget
-          </p>
-          <h2 className="text-h2 mt-4 text-ink">
+          <h2 className="text-h2 text-ink">
             Browse by{" "}
             <span className="inline-block whitespace-nowrap rounded-md bg-[#8EBFDF] px-1.5 text-[#002852]">
               monthly budget

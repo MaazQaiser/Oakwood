@@ -13,7 +13,6 @@ export function LegalHub() {
     <>
       <LegalViewTracker slug="hub" />
       <PageBanner
-        eyebrow="Legal"
         title={LEGAL_HUB_H1}
         description={LEGAL_HUB_INTRO}
         breadcrumbs={createBreadcrumbs([

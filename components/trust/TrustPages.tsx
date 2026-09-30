@@ -88,7 +88,6 @@ function TrustHero({
 }) {
   return (
     <AftersalesHero
-      eyebrow={copy.eyebrow}
       title={copy.title}
       description={copy.description}
       primary={primary}

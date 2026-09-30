@@ -1,7 +1,6 @@
 "use client";
 
 import { Chip } from "@/components/ui/Badge";
-import { IconButton } from "@/components/ui/Button";
 import { IconClose } from "@/components/ui/icons";
 import { formatPounds } from "@/lib/format/money";
 import type { LockedFilters, SearchQuery } from "@/lib/validation/search";
@@ -34,19 +33,22 @@ export function getFilterChips(
     });
   }
 
-  if (query.make) {
+  const activeMake = query.make ?? locked.make;
+  if (activeMake) {
     chips.push({
       id: "make",
-      label: `Make: ${getMakeName(query.make)}`,
+      label: `Make: ${getMakeName(activeMake)}`,
       locked: Boolean(locked.make),
       onRemove: locked.make ? undefined : () => onRemove("make"),
     });
   }
 
   if (query.model) {
+    const modelName =
+      getModelName(activeMake, query.model) ?? query.model;
     chips.push({
       id: "model",
-      label: getModelName(query.make, query.model) ?? query.model,
+      label: `Model: ${modelName}`,
       locked: Boolean(locked.model),
       onRemove: locked.model ? undefined : () => onRemove("model"),
     });
@@ -191,17 +193,23 @@ export function ActiveFilterChips({
   return (
     <div className="flex flex-wrap items-center gap-2">
       {chips.map((chip) => (
-        <Chip key={chip.id} className="max-w-full gap-1 border-primary bg-primary-soft pr-1 text-primary">
-          <span className="min-w-0 truncate">{chip.label}</span>
+        <Chip
+          key={chip.id}
+          className="max-w-full gap-0.5 border-primary bg-primary-soft py-1 pl-3 text-primary"
+        >
+          <span className="min-w-0 truncate text-body-sm">{chip.label}</span>
           {chip.onRemove ? (
-            <IconButton
-              label={`Remove ${chip.label} filter`}
-              className="min-h-11 min-w-11 shrink-0"
+            <button
+              type="button"
+              className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-primary hover:bg-white/50"
+              aria-label={`Remove ${chip.label} filter`}
               onClick={chip.onRemove}
             >
               <IconClose width={14} height={14} />
-            </IconButton>
-          ) : null}
+            </button>
+          ) : (
+            <span className="w-1 shrink-0" aria-hidden />
+          )}
         </Chip>
       ))}
       <button

@@ -2,13 +2,11 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { getBookingUrl } from "@/config/routes";
 
 export function AftersalesHero({
-  eyebrow,
   title,
   description,
   primary,
   secondary,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
   primary: { href: string; label: string };
@@ -16,7 +14,6 @@ export function AftersalesHero({
 }) {
   return (
     <PageBanner
-      eyebrow={eyebrow}
       title={title}
       description={description}
       primary={primary}
@@ -28,7 +25,6 @@ export function AftersalesHero({
 export function AftersalesHubHero() {
   return (
     <AftersalesHero
-      eyebrow="Aftersales"
       title="Keep your car running at its best"
       description="Book servicing, MOTs and support with Oakwood."
       primary={{

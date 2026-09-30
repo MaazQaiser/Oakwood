@@ -26,7 +26,6 @@ const widthClass = {
 } as const;
 
 export function PageBanner({
-  eyebrow,
   title,
   description,
   breadcrumbs,
@@ -36,7 +35,6 @@ export function PageBanner({
   children,
   width = "wide",
 }: {
-  eyebrow?: string;
   title: string;
   description?: ReactNode;
   breadcrumbs?: BreadcrumbItem[];
@@ -53,12 +51,12 @@ export function PageBanner({
     <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 overflow-hidden rounded-[32px] bg-[#ECF3F8] px-[var(--oak-page-x)] pb-10 pt-[calc(var(--oak-header-height)+1.75rem)] sm:mx-4 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6 lg:pb-12">
       <div className={cn("mx-auto w-full", widthClass[width])}>
         {crumbs && crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
-        {eyebrow ? (
-          <p className={cn("text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-[#002852]", crumbs?.length ? "mt-5" : undefined)}>
-            {eyebrow}
-          </p>
-        ) : null}
-        <h1 className="mt-3 max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]">
+        <h1
+          className={cn(
+            "max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]",
+            crumbs?.length ? "mt-5" : "mt-0",
+          )}
+        >
           {title}
         </h1>
         {description ? (

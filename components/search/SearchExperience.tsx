@@ -38,6 +38,7 @@ import {
 import { countLabel, fewResultsLabel, getSearchCopy } from "@/lib/vehicles/searchCopy";
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
 import type { Vehicle } from "@/types/vehicle";
+import { getMakeUrl, routes, type StockCategory } from "@/config/routes";
 
 export function SearchExperience({
   context,
@@ -163,6 +164,34 @@ export function SearchExperience({
     });
   }
 
+  function changeMake(makeSlug: string | undefined) {
+    trackEvent(analyticsEvents.filterApplied, {
+      make: makeSlug,
+      category: context.category,
+    });
+    if (vanEvents) {
+      trackEvent(vanEvents.filterApplied, { make: makeSlug });
+    }
+
+    const stockCategory: StockCategory =
+      context.category === "van" ? "vans" : "cars";
+    const hub =
+      stockCategory === "vans" ? routes.usedVans : routes.usedCars;
+    const nextQuery = mergeSearchQuery(
+      { ...resolved, page: undefined },
+      { make: makeSlug, model: undefined },
+    );
+
+    if (context.locked.make) {
+      const basePath = makeSlug ? getMakeUrl(makeSlug, stockCategory) : hub;
+      const locked = makeSlug ? { make: makeSlug } : {};
+      router.push(buildSearchHref(basePath, nextQuery, locked));
+      return;
+    }
+
+    update({ make: makeSlug, model: undefined });
+  }
+
   const chips = getFilterChips(resolved, context.locked, removeFilter);
   const removableChips = chips.filter((chip) => Boolean(chip.onRemove));
   const alternatives = getAlternativeSearches(resolved, context.locked, {
@@ -221,6 +250,7 @@ export function SearchExperience({
           financeMode={finance.mode}
           category={context.category}
           onChange={update}
+          onMakeChange={changeMake}
         />
 
         <div className="min-w-0 flex-1" id="results">
@@ -322,6 +352,7 @@ export function SearchExperience({
         category={context.category}
         resultLabel={copy.nounPlural}
         onChange={update}
+        onMakeChange={changeMake}
         onClose={() => setFiltersOpen(false)}
         onClear={clearFilters}
       />

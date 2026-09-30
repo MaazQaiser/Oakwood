@@ -29,7 +29,6 @@ export function FinanceCalculatorPage({
   return (
     <>
       <PageBanner
-        eyebrow="Finance"
         title={CALCULATOR_H1}
         description={CALCULATOR_INTRO}
         breadcrumbs={breadcrumbs}
