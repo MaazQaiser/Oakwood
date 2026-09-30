@@ -278,6 +278,10 @@ select {
   }
 }
 
+body[data-vehicle-lightbox] header {
+  z-index: var(--oak-z-base);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
