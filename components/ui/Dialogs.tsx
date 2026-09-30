@@ -51,8 +51,8 @@ export function Modal({
       ref={ref}
       className={
         size === "wide"
-          ? "w-[min(100%-1rem,72rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
-          : "w-[min(100%-2rem,32rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
+          ? "z-[var(--oak-z-modal)] w-[min(100%-1rem,72rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
+          : "z-[var(--oak-z-modal)] w-[min(100%-2rem,32rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
       }
       onClose={onClose}
     >

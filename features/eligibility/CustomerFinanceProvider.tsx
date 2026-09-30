@@ -37,6 +37,8 @@ interface CustomerFinanceUi {
   deposit: number;
   term: number;
   assumptionsOpen: boolean;
+  profileTerm: number | null;
+  profileDeposit: number | null;
   setMode: (mode: CustomerFinanceMode) => void;
   setDeposit: (value: number) => void;
   setTerm: (value: number) => void;
@@ -70,7 +72,9 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
   const [maxAdvance, setMaxAdvance] = useState(26500);
   const [deposit, setDeposit] = useState(ILLUSTRATION_BASE_DEPOSIT);
   const [term, setTerm] = useState(ILLUSTRATION_BASE_TERM);
-  const [assumptionsOpen, setAssumptionsOpen] = useState(false);
+  const [assumptionsOpen, setAssumptionsOpenState] = useState(false);
+  const [profileTerm, setProfileTerm] = useState<number | null>(null);
+  const [profileDeposit, setProfileDeposit] = useState<number | null>(null);
   const hydrated = useRef(false);
 
   const setModeSafe = useCallback((next: CustomerFinanceMode) => {
@@ -78,13 +82,34 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const applyEligibilityProfile = useCallback((input: EligibilityProfileInput) => {
+    const nextDeposit = input.deposit || ILLUSTRATION_BASE_DEPOSIT;
+    const nextTerm = normaliseAssumptionTerm(input.term);
     setMode(input.mode);
     setApr(input.apr);
     setMaxAdvance(input.maxAdvance);
-    setDeposit(input.deposit || ILLUSTRATION_BASE_DEPOSIT);
-    setTerm(normaliseAssumptionTerm(input.term));
+    setProfileDeposit(nextDeposit);
+    setProfileTerm(nextTerm);
+    setDeposit(nextDeposit);
+    setTerm(nextTerm);
     trackEvent(analyticsEvents.financeProfileUpdated);
   }, []);
+
+  const setAssumptionsOpen = useCallback(
+    (open: boolean) => {
+      if (
+        open &&
+        profileTerm !== null &&
+        (mode === "personalised" || mode === "ineligible")
+      ) {
+        setTerm(profileTerm);
+        if (profileDeposit !== null) {
+          setDeposit(profileDeposit);
+        }
+      }
+      setAssumptionsOpenState(open);
+    },
+    [mode, profileDeposit, profileTerm],
+  );
 
   useEffect(() => {
     if (hydrated.current) {
@@ -122,6 +147,8 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
       deposit,
       term,
       assumptionsOpen,
+      profileTerm,
+      profileDeposit,
       setMode: setModeSafe,
       setDeposit,
       setTerm,
@@ -135,7 +162,10 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
       deposit,
       term,
       assumptionsOpen,
+      profileTerm,
+      profileDeposit,
       setModeSafe,
+      setAssumptionsOpen,
       applyEligibilityProfile,
     ],
   );

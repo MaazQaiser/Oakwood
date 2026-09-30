@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Dialogs";
 import { Slider } from "@/components/forms/FormControls";
@@ -10,6 +11,7 @@ import { getEligibilityUrl } from "@/config/routes";
 import { formatApr, formatPounds } from "@/lib/format/money";
 
 export function CustomerFinanceControl() {
+  const router = useRouter();
   const {
     mode,
     apr,
@@ -24,6 +26,14 @@ export function CustomerFinanceControl() {
   const eligibilityHref = personalised
     ? getEligibilityUrl("result")
     : getEligibilityUrl("questions");
+  const assumptionsCtaLabel = personalised
+    ? "View my eligibility result"
+    : "Check my eligibility";
+
+  function goToEligibility() {
+    setAssumptionsOpen(false);
+    router.push(eligibilityHref);
+  }
 
   return (
     <>
@@ -82,12 +92,8 @@ export function CustomerFinanceControl() {
             value={term}
             onChange={(event) => setTerm(Number(event.target.value))}
           />
-          <Button
-            href={eligibilityHref}
-            variant="secondary"
-            onClick={() => setAssumptionsOpen(false)}
-          >
-            Check my eligibility
+          <Button variant="secondary" onClick={goToEligibility}>
+            {assumptionsCtaLabel}
           </Button>
           <p className="text-caption">
             Changes apply to this session only. No finance profile is stored in
