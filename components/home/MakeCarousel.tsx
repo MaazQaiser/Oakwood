@@ -36,8 +36,8 @@ function MakeLogo({ slug }: { slug: string }) {
   if (!src) return null;
 
   return (
-    <span className="relative mx-auto block h-7 w-14">
-      <Image src={src} alt="" fill sizes="56px" className="object-contain" />
+    <span className="relative mx-auto block h-8 w-[4.5rem]">
+      <Image src={src} alt="" fill sizes="72px" className="object-contain" />
     </span>
   );
 }
@@ -94,7 +94,9 @@ export function MakeCarousel({
               className="flex flex-col items-center px-2 py-3 text-center no-underline"
             >
               <MakeLogo slug={make.slug} />
-              <span className="mt-2 text-[0.95rem] font-medium text-ink">{make.name}</span>
+              <span className="mt-2 flex min-h-10 w-full items-center justify-center px-1 text-center text-caption font-medium leading-snug text-ink">
+                {make.name}
+              </span>
               <span className="relative mt-3 block h-16 w-full">
                 <Image
                   src={MAKE_IMAGES[make.slug] ?? "/images/vehicle-side.svg"}
