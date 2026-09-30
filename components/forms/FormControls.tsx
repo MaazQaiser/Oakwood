@@ -136,17 +136,29 @@ export function Radio({
 
 export function Toggle({
   label,
+  hideLabel = false,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  hideLabel?: boolean;
+}) {
   const id = props.id ?? props.name;
   return (
-    <label htmlFor={id} className="flex min-h-11 items-center justify-between gap-4">
-      <span className="text-label">{label}</span>
+    <label
+      htmlFor={id}
+      className={
+        hideLabel
+          ? "flex min-h-11 items-center justify-end"
+          : "flex min-h-11 items-center justify-between gap-4"
+      }
+    >
+      {hideLabel ? null : <span className="text-label">{label}</span>}
       <input
         type="checkbox"
         id={id}
         role="switch"
         className="peer sr-only"
+        aria-label={hideLabel ? label : undefined}
         {...props}
       />
       <span

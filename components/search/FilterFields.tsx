@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Accordion } from "@/components/ui/Accordion";
 import {
   Checkbox,
@@ -48,7 +47,6 @@ export function FilterFields({
   idPrefix?: string;
   category?: VehicleCategory;
 }) {
-  const router = useRouter();
   const copy = getSearchCopy(category);
   const fid = (name: string) => `${idPrefix}${name}`;
   const makes = getMakes(category);
@@ -424,20 +422,18 @@ export function FilterFields({
         ))}
       </Accordion>
 
-      <div className="border-b border-[#d0d5dd] py-4 last:border-b-0">
+      <Accordion title="Affordable to me" defaultOpen>
         <Toggle
           id={fid("affordable-to-me")}
           label="Affordable to me"
+          hideLabel
           checked={eligible && query.affordable === "1"}
-          onChange={(event) => {
-            if (!eligible) {
-              router.push(getEligibilityUrl());
-              return;
-            }
+          disabled={!eligible}
+          onChange={(event) =>
             onChange({
               affordable: event.target.checked ? "1" : undefined,
-            });
-          }}
+            })
+          }
         />
         <p className="mt-2 text-caption">
           {eligible ? (
@@ -460,7 +456,7 @@ export function FilterFields({
             Clear affordable filter
           </button>
         ) : null}
-      </div>
+      </Accordion>
     </div>
   );
 }
