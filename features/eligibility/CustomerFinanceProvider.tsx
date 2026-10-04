@@ -94,17 +94,24 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
     trackEvent(analyticsEvents.financeProfileUpdated);
   }, []);
 
+  const setTermSafe = useCallback((value: number) => {
+    setTerm(normaliseAssumptionTerm(value));
+  }, []);
+
   const setAssumptionsOpen = useCallback(
     (open: boolean) => {
-      if (
-        open &&
-        profileTerm !== null &&
-        (mode === "personalised" || mode === "ineligible")
-      ) {
-        setTerm(profileTerm);
+      if (open && (mode === "personalised" || mode === "ineligible")) {
+        if (profileTerm !== null) {
+          setTerm(profileTerm);
+        } else {
+          setTerm((current) => normaliseAssumptionTerm(current));
+        }
         if (profileDeposit !== null) {
           setDeposit(profileDeposit);
         }
+      }
+      if (open && mode === "anonymous") {
+        setTerm((current) => normaliseAssumptionTerm(current));
       }
       setAssumptionsOpenState(open);
     },
@@ -151,7 +158,7 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
       profileDeposit,
       setMode: setModeSafe,
       setDeposit,
-      setTerm,
+      setTerm: setTermSafe,
       setAssumptionsOpen,
       applyEligibilityProfile,
     }),
@@ -165,6 +172,7 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
       profileTerm,
       profileDeposit,
       setModeSafe,
+      setTermSafe,
       setAssumptionsOpen,
       applyEligibilityProfile,
     ],

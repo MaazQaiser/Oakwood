@@ -23,7 +23,7 @@ export function FinanceEducation() {
         </SectionIntro>
 
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          <article className="flex min-h-[28rem] flex-col rounded-[28px] bg-[#d4e4ff] p-7 sm:p-9">
+          <article className="flex flex-col gap-8 rounded-[28px] bg-[#d4e4ff] p-7 sm:p-9 lg:min-h-[28rem] lg:justify-between lg:gap-0">
             <div className="max-w-md">
               <h3 className="text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-[#14325c] sm:text-[2.35rem]">
                 Flexible finance that starts with your budget.
@@ -34,12 +34,12 @@ export function FinanceEducation() {
               <p className="mt-4 text-[0.98rem] text-[#14325c]">No impact on your credit score.</p>
               <Link
                 href={routes.eligibility}
-                className="mt-8 inline-flex min-h-11 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d]"
+                className="mt-6 inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d] sm:mt-8"
               >
                 Check eligibility
               </Link>
             </div>
-            <div className="mt-auto grid grid-cols-3 gap-2 border-t border-[#14325c]/10 pt-5 text-center">
+            <div className="grid shrink-0 grid-cols-3 gap-2 border-t border-[#14325c]/10 pt-5 text-center">
               {financePoints.map((point) => (
                 <Link
                   key={point.label}

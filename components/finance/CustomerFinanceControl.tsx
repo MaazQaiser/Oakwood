@@ -1,17 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Dialogs";
 import { Slider } from "@/components/forms/FormControls";
 import { PersonalisedPricingIndicator } from "@/components/finance/FinancePrimitives";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { financeCta } from "@/config/navigation";
-import { getEligibilityUrl } from "@/config/routes";
+import { getSearchUrl, routes } from "@/config/routes";
 import { formatApr, formatPounds } from "@/lib/format/money";
 
 export function CustomerFinanceControl() {
-  const router = useRouter();
+  const pathname = usePathname();
   const {
     mode,
     apr,
@@ -23,17 +24,30 @@ export function CustomerFinanceControl() {
     setAssumptionsOpen,
   } = useCustomerFinance();
   const personalised = mode === "personalised" || mode === "ineligible";
-  const eligibilityHref = personalised
-    ? getEligibilityUrl("result")
-    : getEligibilityUrl("questions");
-  const assumptionsCtaLabel = personalised
-    ? "View my eligibility result"
-    : "Check my eligibility";
-
-  function goToEligibility() {
-    setAssumptionsOpen(false);
-    router.push(eligibilityHref);
-  }
+  const eligibilityAction = useMemo(() => {
+    if (personalised) {
+      if (pathname === routes.eligibilityResult) {
+        return {
+          href: getSearchUrl({ affordable: "1" }),
+          label: "Browse affordable cars",
+        };
+      }
+      return {
+        href: routes.eligibilityResult,
+        label: "View my eligibility result",
+      };
+    }
+    if (
+      pathname === routes.eligibilityQuestions ||
+      pathname === routes.eligibilityResume
+    ) {
+      return null;
+    }
+    return {
+      href: routes.eligibilityQuestions,
+      label: "Check my eligibility",
+    };
+  }, [pathname, personalised]);
 
   return (
     <>
@@ -84,17 +98,22 @@ export function CustomerFinanceControl() {
           />
           <Slider
             name="term"
-            label="Term"
-            valueLabel={`${term} months`}
+            label={`Term ${term} months`}
             min={24}
             max={60}
             step={6}
             value={term}
             onChange={(event) => setTerm(Number(event.target.value))}
           />
-          <Button variant="secondary" onClick={goToEligibility}>
-            {assumptionsCtaLabel}
-          </Button>
+          {eligibilityAction ? (
+            <Button
+              variant="secondary"
+              href={eligibilityAction.href}
+              onClick={() => setAssumptionsOpen(false)}
+            >
+              {eligibilityAction.label}
+            </Button>
+          ) : null}
           <p className="text-caption">
             Changes apply to this session only. No finance profile is stored in
             the browser.

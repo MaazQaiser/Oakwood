@@ -193,9 +193,9 @@ export function Slider({
       <input
         id={id}
         type="range"
-        value={value}
         className="h-11 w-full accent-primary"
         {...props}
+        value={value}
       />
     </div>
   );
