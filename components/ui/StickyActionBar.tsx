@@ -13,7 +13,7 @@ export function StickyActionBar({
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-[var(--oak-consent-offset,0px)] z-[30] border-t border-border bg-surface px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3",
+        "fixed inset-x-0 bottom-[calc(var(--oak-consent-offset,0px)+var(--oak-compare-offset,0px))] z-[30] border-t border-border bg-surface px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3",
         hiddenOnDesktop && "lg:hidden",
         className,
       )}

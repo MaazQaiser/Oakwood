@@ -197,6 +197,17 @@ export function FinanceTerm({ months }: { months?: number }) {
   );
 }
 
+export function TotalPayable({ amount }: { amount?: number }) {
+  return (
+    <p className="text-body-sm">
+      <span className="text-muted">Total payable </span>
+      <span className="financial-number financial-number--sm">
+        {amount === undefined ? "—" : formatPounds(amount)}
+      </span>
+    </p>
+  );
+}
+
 export function FinanceBadge({
   state = "representative",
 }: {
@@ -244,21 +255,34 @@ export function FinanceSummary({
   apr,
   deposit,
   term,
+  totalPayable,
+  financeType,
   state = "representative",
   gapAmount,
+  showDisclaimer = true,
 }: {
   monthly?: number;
   cash?: number;
   apr?: number;
   deposit?: number;
   term?: number;
+  totalPayable?: number;
+  financeType?: "hp" | "pcp";
   state?: FinanceDisplayState;
   gapAmount?: number;
+  showDisclaimer?: boolean;
 }) {
   return (
     <aside className="rounded-lg border border-border bg-page-tint p-5">
       <div className="flex items-start justify-between gap-3">
-        <MonthlyPayment amount={monthly} state={state} gapAmount={gapAmount} />
+        <MonthlyPayment
+          amount={monthly}
+          state={state}
+          gapAmount={gapAmount}
+          term={term}
+          financeType={financeType}
+          showDisclaimer={showDisclaimer}
+        />
         <FinanceBadge state={state} />
       </div>
       <div className="mt-4 flex flex-col gap-2">
@@ -266,6 +290,9 @@ export function FinanceSummary({
         <APR value={apr} state={state} />
         <Deposit amount={deposit} />
         <FinanceTerm months={term} />
+        {totalPayable !== undefined ? (
+          <TotalPayable amount={totalPayable} />
+        ) : null}
       </div>
     </aside>
   );

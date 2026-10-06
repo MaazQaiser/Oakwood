@@ -12,6 +12,7 @@ export interface SearchCopy {
   searchHint: string;
   emptyHeading: string;
   emptyFallback: string;
+  notifyLabel: string;
   browseAllLabel: string;
   requestLabel: string;
   showNotify: boolean;
@@ -50,8 +51,9 @@ const CAR_COPY: SearchCopy = {
   landingDescription:
     "Explore our used cars and find one that fits your budget, lifestyle and finance options.",
   searchHint: "Try “BMW automatic under £300 a month” or “Family SUV under £400 a month”.",
-  emptyHeading: "No cars match those filters.",
-  emptyFallback: "Try removing a filter or broaden your search.",
+  emptyHeading: "No exact matches found.",
+  emptyFallback: "Try removing a filter or change what you searched for.",
+  notifyLabel: "Notify me when available",
   browseAllLabel: "Browse all cars",
   requestLabel: "Request a car",
   showNotify: true,
@@ -95,8 +97,9 @@ const VAN_COPY: SearchCopy = {
   landingDescription:
     "Browse available Oakwood vans and find one that fits your budget. Compare monthly payments, cash price and specification, then continue into finance or reserve.",
   searchHint: "Try “Ford Transit under £300 a month” or “Diesel van in Bury”.",
-  emptyHeading: "We couldn't find a van matching those filters.",
-  emptyFallback: "Try removing a filter or broaden your search.",
+  emptyHeading: "No exact matches found.",
+  emptyFallback: "Try removing a filter or change what you searched for.",
+  notifyLabel: "Notify me when available",
   browseAllLabel: "Browse all vans",
   requestLabel: "Request a van",
   showNotify: false,

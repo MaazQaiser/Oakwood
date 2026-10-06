@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { useToast } from "@/components/ui/Toast";
 import { routes } from "@/config/routes";
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -16,28 +14,15 @@ export function EmptyResults({
   alternatives,
   copy = getSearchCopy("car"),
   onClear,
-  onNearest,
 }: {
   heading?: string;
   description?: string;
   alternatives: AlternativeSearch[];
   copy?: SearchCopy;
   onClear: () => void;
-  onNearest: () => void;
 }) {
-  const { pushToast } = useToast();
   const vanEvents = getVanSearchEvents(copy.category);
   const title = heading ?? copy.emptyHeading;
-
-  useEffect(() => {
-    trackEvent(analyticsEvents.zeroResultsViewed, {
-      heading: title,
-      category: copy.category,
-    });
-    if (copy.category === "van") {
-      trackEvent(analyticsEvents.vanZeroResults, { heading: title });
-    }
-  }, [title, copy.category]);
 
   return (
     <div className="rounded-lg border border-border bg-surface px-5 py-8">
@@ -46,18 +31,22 @@ export function EmptyResults({
         {description ?? copy.emptyFallback}
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Button onClick={onClear}>
-          {copy.category === "van" ? "Relax filters" : "Clear filters"}
-        </Button>
-        <Button variant="secondary" onClick={onNearest}>
-          View nearest matches
-        </Button>
-        <Button href={copy.hubHref} variant="tertiary">
-          {copy.browseAllLabel}
-        </Button>
+        {copy.showNotify ? (
+          <Button
+            href={routes.getAQuote}
+            onClick={() => {
+              trackEvent(analyticsEvents.requestACarClicked, {
+                category: copy.category,
+                type: "notify",
+              });
+            }}
+          >
+            {copy.notifyLabel}
+          </Button>
+        ) : null}
         <Button
           href={routes.getAQuote}
-          variant="tertiary"
+          variant={copy.showNotify ? "secondary" : "primary"}
           onClick={() => {
             trackEvent(analyticsEvents.requestACarClicked, {
               category: copy.category,
@@ -69,21 +58,16 @@ export function EmptyResults({
         >
           {copy.requestLabel}
         </Button>
-        {copy.showNotify ? (
-          <Button
-            variant="text"
-            onClick={() => {
-              trackEvent(analyticsEvents.requestACarClicked, { type: "notify" });
-              pushToast("We'll look into alerts for this search.", "info");
-            }}
-          >
-            Notify me
-          </Button>
-        ) : null}
+        <Button variant="tertiary" onClick={onClear}>
+          {copy.category === "van" ? "Relax filters" : "Clear filters"}
+        </Button>
+        <Button href={copy.hubHref} variant="tertiary">
+          {copy.browseAllLabel}
+        </Button>
       </div>
       {alternatives.length > 0 ? (
         <div className="mt-8">
-          <h3 className="text-h4">Try these options</h3>
+          <h3 className="text-h4">Change this search</h3>
           <ul className="mt-3 flex flex-col gap-2">
             {alternatives.map((item) => (
               <li key={item.href}>
@@ -93,25 +77,6 @@ export function EmptyResults({
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-body-sm text-muted">
-            Tell us what you&apos;re looking for
-          </p>
-          <Button
-            href={routes.getAQuote}
-            className="mt-3"
-            onClick={() => {
-              trackEvent(analyticsEvents.requestACarClicked, {
-                category: copy.category,
-              });
-              if (vanEvents) {
-                trackEvent(vanEvents.requestStarted, {
-                  source: "empty_results_follow_up",
-                });
-              }
-            }}
-          >
-            {copy.requestLabel}
-          </Button>
         </div>
       ) : null}
     </div>

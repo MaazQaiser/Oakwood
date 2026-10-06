@@ -62,12 +62,14 @@ function progressFor(step: string): PxProgressStage | undefined {
 export function PxFlow({
   variant,
   initialPx,
+  initialRegistration,
   consideredStockId,
   vdp,
   onApplied,
 }: {
   variant: PxVariant;
   initialPx?: DealPartExchangeInput;
+  initialRegistration?: string;
   consideredStockId?: string;
   vdp?: boolean;
   onApplied?: (px: DealPartExchangeInput) => void | Promise<void>;
@@ -75,6 +77,7 @@ export function PxFlow({
   const flow = usePartExchange({
     variant,
     initialPx,
+    initialRegistration,
     consideredStockId,
     vdp,
     onApplied,
@@ -396,6 +399,12 @@ export function PxFlow({
   );
 }
 
-export function PxStandalone() {
-  return <PxFlow variant="standalone" />;
+export function PxStandalone({
+  initialRegistration,
+}: {
+  initialRegistration?: string;
+} = {}) {
+  return (
+    <PxFlow variant="standalone" initialRegistration={initialRegistration} />
+  );
 }

@@ -1,4 +1,5 @@
-/** Local Unsplash stock used for authentic UK automotive imagery. */
+/** Local Unsplash stock used off-homepage until authentic Oakwood photography is connected.
+ *  Do not use these on the homepage. Homepage imagery lives in lib/home/photography.ts. */
 
 export const stockImages = {
   hatchback01: "/images/stock/hatchback-01.jpg",

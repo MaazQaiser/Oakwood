@@ -1,248 +1,285 @@
-"use client";
-
 import Image from "next/image";
-import Link from "next/link";
-import { useRef } from "react";
-import { Container, Section } from "@/components/layout/Container";
-import { getSearchUrl, routes } from "@/config/routes";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/cards/Card";
+import { Container, Grid, Section } from "@/components/layout/Container";
+import { SectionIntro } from "@/components/home/SectionIntro";
+import { getLocationUrl } from "@/config/routes";
+import {
+  WHY_OAKWOOD_AA_INSPECTED,
+  WHY_OAKWOOD_AA_NOTE,
+  WHY_OAKWOOD_AA_POINTS,
+  WHY_OAKWOOD_CARS,
+  WHY_OAKWOOD_CARS_HANDED_OVER,
+  WHY_OAKWOOD_CMS_NOTICE,
+  WHY_OAKWOOD_ESTABLISHED_YEAR,
+  WHY_OAKWOOD_HEADING,
+  WHY_OAKWOOD_IMAGES,
+  WHY_OAKWOOD_INTRO,
+  WHY_OAKWOOD_LINKS,
+  WHY_OAKWOOD_PREPARATION,
+  WHY_OAKWOOD_SHOWROOMS,
+  WHY_OAKWOOD_TECHNICIANS,
+  WHY_OAKWOOD_WARRANTY,
+  WHY_OAKWOOD_WARRANTY_COPY,
+  WHY_OAKWOOD_WORKSHOP,
+  type WhyOakwoodImageSlot,
+  type WhyOakwoodTechnician,
+} from "@/lib/home/why-oakwood";
+import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 
-const cards = [
-  {
-    id: "budget",
-    title: "Cars under £200",
-    copy: "Used cars with a cash price and an example monthly payment.",
-    href: getSearchUrl({ monthly_max: 200 }),
-    cta: "Shop by budget",
-    tone: "blue",
-  },
-  {
-    id: "finance",
-    title: "See what you'll pay",
-    copy: "Your finance profile follows you, so monthly figures stay personalised.",
-    href: routes.eligibility,
-    cta: "Check eligibility",
-    tone: "pale",
-  },
-  {
-    id: "view",
-    title: "Ready to view",
-    copy: "Cars at Bury and Chorley, with a cash price beside the monthly example.",
-    href: routes.usedCars,
-    cta: "Browse used cars",
-    tone: "navy",
-  },
-  {
-    id: "history",
-    title: "Know the car",
-    copy: "History, condition, specification and documents before you buy.",
-    href: routes.usedCars,
-    cta: "View used cars",
-    tone: "ink",
-  },
-] as const;
-
-const shell: Record<(typeof cards)[number]["tone"], string> = {
-  blue: "bg-[#8EBFDF] text-[#002852]",
-  pale: "bg-[#F2F4F7] text-[#002852]",
-  navy: "bg-[#002852] text-white",
-  ink: "bg-[#101828] text-white",
-};
-
-function ArrowButton({
-  direction,
+function ContentSlot({
   label,
-  onClick,
+  children,
 }: {
-  direction: "prev" | "next";
   label: string;
-  onClick: () => void;
+  children: string;
 }) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-ink hover:bg-page-tint"
-    >
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
-        <path
-          d={direction === "prev" ? "M14.5 6 8.5 12l6 6" : "m9.5 6 6 6-6 6"}
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
-  );
-}
-
-function BudgetVisual() {
-  return (
-    <div className="mt-auto">
-      <p className="text-[3.15rem] font-semibold leading-none tracking-tight tabular-nums">
-        £189
-        <span className="ml-1 align-baseline text-base font-semibold">/month</span>
+    <div className="rounded-[18px] border border-dashed border-ink/20 bg-white/70 px-4 py-4">
+      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
+        {label}
       </p>
-      <div className="relative mt-3 h-24">
-        <Image
-          src="/images/promo/budget-car.png"
-          alt=""
-          fill
-          sizes="280px"
-          className="object-contain object-bottom"
-        />
-      </div>
+      <p className="mt-2 text-body-sm text-muted">{children}</p>
     </div>
   );
 }
 
-function FinanceVisual() {
-  return (
-    <div className="relative mt-auto h-44">
-      <span className="absolute left-[4%] top-6 z-10 flex h-[4.75rem] w-[3.75rem] rotate-[12deg] flex-col items-center rounded-[14px] bg-[#002852] pt-1.5 text-white shadow-md">
-        <span className="h-1.5 w-1.5 rounded-full bg-white" />
-        <span className="mt-1 grid h-9 w-9 place-items-center rounded-full border-2 border-white text-lg font-semibold">
-          £
-        </span>
-      </span>
-      <div className="absolute inset-x-[-6%] bottom-0 h-32">
-        <Image
-          src="/images/promo/deal-car.png"
-          alt=""
-          fill
-          sizes="320px"
-          className="object-contain object-bottom"
-        />
-      </div>
-    </div>
-  );
-}
+function PhotoSlot({ slot }: { slot: WhyOakwoodImageSlot }) {
+  const src = oakwoodInventoryImage(slot.src);
 
-function CalendarVisual() {
-  const days = ["S", "M", "T", "W", "T", "F", "S"];
-  const dates = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-
-  return (
-    <div className="mt-auto" aria-hidden="true">
-      <div className="grid grid-cols-7 gap-y-1.5 text-center text-[0.68rem] font-medium text-white/40">
-        {days.map((day, index) => (
-          <span key={`${day}-${index}`}>{day}</span>
-        ))}
-        {dates.map((date) =>
-          date === 11 ? (
-            <span key={date} className="grid place-items-center">
-              <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#8EBFDF] text-[#002852]">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
-                  <circle cx="8" cy="12" r="3.25" stroke="currentColor" strokeWidth="2" />
-                  <path d="M11 12h9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M16.5 12v2.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M20 12v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </span>
-            </span>
-          ) : (
-            <span key={date} className="grid h-8 place-items-center">
-              {date}
-            </span>
-          ),
-        )}
-      </div>
-    </div>
-  );
-}
-
-function HistoryVisual() {
-  return (
-    <div className="relative mt-auto h-44">
-      <div className="absolute left-0 top-2 z-10 w-[70%] rounded-2xl bg-white p-3 text-[#002852] shadow-lg">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-sm font-semibold leading-tight">Audi A3</p>
-            <p className="mt-1 text-xs text-[#667085]">£16,495</p>
-          </div>
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#8EBFDF] text-[#002852]">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
-              <path
-                d="M12 4.5c2.2 2.4 3.5 4.4 3.5 6.7a3.5 3.5 0 1 1-7 0c0-2.3 1.3-4.3 3.5-6.7Z"
-                stroke="currentColor"
-                strokeWidth="1.75"
-              />
-              <path d="M12 13.2v-2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-            </svg>
-          </span>
+  if (src) {
+    return (
+      <figure className="overflow-hidden rounded-[22px] bg-page-tint">
+        <div className="relative aspect-[16/10] max-h-40 w-full sm:max-h-56">
+          <Image
+            src={src}
+            alt={slot.alt ?? slot.intended}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+          />
         </div>
-      </div>
-      <div className="absolute inset-x-[-6%] bottom-0 h-32">
-        <Image
-          src="/images/promo/range-car.png"
-          alt=""
-          fill
-          sizes="280px"
-          className="object-contain object-bottom"
-        />
-      </div>
-    </div>
-  );
-}
-
-const visuals = {
-  budget: BudgetVisual,
-  finance: FinanceVisual,
-  view: CalendarVisual,
-  history: HistoryVisual,
-};
-
-export function WhyOakwood() {
-  const scroller = useRef<HTMLUListElement>(null);
-
-  function scrollByPage(direction: -1 | 1) {
-    const node = scroller.current;
-    if (!node) return;
-    const distance = Math.round(node.clientWidth * 0.6) * direction;
-    node.scrollTo({ left: node.scrollLeft + distance, behavior: "smooth" });
+        <figcaption className="px-4 py-3 text-body-sm text-ink">
+          {slot.label}
+        </figcaption>
+      </figure>
+    );
   }
 
   return (
-    <Section>
+    <figure className="overflow-hidden rounded-[22px] bg-page-tint">
+      <div
+        className="flex aspect-[16/10] max-h-40 w-full flex-col justify-end p-3 sm:max-h-56 sm:p-4"
+        role="img"
+        aria-label={`${slot.label} photography slot. ${slot.intended}.`}
+      >
+        <figcaption>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
+            {slot.label}
+          </p>
+          <p className="mt-1 text-body-sm leading-snug text-secondary">
+            Photography will appear here when the image is connected.
+          </p>
+        </figcaption>
+      </div>
+    </figure>
+  );
+}
+
+function TechnicianSlot({ person, index }: { person?: WhyOakwoodTechnician; index: number }) {
+  if (person?.name) {
+    return (
+      <Card as="article" className="border-0 shadow-sm">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
+          Technician
+        </p>
+        <h3 className="mt-2 text-h5">{person.name}</h3>
+        {person.qualifications ? (
+          <p className="mt-2 text-body-sm text-muted">{person.qualifications}</p>
+        ) : (
+          <p className="mt-2 text-body-sm text-muted">
+            Qualifications will appear here when the content source is connected.
+          </p>
+        )}
+        {person.yearsOfService ? (
+          <p className="mt-1 text-body-sm text-muted">{person.yearsOfService}</p>
+        ) : (
+          <p className="mt-1 text-body-sm text-muted">
+            Years of service will appear here when the content source is connected.
+          </p>
+        )}
+      </Card>
+    );
+  }
+
+  return (
+    <ContentSlot label={index === 0 ? "Named technicians" : `Technician ${index + 1}`}>
+      Technician names, qualifications and years of service will appear here when
+      the content source is connected.
+    </ContentSlot>
+  );
+}
+
+export function WhyOakwood() {
+  const people =
+    WHY_OAKWOOD_TECHNICIANS.length > 0 ? WHY_OAKWOOD_TECHNICIANS : [undefined];
+
+  return (
+    <Section
+      id="why-oakwood"
+      aria-label="Why Oakwood"
+      className="bg-page-tint"
+    >
       <Container>
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-h3 text-ink">A simpler way to buy</h2>
-          <div className="flex gap-2">
-            <ArrowButton direction="prev" label="Show previous reasons" onClick={() => scrollByPage(-1)} />
-            <ArrowButton direction="next" label="Show next reasons" onClick={() => scrollByPage(1)} />
-          </div>
-        </div>
-        <ul
-          ref={scroller}
-          className="mt-6 flex gap-4 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        <SectionIntro
+          align="center"
+          heading={WHY_OAKWOOD_HEADING}
+          headingClassName="text-primary"
         >
-          {cards.map((card) => {
-            const Visual = visuals[card.id];
-            const light = card.tone === "blue" || card.tone === "pale";
-            return (
-              <li key={card.id} className="w-[17.5rem] shrink-0 lg:w-[calc((100%-3rem)/4)]">
-                <Link
-                  href={card.href}
-                  className={`flex h-full min-h-[27.5rem] flex-col rounded-[22px] p-5 no-underline ${shell[card.tone]}`}
-                >
-                  <h3 className="text-[1.35rem] font-semibold leading-snug tracking-tight">{card.title}</h3>
-                  <p className={`mt-2 text-sm leading-snug ${light ? "text-[#002852]/75" : "text-white/75"}`}>
-                    {card.copy}
+          {WHY_OAKWOOD_INTRO}
+        </SectionIntro>
+
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">
+          <article className="flex flex-col justify-between rounded-[28px] bg-primary p-6 text-white sm:p-8 lg:col-span-2">
+            <div>
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-white/70">
+                Vehicle checks
+              </p>
+              <h3 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-[-0.03em] sm:text-[1.9rem]">
+                {WHY_OAKWOOD_AA_INSPECTED}
+              </h3>
+              <p className="mt-3 text-lg font-medium text-white/85">
+                {WHY_OAKWOOD_AA_POINTS}
+              </p>
+              <p className="mt-4 max-w-xl text-body-sm leading-relaxed text-white/75">
+                {WHY_OAKWOOD_AA_NOTE}
+              </p>
+            </div>
+            <p className="mt-6">
+              <Button href={WHY_OAKWOOD_LINKS.aaStandards} variant="secondary">
+                AA standards
+              </Button>
+            </p>
+          </article>
+
+          <article className="flex flex-col rounded-[28px] bg-white p-6 sm:p-7">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
+              Oakwood experience
+            </p>
+            <div className="mt-5 space-y-4">
+              {WHY_OAKWOOD_ESTABLISHED_YEAR ? (
+                <div>
+                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
+                    {WHY_OAKWOOD_ESTABLISHED_YEAR}
                   </p>
-                  <Visual />
-                  <span
-                    className={`mt-4 flex h-11 items-center justify-center rounded-full px-4 text-sm font-semibold ${
-                      light ? "bg-[#002852] text-white" : "bg-white text-[#002852]"
-                    }`}
+                  <p className="mt-2 text-body-sm text-muted">Established</p>
+                </div>
+              ) : (
+                <ContentSlot label="Established">
+                  Not in the content source yet.
+                </ContentSlot>
+              )}
+              {WHY_OAKWOOD_CARS_HANDED_OVER ? (
+                <div>
+                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
+                    {WHY_OAKWOOD_CARS_HANDED_OVER}
+                  </p>
+                  <p className="mt-2 text-body-sm text-muted">Cars handed over</p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
+                    {WHY_OAKWOOD_CARS}
+                  </p>
+                  <p className="mt-2 text-body-sm text-muted">Oakwood used cars</p>
+                </div>
+              )}
+            </div>
+          </article>
+        </div>
+
+        <Grid columns="default" className="mt-4 xl:grid-cols-3">
+          <Card as="article" className="border-0 shadow-sm">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
+              Warranty
+            </p>
+            <h3 className="mt-3 text-h5">{WHY_OAKWOOD_WARRANTY}</h3>
+            <p className="mt-2 text-body-sm text-muted">{WHY_OAKWOOD_WARRANTY_COPY}</p>
+            <p className="mt-4">
+              <Button href={WHY_OAKWOOD_LINKS.warranty} variant="text" className="px-0">
+                Warranty details
+              </Button>
+            </p>
+          </Card>
+
+          <Card as="article" className="border-0 shadow-sm">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
+              Preparation
+            </p>
+            <h3 className="mt-3 text-h5">In-house vehicle preparation</h3>
+            <p className="mt-2 text-body-sm text-muted">{WHY_OAKWOOD_PREPARATION}</p>
+            <p className="mt-4">
+              <Button href={WHY_OAKWOOD_LINKS.garage} variant="text" className="px-0">
+                Our garage
+              </Button>
+            </p>
+          </Card>
+
+          <Card as="article" className="border-0 shadow-sm">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
+              Locations and workshop
+            </p>
+            <h3 className="mt-3 text-h5">
+              Two showrooms + {WHY_OAKWOOD_WORKSHOP.toLowerCase()}
+            </h3>
+            <ul className="mt-3 space-y-1 text-body-sm text-muted">
+              {WHY_OAKWOOD_SHOWROOMS.map((showroom) => (
+                <li key={showroom.slug}>
+                  <Button
+                    href={getLocationUrl(showroom.slug)}
+                    variant="text"
+                    className="px-0"
                   >
-                    {card.cta}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                    {showroom.name}
+                  </Button>
+                </li>
+              ))}
+              <li>{WHY_OAKWOOD_WORKSHOP}</li>
+            </ul>
+            <p className="mt-4">
+              <Button href={WHY_OAKWOOD_LINKS.locations} variant="text" className="px-0">
+                All locations
+              </Button>
+            </p>
+          </Card>
+        </Grid>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+          {WHY_OAKWOOD_IMAGES.map((slot) => (
+            <PhotoSlot key={slot.id} slot={slot} />
+          ))}
+        </div>
+
+        <div className="mt-8">
+          <h3 className="text-h4 text-primary">People</h3>
+          <p className="mt-2 max-w-2xl text-body-sm text-muted">
+            Named technicians, qualifications and years of service are published
+            here only when they are in the Oakwood content source.
+          </p>
+          <Grid columns="two" className="mt-4">
+            {people.map((person, index) => (
+              <TechnicianSlot
+                key={person?.name ?? `technician-slot-${index}`}
+                person={person}
+                index={index}
+              />
+            ))}
+          </Grid>
+        </div>
+
+        <p className="mt-8 text-center text-caption text-muted">
+          {WHY_OAKWOOD_CMS_NOTICE}
+        </p>
       </Container>
     </Section>
   );

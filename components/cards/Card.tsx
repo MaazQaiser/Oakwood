@@ -8,9 +8,11 @@ import {
 } from "@/components/finance/FinancePrimitives";
 import { Button } from "@/components/ui/Button";
 import { IconArrow } from "@/components/ui/icons";
+import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import { getVehicleUrl } from "@/config/routes";
+import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 import type { Vehicle } from "@/types/vehicle";
 import Link from "next/link";
 
@@ -105,6 +107,9 @@ export function VehicleCard({
   financeType?: "hp" | "pcp";
 }) {
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  const displayImage = featured
+    ? oakwoodInventoryImage(vehicle.image)
+    : vehicle.image;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
   const availabilityLabel =
     vehicle.availability === "reserved"
@@ -137,18 +142,38 @@ export function VehicleCard({
             featured ? "aspect-[4/3]" : "aspect-[16/10]",
           )}
         >
-          <Image
-            src={vehicle.image ?? "/images/vehicle-placeholder.svg"}
-            alt={imageLabel}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            priority={imagePriority}
-            unoptimized={(vehicle.image ?? "/images/vehicle-placeholder.svg").endsWith(".svg")}
-            className="object-cover"
-          />
+          {displayImage ? (
+            <Image
+              src={displayImage}
+              alt={imageLabel}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              priority={imagePriority}
+              unoptimized={displayImage.endsWith(".svg")}
+              className="object-cover"
+            />
+          ) : featured ? (
+            <OakwoodPhotoSlot
+              slot={{
+                label: "Vehicle",
+                intended: `Oakwood photography of this ${vehicle.make} ${vehicle.model}`,
+              }}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            />
+          ) : (
+            <Image
+              src="/images/vehicle-placeholder.svg"
+              alt={imageLabel}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              unoptimized
+              className="object-cover"
+            />
+          )}
         </div>
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-surface px-2.5 py-1 text-caption text-ink shadow-sm">
+          <span className="rounded-full bg-surface px-2.5 py-1 text-caption text-ink tabular-nums shadow-sm">
             {vehicle.year}
           </span>
           {vehicle.availability !== "available" ? (
@@ -172,7 +197,7 @@ export function VehicleCard({
                 {vehicle.make} {vehicle.model}
               </Link>
             </h3>
-            <p className="shrink-0 pt-0.5 text-right text-[0.9375rem] font-medium leading-tight text-ink">
+            <p className="shrink-0 pt-0.5 text-right text-[0.9375rem] font-medium leading-tight text-ink tabular-nums">
               {formatPounds(vehicle.cashPrice)}
             </p>
           </div>
@@ -216,7 +241,7 @@ export function VehicleCard({
           ].map((label) => (
             <span
               key={label}
-              className="inline-flex items-center rounded-full bg-[#E7F1F8] px-2.5 py-1 text-caption text-[#002852]"
+              className="inline-flex items-center rounded-full bg-page-tint px-2.5 py-1 text-caption text-ink tabular-nums"
             >
               {label}
             </span>
@@ -229,7 +254,7 @@ export function VehicleCard({
               <Button
                 href={getVehicleUrl(vehicle)}
                 variant="secondary"
-                className="btn-compact h-11! min-h-11! w-full border-[#002852]! bg-white text-[#002852] hover:bg-[#E7F1F8]"
+                className="btn-compact h-11! min-h-11! w-full border-border! bg-white text-ink hover:bg-page-tint"
               >
                 View car
               </Button>

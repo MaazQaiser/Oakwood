@@ -5,19 +5,6 @@ import Link from "next/link";
 import { useRef } from "react";
 import { getMakeUrl } from "@/config/routes";
 
-const MAKE_IMAGES: Record<string, string> = {
-  audi: "/images/makes/audi.png",
-  bmw: "/images/makes/bmw.png",
-  ford: "/images/makes/ford.png",
-  "mercedes-benz": "/images/makes/mercedes.png",
-  volkswagen: "/images/makes/volkswagen.png",
-  toyota: "/images/makes/toyota.png",
-  hyundai: "/images/makes/hyundai.png",
-  vauxhall: "/images/makes/vauxhall.png",
-  nissan: "/images/makes/nissan.png",
-  kia: "/images/makes/kia.png",
-};
-
 const MAKE_LOGOS: Record<string, string> = {
   audi: "/images/brand-logos/audi.png",
   bmw: "/images/brand-logos/bmw.png",
@@ -59,7 +46,7 @@ export function MakeCarousel({
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-h3 text-ink">Browse by make</h2>
+        <h2 className="text-h3 text-oakwood">Browse by make</h2>
         <div className="flex gap-2">
           <button
             type="button"
@@ -96,15 +83,6 @@ export function MakeCarousel({
               <MakeLogo slug={make.slug} />
               <span className="mt-2 flex min-h-10 w-full items-center justify-center px-1 text-center text-caption font-medium leading-snug text-ink">
                 {make.name}
-              </span>
-              <span className="relative mt-3 block h-16 w-full">
-                <Image
-                  src={MAKE_IMAGES[make.slug] ?? "/images/vehicle-side.svg"}
-                  alt=""
-                  fill
-                  sizes="168px"
-                  className="object-contain object-bottom"
-                />
               </span>
             </Link>
           </li>

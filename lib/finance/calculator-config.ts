@@ -27,6 +27,16 @@ export interface FinanceCalculatorConfig {
    * Do not display MOCK_APR_BASE as a representative rate.
    */
   representativeApr?: number;
+  /**
+   * Published starting rate used in marketing ("Rates from").
+   * Distinct from a personalised quotation and from MOCK_APR_BASE.
+   */
+  ratesFromApr?: number;
+  /**
+   * 0% finance is offered on selected / eligible cars only.
+   * Do not present this as applying to every vehicle.
+   */
+  zeroPercentOnSelectedCars?: boolean;
 }
 
 export const FINANCE_CALCULATOR_CONFIG: FinanceCalculatorConfig = {
@@ -35,4 +45,6 @@ export const FINANCE_CALCULATOR_CONFIG: FinanceCalculatorConfig = {
   defaultDeposit: ILLUSTRATION_BASE_DEPOSIT,
   defaultTerm: ILLUSTRATION_BASE_TERM,
   catalogueExampleStockId: "1000020",
+  ratesFromApr: 9.4,
+  zeroPercentOnSelectedCars: true,
 };

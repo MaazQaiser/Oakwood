@@ -47,7 +47,11 @@ export function BudgetCard({
 
 export function MonthlyBudgetSection() {
   return (
-    <Section className="bg-[#ECF3F8] [background-image:radial-gradient(ellipse_at_88%_0%,#ffffff_0%,transparent_46%)]">
+    <Section
+      id="browse-monthly-budget"
+      aria-label="Browse by monthly budget"
+      className="bg-[#ECF3F8] [background-image:radial-gradient(ellipse_at_88%_0%,#ffffff_0%,transparent_46%)]"
+    >
       <Container>
         <header className="mx-auto max-w-3xl text-center">
           <h2 className="text-h2 text-ink">

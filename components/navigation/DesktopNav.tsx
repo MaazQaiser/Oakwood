@@ -104,7 +104,7 @@ export function DesktopNav({ onDetailOpen }: { onDetailOpen?: (open: boolean) =>
       {openGroup && openMenuContent ? (
         <div
           id="primary-section-menu"
-          className="absolute inset-x-0 top-full z-[var(--oak-z-dropdown)] rounded-b-[14px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(16,40,72,0.12)]"
+          className="absolute inset-x-0 top-full z-[var(--oak-z-dropdown)] rounded-b-[14px] bg-page-tint shadow-[0_18px_40px_rgba(66,69,78,0.12)]"
         >
           <Container width="wide" className="py-8">
             <SectionMenu
@@ -146,8 +146,8 @@ function NavItem({
           href={href}
           aria-current={current ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-11 items-center whitespace-nowrap px-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink hover:text-black xl:text-[0.72rem] xl:tracking-[0.12em]",
-            current && "underline decoration-ink underline-offset-8",
+            "inline-flex min-h-11 items-center whitespace-nowrap px-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink hover:text-primary xl:text-[0.72rem] xl:tracking-[0.12em]",
+            current && "underline decoration-primary underline-offset-8",
           )}
         >
           {label}
@@ -161,8 +161,8 @@ function NavItem({
       <button
         type="button"
         className={cn(
-          "inline-flex min-h-11 items-center gap-1 whitespace-nowrap px-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink hover:text-black xl:text-[0.72rem] xl:tracking-[0.12em]",
-          (current || open) && "underline decoration-ink underline-offset-8",
+          "inline-flex min-h-11 items-center gap-1 whitespace-nowrap px-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink hover:text-primary xl:text-[0.72rem] xl:tracking-[0.12em]",
+          (current || open) && "underline decoration-primary underline-offset-8",
         )}
         aria-expanded={open}
         aria-controls={open ? "primary-section-menu" : undefined}

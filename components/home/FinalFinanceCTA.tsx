@@ -4,47 +4,74 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container, Section } from "@/components/layout/Container";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { getSearchUrl, routes } from "@/config/routes";
+import { getFinanceCalculatorUrl, getSearchUrl, routes } from "@/config/routes";
+import { getRepresentativeFinanceExample } from "@/lib/finance/representative-example";
+import { formatPounds } from "@/lib/format/money";
+import { oakwoodInventoryImage } from "@/lib/media/oakwood";
+import { findVehicleByStockId } from "@/lib/vehicles/query";
 
 function ExampleCard() {
+  const example = getRepresentativeFinanceExample();
+  const monthly = example
+    ? formatPounds(example.monthlyPayment)
+    : undefined;
+  const exampleImage = example
+    ? oakwoodInventoryImage(findVehicleByStockId(example.stockId)?.image)
+    : undefined;
+
   return (
-    <div
-      className="mx-auto flex w-full max-w-[24rem] flex-col items-end gap-4"
-      aria-hidden="true"
-    >
+    <div className="mx-auto flex w-full max-w-[24rem] flex-col items-end gap-4">
       <div className="relative w-full max-w-[16.5rem] rounded-[22px] bg-[#E7F1F8] px-4 pb-5 pt-8">
         <span className="absolute left-4 top-3 rounded-full bg-[#8EBFDF] px-3 py-1 text-xs font-semibold text-[#002852]">
           Example
         </span>
         <div className="relative mt-4 h-[5.5rem]">
-          <Image
-            src="/images/promo/budget-car.png"
-            alt=""
-            fill
-            sizes="260px"
-            className="object-contain object-center"
-          />
+          {exampleImage ? (
+            <Image
+              src={exampleImage}
+              alt=""
+              fill
+              sizes="260px"
+              className="object-contain object-center"
+            />
+          ) : (
+            <div
+              className="h-full"
+              role="img"
+              aria-label="Example vehicle photography slot. Oakwood photography of this car will appear here when the image is connected."
+            />
+          )}
         </div>
-        <div className="mt-4 h-2 w-28 rounded-full bg-[#002852]/10" />
+        {example ? (
+          <p className="mt-4 text-sm font-semibold text-[#002852]">
+            {example.year} {example.make} {example.model}
+          </p>
+        ) : (
+          <div className="mt-4 h-2 w-28 rounded-full bg-[#002852]/10" />
+        )}
         <div className="mt-2 h-2 w-16 rounded-full bg-[#002852]/10" />
       </div>
-      <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 text-[#002852] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#8EBFDF]">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
-            <path
-              d="M12 5v12M7 12l5 5 5-5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
-        <span>
-          <span className="block text-[1.35rem] font-semibold leading-none tabular-nums">£189</span>
-          <span className="mt-1 block text-xs text-[#667085]">a month</span>
-        </span>
-      </div>
+      {monthly ? (
+        <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 text-[#002852] shadow-[0_12px_28px_rgba(0,0,0,0.18)]">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#8EBFDF]">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+              <path
+                d="M12 5v12M7 12l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span>
+            <span className="tabular-number block text-[1.35rem] font-semibold leading-none">
+              {monthly}
+            </span>
+            <span className="mt-1 block text-xs text-[#667085]">a month</span>
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -52,6 +79,7 @@ function ExampleCard() {
 export function FinalFinanceCTA() {
   const { mode } = useCustomerFinance();
   const eligible = mode === "personalised";
+  const example = getRepresentativeFinanceExample();
 
   return (
     <Section>
@@ -75,7 +103,9 @@ export function FinalFinanceCTA() {
               <p className="text-sm text-white/75">
                 No impact on your credit score.{" "}
                 <Link
-                  href={routes.financeCalculator}
+                  href={getFinanceCalculatorUrl(
+                    example ? { stockId: example.stockId } : undefined,
+                  )}
                   className="font-semibold text-white underline decoration-white/70 underline-offset-[5px]"
                 >
                   Calculate finance

@@ -9,7 +9,7 @@ export { LocationCard } from "@/components/locations/LocationCard";
 
 export function LocationSection() {
   return (
-    <Section>
+    <Section id="locations" aria-label="Locations">
       <Container>
         <SectionIntro align="center" heading="Find your nearest Oakwood.">
           Visit us in Bury or Chorley and see your next car in person.

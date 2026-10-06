@@ -2,6 +2,7 @@
 
 import { Chip } from "@/components/ui/Badge";
 import { IconClose } from "@/components/ui/icons";
+import { cn } from "@/lib/cn";
 import { formatPounds } from "@/lib/format/money";
 import type { LockedFilters, SearchQuery } from "@/lib/validation/search";
 import { splitFilterValues } from "@/lib/validation/search";
@@ -15,17 +16,35 @@ export interface FilterChip {
   id: string;
   label: string;
   locked?: boolean;
+  relaxed?: boolean;
   onRemove?: () => void;
+}
+
+function isRelaxed(
+  relaxedKeys: Array<keyof SearchQuery>,
+  keys: Array<keyof SearchQuery>,
+) {
+  return keys.some((key) => relaxedKeys.includes(key));
 }
 
 export function getFilterChips(
   query: SearchQuery,
   locked: LockedFilters,
   onRemove: (key: keyof SearchQuery, value?: string) => void,
+  relaxedKeys: Array<keyof SearchQuery> = [],
 ): FilterChip[] {
   const chips: FilterChip[] = [];
+  const structured =
+    Boolean(query.make) ||
+    Boolean(query.model) ||
+    Boolean(query.colour) ||
+    Boolean(query.fuel) ||
+    Boolean(query.transmission) ||
+    Boolean(query.body_style) ||
+    Boolean(query.max_price) ||
+    Boolean(query.monthly_max ?? query.monthly);
 
-  if (query.q) {
+  if (query.q && !structured) {
     chips.push({
       id: "q",
       label: query.q,
@@ -37,8 +56,9 @@ export function getFilterChips(
   if (activeMake) {
     chips.push({
       id: "make",
-      label: `Make: ${getMakeName(activeMake)}`,
+      label: getMakeName(activeMake) ?? activeMake,
       locked: Boolean(locked.make),
+      relaxed: isRelaxed(relaxedKeys, ["make"]),
       onRemove: locked.make ? undefined : () => onRemove("make"),
     });
   }
@@ -48,8 +68,9 @@ export function getFilterChips(
       getModelName(activeMake, query.model) ?? query.model;
     chips.push({
       id: "model",
-      label: `Model: ${modelName}`,
+      label: modelName,
       locked: Boolean(locked.model),
+      relaxed: isRelaxed(relaxedKeys, ["model"]),
       onRemove: locked.model ? undefined : () => onRemove("model"),
     });
   }
@@ -58,6 +79,7 @@ export function getFilterChips(
     chips.push({
       id: `body-${value}`,
       label: value,
+      relaxed: isRelaxed(relaxedKeys, ["body_style"]),
       onRemove: () => onRemove("body_style", value),
     });
   });
@@ -66,6 +88,7 @@ export function getFilterChips(
     chips.push({
       id: `fuel-${value}`,
       label: value,
+      relaxed: isRelaxed(relaxedKeys, ["fuel"]),
       onRemove: () => onRemove("fuel", value),
     });
   });
@@ -74,6 +97,7 @@ export function getFilterChips(
     chips.push({
       id: `transmission-${value}`,
       label: value,
+      relaxed: isRelaxed(relaxedKeys, ["transmission"]),
       onRemove: () => onRemove("transmission", value),
     });
   });
@@ -83,6 +107,7 @@ export function getFilterChips(
       id: `location-${value}`,
       label: getLocationName(value) ?? value,
       locked: locked.location === value,
+      relaxed: isRelaxed(relaxedKeys, ["location"]),
       onRemove:
         locked.location === value
           ? undefined
@@ -94,6 +119,7 @@ export function getFilterChips(
     chips.push({
       id: `colour-${value}`,
       label: value,
+      relaxed: isRelaxed(relaxedKeys, ["colour"]),
       onRemove: () => onRemove("colour", value),
     });
   });
@@ -102,6 +128,7 @@ export function getFilterChips(
     chips.push({
       id: "price",
       label: `${query.min_price ? formatPounds(Number(query.min_price)) : "Any"} — ${query.max_price ? formatPounds(Number(query.max_price)) : "Any"}`,
+      relaxed: isRelaxed(relaxedKeys, ["min_price", "max_price"]),
       onRemove: () => {
         onRemove("min_price");
         onRemove("max_price");
@@ -115,6 +142,7 @@ export function getFilterChips(
     chips.push({
       id: "monthly",
       label: `${monthlyMin ? formatPounds(Number(monthlyMin)) : "Any"}–${monthlyMax ? formatPounds(Number(monthlyMax)) : "Any"}/month`,
+      relaxed: isRelaxed(relaxedKeys, ["monthly_min", "monthly_max", "monthly"]),
       onRemove: () => {
         onRemove("monthly_min");
         onRemove("monthly_max");
@@ -127,6 +155,7 @@ export function getFilterChips(
     chips.push({
       id: "mileage",
       label: `${query.min_mileage ?? "0"} — ${query.max_mileage ?? "any"} miles`,
+      relaxed: isRelaxed(relaxedKeys, ["min_mileage", "max_mileage"]),
       onRemove: () => {
         onRemove("min_mileage");
         onRemove("max_mileage");
@@ -138,6 +167,7 @@ export function getFilterChips(
     chips.push({
       id: "year",
       label: `From ${query.min_year}`,
+      relaxed: isRelaxed(relaxedKeys, ["min_year", "max_year"]),
       onRemove: () => onRemove("min_year"),
     });
   }
@@ -146,6 +176,7 @@ export function getFilterChips(
     chips.push({
       id: "doors",
       label: `${query.doors} doors`,
+      relaxed: isRelaxed(relaxedKeys, ["doors"]),
       onRemove: () => onRemove("doors"),
     });
   }
@@ -154,6 +185,7 @@ export function getFilterChips(
     chips.push({
       id: "seats",
       label: `${query.seats} seats`,
+      relaxed: isRelaxed(relaxedKeys, ["seats"]),
       onRemove: () => onRemove("seats"),
     });
   }
@@ -162,6 +194,7 @@ export function getFilterChips(
     chips.push({
       id: "affordable",
       label: "Affordable to me",
+      relaxed: isRelaxed(relaxedKeys, ["affordable"]),
       onRemove: () => onRemove("affordable"),
     });
   }
@@ -170,6 +203,7 @@ export function getFilterChips(
     chips.push({
       id: "need",
       label: query.need.replace("-", " "),
+      relaxed: isRelaxed(relaxedKeys, ["need"]),
       onRemove: () => onRemove("need"),
     });
   }
@@ -195,14 +229,23 @@ export function ActiveFilterChips({
       {chips.map((chip) => (
         <Chip
           key={chip.id}
-          className="max-w-full gap-0.5 border-primary bg-primary-soft py-1 pl-3 text-primary"
+          className={cn(
+            "max-w-full gap-0.5 py-1 pl-3",
+            chip.relaxed
+              ? "border-dashed border-border bg-transparent text-muted"
+              : "border-primary bg-primary-soft text-primary",
+          )}
         >
           <span className="min-w-0 truncate text-body-sm">{chip.label}</span>
           {chip.onRemove ? (
             <button
               type="button"
               className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-primary hover:bg-white/50"
-              aria-label={`Remove ${chip.label} filter`}
+              aria-label={
+                chip.relaxed
+                  ? `Remove ${chip.label} from search. Not applied to these results.`
+                  : `Remove ${chip.label} filter`
+              }
               onClick={chip.onRemove}
             >
               <IconClose width={14} height={14} />

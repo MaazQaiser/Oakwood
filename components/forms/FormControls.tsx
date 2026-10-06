@@ -52,7 +52,7 @@ export function Field({
 }
 
 const controlClass =
-  "min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm font-medium text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:border-border disabled:bg-surface disabled:text-ink disabled:opacity-100";
+  "min-h-11 w-full rounded-xl border border-border-input bg-surface px-3 text-sm font-medium text-ink placeholder:text-subtle disabled:cursor-not-allowed disabled:border-border-input disabled:bg-surface disabled:text-ink disabled:opacity-100";
 
 export function Input({
   className,

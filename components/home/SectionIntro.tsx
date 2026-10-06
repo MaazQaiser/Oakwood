@@ -7,12 +7,14 @@ export function SectionIntro({
   headingLevel = "h2",
   align = "left",
   action,
+  headingClassName = "text-oakwood",
 }: {
   heading: string;
   children?: ReactNode;
   headingLevel?: "h2" | "h1";
   align?: "left" | "center";
   action?: ReactNode;
+  headingClassName?: string;
 }) {
   const HeadingTag = headingLevel;
   const centered = align === "center";
@@ -27,7 +29,12 @@ export function SectionIntro({
       )}
     >
       <div className={cn(centered ? "mx-auto max-w-3xl" : undefined)}>
-        <HeadingTag className={headingLevel === "h1" ? "text-display" : "text-h2"}>
+        <HeadingTag
+          className={cn(
+            headingLevel === "h1" ? "text-display" : "text-h2",
+            headingClassName,
+          )}
+        >
           {heading}
         </HeadingTag>
         {children ? (

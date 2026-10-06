@@ -193,7 +193,7 @@ const menuIcons: Record<MenuIcon, LucideIcon> = {
 
 function MenuGlyph({ name }: { name: MenuIcon }) {
   const Icon = menuIcons[name];
-  return <Icon aria-hidden className="h-11 w-11 text-[#002852]" strokeWidth={1.75} />;
+  return <Icon aria-hidden className="h-11 w-11 text-primary" strokeWidth={1.75} />;
 }
 
 export function SectionMenu({
@@ -238,7 +238,7 @@ export function SectionMenu({
             {card.title}
             <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.75} />
           </span>
-          <span className="mt-2 text-[0.92rem] leading-relaxed text-[#5c6b7a]">{card.description}</span>
+          <span className="mt-2 text-[0.92rem] leading-relaxed text-secondary">{card.description}</span>
         </Link>
       ))}
       <div>

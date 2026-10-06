@@ -3,6 +3,7 @@
 import { Grid } from "@/components/layout/Container";
 import { VehicleCard } from "@/components/cards/Card";
 import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
+import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { Button } from "@/components/ui/Button";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { EmptyState } from "@/components/ui/Feedback";
@@ -68,10 +69,18 @@ export function SimilarVehicles({ vehicles }: { vehicles: Vehicle[] }) {
                 imagePriority={false}
                 term={finance.term}
                 toolbar={
-                  <SaveVehicleButton
-                    vehicleName={`${vehicle.make} ${vehicle.model}`}
-                    stockId={vehicle.stockId}
-                  />
+                  <div className="flex items-center gap-2">
+                    <CompareVehicleButton
+                      vehicleName={`${vehicle.make} ${vehicle.model}`}
+                      stockId={vehicle.stockId}
+                      category={vehicle.category}
+                    />
+                    <SaveVehicleButton
+                      vehicleName={`${vehicle.make} ${vehicle.model}`}
+                      stockId={vehicle.stockId}
+                      category={vehicle.category}
+                    />
+                  </div>
                 }
                 action={
                   <Button

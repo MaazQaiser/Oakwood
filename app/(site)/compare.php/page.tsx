@@ -1,12 +1,24 @@
-import { EnquiryPage } from "@/components/templates/pages";
-import { routes } from "@/config/routes";
+import { ComparePage } from "@/components/compare/ComparePage";
+import { parseCompareIds, routes } from "@/config/routes";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Compare",
+  title: "Compare cars",
   path: routes.compare,
+  description:
+    "Compare up to two Oakwood used cars side by side, including monthly payments, cash price and key specification.",
 });
 
-export default function Page() {
-  return <EnquiryPage title="Compare" route={routes.compare} />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const ids = parseCompareIds(
+    typeof params.ids === "string" || Array.isArray(params.ids)
+      ? params.ids
+      : undefined,
+  );
+  return <ComparePage initialIds={ids} />;
 }

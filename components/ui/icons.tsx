@@ -41,6 +41,16 @@ export function IconArrow(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconCompare(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="20" height="20" {...props}>
+      <rect x="3.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.75" />
+      <rect x="13.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.75" />
+      <path d="M6 10h2M6 13.5h2M16 10h2M16 13.5h2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconHeart({
   filled = false,
   ...props

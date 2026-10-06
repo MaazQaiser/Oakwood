@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { StickyActionBar } from "@/components/ui/StickyActionBar";
 import { IconHelp, IconPhone } from "@/components/ui/icons";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
+import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { getContactUrl, getUsedCarsUrl } from "@/config/routes";
 import { getStockLocation } from "@/config/locations";
@@ -42,6 +43,12 @@ export function MobileVehicleActionBar() {
         >
           <IconHelp />
         </Button>
+        <CompareVehicleButton
+          vehicleName={`${vehicle.make} ${vehicle.model}`}
+          stockId={vehicle.stockId}
+          category={vehicle.category}
+          className="border border-border"
+        />
         {reservable ? (
           <StartReservationButton stockId={vehicle.stockId} className="min-w-0 flex-1" />
         ) : (

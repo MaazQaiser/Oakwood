@@ -173,6 +173,10 @@ export const analyticsEvents = {
   contentPxClicked: "content_px_clicked",
   comparisonViewed: "comparison_viewed",
   contentCtaClicked: "content_cta_clicked",
+  compareVehicleAdded: "compare_vehicle_added",
+  compareVehicleRemoved: "compare_vehicle_removed",
+  compareViewed: "compare_viewed",
+  compareTrayClicked: "compare_tray_clicked",
 } as const;
 
 export type AnalyticsEvent =

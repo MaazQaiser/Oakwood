@@ -5,6 +5,7 @@ import { VehicleCard } from "@/components/cards/Card";
 import { Card } from "@/components/cards/Card";
 import { Skeleton } from "@/components/ui/Loading";
 import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
+import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { Button } from "@/components/ui/Button";
 import { getVehicleUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -61,11 +62,18 @@ export function VehicleGrid({
             imagePriority={index < 4}
             term={term}
             toolbar={
-              <SaveVehicleButton
-                vehicleName={`${vehicle.make} ${vehicle.model}`}
-                stockId={vehicle.stockId}
-                category={category}
-              />
+              <div className="flex items-center gap-2">
+                <CompareVehicleButton
+                  vehicleName={`${vehicle.make} ${vehicle.model}`}
+                  stockId={vehicle.stockId}
+                  category={category}
+                />
+                <SaveVehicleButton
+                  vehicleName={`${vehicle.make} ${vehicle.model}`}
+                  stockId={vehicle.stockId}
+                  category={category}
+                />
+              </div>
             }
             financeActions={
               state === "ineligible" ? (

@@ -3,6 +3,7 @@ import { AppProviders } from "@/components/layout/AppProviders";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SkipLink } from "@/components/layout/SkipLink";
+import { CompareTray } from "@/components/compare/CompareTray";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Poppins } from "next/font/google";
 import "@/styles/globals.css";
@@ -40,10 +41,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AppProviders>
           <SkipLink />
           <SiteHeader />
-          <main id="main-content" className="flex-1">
+          <main
+            id="main-content"
+            className="flex-1 pb-[var(--oak-compare-offset,0px)]"
+          >
             {children}
           </main>
           <SiteFooter />
+          <CompareTray variant="mobile" />
         </AppProviders>
       </body>
     </html>

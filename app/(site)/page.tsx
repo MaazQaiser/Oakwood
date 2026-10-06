@@ -1,12 +1,12 @@
 import { HomePage } from "@/components/home/HomePage";
 import { routes } from "@/config/routes";
+import { HOME_META_DESCRIPTION, HOME_META_TITLE } from "@/lib/home/copy";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Used cars that fit your budget",
+  title: HOME_META_TITLE,
   path: routes.home,
-  description:
-    "Check your finance eligibility in under 60 seconds, then browse used cars that fit your monthly budget. No impact on your credit score.",
+  description: HOME_META_DESCRIPTION,
 });
 
 export default function Page() {

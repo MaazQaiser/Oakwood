@@ -26,7 +26,7 @@ export function BrandMakesRow() {
   }
 
   return (
-    <Section>
+    <Section id="browse-by-make" aria-label="Browse by make">
       <div className="mx-3 sm:mx-4 lg:mx-6">
         <MakeCarousel makes={featured} />
       </div>

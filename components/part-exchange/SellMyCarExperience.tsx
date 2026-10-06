@@ -2,6 +2,10 @@
 
 import { PxStandalone } from "@/components/part-exchange/PxFlow";
 
-export function SellMyCarExperience() {
-  return <PxStandalone />;
+export function SellMyCarExperience({
+  initialRegistration,
+}: {
+  initialRegistration?: string;
+}) {
+  return <PxStandalone initialRegistration={initialRegistration} />;
 }

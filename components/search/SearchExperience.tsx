@@ -14,6 +14,7 @@ import {
 import { MobileSortButton, SortDropdown } from "@/components/search/SortDropdown";
 import { VehicleGrid } from "@/components/search/VehicleGrid";
 import { EmptyResults, StockErrorState } from "@/components/search/EmptyResults";
+import { SearchRecovery } from "@/components/search/SearchRecovery";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -27,9 +28,22 @@ import {
   type SearchSort,
 } from "@/lib/validation/search";
 import {
+  applyUnmatchedRemainder,
+  describeClosestMatches,
+  describeRelaxation,
+  describeShowingWithout,
+  describeUnmatchedSearch,
+  getClosestSearchResults,
+  relaxedKeysFrom,
+  unmatchedRemainderFrom,
+} from "@/lib/vehicles/closest";
+import {
+  interpretNaturalLanguage,
+  removeNaturalLanguageTerm,
+} from "@/lib/vehicles/natural-language";
+import {
   FEW_RESULTS_THRESHOLD,
   SEARCH_PAGE_SIZE,
-  describeSearch,
   filterVehicles,
   getAlternativeSearches,
   resolveSearchQuery,
@@ -39,6 +53,51 @@ import { countLabel, fewResultsLabel, getSearchCopy } from "@/lib/vehicles/searc
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
 import type { Vehicle } from "@/types/vehicle";
 import { getMakeUrl, routes, type StockCategory } from "@/config/routes";
+
+function stripTermFromQuery(
+  q: string | undefined,
+  key: keyof SearchQuery,
+  catalog: Vehicle[],
+  value?: string,
+): string | undefined {
+  if (!q) {
+    return q;
+  }
+
+  const { terms } = interpretNaturalLanguage(q, catalog);
+  const matches = terms
+    .filter((term) => {
+      const keyMatch =
+        term.key === key ||
+        (key === "monthly" && term.key === "monthly_max") ||
+        (key === "monthly_max" && term.key === "monthly") ||
+        (key === "min_price" && term.key === "max_price");
+      if (!keyMatch) {
+        return false;
+      }
+      if (!value) {
+        return true;
+      }
+      return term.value.toLowerCase() === value.toLowerCase();
+    })
+    .sort((a, b) => b.start - a.start);
+
+  return matches.reduce(
+    (current, term) => removeNaturalLanguageTerm(current, term),
+    q,
+  ).trim() || undefined;
+}
+
+function stripKeysFromQuery(
+  q: string | undefined,
+  keys: Array<keyof SearchQuery>,
+  catalog: Vehicle[],
+): string | undefined {
+  return keys.reduce(
+    (current, key) => stripTermFromQuery(current, key, catalog),
+    q,
+  );
+}
 
 export function SearchExperience({
   context,
@@ -78,12 +137,20 @@ export function SearchExperience({
     finance.mode === "personalised" || finance.mode === "ineligible";
   const maxAdvance = eligible ? finance.maxAdvance : undefined;
 
+  const unmatchedRemainder = useMemo(
+    () => unmatchedRemainderFrom(resolved, catalog),
+    [resolved, catalog],
+  );
+
   const matches = useMemo(() => {
     return sortVehicles(
-      filterVehicles(catalog, resolved, {
-        maxAdvance,
-        deposit: finance.deposit,
-      }),
+      applyUnmatchedRemainder(
+        filterVehicles(catalog, resolved, {
+          maxAdvance,
+          deposit: finance.deposit,
+        }),
+        unmatchedRemainder,
+      ),
       getSearchSort(resolved),
       {
         preferAffordable: eligible,
@@ -91,10 +158,36 @@ export function SearchExperience({
         deposit: finance.deposit,
       },
     );
-  }, [catalog, resolved, maxAdvance, eligible, finance.deposit]);
+  }, [
+    catalog,
+    resolved,
+    maxAdvance,
+    eligible,
+    finance.deposit,
+    unmatchedRemainder,
+  ]);
 
-  const total = matches.length;
-  const displayed = matches.slice(0, page * SEARCH_PAGE_SIZE);
+  const recovery = useMemo(() => {
+    if (matches.length > 0) {
+      return null;
+    }
+    const closest = getClosestSearchResults(resolved, catalog, {
+      maxAdvance,
+      deposit: finance.deposit,
+      locked: context.locked,
+      category: context.category,
+      preferAffordable: eligible,
+    });
+    if (closest.closest.length === 0) {
+      return null;
+    }
+    return closest;
+  }, [matches.length, resolved, catalog, maxAdvance, finance.deposit, context.locked, context.category, eligible]);
+
+  const results = recovery?.closest ?? matches;
+  const total = results.length;
+  const displayed = results.slice(0, page * SEARCH_PAGE_SIZE);
+  const relaxedKeys = recovery ? relaxedKeysFrom(recovery.constraints) : [];
 
   function navigate(nextQuery: SearchQuery) {
     const href = buildSearchHref(
@@ -138,6 +231,7 @@ export function SearchExperience({
     if (vanEvents) {
       trackEvent(vanEvents.filterRemoved, { key, value });
     }
+    const nextQ = stripTermFromQuery(resolved.q, key, catalog, value);
     if (
       value &&
       (key === "fuel" ||
@@ -149,10 +243,10 @@ export function SearchExperience({
       const next = splitFilterValues(resolved[key])
         .filter((item) => item !== value)
         .join(",");
-      update({ [key]: next || undefined });
+      update({ [key]: next || undefined, q: nextQ });
       return;
     }
-    update({ [key]: undefined });
+    update({ [key]: undefined, q: nextQ });
   }
 
   function clearFilters() {
@@ -192,14 +286,17 @@ export function SearchExperience({
     update({ make: makeSlug, model: undefined });
   }
 
-  const chips = getFilterChips(resolved, context.locked, removeFilter);
+  const chips = getFilterChips(resolved, context.locked, removeFilter, relaxedKeys);
   const removableChips = chips.filter((chip) => Boolean(chip.onRemove));
   const alternatives = getAlternativeSearches(resolved, context.locked, {
     category: context.category,
     basePath: context.basePath,
   });
   const fewResults =
-    total > 0 && total <= FEW_RESULTS_THRESHOLD && removableChips.length > 0;
+    !recovery &&
+    total > 0 &&
+    total <= FEW_RESULTS_THRESHOLD &&
+    removableChips.length > 0;
   const canLoadMore = displayed.length < total;
   const nextPage = page + 1;
   const nextHref = buildSearchHref(
@@ -207,6 +304,27 @@ export function SearchExperience({
     { ...resolved, page: String(nextPage) },
     context.locked,
   );
+  const unmatchedCopy = describeUnmatchedSearch(
+    resolved,
+    context.category,
+    unmatchedRemainder,
+  );
+
+  useEffect(() => {
+    if (matches.length > 0) {
+      return;
+    }
+    trackEvent(analyticsEvents.zeroResultsViewed, {
+      category: context.category,
+      recovered: Boolean(recovery),
+      relaxed: recovery?.constraints.map((item) => item.id).join(",") ?? "",
+    });
+    if (context.category === "van") {
+      trackEvent(analyticsEvents.vanZeroResults, {
+        recovered: Boolean(recovery),
+      });
+    }
+  }, [matches.length, recovery, context.category]);
 
   function trackSort(sort: SearchSort) {
     trackEvent(analyticsEvents.sortChanged, { sort, category: context.category });
@@ -260,7 +378,9 @@ export function SearchExperience({
                 {countLabel(total, copy)}
               </h2>
               <p className="mt-1 text-body-sm text-muted">
-                {copy.resultsShowing}
+                {recovery
+                  ? describeShowingWithout(recovery.constraints)
+                  : copy.resultsShowing}
               </p>
             </div>
             <SortDropdown
@@ -286,25 +406,68 @@ export function SearchExperience({
                 copy={copy}
                 onRetry={() => navigate({ ...resolved, error: undefined })}
               />
+            ) : recovery ? (
+              <>
+                <SearchRecovery
+                  copy={copy}
+                  unmatched={unmatchedCopy}
+                  relaxation={describeRelaxation(recovery.constraints)}
+                  closestHeading={describeClosestMatches(
+                    recovery.relaxedQuery,
+                    context.category,
+                  )}
+                  showingWithout={describeShowingWithout(recovery.constraints)}
+                  onApplyClosest={() => {
+                    const q = stripKeysFromQuery(
+                      resolved.q,
+                      relaxedKeys,
+                      catalog,
+                    );
+                    navigate({
+                      ...recovery.relaxedQuery,
+                      q,
+                      page: undefined,
+                    });
+                  }}
+                />
+                <div className="mt-6">
+                  <VehicleGrid
+                    vehicles={displayed}
+                    financeMode={finance.mode}
+                    maxAdvance={finance.maxAdvance}
+                    deposit={finance.deposit}
+                    term={finance.term}
+                    category={context.category}
+                    viewLabel={copy.viewCta}
+                    affordableLabel={copy.affordableCta}
+                    onAdjustDeposit={() => finance.setAssumptionsOpen(true)}
+                    onViewAffordable={() => {
+                      if (vanEvents) {
+                        trackEvent(vanEvents.financeClicked, {
+                          source: "affordable_filter",
+                        });
+                      }
+                      update({ affordable: "1" });
+                    }}
+                  />
+                </div>
+                {canLoadMore ? (
+                  <div className="mt-8 flex flex-col items-center gap-3">
+                    <Button href={nextHref} variant="secondary">
+                      {copy.loadMore}
+                    </Button>
+                    <p className="text-caption text-muted">
+                      Showing {displayed.length} of {total}
+                    </p>
+                  </div>
+                ) : null}
+              </>
             ) : total === 0 ? (
               <EmptyResults
                 copy={copy}
-                description={
-                  describeSearch(resolved, context.category) ??
-                  copy.emptyFallback
-                }
+                description={unmatchedCopy || copy.emptyFallback}
                 alternatives={alternatives}
                 onClear={clearFilters}
-                onNearest={() => {
-                  update({
-                    monthly_max: resolved.monthly_max
-                      ? String(Number(resolved.monthly_max) + 50)
-                      : undefined,
-                    monthly: undefined,
-                    max_price: undefined,
-                    affordable: undefined,
-                  });
-                }}
               />
             ) : (
               <>
@@ -317,15 +480,15 @@ export function SearchExperience({
                   category={context.category}
                   viewLabel={copy.viewCta}
                   affordableLabel={copy.affordableCta}
-                  onAdjustDeposit={() => finance.setAssumptionsOpen(true)}
-                  onViewAffordable={() => {
-                    if (vanEvents) {
-                      trackEvent(vanEvents.financeClicked, {
-                        source: "affordable_filter",
-                      });
-                    }
-                    update({ affordable: "1" });
-                  }}
+                    onAdjustDeposit={() => finance.setAssumptionsOpen(true)}
+                    onViewAffordable={() => {
+                      if (vanEvents) {
+                        trackEvent(vanEvents.financeClicked, {
+                          source: "affordable_filter",
+                        });
+                      }
+                      update({ affordable: "1" });
+                    }}
                 />
                 {canLoadMore ? (
                   <div className="mt-8 flex flex-col items-center gap-3">

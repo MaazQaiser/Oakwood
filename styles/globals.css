@@ -10,10 +10,12 @@
   --color-subtle: var(--oak-ink-subtle);
   --color-border: var(--oak-border);
   --color-border-strong: var(--oak-border-strong);
+  --color-border-input: var(--oak-border-input);
   --color-primary: var(--oak-primary);
   --color-primary-hover: var(--oak-primary-hover);
   --color-primary-soft: var(--oak-primary-soft);
   --color-primary-secondary: var(--oak-primary-secondary);
+  --color-oakwood: var(--oak-blue);
   --color-page-tint: var(--oak-page-tint);
   --color-finance: var(--oak-finance);
   --color-focus: var(--oak-focus);
@@ -100,7 +102,7 @@ select {
 .select-field {
   appearance: none;
   border-radius: 14px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%23002852' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%2342454E' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.875rem center;
   background-size: 1rem 1rem;
@@ -108,9 +110,9 @@ select {
 }
 
 .select-field:disabled {
-  color: #101828;
+  color: var(--oak-ink);
   opacity: 1;
-  -webkit-text-fill-color: #101828;
+  -webkit-text-fill-color: var(--oak-ink);
 }
 
 ::selection {

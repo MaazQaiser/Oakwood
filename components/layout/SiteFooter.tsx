@@ -22,10 +22,10 @@ export function SiteFooter() {
   const phone = showrooms.find((item) => item.telephone)?.telephone;
 
   return (
-    <footer className="mt-auto bg-[#d4e4ff]">
+    <footer className="mt-auto bg-page-tint">
       <Container width="wide" className="py-10 md:py-12">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <Logo />
+          <Logo height={48} />
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
             {showrooms.map((location) => (
               <Link

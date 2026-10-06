@@ -35,12 +35,25 @@ export function Section({
   children,
   className,
   as: Tag = "section",
+  id,
 }: {
   children: ReactNode;
   className?: string;
   as?: "section" | "div" | "article";
+  id?: string;
 }) {
-  return <Tag className={cn("space-section", className)}>{children}</Tag>;
+  return (
+    <Tag
+      id={id}
+      className={cn(
+        "space-section",
+        id && "scroll-mt-[calc(var(--oak-header-height)+1.25rem)]",
+        className,
+      )}
+    >
+      {children}
+    </Tag>
+  );
 }
 
 export function Stack({

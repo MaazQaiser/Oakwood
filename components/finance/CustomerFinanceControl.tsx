@@ -57,7 +57,7 @@ export function CustomerFinanceControl() {
             variant="secondary"
             size="sm"
             onClick={() => setAssumptionsOpen(true)}
-            className="h-10! min-h-10! max-w-[12rem] truncate border-border! bg-white! px-4! text-[0.72rem]! font-semibold! uppercase! tracking-[0.08em]! text-ink! xl:max-w-none"
+            className="h-10! min-h-10! max-w-[12rem] truncate border-border! bg-white! px-4! text-[0.72rem]! font-semibold! uppercase! tracking-[0.08em]! text-ink! tabular-nums! xl:max-w-none"
           >
             <span className="xl:hidden">{formatApr(apr)}</span>
             <span className="hidden xl:inline">Your finance: {formatApr(apr)}</span>
@@ -66,7 +66,7 @@ export function CustomerFinanceControl() {
           <Button
             href={financeCta.href}
             size="sm"
-            className="h-10! min-h-10! rounded-[14px]! border-0! bg-[#002852]! px-5! text-[0.72rem]! font-semibold! uppercase! tracking-[0.12em]! text-white! hover:bg-[#001c3d]!"
+            className="h-10! min-h-10! rounded-[14px]! border-0! bg-primary! px-5! text-[0.72rem]! font-semibold! uppercase! tracking-[0.12em]! text-white! hover:bg-primary-hover!"
           >
             {financeCta.anonymousShortLabel}
           </Button>

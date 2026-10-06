@@ -21,3 +21,9 @@ export {
   listMatchingVehicles,
   searchCatalog,
 } from "@/lib/vehicles/search";
+export {
+  describeClosestMatches,
+  describeRelaxation,
+  describeUnmatchedSearch,
+  getClosestSearchResults,
+} from "@/lib/vehicles/closest";

@@ -11,6 +11,7 @@ import {
   getMakeName,
   getModelName,
 } from "@/lib/vehicles/labels";
+import { interpretNaturalLanguage } from "@/lib/vehicles/natural-language";
 import { listVehicles } from "@/lib/vehicles/query";
 import type { Vehicle, VehicleCategory } from "@/types/vehicle";
 
@@ -90,96 +91,8 @@ export function parseNaturalLanguage(
   q: string,
   catalog: Vehicle[] = listVehicles("car"),
 ): Partial<SearchQuery> {
-  const text = q.toLowerCase();
-  const result: Partial<SearchQuery> = { q };
-
-  const makes = Array.from(
-    new Map(catalog.map((vehicle) => [vehicle.makeSlug, vehicle.make])).entries(),
-  ).sort((a, b) => b[1].length - a[1].length);
-
-  for (const [slug, name] of makes) {
-    if (
-      text.includes(name.toLowerCase()) ||
-      text.includes(slug.replace(/-/g, " "))
-    ) {
-      result.make = slug;
-      break;
-    }
-  }
-
-  const models = catalog
-    .filter((vehicle) => !result.make || vehicle.makeSlug === result.make)
-    .map((vehicle) => ({ slug: vehicle.modelSlug, name: vehicle.model }))
-    .sort((a, b) => b.name.length - a.name.length);
-
-  for (const model of models) {
-    const needle = model.name.toLowerCase();
-    if (needle.length > 1 && text.includes(needle)) {
-      result.model = model.slug;
-      break;
-    }
-  }
-
-  const locations = Array.from(
-    new Map(
-      catalog.map((vehicle) => [vehicle.locationSlug, vehicle.locationName]),
-    ).entries(),
-  );
-
-  for (const [slug, name] of locations) {
-    if (text.includes(name.toLowerCase()) || text.includes(slug)) {
-      result.location = slug;
-      break;
-    }
-  }
-
-  if (/\bautomatic\b/.test(text)) {
-    result.transmission = "Automatic";
-  } else if (/\bmanual\b/.test(text)) {
-    result.transmission = "Manual";
-  }
-
-  if (/\belectric\b/.test(text)) {
-    result.fuel = "Electric";
-  } else if (/\bhybrid\b/.test(text)) {
-    result.fuel = "Hybrid";
-  } else if (/\bdiesel\b/.test(text)) {
-    result.fuel = "Diesel";
-  } else if (/\bpetrol\b/.test(text)) {
-    result.fuel = "Petrol";
-  }
-
-  const catalogBodies = Array.from(
-    new Set(catalog.map((vehicle) => vehicle.bodyStyle)),
-  );
-  const bodyMatch = [...catalogBodies, ...BODY_TYPES].find((body) =>
-    text.includes(body.toLowerCase()),
-  );
-  if (bodyMatch) {
-    result.body_style = bodyMatch;
-  }
-
-  const monthlyMatch = text.match(
-    /(?:under|below|up to)\s*£?\s*([\d,]+)\s*(?:a\s*month|per\s*month|\/month|pcm|monthly)/i,
-  );
-  const priceMatch = text.match(/(?:under|below|up to)\s*£\s*([\d,]+)/i);
-
-  if (monthlyMatch) {
-    result.monthly_max = monthlyMatch[1].replace(/,/g, "");
-  } else if (priceMatch) {
-    const amount = Number(priceMatch[1].replace(/,/g, ""));
-    if (amount <= 1500) {
-      result.monthly_max = String(amount);
-    } else {
-      result.max_price = String(amount);
-    }
-  }
-
-  if (/\bfamily\b/.test(text)) {
-    result.need = "family";
-  }
-
-  return result;
+  const { query } = interpretNaturalLanguage(q, catalog);
+  return { ...query, q };
 }
 
 export function resolveSearchQuery(

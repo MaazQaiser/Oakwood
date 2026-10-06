@@ -1,5 +1,6 @@
 import { Chip } from "@/components/ui/Badge";
 import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
+import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber } from "@/lib/format/money";
 import type { VehicleDetail } from "@/types/vehicle-detail";
@@ -19,10 +20,13 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
             {vehicle.transmission}
           </p>
         </div>
-        <SaveVehicleButton
-          vehicleName={`${vehicle.make} ${vehicle.model}`}
-          stockId={vehicle.stockId}
-        />
+        <div className="flex shrink-0 items-center gap-2">
+          <SaveVehicleButton
+            vehicleName={`${vehicle.make} ${vehicle.model}`}
+            stockId={vehicle.stockId}
+            category={vehicle.category}
+          />
+        </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <VehicleAvailabilityBadge availability={vehicle.availability} />
@@ -31,6 +35,13 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
         <Chip>{vehicle.fuelType}</Chip>
         <Chip>{vehicle.transmission}</Chip>
       </div>
+      <CompareVehicleButton
+        vehicleName={`${vehicle.make} ${vehicle.model}`}
+        stockId={vehicle.stockId}
+        category={vehicle.category}
+        appearance="button"
+        className="mt-4"
+      />
     </header>
   );
 }

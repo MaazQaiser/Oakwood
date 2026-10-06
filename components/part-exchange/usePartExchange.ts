@@ -20,6 +20,7 @@ import { getDealUrl, getUsedCarsUrl } from "@/config/routes";
 import {
   manualVehicleError,
   mileageError,
+  normaliseRegistration,
   parseMileage,
   parsePounds,
   registrationError,
@@ -65,6 +66,7 @@ function stepFromSnapshot(snapshot: PartExchange, variant: PxVariant): PxStep {
 export function usePartExchange({
   variant,
   initialPx,
+  initialRegistration,
   consideredStockId,
   vdp = false,
   onApplied,
@@ -72,6 +74,7 @@ export function usePartExchange({
 }: {
   variant: PxVariant;
   initialPx?: DealPartExchangeInput;
+  initialRegistration?: string;
   consideredStockId?: string;
   vdp?: boolean;
   onApplied?: (px: DealPartExchangeInput) => void | Promise<void>;
@@ -86,7 +89,8 @@ export function usePartExchange({
     initialPx ? "result" : variant === "standalone" ? "intro" : "registration",
   );
   const [registration, setRegistration] = useState(
-    initialPx?.registration ?? "",
+    initialPx?.registration ??
+      (initialRegistration ? normaliseRegistration(initialRegistration) : ""),
   );
   const [mileage, setMileage] = useState(
     initialPx ? String(initialPx.mileage) : "",

@@ -20,12 +20,12 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary:
-    "rounded-[14px]! border border-transparent bg-[#002852] text-white hover:bg-[#001c3d]",
+    "rounded-[14px]! border border-transparent bg-primary text-white hover:bg-primary-hover",
   secondary:
-    "min-h-14! rounded-[14px]! border border-transparent bg-white px-5! text-[#002852] hover:bg-[#E7F1F8]",
-  tertiary: "rounded-[14px]! bg-[#E7F1F8] text-[#002852] border border-transparent hover:bg-white",
+    "min-h-14! rounded-[14px]! border border-transparent bg-white px-5! text-ink hover:bg-page-tint",
+  tertiary: "rounded-[14px]! bg-page-tint text-primary border border-transparent hover:bg-white",
   destructive: "bg-danger text-white hover:bg-danger/90 border border-transparent",
-  text: "bg-transparent text-primary border border-transparent hover:underline underline-offset-4 px-2",
+  text: "bg-transparent text-primary-secondary border border-transparent hover:underline underline-offset-4 px-2",
   icon: "bg-transparent text-ink border border-transparent hover:bg-page",
 };
 
@@ -91,11 +91,11 @@ export function Button({
     "disabled:cursor-not-allowed disabled:opacity-50",
     "active:translate-y-px",
     compact && variant === "primary"
-      ? "h-11 min-h-11 shrink-0 justify-between gap-2 whitespace-nowrap rounded-[14px] bg-[#002852] py-1 pl-4 pr-1 text-white hover:bg-[#001c3d]"
+      ? "h-11 min-h-11 shrink-0 justify-between gap-2 whitespace-nowrap rounded-[14px] bg-primary py-1 pl-4 pr-1 text-white hover:bg-primary-hover"
       : compact && variant === "secondary"
-        ? "h-11 min-h-11 shrink-0 justify-center whitespace-nowrap rounded-[14px] border border-transparent bg-white px-4 text-[#002852] hover:bg-[#E7F1F8]"
+        ? "h-11 min-h-11 shrink-0 justify-center whitespace-nowrap rounded-[14px] border border-transparent bg-white px-4 text-ink hover:bg-page-tint"
         : withArrow
-          ? "min-h-14 justify-between gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white hover:bg-[#001c3d]"
+          ? "min-h-14 justify-between gap-3 rounded-[14px] bg-primary py-1.5 pl-5 pr-1.5 text-white hover:bg-primary-hover"
           : cn(
               "justify-center gap-2 rounded-full",
               variant === "icon" ? "min-h-11 min-w-11 px-0" : sizeClass[size],
@@ -111,8 +111,8 @@ export function Button({
         <span
           className={
             compact
-              ? "grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-white text-[#002852]"
-              : "grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-white text-[#002852]"
+              ? "grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-white text-primary"
+              : "grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-white text-primary"
           }
         >
           <IconArrow width={compact ? 16 : 20} height={compact ? 16 : 20} />

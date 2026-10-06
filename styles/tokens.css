@@ -1,24 +1,26 @@
 :root {
-  /* Colour — charcoal action, warm neutrals. */
+  /* Colour — Oakwood brand. */
   --oak-page: #ffffff;
-  --oak-page-tint: #f4f5f7;
+  --oak-page-tint: #f4f6f8;
   --oak-surface: #ffffff;
-  --oak-ink: #101828;
+  --oak-ink: #42454e;
   --oak-ink-muted: #344054;
   --oak-ink-subtle: #667085;
   --oak-border: #d0d5dd;
   --oak-border-strong: #98a2b3;
-  --oak-primary: #101828;
-  --oak-primary-hover: #000000;
-  --oak-primary-secondary: #344054;
-  --oak-primary-soft: #f2f4f7;
-  --oak-finance: #101828;
-  --oak-focus: #101828;
+  --oak-border-input: #767c85;
+  --oak-primary: #0061a2;
+  --oak-primary-hover: #004e82;
+  --oak-primary-secondary: #00719f;
+  --oak-primary-soft: #e6f4fb;
+  --oak-blue: #009ce0;
+  --oak-finance: #0061a2;
+  --oak-focus: #0061a2;
   --oak-danger: #d92d20;
   --oak-danger-soft: #fee4e2;
   --oak-warning: #f79009;
   --oak-warning-soft: #fef0c7;
-  --oak-success: #12b76a;
+  --oak-success: #12805b;
   --oak-success-soft: #d1fadf;
   --oak-info: #344054;
   --oak-info-soft: #f2f4f7;
@@ -88,7 +90,7 @@
   --oak-shadow-sm: 0 8px 24px rgb(16 24 40 / 0.04);
   --oak-shadow-md: 0 16px 40px rgb(16 24 40 / 0.06);
   --oak-shadow-lg: 0 24px 56px rgb(16 24 40 / 0.08);
-  --oak-shadow-focus: 0 0 0 3px rgb(16 24 40 / 0.18);
+  --oak-shadow-focus: 0 0 0 3px rgb(0 97 162 / 0.28);
 
   /* Layout */
   --oak-width-narrow: 40rem;
@@ -97,6 +99,7 @@
   --oak-header-height: 4rem;
   --oak-touch: 2.75rem;
   --oak-consent-offset: 0px;
+  --oak-compare-offset: 0px;
 
   /* Breakpoints (reference; Tailwind theme maps these) */
   --oak-bp-sm: 40rem;

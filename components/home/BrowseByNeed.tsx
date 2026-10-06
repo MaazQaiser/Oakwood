@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Container, Grid, Section } from "@/components/layout/Container";
 import { Card } from "@/components/cards/Card";
+import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { IconArrow } from "@/components/ui/icons";
 import { SectionIntro } from "@/components/home/SectionIntro";
-import { needCategoryImage } from "@/lib/media/stock";
+import { needPhotography } from "@/lib/home/photography";
 import { needCategories } from "@/lib/mock/home";
 
 export function CategoryCard({
@@ -21,13 +21,11 @@ export function CategoryCard({
   return (
     <Link href={href} className="block h-full">
       <Card as="article" className="flex h-full flex-col overflow-hidden border-0 shadow-sm" padded={false}>
-        <div className="relative aspect-[16/10] bg-page-tint">
-          <Image
-            src={needCategoryImage(id)}
-            alt={title}
+        <div className="relative aspect-[16/10] max-h-40 overflow-hidden bg-page-tint sm:max-h-52">
+          <OakwoodPhotoSlot
+            slot={needPhotography(id)}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover"
           />
         </div>
         <div className="flex flex-1 items-start justify-between gap-3 p-5">
@@ -44,7 +42,7 @@ export function CategoryCard({
 
 export function BrowseByNeed() {
   return (
-    <Section>
+    <Section id="shop-by-need" aria-label="Shop by what you need">
       <Container>
         <SectionIntro align="center" heading="Shop by what you need.">
           Start with the type of car that suits your everyday life.

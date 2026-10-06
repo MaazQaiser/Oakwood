@@ -6,6 +6,7 @@ import { Drawer } from "@/components/ui/Dialogs";
 import { IconButton } from "@/components/ui/Button";
 import { IconMenu, IconSearch } from "@/components/ui/icons";
 import { CustomerFinanceControl } from "@/components/finance/CustomerFinanceControl";
+import { CompareTray } from "@/components/compare/CompareTray";
 import { DesktopNav } from "@/components/navigation/DesktopNav";
 import { MobileNav } from "@/components/navigation/MobileNav";
 import { Logo } from "@/components/navigation/Logo";
@@ -32,9 +33,9 @@ export function SiteHeader() {
     <header
       className={cn(
         "sticky top-3 z-[var(--oak-z-header)] mx-3 sm:mx-4 lg:top-4 lg:mx-6",
-        elevated && !detailOpen && "rounded-[14px] bg-[#ECF3F8] shadow-[0_10px_28px_rgba(16,40,72,0.08)]",
-        elevated && detailOpen && "rounded-t-[14px] bg-[#ECF3F8]",
-        !elevated && detailOpen && "rounded-t-[32px] bg-[#ECF3F8]",
+        elevated && !detailOpen && "rounded-[14px] bg-page-tint shadow-[0_10px_28px_rgba(66,69,78,0.08)]",
+        elevated && detailOpen && "rounded-t-[14px] bg-page-tint",
+        !elevated && detailOpen && "rounded-t-[32px] bg-page-tint",
       )}
     >
       <Container
@@ -61,6 +62,7 @@ export function SiteHeader() {
           >
             <IconSearch />
           </Link>
+          <CompareTray variant="header" />
           <CustomerFinanceControl />
           <IconButton
             label="Open menu"

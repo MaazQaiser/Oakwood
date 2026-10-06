@@ -1,11 +1,11 @@
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/cards/Card";
+import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { formatShowroomAddress } from "@/config/locations";
+import { showroomPhotography } from "@/lib/home/photography";
 import { LOCATION_HOURS_NOTICE } from "@/lib/locations/content";
 import { getDirectionsUrl } from "@/lib/locations/directions";
 import { countLocationStock } from "@/lib/locations/stock";
-import { locationStockImage } from "@/lib/media/stock";
 import type { ShowroomProfile } from "@/types/locations";
 
 export function LocationCard({
@@ -26,13 +26,11 @@ export function LocationCard({
 
   return (
     <Card as="article" padded={false} className="overflow-hidden border-0 shadow-sm">
-      <div className="relative aspect-[16/10] bg-page-tint">
-        <Image
-          src={locationStockImage(profile.slug)}
-          alt={`Oakwood Motor Company ${profile.name}`}
+      <div className="relative aspect-[16/10] max-h-56 overflow-hidden bg-page-tint sm:max-h-64">
+        <OakwoodPhotoSlot
+          slot={showroomPhotography(profile.slug)}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
         />
       </div>
       <div className="p-5">
@@ -46,13 +44,13 @@ export function LocationCard({
           <p className="mt-2 text-body-sm text-muted">{profile.region}</p>
         )}
         {profile.telephone ? (
-          <p className="mt-1 text-body-sm">{profile.telephone}</p>
+          <p className="mt-1 text-body-sm tabular-nums">{profile.telephone}</p>
         ) : null}
         <p className="mt-2 text-body-sm text-muted">{LOCATION_HOURS_NOTICE}</p>
         <p className="mt-2 text-body-sm text-muted">
           Used cars, finance, part exchange, servicing, MOT and warranty.
         </p>
-        <p className="mt-2 text-body-sm text-muted">
+        <p className="mt-2 text-body-sm text-muted tabular-nums">
           {stockCount > 0
             ? `${stockCount} car${stockCount === 1 ? "" : "s"} listed at this location.`
             : "Current stock for this location is listed on the used cars page."}

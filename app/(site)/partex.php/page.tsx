@@ -9,6 +9,15 @@ export const metadata = createPageMetadata({
   path: routes.partExchange,
 });
 
-export default function Page() {
-  return <SellMyCarExperience />;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const registration = Array.isArray(params.registration)
+    ? params.registration[0]
+    : params.registration;
+
+  return <SellMyCarExperience initialRegistration={registration} />;
 }

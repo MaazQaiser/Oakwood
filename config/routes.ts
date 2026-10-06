@@ -206,6 +206,34 @@ export function getVehicleUrl(
   return `/${vehicle.slug}`;
 }
 
+export function parseCompareIds(
+  raw?: string | string[] | null,
+): string[] {
+  const value = Array.isArray(raw) ? raw.join(",") : (raw ?? "");
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const part of value.split(",")) {
+    const id = decodeURIComponent(part.trim());
+    if (!id || seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    ids.push(id);
+    if (ids.length === 2) {
+      break;
+    }
+  }
+  return ids;
+}
+
+export function getCompareUrl(stockIds?: string[]): string {
+  const ids = parseCompareIds(stockIds?.join(",") ?? "");
+  if (ids.length === 0) {
+    return routes.compare;
+  }
+  return `${routes.compare}?ids=${ids.map(encodeURIComponent).join(",")}`;
+}
+
 export function getFinanceIntentUrl(intent: FinanceIntentSlug | string): string {
   return `${routes.finance}/${slugify(intent)}`;
 }
