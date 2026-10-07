@@ -8,11 +8,9 @@ import {
 } from "@/components/finance/FinancePrimitives";
 import { Button } from "@/components/ui/Button";
 import { IconArrow } from "@/components/ui/icons";
-import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import { getVehicleUrl } from "@/config/routes";
-import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 import type { Vehicle } from "@/types/vehicle";
 import Link from "next/link";
 
@@ -107,9 +105,6 @@ export function VehicleCard({
   financeType?: "hp" | "pcp";
 }) {
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  const displayImage = featured
-    ? oakwoodInventoryImage(vehicle.image)
-    : vehicle.image;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
   const availabilityLabel =
     vehicle.availability === "reserved"
@@ -142,35 +137,15 @@ export function VehicleCard({
             featured ? "aspect-[4/3]" : "aspect-[16/10]",
           )}
         >
-          {displayImage ? (
-            <Image
-              src={displayImage}
-              alt={imageLabel}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              priority={imagePriority}
-              unoptimized={displayImage.endsWith(".svg")}
-              className="object-cover"
-            />
-          ) : featured ? (
-            <OakwoodPhotoSlot
-              slot={{
-                label: "Vehicle",
-                intended: `Oakwood photography of this ${vehicle.make} ${vehicle.model}`,
-              }}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
-          ) : (
-            <Image
-              src="/images/vehicle-placeholder.svg"
-              alt={imageLabel}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              unoptimized
-              className="object-cover"
-            />
-          )}
+          <Image
+            src={vehicle.image ?? "/images/vehicle-placeholder.svg"}
+            alt={imageLabel}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            priority={imagePriority}
+            unoptimized={(vehicle.image ?? "/images/vehicle-placeholder.svg").endsWith(".svg")}
+            className="object-cover"
+          />
         </div>
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <span className="rounded-full bg-surface px-2.5 py-1 text-caption text-ink tabular-nums shadow-sm">

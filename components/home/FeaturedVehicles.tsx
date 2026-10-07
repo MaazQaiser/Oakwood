@@ -9,7 +9,6 @@ import { SectionIntro } from "@/components/home/SectionIntro";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
 import { getIllustratedMonthly } from "@/lib/finance/illustration";
-import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 import { featuredVehicles } from "@/lib/mock/home";
 import { getSearchUrl, routes } from "@/config/routes";
 
@@ -95,10 +94,7 @@ export function FeaturedVehicles() {
                 >
                   <VehicleCard
                     featured
-                    vehicle={{
-                      ...vehicle,
-                      image: oakwoodInventoryImage(vehicle.image),
-                    }}
+                    vehicle={vehicle}
                     monthly={getIllustratedMonthly(
                       vehicle,
                       deposit,

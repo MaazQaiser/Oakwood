@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
-import { oakwoodInventoryImage, type OakwoodImageSlot } from "@/lib/media/oakwood";
+import type { OakwoodImageSlot } from "@/lib/media/oakwood";
 
 export function OakwoodPhotoSlot({
   slot,
@@ -17,13 +17,12 @@ export function OakwoodPhotoSlot({
 }) {
   const captionAlign =
     caption === "start" ? "justify-start" : "justify-end";
-  const src = oakwoodInventoryImage(slot.src);
 
-  if (src) {
+  if (slot.src) {
     return (
       <div className={cn(fill ? "absolute inset-0" : "relative", className)}>
         <Image
-          src={src}
+          src={slot.src}
           alt={slot.alt ?? slot.intended}
           fill
           sizes={sizes}

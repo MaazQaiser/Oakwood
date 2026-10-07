@@ -7,7 +7,6 @@ import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvid
 import { getFinanceCalculatorUrl, getSearchUrl, routes } from "@/config/routes";
 import { getRepresentativeFinanceExample } from "@/lib/finance/representative-example";
 import { formatPounds } from "@/lib/format/money";
-import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 
 function ExampleCard() {
@@ -16,7 +15,7 @@ function ExampleCard() {
     ? formatPounds(example.monthlyPayment)
     : undefined;
   const exampleImage = example
-    ? oakwoodInventoryImage(findVehicleByStockId(example.stockId)?.image)
+    ? findVehicleByStockId(example.stockId)?.image
     : undefined;
 
   return (

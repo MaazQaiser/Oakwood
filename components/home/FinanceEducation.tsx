@@ -9,7 +9,10 @@ import {
   HOME_WARRANTY_AA_UPGRADE,
   HOME_WARRANTY_INCLUDED,
 } from "@/lib/home/copy";
-import { HOME_FINANCE_IMAGES } from "@/lib/home/photography";
+import {
+  HOME_FINANCE_IMAGES,
+  financeWarrantyPhotography,
+} from "@/lib/home/photography";
 
 const financePoints = [
   { label: "Deposit", href: routes.financeCalculator },
@@ -62,7 +65,7 @@ export function FinanceEducation() {
             <article className="grid min-h-[16.5rem] overflow-hidden rounded-[28px] bg-white sm:grid-cols-2">
               <div className="relative min-h-52 max-h-64 sm:max-h-none">
                 <OakwoodPhotoSlot
-                  slot={HOME_FINANCE_IMAGES.warranty}
+                  slot={financeWarrantyPhotography()}
                   fill
                   sizes="(max-width: 1024px) 100vw, 22rem"
                 />
