@@ -32,7 +32,7 @@ export function Logo({
             ? "h-9 w-11 object-cover object-left"
             : sized
               ? "w-auto"
-              : "h-9 w-11 object-cover object-left md:h-12 md:w-auto md:object-contain"
+              : "h-8 w-10 object-cover object-left md:h-9 md:w-auto md:object-contain"
         }
         style={sized ? { height } : undefined}
       />

@@ -7,7 +7,7 @@ import { Modal } from "@/components/ui/Dialogs";
 import { Slider } from "@/components/forms/FormControls";
 import { PersonalisedPricingIndicator } from "@/components/finance/FinancePrimitives";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { financeCta } from "@/config/navigation";
+import { headerPrimaryAction } from "@/config/navigation";
 import { getSearchUrl, routes } from "@/config/routes";
 import { formatApr, formatPounds } from "@/lib/format/money";
 
@@ -63,12 +63,8 @@ export function CustomerFinanceControl() {
             <span className="hidden xl:inline">Your finance: {formatApr(apr)}</span>
           </Button>
         ) : (
-          <Button
-            href={financeCta.href}
-            size="sm"
-            className="h-10! min-h-10! rounded-[14px]! border-0! bg-primary! px-5! text-[0.72rem]! font-semibold! uppercase! tracking-[0.12em]! text-white! hover:bg-primary-hover!"
-          >
-            {financeCta.anonymousShortLabel}
+          <Button href={headerPrimaryAction.href} className="btn-compact">
+            {headerPrimaryAction.label}
           </Button>
         )}
       </div>

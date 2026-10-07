@@ -8,6 +8,7 @@ export function SectionIntro({
   align = "left",
   action,
   headingClassName = "text-oakwood",
+  bodyClassName = "text-muted",
 }: {
   heading: string;
   children?: ReactNode;
@@ -15,6 +16,7 @@ export function SectionIntro({
   align?: "left" | "center";
   action?: ReactNode;
   headingClassName?: string;
+  bodyClassName?: string;
 }) {
   const HeadingTag = headingLevel;
   const centered = align === "center";
@@ -38,7 +40,7 @@ export function SectionIntro({
           {heading}
         </HeadingTag>
         {children ? (
-          <div className="mt-4 text-body text-muted">{children}</div>
+          <div className={cn("mt-4 text-body", bodyClassName)}>{children}</div>
         ) : null}
       </div>
       {action ? <div className={cn(centered && "mt-5")}>{action}</div> : null}

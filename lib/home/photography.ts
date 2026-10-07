@@ -10,10 +10,14 @@ export const HOME_SHOWROOM_IMAGES: Record<string, OakwoodImageSlot> = {
   bury: {
     label: "Bury showroom",
     intended: "Oakwood Motor Company Bury showroom",
+    src: "/images/hero/showroom-customer.png",
+    alt: "A customer with a car in the showroom",
   },
   chorley: {
     label: "Chorley showroom",
     intended: "Oakwood Motor Company Chorley showroom",
+    src: "/images/stock/dealership-02.jpg",
+    alt: "A used car from Oakwood stock",
   },
 };
 
@@ -56,6 +60,8 @@ export const HOME_FINANCE_IMAGES = {
   customer: {
     label: "Customer handover",
     intended: "Oakwood customer at Bury or Chorley",
+    src: "/images/hero/showroom-customer.png",
+    alt: "A customer with a car in the showroom",
   },
 } as const satisfies Record<string, OakwoodImageSlot>;
 
@@ -63,10 +69,14 @@ export const HOME_REVIEW_IMAGES = {
   "driving-away": {
     label: "Driving away",
     intended: "Oakwood customer driving away from Bury",
+    src: "/images/hero/open-sky.png",
+    alt: "A smiling customer beside a car under an open sky",
   },
   "showroom-handover": {
     label: "Showroom handover",
     intended: "Oakwood customer handover at Bury",
+    src: "/images/hero/showroom-customer.png",
+    alt: "A customer with a car in the showroom",
   },
 } as const satisfies Record<string, OakwoodImageSlot>;
 
@@ -142,4 +152,19 @@ export function financeWarrantyPhotography(): OakwoodImageSlot {
     (item) => item.availability === "available",
   );
   return withVehicleImage(HOME_FINANCE_IMAGES.warranty, vehicle);
+}
+
+export function representativeExamplePhotography(
+  vehicle?: Vehicle,
+): OakwoodImageSlot {
+  const title = vehicle
+    ? `${vehicle.year} ${vehicle.make} ${vehicle.model}`
+    : "Representative example";
+
+  return {
+    label: title,
+    intended: `Oakwood photography of this ${title}`,
+    src: vehicle?.image,
+    alt: title,
+  };
 }

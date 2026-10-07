@@ -43,6 +43,8 @@ export const WHY_OAKWOOD_WARRANTY = HOME_WARRANTY_INCLUDED;
 
 export const WHY_OAKWOOD_WARRANTY_COPY = HOME_WARRANTY_AA_UPGRADE;
 
+export const WHY_OAKWOOD_PREPARATION_HEADING = "In-house vehicle preparation";
+
 export const WHY_OAKWOOD_PREPARATION = preparationCopy.description;
 
 export const WHY_OAKWOOD_WORKSHOP = "Own workshop";
@@ -63,21 +65,29 @@ export const WHY_OAKWOOD_IMAGES: WhyOakwoodImageSlot[] = [
     id: "preparation",
     label: "Preparation centre",
     intended: "Oakwood in-house vehicle preparation",
+    src: "/images/stock/family.jpg",
+    alt: "A prepared used car ready for handover",
   },
   {
     id: "workshop",
     label: "Workshop",
     intended: "Oakwood's own workshop",
+    src: "/images/stock/dealership-01.jpg",
+    alt: "Vehicles being prepared at Oakwood",
   },
   {
     id: "showrooms",
     label: "Showrooms",
     intended: "Oakwood Bury and Chorley",
+    src: "/images/hero/showroom-customer.png",
+    alt: "A customer with a car in the showroom",
   },
   {
     id: "technicians",
     label: "Technicians",
     intended: "Oakwood technicians and workshop staff",
+    src: "/images/hero/open-sky.png",
+    alt: "A smiling customer beside a car under an open sky",
   },
 ];
 

@@ -1,286 +1,192 @@
-import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/cards/Card";
-import { Container, Grid, Section } from "@/components/layout/Container";
+import Link from "next/link";
+import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
+import { HomeRepresentativeExample } from "@/components/home/HomeRepresentativeExample";
 import { SectionIntro } from "@/components/home/SectionIntro";
-import { getLocationUrl } from "@/config/routes";
+import { Container, Section } from "@/components/layout/Container";
+import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
+import { getFinanceIntentUrl, routes } from "@/config/routes";
+import { HOME_WARRANTY_AA_UPGRADE } from "@/lib/home/copy";
 import {
-  WHY_OAKWOOD_AA_INSPECTED,
-  WHY_OAKWOOD_AA_NOTE,
+  HOME_FINANCE_IMAGES,
+  financeWarrantyPhotography,
+} from "@/lib/home/photography";
+import {
   WHY_OAKWOOD_AA_POINTS,
-  WHY_OAKWOOD_CARS,
-  WHY_OAKWOOD_CARS_HANDED_OVER,
-  WHY_OAKWOOD_CMS_NOTICE,
-  WHY_OAKWOOD_ESTABLISHED_YEAR,
   WHY_OAKWOOD_HEADING,
-  WHY_OAKWOOD_IMAGES,
   WHY_OAKWOOD_INTRO,
   WHY_OAKWOOD_LINKS,
   WHY_OAKWOOD_PREPARATION,
-  WHY_OAKWOOD_SHOWROOMS,
-  WHY_OAKWOOD_TECHNICIANS,
   WHY_OAKWOOD_WARRANTY,
-  WHY_OAKWOOD_WARRANTY_COPY,
-  WHY_OAKWOOD_WORKSHOP,
-  type WhyOakwoodImageSlot,
-  type WhyOakwoodTechnician,
 } from "@/lib/home/why-oakwood";
-import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 
-function ContentSlot({
-  label,
-  children,
-}: {
-  label: string;
-  children: string;
-}) {
-  return (
-    <div className="rounded-[18px] border border-dashed border-ink/20 bg-white/70 px-4 py-4">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
-        {label}
-      </p>
-      <p className="mt-2 text-body-sm text-muted">{children}</p>
-    </div>
-  );
-}
-
-function PhotoSlot({ slot }: { slot: WhyOakwoodImageSlot }) {
-  const src = oakwoodInventoryImage(slot.src);
-
-  if (src) {
-    return (
-      <figure className="overflow-hidden rounded-[22px] bg-page-tint">
-        <div className="relative aspect-[16/10] max-h-40 w-full sm:max-h-56">
-          <Image
-            src={src}
-            alt={slot.alt ?? slot.intended}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover"
-          />
-        </div>
-        <figcaption className="px-4 py-3 text-body-sm text-ink">
-          {slot.label}
-        </figcaption>
-      </figure>
-    );
-  }
-
-  return (
-    <figure className="overflow-hidden rounded-[22px] bg-page-tint">
-      <div
-        className="flex aspect-[16/10] max-h-40 w-full flex-col justify-end p-3 sm:max-h-56 sm:p-4"
-        role="img"
-        aria-label={`${slot.label} photography slot. ${slot.intended}.`}
-      >
-        <figcaption>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
-            {slot.label}
-          </p>
-          <p className="mt-1 text-body-sm leading-snug text-secondary">
-            Photography will appear here when the image is connected.
-          </p>
-        </figcaption>
-      </div>
-    </figure>
-  );
-}
-
-function TechnicianSlot({ person, index }: { person?: WhyOakwoodTechnician; index: number }) {
-  if (person?.name) {
-    return (
-      <Card as="article" className="border-0 shadow-sm">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
-          Technician
-        </p>
-        <h3 className="mt-2 text-h5">{person.name}</h3>
-        {person.qualifications ? (
-          <p className="mt-2 text-body-sm text-muted">{person.qualifications}</p>
-        ) : (
-          <p className="mt-2 text-body-sm text-muted">
-            Qualifications will appear here when the content source is connected.
-          </p>
-        )}
-        {person.yearsOfService ? (
-          <p className="mt-1 text-body-sm text-muted">{person.yearsOfService}</p>
-        ) : (
-          <p className="mt-1 text-body-sm text-muted">
-            Years of service will appear here when the content source is connected.
-          </p>
-        )}
-      </Card>
-    );
-  }
-
-  return (
-    <ContentSlot label={index === 0 ? "Named technicians" : `Technician ${index + 1}`}>
-      Technician names, qualifications and years of service will appear here when
-      the content source is connected.
-    </ContentSlot>
-  );
-}
+const financePoints = [
+  { label: "Deposit", href: routes.financeCalculator },
+  { label: "Monthly payments", href: routes.finance },
+  { label: "Final payment", href: getFinanceIntentUrl("pcp") },
+];
 
 export function WhyOakwood() {
-  const people =
-    WHY_OAKWOOD_TECHNICIANS.length > 0 ? WHY_OAKWOOD_TECHNICIANS : [undefined];
-
   return (
-    <Section
-      id="why-oakwood"
-      aria-label="Why Oakwood"
-      className="bg-page-tint"
-    >
-      <Container>
-        <SectionIntro
-          align="center"
-          heading={WHY_OAKWOOD_HEADING}
-          headingClassName="text-primary"
-        >
+    <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING}>
+      <Container width="wide">
+        <SectionIntro heading={`${WHY_OAKWOOD_HEADING}.`} headingClassName="text-[#002852]">
           {WHY_OAKWOOD_INTRO}
         </SectionIntro>
-
-        <div className="mt-10 grid gap-4 lg:grid-cols-3">
-          <article className="flex flex-col justify-between rounded-[28px] bg-primary p-6 text-white sm:p-8 lg:col-span-2">
-            <div>
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-white/70">
-                Vehicle checks
-              </p>
-              <h3 className="mt-3 text-[1.65rem] font-semibold leading-tight tracking-[-0.03em] sm:text-[1.9rem]">
-                {WHY_OAKWOOD_AA_INSPECTED}
+        <div className="mt-10 grid gap-4 lg:grid-cols-2">
+          <article
+            id="finance"
+            className="flex flex-col gap-8 rounded-[28px] bg-[#ECF3F8] p-7 sm:p-9 lg:min-h-[28rem] lg:justify-between lg:gap-0"
+          >
+            <div className="max-w-md">
+              <h3 className="text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-[#002852] sm:text-[2.35rem]">
+                Flexible finance that starts with your budget.
               </h3>
-              <p className="mt-3 text-lg font-medium text-white/85">
-                {WHY_OAKWOOD_AA_POINTS}
+              <p className="mt-4 text-[0.98rem] leading-relaxed text-secondary">
+                Check eligibility and see a personalised finance profile. Monthly
+                figures before a full application are illustrations.
               </p>
-              <p className="mt-4 max-w-xl text-body-sm leading-relaxed text-white/75">
-                {WHY_OAKWOOD_AA_NOTE}
+              <p className="mt-4 text-[0.98rem] text-[#002852]">
+                No impact on your credit score.
               </p>
+              <Link
+                href={routes.eligibility}
+                className="mt-6 inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d] sm:mt-8"
+              >
+                Check eligibility
+              </Link>
             </div>
-            <p className="mt-6">
-              <Button href={WHY_OAKWOOD_LINKS.aaStandards} variant="secondary">
-                AA standards
-              </Button>
-            </p>
-          </article>
-
-          <article className="flex flex-col rounded-[28px] bg-white p-6 sm:p-7">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
-              Oakwood experience
-            </p>
-            <div className="mt-5 space-y-4">
-              {WHY_OAKWOOD_ESTABLISHED_YEAR ? (
-                <div>
-                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
-                    {WHY_OAKWOOD_ESTABLISHED_YEAR}
-                  </p>
-                  <p className="mt-2 text-body-sm text-muted">Established</p>
-                </div>
-              ) : (
-                <ContentSlot label="Established">
-                  Not in the content source yet.
-                </ContentSlot>
-              )}
-              {WHY_OAKWOOD_CARS_HANDED_OVER ? (
-                <div>
-                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
-                    {WHY_OAKWOOD_CARS_HANDED_OVER}
-                  </p>
-                  <p className="mt-2 text-body-sm text-muted">Cars handed over</p>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-[1.75rem] font-semibold leading-none tracking-tight text-oakwood tabular-nums">
-                    {WHY_OAKWOOD_CARS}
-                  </p>
-                  <p className="mt-2 text-body-sm text-muted">Oakwood used cars</p>
-                </div>
-              )}
-            </div>
-          </article>
-        </div>
-
-        <Grid columns="default" className="mt-4 xl:grid-cols-3">
-          <Card as="article" className="border-0 shadow-sm">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
-              Warranty
-            </p>
-            <h3 className="mt-3 text-h5">{WHY_OAKWOOD_WARRANTY}</h3>
-            <p className="mt-2 text-body-sm text-muted">{WHY_OAKWOOD_WARRANTY_COPY}</p>
-            <p className="mt-4">
-              <Button href={WHY_OAKWOOD_LINKS.warranty} variant="text" className="px-0">
-                Warranty details
-              </Button>
-            </p>
-          </Card>
-
-          <Card as="article" className="border-0 shadow-sm">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
-              Preparation
-            </p>
-            <h3 className="mt-3 text-h5">In-house vehicle preparation</h3>
-            <p className="mt-2 text-body-sm text-muted">{WHY_OAKWOOD_PREPARATION}</p>
-            <p className="mt-4">
-              <Button href={WHY_OAKWOOD_LINKS.garage} variant="text" className="px-0">
-                Our garage
-              </Button>
-            </p>
-          </Card>
-
-          <Card as="article" className="border-0 shadow-sm">
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-primary-secondary">
-              Locations and workshop
-            </p>
-            <h3 className="mt-3 text-h5">
-              Two showrooms + {WHY_OAKWOOD_WORKSHOP.toLowerCase()}
-            </h3>
-            <ul className="mt-3 space-y-1 text-body-sm text-muted">
-              {WHY_OAKWOOD_SHOWROOMS.map((showroom) => (
-                <li key={showroom.slug}>
-                  <Button
-                    href={getLocationUrl(showroom.slug)}
-                    variant="text"
-                    className="px-0"
-                  >
-                    {showroom.name}
-                  </Button>
-                </li>
+            <div className="grid shrink-0 grid-cols-3 gap-2 border-t border-ink/10 pt-5 text-center">
+              {financePoints.map((point) => (
+                <Link
+                  key={point.label}
+                  href={point.href}
+                  className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary no-underline hover:underline sm:tracking-[0.12em]"
+                >
+                  {point.label}
+                </Link>
               ))}
-              <li>{WHY_OAKWOOD_WORKSHOP}</li>
-            </ul>
-            <p className="mt-4">
-              <Button href={WHY_OAKWOOD_LINKS.locations} variant="text" className="px-0">
-                All locations
-              </Button>
+            </div>
+          </article>
+
+          <div className="grid gap-4">
+            <article className="grid min-h-[16.5rem] overflow-hidden rounded-[28px] bg-white sm:grid-cols-2">
+              <div className="relative min-h-52 min-w-0 max-h-64 sm:h-full sm:max-h-none">
+                <OakwoodPhotoSlot
+                  slot={financeWarrantyPhotography()}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 22rem"
+                />
+              </div>
+              <div className="relative flex min-w-0 flex-col justify-center bg-[#E7F3C4] px-6 pt-24 pb-6 sm:py-8 sm:pr-6 sm:pl-16">
+                <span className="absolute top-5 left-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#002852] text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.04em] text-white tabular-nums sm:top-1/2 sm:left-0 sm:h-[4.6rem] sm:w-[4.6rem] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[1.15rem]">
+                  6
+                  <br />
+                  month
+                  <br />
+                  warranty
+                </span>
+                <h3 className="text-xl font-semibold leading-snug text-[#002852]">
+                  {WHY_OAKWOOD_WARRANTY}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#3d4d34]">
+                  {HOME_WARRANTY_AA_UPGRADE}
+                </p>
+                <Link
+                  href={WHY_OAKWOOD_LINKS.warranty}
+                  className="mt-4 text-sm font-semibold text-primary-secondary no-underline hover:underline"
+                >
+                  Warranty details
+                </Link>
+              </div>
+            </article>
+
+            <Link
+              href={WHY_OAKWOOD_LINKS.garage}
+              className="flex min-h-36 flex-col justify-center rounded-[28px] bg-page-tint p-7 no-underline"
+            >
+              <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#002852]">
+                Checked, verified, and prepared
+              </h3>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-secondary">
+                {WHY_OAKWOOD_PREPARATION} {WHY_OAKWOOD_AA_POINTS}.
+              </p>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.35fr_1fr_1fr]">
+          <div className="relative min-h-56 overflow-hidden rounded-[28px] sm:min-h-72 lg:min-h-[22rem]">
+            <OakwoodPhotoSlot
+              slot={HOME_FINANCE_IMAGES.customer}
+              fill
+              sizes="(max-width: 1024px) 100vw, 40rem"
+            />
+          </div>
+
+          <article className="flex flex-col rounded-[28px] bg-page-tint p-7">
+            <PiggyIcon />
+            <h3 className="mt-5 text-xl font-semibold text-[#002852]">Clear pricing</h3>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Each car shows a cash price and an example monthly payment together, so you can compare before you enquire.
             </p>
-          </Card>
-        </Grid>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Check eligibility when you want those monthly figures to follow your finance profile.
+            </p>
+            <Link
+              href={routes.usedCars}
+              className="mt-auto pt-6 text-sm font-semibold text-primary-secondary no-underline hover:underline"
+            >
+              Browse used cars
+            </Link>
+          </article>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
-          {WHY_OAKWOOD_IMAGES.map((slot) => (
-            <PhotoSlot key={slot.id} slot={slot} />
-          ))}
+          <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-7">
+            <ExchangeIcon />
+            <h3 className="mt-5 text-xl font-semibold text-[#002852]">Part exchange</h3>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Get a valuation you can put towards your deposit. The online figure is an estimate.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-secondary">
+              Oakwood confirms the offer with you before it becomes part of a deal.
+            </p>
+            <Link
+              href={routes.partExchange}
+              className="mt-auto pt-6 text-sm font-semibold text-primary-secondary no-underline hover:underline"
+            >
+              Value my car
+            </Link>
+          </article>
         </div>
 
-        <div className="mt-8">
-          <h3 className="text-h4 text-primary">People</h3>
-          <p className="mt-2 max-w-2xl text-body-sm text-muted">
-            Named technicians, qualifications and years of service are published
-            here only when they are in the Oakwood content source.
-          </p>
-          <Grid columns="two" className="mt-4">
-            {people.map((person, index) => (
-              <TechnicianSlot
-                key={person?.name ?? `technician-slot-${index}`}
-                person={person}
-                index={index}
-              />
-            ))}
-          </Grid>
+        <div className="mt-16 lg:mt-24">
+          <HomeRepresentativeExample />
         </div>
 
-        <p className="mt-8 text-center text-caption text-muted">
-          {WHY_OAKWOOD_CMS_NOTICE}
-        </p>
+        <HomeFinanceStrip variant="eligibility" className="mt-12 lg:mt-16" />
       </Container>
     </Section>
+  );
+}
+
+function PiggyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-[#002852]">
+      <rect x="3.5" y="6" width="17" height="12" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M12 9v6M10.3 10.3c.3-.5.9-.8 1.7-.8 1 0 1.7.5 1.7 1.3 0 .8-.7 1.1-1.7 1.4-.9.3-1.7.6-1.7 1.4 0 .8.7 1.3 1.7 1.3.8 0 1.4-.3 1.7-.8"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ExchangeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-[#002852]">
+      <path d="M7 8h10l-2.2-2.2M17 16H7l2.2 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16.8 8a6.2 6.2 0 0 1-9.4 7.2M7.2 16A6.2 6.2 0 0 1 16.6 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
   );
 }

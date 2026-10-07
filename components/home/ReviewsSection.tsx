@@ -5,7 +5,6 @@ import { useEffect, useId, useState } from "react";
 import { Container, Section } from "@/components/layout/Container";
 import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { SectionIntro } from "@/components/home/SectionIntro";
-import { ReviewSummary } from "@/components/trust/ReviewSummary";
 import { ReviewsGrid } from "@/components/trust/ReviewsGrid";
 import { routes } from "@/config/routes";
 import { HOME_REVIEW_IMAGES } from "@/lib/home/photography";
@@ -61,11 +60,11 @@ export function ReviewsSection() {
           {reviewsCopy.description}
         </SectionIntro>
 
-        <div className="mt-8">
-          <ReviewSummary feed={feed} variant="prominent" />
-        </div>
-
-        {feed.items.length > 0 ? <ReviewsGrid reviews={feed.items} /> : null}
+        {feed.items.length > 0 ? (
+          <div className="mt-8">
+            <ReviewsGrid reviews={feed.items} />
+          </div>
+        ) : null}
 
         <div className="mt-10">
           <h3 className="text-h4 text-oakwood">Video reviews</h3>

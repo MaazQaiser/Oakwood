@@ -1,19 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import { Container, Section } from "@/components/layout/Container";
+import { Button } from "@/components/ui/Button";
+import { IconArrow } from "@/components/ui/icons";
 import { getBookingUrl, routes } from "@/config/routes";
 import {
   HOME_AFTERSALES_CTA,
   HOME_AFTERSALES_EYEBROW,
   HOME_AFTERSALES_HEADING,
   HOME_AFTERSALES_IMAGE,
-  HOME_AFTERSALES_REASSURANCE,
   HOME_AFTERSALES_SERVICES,
   HOME_AFTERSALES_SUPPORT,
   HOME_AFTERSALES_WORKSHOP,
 } from "@/lib/home/copy";
-import { oakwoodInventoryImage } from "@/lib/media/oakwood";
 
 const serviceHrefs = {
   mot: routes.mot,
@@ -22,16 +21,9 @@ const serviceHrefs = {
   mechanical: routes.aftersales,
 } as const;
 
-const reassuranceHrefs = {
-  "all-cars": routes.aftersales,
-  manufacturer: routes.servicingAudi,
-  "service-plans": routes.aftersales,
-  "mot-plans": routes.mot,
-} as const;
-
 function WorkshopPhotoSlot() {
   const slot = HOME_AFTERSALES_IMAGE;
-  const src = oakwoodInventoryImage(slot.src);
+  const src = slot.src;
 
   if (src) {
     return (
@@ -106,22 +98,14 @@ export function HomeAftersales() {
             <li key={service.key} className="min-w-0">
               <Link
                 href={serviceHrefs[service.key]}
-                className="flex min-h-14 items-center rounded-[20px] bg-page-tint px-4 py-3 text-sm font-semibold leading-snug text-primary no-underline hover:bg-white"
+                className="group flex min-h-14 items-center justify-between gap-3 rounded-[20px] bg-page-tint px-4 py-3 text-sm font-semibold leading-snug text-primary no-underline hover:bg-white"
               >
                 {service.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-[20px] bg-page-tint px-5 py-4">
-          {HOME_AFTERSALES_REASSURANCE.map((item) => (
-            <li key={item.key} className="min-w-0">
-              <Link
-                href={reassuranceHrefs[item.key]}
-                className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-secondary no-underline hover:underline"
-              >
-                {item.title}
+                <IconArrow
+                  width={16}
+                  height={16}
+                  className="shrink-0 text-primary opacity-0 transition-opacity duration-[var(--oak-motion-fast)] ease-[var(--oak-ease)] group-hover:opacity-100 group-focus-visible:opacity-100"
+                />
               </Link>
             </li>
           ))}

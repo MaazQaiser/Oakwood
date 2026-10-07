@@ -1,7 +1,7 @@
 import type { Location } from "@/types/vehicle";
 
-export function getDirectionsUrl(location: Location): string {
-  const query = [
+function mapsQuery(location: Location): string {
+  return [
     "Oakwood Motor Company",
     location.name,
     location.postcode,
@@ -9,6 +9,19 @@ export function getDirectionsUrl(location: Location): string {
   ]
     .filter(Boolean)
     .join(" ");
+}
 
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+export function getDirectionsUrl(location: Location): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(location))}`;
+}
+
+export function getMapEmbedUrl(location: Location): string {
+  const params = new URLSearchParams({
+    q: mapsQuery(location),
+    z: "15",
+    hl: "en",
+    output: "embed",
+  });
+
+  return `https://maps.google.com/maps?${params.toString()}`;
 }

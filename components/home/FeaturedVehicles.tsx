@@ -117,12 +117,6 @@ export function FeaturedVehicles() {
           </Button>
         </div>
         ) : null}
-        {mode === "anonymous" ? (
-          <p className="mt-4 max-w-2xl text-caption text-muted">
-            Monthly figures are a representative example. Check eligibility to
-            see personalised pricing.
-          </p>
-        ) : null}
       </Container>
     </Section>
   );

@@ -1,5 +1,6 @@
 export { DirectionsCTA } from "./DirectionsCTA";
 export { LocationCard } from "./LocationCard";
+export { LocationMap } from "./LocationMap";
 export { LocationContactCta } from "./LocationContactCta";
 export { LocationDetails } from "./LocationDetails";
 export { LocationHeroActions } from "./LocationHero";

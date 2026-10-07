@@ -101,6 +101,12 @@ export const homepagePrimaryAction: NavigationItem = {
   notes: "Homepage primary commercial action.",
 };
 
+export const headerPrimaryAction = {
+  id: "find-your-car",
+  label: "Find Your Car",
+  href: routes.search,
+} as const;
+
 export const financeCta = {
   anonymousLabel: "Check my eligibility",
   anonymousShortLabel: "Check eligibility",
