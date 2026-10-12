@@ -4,8 +4,8 @@ import { Grid } from "@/components/layout/Container";
 import { VehicleCard } from "@/components/cards/Card";
 import { Card } from "@/components/cards/Card";
 import { Skeleton } from "@/components/ui/Loading";
-import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
+import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { Button } from "@/components/ui/Button";
 import { getVehicleUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -13,6 +13,7 @@ import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
 import { getIllustratedMonthly } from "@/lib/finance/illustration";
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import type { CustomerFinanceMode } from "@/features/eligibility/CustomerFinanceProvider";
+import type { ListingPriceView } from "@/lib/vehicles/searchCopy";
 import type { Vehicle, VehicleCategory } from "@/types/vehicle";
 
 export function VehicleGrid({
@@ -26,6 +27,7 @@ export function VehicleGrid({
   category = "car",
   viewLabel = "View car",
   affordableLabel = "View affordable cars",
+  priceView = "monthly",
 }: {
   vehicles: Vehicle[];
   financeMode: CustomerFinanceMode;
@@ -37,9 +39,10 @@ export function VehicleGrid({
   category?: VehicleCategory;
   viewLabel?: string;
   affordableLabel?: string;
+  priceView?: ListingPriceView;
 }) {
   return (
-    <Grid columns="featured">
+    <Grid columns="listing">
       {vehicles.map((vehicle, index) => {
         const state = getFinanceDisplayState(
           financeMode,
@@ -57,6 +60,7 @@ export function VehicleGrid({
             key={vehicle.stockId}
             vehicle={vehicle}
             monthly={getIllustratedMonthly(vehicle, deposit, term)}
+            priceView={priceView}
             state={state}
             gapAmount={gapAmount}
             imagePriority={index < 4}
@@ -90,7 +94,7 @@ export function VehicleGrid({
             action={
               <Button
                 href={getVehicleUrl(vehicle)}
-                className="w-full"
+                className="btn-compact w-full"
                 onClick={() => {
                   trackEvent(analyticsEvents.vehicleViewed, {
                     stockId: vehicle.stockId,
@@ -116,7 +120,7 @@ export function VehicleGrid({
 
 export function VehicleGridSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <Grid columns="featured">
+    <Grid columns="listing">
       {Array.from({ length: count }, (_, index) => (
         <Card key={index} className="flex flex-col gap-4">
           <Skeleton className="aspect-[16/10] h-auto w-full" />

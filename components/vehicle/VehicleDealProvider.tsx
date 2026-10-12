@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -14,6 +15,11 @@ import { illustrateFinance } from "@/lib/finance/illustration";
 import { getMockValuation } from "@/lib/mock/vehicle-detail";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { isReservable } from "@/lib/vehicles/sold";
+import {
+  readStoredListingPriceView,
+  storeListingPriceView,
+  type ListingPriceView,
+} from "@/lib/vehicles/searchCopy";
 import type { FinanceDisplayState } from "@/components/finance/FinancePrimitives";
 import type { FinanceType, VehicleDetail } from "@/types/vehicle-detail";
 
@@ -44,6 +50,8 @@ interface VehicleDealContextValue {
   extraDeposit: number;
   negativeEquity: number;
   reservable: boolean;
+  priceView: ListingPriceView;
+  setPriceView: (view: ListingPriceView) => void;
   setFinanceType: (type: FinanceType) => void;
   adjustDeposit: (delta: number) => void;
   setDepositValue: (value: number) => void;
@@ -69,6 +77,19 @@ export function VehicleDealProvider({
   const [financeType, setFinanceTypeState] = useState<FinanceType>("hp");
   const [px, setPx] = useState<PartExchangeValuation | undefined>();
   const [opened, setOpened] = useState(false);
+  const [priceView, setPriceViewState] = useState<ListingPriceView>("total");
+
+  useEffect(() => {
+    const stored = readStoredListingPriceView();
+    if (stored) {
+      setPriceViewState(stored);
+    }
+  }, []);
+
+  const setPriceView = useCallback((view: ListingPriceView) => {
+    setPriceViewState(view);
+    storeListingPriceView(view);
+  }, []);
 
   const markOpened = useCallback(() => {
     if (!opened) {
@@ -206,6 +227,8 @@ export function VehicleDealProvider({
       extraDeposit,
       negativeEquity,
       reservable: isReservable(vehicle),
+      priceView,
+      setPriceView,
       setFinanceType,
       adjustDeposit,
       setDepositValue,
@@ -229,6 +252,8 @@ export function VehicleDealProvider({
       equity,
       extraDeposit,
       negativeEquity,
+      priceView,
+      setPriceView,
       setFinanceType,
       adjustDeposit,
       setDepositValue,
@@ -248,8 +273,12 @@ export function VehicleDealProvider({
   );
 }
 
+export function useOptionalVehicleDeal() {
+  return useContext(VehicleDealContext);
+}
+
 export function useVehicleDeal() {
-  const context = useContext(VehicleDealContext);
+  const context = useOptionalVehicleDeal();
   if (!context) {
     throw new Error("useVehicleDeal must be used within VehicleDealProvider");
   }

@@ -6,7 +6,6 @@ import { Drawer } from "@/components/ui/Dialogs";
 import { IconButton } from "@/components/ui/Button";
 import { IconMenu, IconSearch } from "@/components/ui/icons";
 import { CustomerFinanceControl } from "@/components/finance/CustomerFinanceControl";
-import { CompareTray } from "@/components/compare/CompareTray";
 import { DesktopNav } from "@/components/navigation/DesktopNav";
 import { MobileNav } from "@/components/navigation/MobileNav";
 import { Logo } from "@/components/navigation/Logo";
@@ -62,7 +61,6 @@ export function SiteHeader() {
           >
             <IconSearch />
           </Link>
-          <CompareTray variant="header" />
           <CustomerFinanceControl />
           <IconButton
             label="Open menu"

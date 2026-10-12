@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { IconHeart } from "@/components/ui/icons";
+import { IconBookmark } from "@/components/ui/icons";
 import { IconButton } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import type { VehicleCategory } from "@/types/vehicle";
 
@@ -28,7 +29,11 @@ export function SaveVehicleButton({
           : `Save ${vehicleName}`
       }
       aria-pressed={saved}
-      className="bg-surface shadow-sm"
+      title={saved ? "Saved" : "Save for later"}
+      className={cn(
+        "bg-surface shadow-sm",
+        saved ? "text-primary" : "text-ink hover:bg-page-tint",
+      )}
       onClick={() => {
         const next = !saved;
         setSaved(next);
@@ -50,7 +55,7 @@ export function SaveVehicleButton({
         }
       }}
     >
-      <IconHeart filled={saved} className={saved ? "text-primary" : undefined} />
+      <IconBookmark filled={saved} className={saved ? "text-primary" : undefined} />
     </IconButton>
   );
 }

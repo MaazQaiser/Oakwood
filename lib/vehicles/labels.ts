@@ -2,6 +2,22 @@ import { getStockLocation } from "@/config/locations";
 import { listVehicles } from "@/lib/vehicles/query";
 import type { Vehicle, VehicleCategory } from "@/types/vehicle";
 
+export function getVehicleTitle(
+  vehicle: Pick<Vehicle, "make" | "model" | "derivative">,
+): string {
+  return [vehicle.make, vehicle.model, vehicle.derivative].filter(Boolean).join(" ");
+}
+
+export function getVehicleIdentity(
+  vehicle: Pick<Vehicle, "make" | "model" | "derivative">,
+): { title: string; subtitle?: string } {
+  const title = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
+  return {
+    title,
+    subtitle: vehicle.derivative || undefined,
+  };
+}
+
 export function titleFromSlug(slug: string): string {
   return slug
     .split("-")

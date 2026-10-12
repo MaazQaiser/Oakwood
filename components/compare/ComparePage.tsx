@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { PageBanner } from "@/components/layout/PageBanner";
@@ -10,13 +10,24 @@ import {
   CompareVehicleCard,
 } from "@/components/compare/CompareVehicleCard";
 import { CompareSpecTable } from "@/components/compare/CompareSpecTable";
+import { VehiclePriceToggle } from "@/components/vehicle/VehiclePriceToggle";
 import { EmptyState } from "@/components/ui/Feedback";
 import { getCompareUrl, parseCompareIds, routes } from "@/config/routes";
 import { useCompare } from "@/features/compare/CompareProvider";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { pruneCompareIds, resolveCompareVehicles } from "@/lib/compare/catalog";
-import { compareCopy } from "@/lib/compare/copy";
+import {
+  COMPARE_MAX,
+  COMPARE_MIN_FOR_TABLE,
+  compareCopy,
+} from "@/lib/compare/copy";
+import {
+  readStoredListingPriceView,
+  storeListingPriceView,
+  type ListingPriceView,
+} from "@/lib/vehicles/searchCopy";
 import { createBreadcrumbs } from "@/lib/seo";
+import { cn } from "@/lib/cn";
 
 function CompareBackLink() {
   const router = useRouter();
@@ -45,6 +56,14 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
   const viewed = useRef(false);
   const queryApplied = useRef(false);
   const queryKey = initialIds.join(",");
+  const [priceView, setPriceView] = useState<ListingPriceView>("total");
+
+  useEffect(() => {
+    const stored = readStoredListingPriceView();
+    if (stored) {
+      setPriceView(stored);
+    }
+  }, []);
 
   useEffect(() => {
     if (!ready) {
@@ -81,6 +100,7 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
     { label: "Home", href: routes.home },
     { label: compareCopy.title, href: routes.compare },
   ]);
+  const showEmptySlot = vehicles.length > 0 && vehicles.length < COMPARE_MAX;
 
   return (
     <>
@@ -93,11 +113,18 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
         }
         breadcrumbs={breadcrumbs}
       >
-        <CompareBackLink />
+        <div className="flex flex-wrap items-center gap-4">
+          <CompareBackLink />
+          <Button href={routes.usedCars} variant="text" className="px-0">
+            {compareCopy.changeSelection}
+          </Button>
+        </div>
       </PageBanner>
       <Section>
         <Container width="wide">
-          {!ready ? null : vehicles.length === 0 ? (
+          {!ready ? (
+            <p className="text-body-sm text-muted">Loading comparison…</p>
+          ) : vehicles.length === 0 ? (
             <EmptyState
               title={compareCopy.emptyTitle}
               actions={
@@ -108,16 +135,69 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
             </EmptyState>
           ) : (
             <>
-              <div className="grid gap-4 md:grid-cols-2">
-                {vehicles.map((vehicle) => (
-                  <CompareVehicleCard
-                    key={vehicle.stockId}
-                    vehicle={vehicle}
-                  />
-                ))}
-                {vehicles.length === 1 ? <CompareEmptySlot /> : null}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-body-sm text-muted">
+                    {vehicles.length < COMPARE_MIN_FOR_TABLE
+                      ? compareCopy.oneCarBody
+                      : compareCopy.trayHint(vehicles.length)}
+                  </p>
+                </div>
+                {vehicles.length >= COMPARE_MIN_FOR_TABLE ? (
+                  <div className="w-full max-w-xs">
+                    <VehiclePriceToggle
+                      value={priceView}
+                      onChange={(next) => {
+                        setPriceView(next);
+                        storeListingPriceView(next);
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
-              <CompareSpecTable vehicles={vehicles} />
+
+              {vehicles.length === 1 ? (
+                <div className="mt-6 rounded-[22px] bg-[#ECF3F8] px-5 py-4 text-[#002852]">
+                  <p className="text-label">{compareCopy.oneCarTitle}</p>
+                  <p className="mt-1 text-body-sm text-secondary">
+                    {compareCopy.oneCarBody}
+                  </p>
+                </div>
+              ) : null}
+
+              <div className="-mx-[var(--oak-page-x)] mt-6 overflow-x-auto px-[var(--oak-page-x)] overscroll-x-contain [scrollbar-width:thin] md:mx-0 md:overflow-visible md:px-0">
+                <div
+                  className={cn(
+                    "grid gap-4",
+                    "w-max grid-flow-col auto-cols-[minmax(16rem,18rem)] md:w-full md:auto-cols-fr md:grid-flow-row",
+                    vehicles.length + (showEmptySlot ? 1 : 0) === 1 &&
+                      "md:grid-cols-1",
+                    vehicles.length + (showEmptySlot ? 1 : 0) === 2 &&
+                      "md:grid-cols-2",
+                    vehicles.length + (showEmptySlot ? 1 : 0) === 3 &&
+                      "md:grid-cols-3",
+                    vehicles.length + (showEmptySlot ? 1 : 0) >= 4 &&
+                      "md:grid-cols-2 xl:grid-cols-4",
+                  )}
+                >
+                  {vehicles.map((vehicle) => (
+                    <CompareVehicleCard
+                      key={vehicle.stockId}
+                      vehicle={vehicle}
+                      priceView={priceView}
+                    />
+                  ))}
+                  {showEmptySlot ? <CompareEmptySlot /> : null}
+                </div>
+              </div>
+
+              {vehicles.length >= COMPARE_MIN_FOR_TABLE ? (
+                <CompareSpecTable vehicles={vehicles} />
+              ) : (
+                <div className="mt-8">
+                  <Button href={routes.usedCars}>{compareCopy.browseCars}</Button>
+                </div>
+              )}
             </>
           )}
         </Container>

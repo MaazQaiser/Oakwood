@@ -1,12 +1,12 @@
 import { PageBanner } from "@/components/layout/PageBanner";
-import { NaturalLanguageSearch } from "@/components/search/NaturalLanguageSearch";
+import { FinancePersonalisationBanner } from "@/components/search/FinancePersonalisationBanner";
 import { SearchHeroActions } from "@/components/search/SearchHeroActions";
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
+import { cn } from "@/lib/cn";
 import { getSearchCopy } from "@/lib/vehicles/searchCopy";
 
 export function SearchHeader({
   context,
-  query,
 }: {
   context: InventoryPageContext;
   query?: string;
@@ -16,18 +16,15 @@ export function SearchHeader({
   return (
     <PageBanner
       title={context.title}
-      description={context.description}
       breadcrumbs={context.breadcrumbs}
+      hideTitle
     >
       {copy.showHeroActions ? <SearchHeroActions copy={copy} /> : null}
-      <div className={copy.showHeroActions ? "mt-6" : undefined}>
-        <NaturalLanguageSearch
-          action={context.searchAction}
-          defaultValue={query}
-          hint={copy.searchHint}
-          category={copy.category}
-        />
-      </div>
+      <FinancePersonalisationBanner
+        copy={copy}
+        unboxed
+        className={cn(copy.showHeroActions && "mt-6")}
+      />
     </PageBanner>
   );
 }

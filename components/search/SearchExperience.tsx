@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { IconFilters } from "@/components/ui/icons";
-import { FinancePersonalisationBanner } from "@/components/search/FinancePersonalisationBanner";
 import { FilterSidebar } from "@/components/search/FilterSidebar";
 import { MobileFilterSheet } from "@/components/search/MobileFilterSheet";
 import {
   ActiveFilterChips,
   getFilterChips,
 } from "@/components/search/ActiveFilterChips";
+import { PriceViewToggle } from "@/components/search/PriceViewToggle";
 import { MobileSortButton, SortDropdown } from "@/components/search/SortDropdown";
 import { VehicleGrid } from "@/components/search/VehicleGrid";
 import { EmptyResults, StockErrorState } from "@/components/search/EmptyResults";
@@ -49,7 +49,14 @@ import {
   resolveSearchQuery,
   sortVehicles,
 } from "@/lib/vehicles/search";
-import { countLabel, fewResultsLabel, getSearchCopy } from "@/lib/vehicles/searchCopy";
+import {
+  countLabel,
+  fewResultsLabel,
+  getSearchCopy,
+  inferListingPriceView,
+  storeListingPriceView,
+  type ListingPriceView,
+} from "@/lib/vehicles/searchCopy";
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
 import type { Vehicle } from "@/types/vehicle";
 import { getMakeUrl, routes, type StockCategory } from "@/config/routes";
@@ -117,6 +124,9 @@ export function SearchExperience({
   const router = useRouter();
   const finance = useCustomerFinance();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [priceView, setPriceView] = useState<ListingPriceView>(() =>
+    inferListingPriceView(query),
+  );
   const copy = getSearchCopy(context.category);
   const isVan = context.category === "van";
   const vanEvents = getVanSearchEvents(context.category);
@@ -126,6 +136,10 @@ export function SearchExperience({
       trackEvent(analyticsEvents.usedVansViewed);
     }
   }, [isVan]);
+
+  useEffect(() => {
+    storeListingPriceView(priceView);
+  }, [priceView]);
 
   const resolved = useMemo(
     () =>
@@ -336,9 +350,7 @@ export function SearchExperience({
 
   return (
     <div className="mt-8">
-      <FinancePersonalisationBanner copy={copy} />
-
-      <div className="sticky top-[var(--oak-header-height)] z-30 mt-6 border-b border-border bg-page py-3 lg:hidden">
+      <div className="sticky top-[calc(0.75rem+var(--oak-header-height))] z-30 border-b border-border bg-page py-3 lg:hidden">
         <div className="flex gap-3">
           <Button
             variant="secondary"
@@ -359,9 +371,12 @@ export function SearchExperience({
             onChange={trackSort}
           />
         </div>
+        <div className="mt-2">
+          <PriceViewToggle value={priceView} onChange={setPriceView} />
+        </div>
       </div>
 
-      <div className="mt-6 flex gap-8">
+      <div className="mt-6 lg:flex lg:items-stretch lg:gap-8">
         <FilterSidebar
           query={resolved}
           locked={context.locked}
@@ -383,11 +398,18 @@ export function SearchExperience({
                   : copy.resultsShowing}
               </p>
             </div>
-            <SortDropdown
-              query={resolved}
-              newestLabel={copy.newestSort}
-              onChange={trackSort}
-            />
+            <div className="hidden shrink-0 items-center gap-2 lg:flex lg:flex-nowrap lg:justify-end">
+              <PriceViewToggle
+                value={priceView}
+                onChange={setPriceView}
+                className="shrink-0"
+              />
+              <SortDropdown
+                query={resolved}
+                newestLabel={copy.newestSort}
+                onChange={trackSort}
+              />
+            </div>
           </div>
 
           <div className="mt-4">
@@ -437,6 +459,7 @@ export function SearchExperience({
                     maxAdvance={finance.maxAdvance}
                     deposit={finance.deposit}
                     term={finance.term}
+                    priceView={priceView}
                     category={context.category}
                     viewLabel={copy.viewCta}
                     affordableLabel={copy.affordableCta}
@@ -477,6 +500,7 @@ export function SearchExperience({
                   maxAdvance={finance.maxAdvance}
                   deposit={finance.deposit}
                   term={finance.term}
+                  priceView={priceView}
                   category={context.category}
                   viewLabel={copy.viewCta}
                   affordableLabel={copy.affordableCta}

@@ -24,14 +24,14 @@ export function SortDropdown({
   );
 
   return (
-    <label className="relative hidden h-11 items-center lg:flex">
-      <span className="pointer-events-none absolute left-4 text-sm text-[#667085]">
+    <label className="relative hidden h-9 shrink-0 items-center lg:flex">
+      <span className="pointer-events-none absolute left-3 text-caption text-[#667085]">
         Sort
       </span>
       <Select
         aria-label="Sort vehicles"
         value={sort}
-        className="h-11! min-h-11! w-[22rem]! appearance-none rounded-[14px]! border border-[#d0d5dd] bg-white py-0 pr-10 pl-[3.4rem] text-sm! font-medium text-[#101828]"
+        className="h-9! min-h-9! w-[15.5rem]! appearance-none rounded-[12px]! border border-[#d0d5dd] bg-white py-0 pr-9 pl-[2.75rem] text-caption! font-medium text-[#101828]"
         onChange={(event) => onChange(event.target.value as SearchSort)}
       >
         {options.map((option) => (

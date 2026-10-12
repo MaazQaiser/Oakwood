@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container, Section } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
-import { IconArrow } from "@/components/ui/icons";
+import { IconCheck } from "@/components/ui/icons";
 import { getBookingUrl, routes } from "@/config/routes";
 import {
   HOME_AFTERSALES_CTA,
@@ -80,6 +80,19 @@ export function HomeAftersales() {
                 {HOME_AFTERSALES_SUPPORT}
               </p>
             </div>
+            <ul className="flex list-none flex-wrap gap-2 p-0">
+              {HOME_AFTERSALES_SERVICES.map((service) => (
+                <li key={service.key} className="min-w-0">
+                  <Link
+                    href={serviceHrefs[service.key]}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-3.5 text-sm font-semibold text-ink no-underline hover:text-primary"
+                  >
+                    <IconCheck className="shrink-0 text-primary" aria-hidden="true" />
+                    {service.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
             <p className="m-0">
               <Button
                 href={getBookingUrl({ type: "service", source: "aftersales" })}
@@ -93,23 +106,6 @@ export function HomeAftersales() {
           <WorkshopPhotoSlot />
         </div>
 
-        <ul className="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {HOME_AFTERSALES_SERVICES.map((service) => (
-            <li key={service.key} className="min-w-0">
-              <Link
-                href={serviceHrefs[service.key]}
-                className="group flex min-h-14 items-center justify-between gap-3 rounded-[20px] bg-page-tint px-4 py-3 text-sm font-semibold leading-snug text-primary no-underline hover:bg-white"
-              >
-                {service.title}
-                <IconArrow
-                  width={16}
-                  height={16}
-                  className="shrink-0 text-primary opacity-0 transition-opacity duration-[var(--oak-motion-fast)] ease-[var(--oak-ease)] group-hover:opacity-100 group-focus-visible:opacity-100"
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
       </Container>
     </Section>
   );

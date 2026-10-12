@@ -19,6 +19,25 @@ export const HOME_BUDGET_DESCRIPTION =
   "See cars that fit your monthly or total budget.";
 export const HOME_BUDGET_FIELD = "Budget";
 export const HOME_SEARCH_PLACEHOLDER = 'Try "white Audi A3 petrol auto"';
+export const HOME_HERO_FILTERS = "Filters";
+export const HOME_HERO_FILTER_HEADING = "Buy used cars online";
+export const HOME_HERO_FILTER_SEARCH = "Search e.g. white Audi A3 auto";
+export const HOME_HERO_FILTER_PRICE = "Total price";
+export const HOME_HERO_FILTER_MONTHLY = "Monthly price";
+export const HOME_HERO_FILTER_MAX_PRICE = "Max total price";
+export const HOME_HERO_FILTER_MAX_MONTHLY = "Max monthly budget";
+export const HOME_HERO_FILTER_SELECT_MAKE = "Select make";
+export const HOME_HERO_FILTER_SELECT_MODEL = "Select model";
+export const HOME_HERO_FILTER_CTA = "Show all 500+ cars";
+export const HOME_HERO_CHIP_UNDER_10K = "Under £10k";
+export const HOME_HERO_CHIP_SUV = "SUV";
+export const HOME_HERO_CHIP_AUTOMATIC = "Automatic";
+export const HOME_HERO_CHIP_SEVEN = "7 seater";
+export const HOME_HERO_PX_PROMPT = "Part exchange? Value your car free";
+export const HOME_HERO_PX_REG = "ENTER REG";
+export const HOME_HERO_PX_CTA = "Value it";
+export const HOME_HERO_PX_VALUATION = "Get a free, instant valuation:";
+export const HOME_HERO_PX_QUOTE = "Start my part exchange quote";
 export const HOME_PART_EXCHANGE = "Part exchange";
 export const HOME_PART_EXCHANGE_SUPPORT =
   "Get a valuation for your current car";

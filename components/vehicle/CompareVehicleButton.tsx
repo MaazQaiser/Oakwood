@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { Button, IconButton } from "@/components/ui/Button";
 import { IconCompare } from "@/components/ui/icons";
 import { useToast } from "@/components/ui/Toast";
 import { getCompareUrl } from "@/config/routes";
 import { useCompare } from "@/features/compare/CompareProvider";
-import { compareCopy } from "@/lib/compare/copy";
+import { COMPARE_MAX, compareCopy } from "@/lib/compare/copy";
+import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import type { VehicleCategory } from "@/types/vehicle";
 
@@ -22,9 +24,10 @@ export function CompareVehicleButton({
   appearance?: "icon" | "button";
   className?: string;
 }) {
-  const { has, toggle } = useCompare();
+  const { has, toggle, count, stockIds } = useCompare();
   const { pushToast } = useToast();
   const selected = has(stockId);
+  const compareHref = getCompareUrl(stockIds);
 
   if (category !== "car") {
     return null;
@@ -36,43 +39,87 @@ export function CompareVehicleButton({
       pushToast(compareCopy.removed, "info");
       return;
     }
+    if (result.action === "limit") {
+      pushToast(compareCopy.limitReached, "info", {
+        href: getCompareUrl(result.stockIds),
+        label: compareCopy.compareNow,
+      });
+      return;
+    }
     if (result.action === "ignored") {
       return;
     }
-    pushToast(
-      result.action === "replaced" ? compareCopy.replaced : compareCopy.added,
-      "success",
-      { href: getCompareUrl(result.stockIds), label: compareCopy.compareNow },
-    );
+    pushToast(compareCopy.added, "success", {
+      href: getCompareUrl(result.stockIds),
+      label:
+        result.stockIds.length >= 2
+          ? compareCopy.compareNow
+          : compareCopy.addAnother,
+    });
+  }
+
+  function onOpenCompare() {
+    trackEvent(analyticsEvents.compareTrayClicked, { count });
   }
 
   if (appearance === "button") {
+    if (selected) {
+      return (
+        <Button
+          href={compareHref}
+          variant="tertiary"
+          className={cn("w-full", className)}
+          onClick={onOpenCompare}
+        >
+          <IconCompare className="text-primary" />
+          {compareCopy.compareNow}
+        </Button>
+      );
+    }
+
     return (
       <Button
         type="button"
-        variant={selected ? "tertiary" : "secondary"}
-        aria-pressed={selected}
+        variant="secondary"
+        aria-pressed={false}
         className={cn("w-full", className)}
         onClick={onToggle}
       >
-        <IconCompare className={selected ? "text-primary" : undefined} />
-        {selected ? "Remove from compare" : "Add to compare"}
+        <IconCompare />
+        {compareCopy.add}
       </Button>
+    );
+  }
+
+  if (selected) {
+    return (
+      <Link
+        href={compareHref}
+        aria-label={`${compareCopy.compareNow}: ${vehicleName}`}
+        title={compareCopy.compareNow}
+        aria-pressed="true"
+        onClick={onOpenCompare}
+        className={cn(
+          "inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-surface text-primary shadow-sm",
+          "transition-colors hover:bg-page-tint",
+          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+          className,
+        )}
+      >
+        <IconCompare className="text-primary" />
+      </Link>
     );
   }
 
   return (
     <IconButton
-      label={
-        selected
-          ? `Remove ${vehicleName} from compare`
-          : `Add ${vehicleName} to compare`
-      }
-      aria-pressed={selected}
-      className={cn("bg-surface shadow-sm", className)}
+      label={`${compareCopy.add}: ${vehicleName}`}
+      aria-pressed={false}
+      title={count >= COMPARE_MAX ? compareCopy.limitReached : compareCopy.add}
+      className={cn("bg-surface shadow-sm text-ink hover:bg-page-tint", className)}
       onClick={onToggle}
     >
-      <IconCompare className={selected ? "text-primary" : undefined} />
+      <IconCompare />
     </IconButton>
   );
 }

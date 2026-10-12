@@ -2,10 +2,12 @@
 
 import { Grid } from "@/components/layout/Container";
 import { VehicleCard } from "@/components/cards/Card";
-import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
+import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { Button } from "@/components/ui/Button";
+import { useOptionalVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
+import type { ListingPriceView } from "@/lib/vehicles/searchCopy";
 import { EmptyState } from "@/components/ui/Feedback";
 import { getUsedCarsUrl, getVehicleUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -13,8 +15,16 @@ import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
 import { getIllustratedMonthly } from "@/lib/finance/illustration";
 import type { Vehicle } from "@/types/vehicle";
 
-export function SimilarVehicles({ vehicles }: { vehicles: Vehicle[] }) {
+export function SimilarVehicles({
+  vehicles,
+  priceView: priceViewProp,
+}: {
+  vehicles: Vehicle[];
+  priceView?: ListingPriceView;
+}) {
   const finance = useCustomerFinance();
+  const deal = useOptionalVehicleDeal();
+  const priceView = priceViewProp ?? deal?.priceView ?? "monthly";
 
   if (vehicles.length === 0) {
     return (
@@ -68,6 +78,7 @@ export function SimilarVehicles({ vehicles }: { vehicles: Vehicle[] }) {
                 gapAmount={gapAmount}
                 imagePriority={false}
                 term={finance.term}
+                priceView={priceView}
                 toolbar={
                   <div className="flex items-center gap-2">
                     <CompareVehicleButton
@@ -85,7 +96,7 @@ export function SimilarVehicles({ vehicles }: { vehicles: Vehicle[] }) {
                 action={
                   <Button
                     href={getVehicleUrl(vehicle)}
-                    className="w-full"
+                    className="btn-compact w-full"
                     onClick={() =>
                       trackEvent(analyticsEvents.similarVehicleClicked, {
                         stockId: vehicle.stockId,

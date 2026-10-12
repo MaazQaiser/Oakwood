@@ -69,10 +69,7 @@ export function ContentStockSection({
         {CONTENT_STOCK_HEADING}
       </h2>
       <div className="mt-4">
-        <FinancePersonalisationBanner
-          copy={getSearchCopy("car")}
-          browseHref={stockHref}
-        />
+        <FinancePersonalisationBanner copy={getSearchCopy("car")} />
       </div>
       <Grid columns="cards" className="mt-6">
         {vehicles.slice(0, 6).map((vehicle, index) => (

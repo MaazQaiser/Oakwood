@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { Container, Section } from "@/components/layout/Container";
 import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
 import { SectionIntro } from "@/components/home/SectionIntro";
 import { ReviewsGrid } from "@/components/trust/ReviewsGrid";
-import { routes } from "@/config/routes";
 import { HOME_REVIEW_IMAGES } from "@/lib/home/photography";
 import type { OakwoodImageSlot } from "@/lib/media/oakwood";
 import { getReviewFeed } from "@/lib/reviews/provider";
@@ -108,12 +106,6 @@ export function ReviewsSection() {
             ))}
           </div>
         </div>
-
-        <p className="mt-6 text-center">
-          <Link href={routes.ourOnlineReviews} className="text-label text-primary-secondary">
-            Read all reviews →
-          </Link>
-        </p>
       </Container>
 
       {active ? (

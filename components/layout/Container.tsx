@@ -117,7 +117,7 @@ export function Grid({
 }: {
   children: ReactNode;
   className?: string;
-  columns?: "default" | "cards" | "two" | "featured" | "budget";
+  columns?: "default" | "cards" | "two" | "featured" | "budget" | "listing";
 }) {
   const columnClass = {
     default: "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
@@ -125,6 +125,7 @@ export function Grid({
     two: "grid-cols-1 md:grid-cols-2",
     featured: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
     budget: "grid-cols-2 lg:grid-cols-3",
+    listing: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3",
   }[columns];
 
   return (

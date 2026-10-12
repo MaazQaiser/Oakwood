@@ -6,7 +6,7 @@ export const metadata = createPageMetadata({
   title: "Compare cars",
   path: routes.compare,
   description:
-    "Compare up to two Oakwood used cars side by side, including monthly payments, cash price and key specification.",
+    "Compare up to four Oakwood used cars side by side, including monthly payments, cash price and key specification.",
 });
 
 export default async function Page({

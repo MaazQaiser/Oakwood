@@ -37,15 +37,15 @@ export function VehicleDocumentation({ vehicle }: { vehicle: VehicleDetail }) {
     <section
       id="vehicle-documentation"
       aria-labelledby="vehicle-docs-heading"
-      className="rounded-lg border border-border bg-surface px-4 md:px-5"
     >
-      <h2 id="vehicle-docs-heading" className="pt-5 text-h3">
+      <h2 id="vehicle-docs-heading" className="text-h3">
         Vehicle history & condition
       </h2>
-      <p className="mt-1 text-body-sm text-muted">
+      <p className="mt-2 text-body-sm text-muted">
         Everything we have on this car is listed here, including items that need
         attention.
       </p>
+      <div className="mt-6 border-t border-border">
 
       <Accordion title="MOT history" defaultOpen>
         <p>
@@ -278,6 +278,7 @@ export function VehicleDocumentation({ vehicle }: { vehicle: VehicleDetail }) {
           </ul>
         )}
       </Accordion>
+      </div>
     </section>
   );
 }

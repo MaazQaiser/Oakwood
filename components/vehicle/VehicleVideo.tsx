@@ -21,7 +21,7 @@ export function VehicleVideo({ vehicle }: { vehicle: VehicleDetail }) {
         See the car in more detail
       </h2>
       <p className="mt-2 text-body-sm text-muted">{video.description}</p>
-      <div className="relative mt-4 overflow-hidden rounded-lg bg-primary-soft">
+      <div className="relative mt-4 overflow-hidden rounded-2xl bg-page-tint">
         <div className="relative aspect-[16/10]">
           {playing && video.src ? (
             <video

@@ -1,13 +1,10 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
 import {
   HOME_FINANCE_BEAT_CTA,
   HOME_FINANCE_BEAT_DESCRIPTION,
-  HOME_FINANCE_BEAT_OFFER,
   HOME_FINANCE_BEAT_TITLE,
-  HOME_FINANCE_ELIGIBILITY,
   HOME_FINANCE_ELIGIBILITY_CTA,
   HOME_FINANCE_ELIGIBILITY_DESCRIPTION,
   HOME_FINANCE_ELIGIBILITY_TITLE,
@@ -15,9 +12,6 @@ import {
   HOME_FINANCE_RATES_SUPPORT,
   HOME_RATES_FROM,
 } from "@/lib/home/copy";
-
-const shell =
-  "flex flex-col gap-3 rounded-[20px] px-4 py-4 text-sm leading-snug sm:px-5 lg:px-6";
 
 export function HomeFinanceStrip({
   variant = "reassurance",
@@ -30,24 +24,36 @@ export function HomeFinanceStrip({
     return (
       <nav
         aria-label="Finance routes"
-        className={cn(
-          shell,
-          "bg-page-tint text-ink lg:flex-row lg:items-center lg:justify-between lg:gap-6",
-          className,
-        )}
+        className={cn("grid gap-4 lg:grid-cols-2", className)}
       >
-        <Link
-          href={routes.eligibility}
-          className="font-semibold text-primary underline-offset-2 hover:underline"
-        >
-          {HOME_FINANCE_ELIGIBILITY}
-        </Link>
-        <Link
-          href={routes.finance}
-          className="font-semibold text-primary-secondary underline-offset-2 hover:underline lg:shrink-0 lg:text-right"
-        >
-          {HOME_FINANCE_BEAT_OFFER}
-        </Link>
+        <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-6 sm:p-7">
+          <EligibilityIcon />
+          <p className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#002852]">
+            {HOME_FINANCE_ELIGIBILITY_TITLE}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-secondary">
+            {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
+          </p>
+          <p className="mt-auto w-full pt-5">
+            <Button href={routes.eligibility} className="btn-compact w-full sm:w-auto">
+              {HOME_FINANCE_ELIGIBILITY_CTA}
+            </Button>
+          </p>
+        </article>
+        <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-6 sm:p-7">
+          <OfferIcon />
+          <p className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#002852]">
+            {HOME_FINANCE_BEAT_TITLE}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-secondary">
+            {HOME_FINANCE_BEAT_DESCRIPTION}
+          </p>
+          <p className="mt-auto w-full pt-5">
+            <Button href={routes.finance} className="btn-compact w-full sm:w-auto">
+              {HOME_FINANCE_BEAT_CTA}
+            </Button>
+          </p>
+        </article>
       </nav>
     );
   }

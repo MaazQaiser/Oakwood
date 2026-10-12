@@ -132,6 +132,59 @@ const VAN_COPY: SearchCopy = {
   affordableHintGuest: "Check eligibility to personalise affordability.",
 };
 
+export const PRICE_VIEW_TOTAL = "Total price";
+export const PRICE_VIEW_CASH = "Cash price";
+export const PRICE_VIEW_MONTHLY = "Monthly payment";
+export const LISTING_PRICE_VIEW_STORAGE_KEY = "oakwood-listing-price-view";
+
+export type ListingPriceView = "monthly" | "total";
+
+export function parseListingPriceView(
+  value: string | null | undefined,
+): ListingPriceView | undefined {
+  return value === "monthly" || value === "total" ? value : undefined;
+}
+
+export function readStoredListingPriceView(): ListingPriceView | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+
+  try {
+    return parseListingPriceView(
+      window.sessionStorage.getItem(LISTING_PRICE_VIEW_STORAGE_KEY),
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+export function storeListingPriceView(value: ListingPriceView) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(LISTING_PRICE_VIEW_STORAGE_KEY, value);
+  } catch {
+    // Ignore quota or private-mode failures.
+  }
+}
+
+export function inferListingPriceView(query: {
+  min_price?: string;
+  max_price?: string;
+  monthly?: string;
+  monthly_min?: string;
+  monthly_max?: string;
+}): ListingPriceView {
+  const hasCashFilter = Boolean(query.min_price || query.max_price);
+  const hasMonthlyFilter = Boolean(
+    query.monthly || query.monthly_min || query.monthly_max,
+  );
+  return hasCashFilter && !hasMonthlyFilter ? "total" : "monthly";
+}
+
 export function getSearchCopy(category: VehicleCategory = "car"): SearchCopy {
   return category === "van" ? VAN_COPY : CAR_COPY;
 }

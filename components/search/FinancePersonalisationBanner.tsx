@@ -6,14 +6,19 @@ import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvid
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import { routes } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 import { getSearchCopy, type SearchCopy } from "@/lib/vehicles/searchCopy";
 
 export function FinancePersonalisationBanner({
   copy = getSearchCopy("car"),
-  browseHref = "#results",
+  className,
+  compact = false,
+  unboxed = false,
 }: {
   copy?: SearchCopy;
-  browseHref?: string;
+  className?: string;
+  compact?: boolean;
+  unboxed?: boolean;
 }) {
   const { mode, setAssumptionsOpen } = useCustomerFinance();
   const [dismissed, setDismissed] = useState(false);
@@ -28,7 +33,12 @@ export function FinancePersonalisationBanner({
     return (
       <section
         aria-label="Finance profile"
-        className="rounded-[14px] border border-border bg-surface px-4 py-3 md:px-5"
+        className={cn(
+          unboxed
+            ? "p-0"
+            : "rounded-[14px] border border-border bg-surface px-4 py-3 md:px-5",
+          className,
+        )}
       >
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -60,41 +70,70 @@ export function FinancePersonalisationBanner({
     );
   }
 
+  function onEligibilityClick() {
+    trackEvent(analyticsEvents.financeEligibilityCtaClicked, {
+      source: "search_banner",
+      category: copy.category,
+    });
+    if (vanEvents) {
+      trackEvent(vanEvents.eligibilityClicked, {
+        source: "search_banner",
+      });
+    }
+  }
+
+  if (compact) {
+    return (
+      <section
+        aria-label="Finance eligibility"
+        className={cn(
+          unboxed
+            ? "flex flex-col gap-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:gap-3"
+            : "flex flex-col gap-3 rounded-[14px] border border-border bg-primary-soft px-4 py-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:gap-3 lg:py-1.5 lg:pl-4 lg:pr-1.5",
+          className,
+        )}
+      >
+        <Button
+          href={routes.eligibility}
+          className="btn-compact w-full shrink-0 lg:w-auto"
+          onClick={onEligibilityClick}
+        >
+          {copy.bannerCta}
+        </Button>
+        <h2 className="min-w-0 text-label lg:truncate">{copy.bannerTitle}</h2>
+      </section>
+    );
+  }
+
   return (
     <section
       aria-label="Finance eligibility"
-      className="rounded-[14px] border border-border bg-primary-soft px-4 py-4 md:px-5"
+      className={cn(
+        unboxed
+          ? null
+          : "rounded-[14px] border border-border bg-primary-soft px-4 py-4 md:px-5",
+        className,
+      )}
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0 lg:max-w-xl lg:flex-1">
-          <h2 className="text-h4">{copy.bannerTitle}</h2>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+        <Button
+          href={routes.eligibility}
+          className="btn-compact w-full shrink-0 sm:w-auto"
+          onClick={onEligibilityClick}
+        >
+          {copy.bannerCta}
+        </Button>
+        <div className="min-w-0">
+          <h2
+            className={
+              unboxed
+                ? "text-[1.35rem] font-medium tracking-[-0.02em] text-ink sm:text-[1.5rem]"
+                : "text-h4"
+            }
+          >
+            {copy.bannerTitle}
+          </h2>
           <p className="mt-1 text-body-sm text-muted">{copy.bannerBody}</p>
-        </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
-          <Button
-            href={routes.eligibility}
-            className="btn-compact w-full shrink-0 sm:w-auto"
-            onClick={() => {
-              trackEvent(analyticsEvents.financeEligibilityCtaClicked, {
-                source: "search_banner",
-                category: copy.category,
-              });
-              if (vanEvents) {
-                trackEvent(vanEvents.eligibilityClicked, {
-                  source: "search_banner",
-                });
-              }
-            }}
-          >
-            {copy.bannerCta}
-          </Button>
-          <Button
-            href={browseHref}
-            variant="secondary"
-            className="btn-compact w-full shrink-0 whitespace-nowrap sm:w-auto"
-          >
-            Browse without checking
-          </Button>
         </div>
       </div>
     </section>

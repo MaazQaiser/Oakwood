@@ -5,21 +5,29 @@ import Link from "next/link";
 import { Button, IconButton } from "@/components/ui/Button";
 import { IconClose } from "@/components/ui/icons";
 import {
-  CashPrice,
+  FinancialNumber,
   MonthlyPayment,
 } from "@/components/finance/FinancePrimitives";
-import { StartDealButton } from "@/components/deal/StartDealButton";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { getVehicleUrl, routes } from "@/config/routes";
 import { useCompare } from "@/features/compare/CompareProvider";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
 import { getIllustratedMonthly } from "@/lib/finance/illustration";
-import { isReservable } from "@/lib/vehicles/sold";
+import { formatNumber, formatPounds } from "@/lib/format/money";
 import { compareCopy } from "@/lib/compare/copy";
+import {
+  PRICE_VIEW_CASH,
+  type ListingPriceView,
+} from "@/lib/vehicles/searchCopy";
 import type { Vehicle } from "@/types/vehicle";
 
-export function CompareVehicleCard({ vehicle }: { vehicle: Vehicle }) {
+export function CompareVehicleCard({
+  vehicle,
+  priceView = "total",
+}: {
+  vehicle: Vehicle;
+  priceView?: ListingPriceView;
+}) {
   const { remove } = useCompare();
   const finance = useCustomerFinance();
   const state = getFinanceDisplayState(
@@ -37,18 +45,25 @@ export function CompareVehicleCard({ vehicle }: { vehicle: Vehicle }) {
     finance.deposit,
     finance.term,
   );
-  const reservable = isReservable(vehicle);
   const heading = [vehicle.make, vehicle.model].join(" ");
+  const showMonthly = priceView === "monthly";
+  const meta = [
+    String(vehicle.year),
+    `${formatNumber(vehicle.mileage)} miles`,
+    vehicle.fuelType,
+    vehicle.transmission,
+    vehicle.bodyStyle,
+  ].filter(Boolean);
 
   return (
-    <article className="flex h-full flex-col rounded-[22px] border border-border bg-surface p-4">
+    <article className="flex h-full min-w-[14rem] flex-col rounded-[22px] border border-border bg-surface p-4">
       <div className="relative">
         <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-page-tint">
           <Image
             src={vehicle.image ?? "/images/vehicle-placeholder.svg"}
             alt={`${vehicle.year} ${heading}`}
             fill
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 70vw, 25vw"
             unoptimized={(vehicle.image ?? "").endsWith(".svg")}
             className="object-cover"
           />
@@ -62,44 +77,62 @@ export function CompareVehicleCard({ vehicle }: { vehicle: Vehicle }) {
         </IconButton>
       </div>
       <div className="mt-4 flex flex-1 flex-col">
-        <h2 className="text-[1.25rem] font-medium leading-tight tracking-[-0.02em]">
+        <h2 className="text-[1.15rem] font-medium leading-tight tracking-[-0.02em]">
           {heading}
         </h2>
         {vehicle.derivative ? (
           <p className="mt-1 text-body-sm text-muted">{vehicle.derivative}</p>
         ) : null}
+        <p className="mt-3 text-caption text-muted">{meta.join(" · ")}</p>
+
         <div className="mt-4">
-          <CashPrice amount={vehicle.cashPrice} state={state} />
+          {showMonthly ? (
+            <MonthlyPayment
+              amount={monthly}
+              state={state}
+              gapAmount={gapAmount}
+              size="md"
+              term={finance.term}
+              financeType="pcp"
+              showDisclaimer={false}
+            />
+          ) : (
+            <div>
+              <p className="text-caption text-muted">{PRICE_VIEW_CASH}</p>
+              <p className="mt-1 text-primary">
+                <FinancialNumber
+                  value={formatPounds(vehicle.cashPrice)}
+                  size="md"
+                />
+              </p>
+            </div>
+          )}
+          <p className="mt-2 text-body-sm text-muted">
+            {showMonthly ? (
+              <>
+                <FinancialNumber
+                  value={formatPounds(vehicle.cashPrice)}
+                  size="sm"
+                  className="text-muted"
+                />{" "}
+                cash price
+              </>
+            ) : (
+              <>
+                From{" "}
+                <FinancialNumber
+                  value={formatPounds(monthly)}
+                  size="sm"
+                  className="text-muted"
+                />
+                /month*
+              </>
+            )}
+          </p>
         </div>
-        <div className="mt-3">
-          <MonthlyPayment
-            amount={monthly}
-            state={state}
-            gapAmount={gapAmount}
-            size="md"
-            term={finance.term}
-            financeType="pcp"
-            showDisclaimer={false}
-          />
-        </div>
-        <div className="mt-auto flex flex-col gap-3 pt-6">
-          {reservable && finance.mode === "anonymous" ? (
-            <StartDealButton stockId={vehicle.stockId} className="w-full" />
-          ) : null}
-          {reservable && finance.mode !== "anonymous" ? (
-            <>
-              <StartReservationButton
-                stockId={vehicle.stockId}
-                className="w-full"
-              />
-              <StartDealButton
-                stockId={vehicle.stockId}
-                variant="secondary"
-                className="w-full"
-              />
-            </>
-          ) : null}
-          <Button href={getVehicleUrl(vehicle)} variant="text" className="px-0">
+
+        <div className="mt-auto pt-6">
+          <Button href={getVehicleUrl(vehicle)} className="btn-compact w-full">
             {compareCopy.viewCar}
           </Button>
         </div>
@@ -112,7 +145,7 @@ export function CompareEmptySlot() {
   return (
     <Link
       href={routes.usedCars}
-      className="flex min-h-[22rem] flex-col items-center justify-center rounded-[22px] border border-dashed border-[#002852]/30 bg-[#ECF3F8] p-6 text-center no-underline"
+      className="flex min-h-[22rem] min-w-[14rem] flex-col items-center justify-center rounded-[22px] border border-dashed border-[#002852]/30 bg-[#ECF3F8] p-6 text-center no-underline"
     >
       <p className="text-[1.05rem] font-semibold text-[#002852]">
         {compareCopy.addAnother}

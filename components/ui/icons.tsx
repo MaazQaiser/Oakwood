@@ -44,9 +44,13 @@ export function IconArrow(props: SVGProps<SVGSVGElement>) {
 export function IconCompare(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="20" height="20" {...props}>
-      <rect x="3.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.75" />
-      <rect x="13.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.75" />
-      <path d="M6 10h2M6 13.5h2M16 10h2M16 13.5h2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      <path
+        d="M4 8h13m0 0-3.5-3.5M17 8l-3.5 3.5M20 16H7m0 0 3.5-3.5M7 16l3.5 3.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -66,6 +70,29 @@ export function IconHeart({
     >
       <path
         d="M12 19s-7-4.4-7-9.2A3.8 3.8 0 0 1 12 6a3.8 3.8 0 0 1 7 3.8C19 14.6 12 19 12 19Z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconBookmark({
+  filled = false,
+  ...props
+}: SVGProps<SVGSVGElement> & { filled?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      width="20"
+      height="20"
+      {...props}
+      fill={filled ? "currentColor" : "none"}
+    >
+      <path
+        d="M7 4.5h10A1.5 1.5 0 0 1 18.5 6v13.2l-6.5-3.4-6.5 3.4V6A1.5 1.5 0 0 1 7 4.5Z"
         stroke="currentColor"
         strokeWidth="1.75"
         strokeLinejoin="round"

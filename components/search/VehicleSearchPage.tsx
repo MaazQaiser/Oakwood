@@ -41,7 +41,7 @@ export function VehicleSearchPage({
   return (
     <>
       <SearchHeader context={context} query={query.q} />
-      <Section className="overflow-x-hidden">
+      <Section>
         <Container width="wide">
           <SearchExperience
             context={context}

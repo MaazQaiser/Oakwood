@@ -14,18 +14,15 @@ export function PartExchange() {
   const [open, setOpen] = useState(false);
 
   return (
-    <section
-      aria-labelledby="part-exchange-heading"
-      className="rounded-lg border border-border bg-surface p-4 md:p-5"
-    >
-      <h2 id="part-exchange-heading" className="text-h3">
-        Part exchange your current car
+    <section aria-labelledby="part-exchange-heading">
+      <h2 id="part-exchange-heading" className="text-label">
+        Part exchange
       </h2>
       <p className="mt-1 text-body-sm text-muted">
         See how much your car could contribute to your deposit.
       </p>
       {px ? (
-        <div className="mt-5 space-y-4">
+        <div className="mt-4 space-y-4">
           <PxEquitySummary
             estimatedValue={px.value}
             settlementFigure={px.settlement ?? 0}
@@ -58,8 +55,10 @@ export function PartExchange() {
           </div>
         </div>
       ) : (
-        <div className="mt-5">
+        <p className="mt-3">
           <Button
+            variant="text"
+            className="px-0"
             onClick={() => {
               trackEvent(analyticsEvents.pxStarted, {
                 source: "vdp",
@@ -70,7 +69,7 @@ export function PartExchange() {
           >
             Get my valuation
           </Button>
-        </div>
+        </p>
       )}
       <PxDealDrawer
         open={open}

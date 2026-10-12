@@ -26,6 +26,8 @@ export interface Vehicle {
   model: string;
   modelSlug: string;
   derivative?: string;
+  /** Short selling point from the stock feed. Omitted when the feed has none. */
+  highlight?: string;
   year: number;
   mileage: number;
   fuelType: string;

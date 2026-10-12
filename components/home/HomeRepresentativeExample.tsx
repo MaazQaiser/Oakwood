@@ -133,13 +133,13 @@ export function HomeRepresentativeExample() {
               </p>
             </div>
           </details>
-        </article>
-      </div>
 
-      <div className="mt-8 flex justify-center">
-        <Button href={budgetHref} className="btn-compact w-full max-w-md sm:w-auto">
-          {HOME_REPRESENTATIVE_CTA}
-        </Button>
+          <div className="mt-auto pt-6">
+            <Button href={budgetHref} className="btn-compact w-full">
+              {HOME_REPRESENTATIVE_CTA}
+            </Button>
+          </div>
+        </article>
       </div>
     </div>
   );

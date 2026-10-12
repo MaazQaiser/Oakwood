@@ -14,7 +14,7 @@ import { COMPARE_MAX, COMPARE_STORAGE_KEY } from "@/lib/compare/copy";
 import { pruneCompareIds } from "@/lib/compare/catalog";
 
 export type CompareToggleResult = {
-  action: "added" | "removed" | "replaced" | "ignored";
+  action: "added" | "removed" | "limit" | "ignored";
   stockIds: string[];
 };
 
@@ -97,13 +97,9 @@ export function CompareProvider({ children }: { children: ReactNode }) {
         return pruned;
       }
       if (pruned.length >= COMPARE_MAX) {
-        action = "replaced";
-        nextIds = pruneCompareIds([...pruned.slice(1), stockId]);
-        trackEvent(analyticsEvents.compareVehicleAdded, {
-          stockId,
-          replaced: true,
-        });
-        return nextIds;
+        action = "limit";
+        nextIds = pruned;
+        return pruned;
       }
       action = "added";
       nextIds = pruneCompareIds([...pruned, stockId]);

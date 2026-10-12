@@ -12,6 +12,10 @@ import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabili
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import { getVehicleUrl } from "@/config/routes";
 import type { Vehicle } from "@/types/vehicle";
+import {
+  PRICE_VIEW_TOTAL,
+  type ListingPriceView,
+} from "@/lib/vehicles/searchCopy";
 import Link from "next/link";
 
 export function PromoPanel({
@@ -91,6 +95,7 @@ export function VehicleCard({
   featured = false,
   term = 48,
   financeType = "pcp",
+  priceView = "monthly",
 }: {
   vehicle: Vehicle;
   monthly?: number;
@@ -103,6 +108,7 @@ export function VehicleCard({
   featured?: boolean;
   term?: number;
   financeType?: "hp" | "pcp";
+  priceView?: ListingPriceView;
 }) {
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
@@ -147,14 +153,11 @@ export function VehicleCard({
             className="object-cover"
           />
         </div>
-        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-surface px-2.5 py-1 text-caption text-ink tabular-nums shadow-sm">
-            {vehicle.year}
-          </span>
-          {vehicle.availability !== "available" ? (
+        {vehicle.availability !== "available" ? (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
             <VehicleAvailabilityBadge availability={vehicle.availability} />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {toolbar && !featured ? (
           <div className="absolute right-3 top-3">{toolbar}</div>
         ) : null}
@@ -167,11 +170,18 @@ export function VehicleCard({
       >
         {featured ? (
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-[1.25rem] font-medium leading-tight tracking-[-0.02em]">
-              <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
-                {vehicle.make} {vehicle.model}
-              </Link>
-            </h3>
+            <div className="min-w-0">
+              <h3 className="text-[1.25rem] font-medium leading-tight tracking-[-0.02em]">
+                <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
+                  {vehicle.make} {vehicle.model}
+                </Link>
+              </h3>
+              {vehicle.highlight ? (
+                <p className="mt-1 text-body-sm font-medium text-primary-secondary">
+                  {vehicle.highlight}
+                </p>
+              ) : null}
+            </div>
             <p className="shrink-0 pt-0.5 text-right text-[0.9375rem] font-medium leading-tight text-ink tabular-nums">
               {formatPounds(vehicle.cashPrice)}
             </p>
@@ -183,21 +193,45 @@ export function VehicleCard({
                 {vehicle.make} {vehicle.model}
               </Link>
             </h3>
+            {vehicle.highlight ? (
+              <p className="mt-1 text-body-sm font-medium text-primary-secondary">
+                {vehicle.highlight}
+              </p>
+            ) : null}
             {vehicle.derivative ? (
               <p className="mt-1 text-body-sm text-muted">{vehicle.derivative}</p>
             ) : null}
           </div>
         )}
-        <MonthlyPayment
-          amount={monthlyAmount}
-          state={state}
-          gapAmount={gapAmount}
-          size="compact"
-          term={term}
-          financeType={financeType}
-          showDisclaimer={false}
-        />
-        {featured ? null : (
+        {featured || priceView === "monthly" ? (
+          <MonthlyPayment
+            amount={monthlyAmount}
+            state={state}
+            gapAmount={gapAmount}
+            size="compact"
+            term={term}
+            financeType={financeType}
+            showDisclaimer={false}
+          />
+        ) : (
+          <div>
+            <p className="text-caption text-muted">{PRICE_VIEW_TOTAL}</p>
+            <p className="mt-1 text-primary">
+              <FinancialNumber
+                value={formatPounds(vehicle.cashPrice)}
+                size="compact"
+              />
+            </p>
+            {state === "ineligible" ? (
+              <p className="mt-1 text-caption text-warning">
+                {gapAmount !== undefined
+                  ? `${formatPounds(gapAmount)} more deposit may make this affordable.`
+                  : "Outside your current budget"}
+              </p>
+            ) : null}
+          </div>
+        )}
+        {featured ? null : priceView === "monthly" ? (
           <p className="text-body-sm text-muted">
             <FinancialNumber
               value={formatPounds(vehicle.cashPrice)}
@@ -206,21 +240,37 @@ export function VehicleCard({
             />{" "}
             cash price
           </p>
+        ) : (
+          <p className="text-body-sm text-muted">
+            <FinancialNumber
+              value={formatPounds(monthlyAmount)}
+              size="sm"
+              className="text-muted"
+            />{" "}
+            /month*
+          </p>
         )}
         <div className="flex flex-wrap gap-1.5">
-          {[
-            `${formatNumber(vehicle.mileage)} miles`,
-            vehicle.fuelType,
-            vehicle.transmission,
-            vehicle.locationName,
-          ].map((label) => (
-            <span
-              key={label}
-              className="inline-flex items-center rounded-full bg-page-tint px-2.5 py-1 text-caption text-ink tabular-nums"
-            >
-              {label}
-            </span>
-          ))}
+          {(
+            [
+              {
+                key: "mileage",
+                label: `${formatNumber(vehicle.mileage)} miles`,
+              },
+              { key: "fuel", label: vehicle.fuelType },
+              { key: "transmission", label: vehicle.transmission },
+              { key: "location", label: vehicle.locationName },
+            ] as const
+          )
+            .filter((item) => Boolean(item.label?.trim()))
+            .map((item) => (
+              <span
+                key={item.key}
+                className="inline-flex items-center rounded-full bg-page-tint px-2.5 py-1 text-caption text-ink tabular-nums"
+              >
+                {item.label}
+              </span>
+            ))}
         </div>
         {financeActions ? <div>{financeActions}</div> : null}
         <div className="mt-auto flex items-center justify-between gap-3 pt-1">

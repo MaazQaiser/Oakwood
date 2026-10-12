@@ -34,6 +34,7 @@ export function PageBanner({
   actions,
   children,
   width = "wide",
+  hideTitle = false,
 }: {
   title: string;
   description?: ReactNode;
@@ -43,22 +44,32 @@ export function PageBanner({
   actions?: ReactNode;
   children?: ReactNode;
   width?: keyof typeof widthClass;
+  hideTitle?: boolean;
 }) {
   const scoped = useContext(PageBannerCrumbs);
   const crumbs = breadcrumbs ?? scoped;
 
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 overflow-hidden rounded-[32px] bg-[#ECF3F8] px-[var(--oak-page-x)] pb-10 pt-[calc(var(--oak-header-height)+1.75rem)] sm:mx-4 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6 lg:pb-12">
+    <section
+      className={cn(
+        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 overflow-hidden rounded-[32px] bg-[#ECF3F8] px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+1.75rem)] sm:mx-4 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6",
+        hideTitle ? "pb-6 lg:pb-7" : "pb-10 lg:pb-12",
+      )}
+    >
       <div className={cn("mx-auto w-full", widthClass[width])}>
         {crumbs && crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
-        <h1
-          className={cn(
-            "max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]",
-            crumbs?.length ? "mt-5" : "mt-0",
-          )}
-        >
-          {title}
-        </h1>
+        {hideTitle ? (
+          <h1 className="sr-only">{title}</h1>
+        ) : (
+          <h1
+            className={cn(
+              "max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]",
+              crumbs?.length ? "mt-5" : "mt-0",
+            )}
+          >
+            {title}
+          </h1>
+        )}
         {description ? (
           <div className="mt-4 max-w-xl text-[0.95rem] leading-relaxed text-[#8b95a3]">{description}</div>
         ) : null}
@@ -89,7 +100,9 @@ export function PageBanner({
             ) : null}
           </div>
         ) : null}
-        {children ? <div className="mt-8">{children}</div> : null}
+        {children ? (
+          <div className={hideTitle ? "mt-4" : "mt-8"}>{children}</div>
+        ) : null}
       </div>
     </section>
   );

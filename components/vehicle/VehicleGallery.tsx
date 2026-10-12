@@ -5,9 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { IconButton } from "@/components/ui/Button";
 import { IconArrow, IconClose, IconPlay, IconSearch } from "@/components/ui/icons";
+import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
+import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { getVehicleGallery } from "@/lib/mock/vehicle-detail";
 import { cn } from "@/lib/cn";
+import { getVehicleTitle } from "@/lib/vehicles/labels";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 function isSvg(src: string) {
@@ -20,6 +23,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
   const [lightbox, setLightbox] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const [broken, setBroken] = useState<Record<number, boolean>>({});
   const touchStart = useRef<number | null>(null);
   const current = items[index];
 
@@ -79,8 +83,31 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [goTo, index, lightbox]);
 
+  const vehicleName = getVehicleTitle(vehicle);
+  const imageBroken = Boolean(current && broken[index]);
+
   if (!current) {
-    return null;
+    return (
+      <div className="vdp-hero__gallery min-w-0">
+        <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-2xl bg-page-tint px-6 text-center">
+          <p className="text-body-sm text-muted">
+            Images are not available for this vehicle.
+          </p>
+          <div className="absolute right-3 top-3 flex items-center gap-2">
+            <CompareVehicleButton
+              vehicleName={vehicleName}
+              stockId={vehicle.stockId}
+              category={vehicle.category}
+            />
+            <SaveVehicleButton
+              vehicleName={vehicleName}
+              stockId={vehicle.stockId}
+              category={vehicle.category}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const playVideo = () => {
@@ -92,7 +119,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
     <div className="vdp-hero__gallery min-w-0">
       <div className="vdp-hero__gallery-sticky">
       <div
-        className="relative overflow-hidden rounded-lg bg-primary-soft"
+        className="relative overflow-hidden rounded-2xl bg-page-tint"
         onTouchStart={(event) => {
           touchStart.current = event.changedTouches[0]?.clientX ?? null;
         }}
@@ -111,7 +138,13 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
         }}
       >
         <div className="relative aspect-[16/10]">
-        {current.kind === "video" && videoPlaying && vehicle.video?.src ? (
+        {imageBroken ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-page-tint px-6 text-center">
+            <p className="max-w-md text-body-sm text-muted">
+              This image could not be loaded. Try another view from the gallery.
+            </p>
+          </div>
+        ) : current.kind === "video" && videoPlaying && vehicle.video?.src ? (
             <video
               className="absolute inset-0 h-full w-full object-cover"
               poster={current.poster}
@@ -138,6 +171,9 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
               loading={index === 0 ? "eager" : "lazy"}
               unoptimized={isSvg(current.kind === "video" ? (current.poster ?? current.src) : current.src)}
               className="object-cover"
+              onError={() =>
+                setBroken((currentBroken) => ({ ...currentBroken, [index]: true }))
+              }
             />
           )}
         </div>
@@ -155,37 +191,51 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           </button>
         ) : null}
 
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-3">
-          <IconButton
-            label="Previous image"
-            className="bg-surface/95 shadow-sm"
-            onClick={() => goTo(index - 1)}
-          >
-            <IconArrow className="rotate-180" />
-          </IconButton>
-          <p className="rounded-full bg-surface/95 px-3 py-1 text-caption text-ink shadow-sm">
-            <span className="financial-number financial-number--sm text-body-sm">
-              {index + 1} / {items.length}
-            </span>
-          </p>
-          <IconButton
-            label="Next image"
-            className="bg-surface/95 shadow-sm"
-            onClick={() => goTo(index + 1)}
-          >
-            <IconArrow />
-          </IconButton>
-        </div>
-
-        {current.kind === "image" ? (
-          <IconButton
-            label="Zoom"
-            className="absolute right-3 top-3 bg-surface/95 shadow-sm"
-            onClick={() => setLightbox(true)}
-          >
-            <IconSearch />
-          </IconButton>
+        {items.length > 1 ? (
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-3">
+            <IconButton
+              label="Previous image"
+              className="bg-surface/95 shadow-sm"
+              onClick={() => goTo(index - 1)}
+            >
+              <IconArrow className="rotate-180" />
+            </IconButton>
+            <p className="rounded-full bg-surface/95 px-3 py-1 text-caption text-ink shadow-sm">
+              <span className="financial-number financial-number--sm text-body-sm">
+                {index + 1} / {items.length}
+              </span>
+            </p>
+            <IconButton
+              label="Next image"
+              className="bg-surface/95 shadow-sm"
+              onClick={() => goTo(index + 1)}
+            >
+              <IconArrow />
+            </IconButton>
+          </div>
         ) : null}
+
+        <div className="absolute right-3 top-3 flex items-center gap-2">
+          <CompareVehicleButton
+            vehicleName={vehicleName}
+            stockId={vehicle.stockId}
+            category={vehicle.category}
+          />
+          <SaveVehicleButton
+            vehicleName={vehicleName}
+            stockId={vehicle.stockId}
+            category={vehicle.category}
+          />
+          {current.kind === "image" && !imageBroken ? (
+            <IconButton
+              label="View larger image"
+              className="bg-surface/95 shadow-sm"
+              onClick={() => setLightbox(true)}
+            >
+              <IconSearch />
+            </IconButton>
+          ) : null}
+        </div>
       </div>
 
       <ul className="mt-3 flex w-full max-w-full gap-2 overflow-x-auto pb-1">
@@ -196,7 +246,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
               aria-label={item.kind === "video" ? item.title ?? "Video" : item.alt}
               aria-current={itemIndex === index ? "true" : undefined}
               className={cn(
-                "relative h-11 w-16 overflow-hidden rounded-md border md:h-16 md:w-24",
+                "relative h-12 w-[4.5rem] overflow-hidden rounded-xl border md:h-[4.25rem] md:w-24",
                 itemIndex === index ? "border-primary" : "border-border",
               )}
               onClick={() => goTo(itemIndex)}

@@ -7,6 +7,7 @@ import { IconSearch } from "@/components/ui/icons";
 import { routes } from "@/config/routes";
 import { getVanSearchEvents } from "@/features/vans/analytics";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 import type { VehicleCategory } from "@/types/vehicle";
 
 export function NaturalLanguageSearch({
@@ -14,11 +15,15 @@ export function NaturalLanguageSearch({
   defaultValue,
   hint = "Try “BMW automatic under £300 a month” or “Family SUV under £400 a month”.",
   category = "car",
+  className,
+  hideHint = false,
 }: {
   action?: string;
   defaultValue?: string;
   hint?: string;
   category?: VehicleCategory;
+  className?: string;
+  hideHint?: boolean;
 }) {
   const [value, setValue] = useState(defaultValue ?? "");
   const inputId = category === "van" ? "van-search" : "vehicle-search";
@@ -28,7 +33,7 @@ export function NaturalLanguageSearch({
       action={action}
       method="get"
       role="search"
-      className="mt-6"
+      className={cn(className ?? "mt-6")}
       onSubmit={() => {
         trackEvent(analyticsEvents.searchSubmitted, { q: value, category });
         const vanEvents = getVanSearchEvents(category);
@@ -57,7 +62,9 @@ export function NaturalLanguageSearch({
           Search
         </Button>
       </div>
-      <p className="mt-2 text-caption text-muted">{hint}</p>
+      {hideHint ? null : (
+        <p className="mt-2 text-caption text-muted">{hint}</p>
+      )}
     </form>
   );
 }
