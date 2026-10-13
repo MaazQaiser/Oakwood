@@ -20,6 +20,9 @@ export interface DealSessionRecord {
   annualMileage?: number;
   px?: DealDraft["px"];
   productIds: string[];
+  productYears?: DealDraft["productYears"];
+  decision?: DealDraft["decision"];
+  stepsCompleted?: DealDraft["stepsCompleted"];
   email?: string;
   resume?: {
     token: string;
@@ -246,5 +249,20 @@ export function toDealDraft(record: DealSessionRecord): DealDraft {
     annualMileage: record.annualMileage,
     px: record.px,
     productIds: record.productIds,
+    productYears: record.productYears,
+    decision: record.decision,
+    stepsCompleted: record.stepsCompleted,
   };
+}
+
+export function findLiveDealForStock(
+  stockId: string,
+  now = Date.now(),
+): DealSessionRecord | null {
+  for (const record of deals.values()) {
+    if (record.vehicleStockId === stockId && !isDealExpired(record, now)) {
+      return record;
+    }
+  }
+  return null;
 }

@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -61,6 +62,7 @@ function writeStoredIds(ids: string[]) {
 export function CompareProvider({ children }: { children: ReactNode }) {
   const [stockIds, setStockIds] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
+  const persistReady = useRef(false);
 
   useEffect(() => {
     const next = readStoredIds();
@@ -70,6 +72,11 @@ export function CompareProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready) {
+      return;
+    }
+    // Skip the first ready pass so an empty initial state never wipes storage.
+    if (!persistReady.current) {
+      persistReady.current = true;
       return;
     }
     writeStoredIds(stockIds);

@@ -14,6 +14,7 @@ import { VehicleLocation } from "@/components/vehicle/VehicleLocation";
 import { SimilarVehicles } from "@/components/vehicle/SimilarVehicles";
 import { MobileVehicleActionBar } from "@/components/vehicle/MobileVehicleActionBar";
 import { VehicleViewTracker } from "@/components/vehicle/VehicleViewTracker";
+import { TrackLastViewedVehicle } from "@/components/vehicle/TrackLastViewedVehicle";
 import {
   ReservedVehicleNotice,
   SoldVehicleNotice,
@@ -22,6 +23,7 @@ import {
 import { getUsedCarsUrl, getEligibilityUrl } from "@/config/routes";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
+import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
 import { isReservable } from "@/lib/vehicles/sold";
 import { createVehicleJsonLd } from "@/lib/seo/json-ld";
 import type { BreadcrumbItem } from "@/lib/seo";
@@ -47,6 +49,7 @@ export function VehicleDetailPage({
   return (
     <VehicleDealProvider vehicle={vehicle}>
       <VehicleViewTracker stockId={vehicle.stockId} />
+      <TrackLastViewedVehicle stockId={vehicle.stockId} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -109,7 +112,7 @@ export function VehicleDetailPage({
               </h2>
               <p className="mt-2 max-w-2xl text-body-sm text-secondary">
                 {reservable
-                  ? "Reserve this car, or build your deal first if you want to configure finance."
+                  ? "Build your deal for part exchange, budget, cover and reserve — or reserve this car straight away."
                   : reserved
                     ? "This car is reserved for another customer. Browse similar stock or check your finance eligibility."
                     : "Browse the latest cars or check your finance eligibility first."}
@@ -117,8 +120,11 @@ export function VehicleDetailPage({
               <div className="mt-5 hidden flex-wrap gap-3 lg:flex">
                 {reservable ? (
                   <>
-                    <StartReservationButton stockId={vehicle.stockId} />
-                    <StartVehicleDealButton variant="secondary" />
+                    <StartVehicleDealButton label={DEAL_VDP_CARD_CTA} />
+                    <StartReservationButton
+                      stockId={vehicle.stockId}
+                      variant="secondary"
+                    />
                   </>
                 ) : (
                   <>
@@ -131,7 +137,17 @@ export function VehicleDetailPage({
               </div>
               <div className="mt-5 flex flex-col gap-3 lg:hidden">
                 {reservable ? (
-                  <StartVehicleDealButton className="w-full" variant="secondary" />
+                  <>
+                    <StartVehicleDealButton
+                      className="w-full"
+                      label={DEAL_VDP_CARD_CTA}
+                    />
+                    <StartReservationButton
+                      stockId={vehicle.stockId}
+                      className="w-full"
+                      variant="secondary"
+                    />
+                  </>
                 ) : (
                   <>
                     <Button href={getUsedCarsUrl()} className="w-full">

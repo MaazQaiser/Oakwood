@@ -95,6 +95,14 @@ export interface DealPartExchangeVehicle {
   transmission: string;
 }
 
+export type DealPxCondition =
+  | "excellent"
+  | "good"
+  | "average"
+  | "needs-work";
+
+export type DealPxServiceHistory = "full" | "partial" | "none";
+
 export interface DealPartExchangeInput {
   registration: string;
   mileage: number;
@@ -102,7 +110,29 @@ export interface DealPartExchangeInput {
   settlement?: number;
   vehicle?: DealPartExchangeVehicle;
   financeOutstanding?: boolean;
+  outstandingFinanceAmount?: number;
+  outstandingFinanceLender?: string;
+  condition?: DealPxCondition;
+  serviceHistory?: DealPxServiceHistory;
   valuationDate?: string;
+}
+
+export type DealDecisionOutcome = "approved" | "approved_less" | "refer";
+
+export interface DealDecisionInput {
+  fullName: string;
+  dateOfBirth: string;
+  postcode: string;
+  addressLine?: string;
+  employmentStatus: string;
+  yearlyIncome: number;
+  outcome?: DealDecisionOutcome;
+  apr?: number;
+  extraDepositNeeded?: number;
+}
+
+export interface DealProductYearSelection {
+  [productId: string]: number;
 }
 
 export interface Deal {
@@ -127,7 +157,18 @@ export interface DealDraft {
   annualMileage?: number;
   px?: DealPartExchangeInput;
   productIds: string[];
+  productYears?: DealProductYearSelection;
+  decision?: DealDecisionInput;
+  stepsCompleted?: DealStepName[];
 }
+
+export type DealStepName =
+  | "part-exchange"
+  | "budget"
+  | "decision"
+  | "cover"
+  | "quote"
+  | "reserve";
 
 export interface DealFinanceProfileInput {
   apr: number;

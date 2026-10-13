@@ -126,7 +126,7 @@ export function ReservationConfirmation({
 
   const vehicle = current.vehicle;
   const purchaseHref = current.dealSnapshot
-    ? getDealUrl(current.dealSnapshot.dealId, "application")
+    ? getDealUrl(current.dealSnapshot.dealId, "quote")
     : getEligibilityUrl();
 
   return (

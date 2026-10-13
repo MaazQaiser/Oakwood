@@ -1,14 +1,22 @@
+import { COMPARE_MAX } from "@/lib/compare/copy";
 import type { FinanceIntentSlug } from "@/types/finance";
 import type { Vehicle } from "@/types/vehicle";
 
 export type StockCategory = "cars" | "vans";
 
 export type DealStep =
-  | "configure"
   | "part-exchange"
+  | "budget"
+  | "decision"
+  | "cover"
+  | "quote"
+  | "reserve";
+
+/** @deprecated Legacy step names kept for redirect maps only. */
+export type LegacyDealStep =
+  | "configure"
   | "products"
   | "application"
-  | "decision"
   | "confirmation";
 
 export type ReservationStep =
@@ -219,7 +227,7 @@ export function parseCompareIds(
     }
     seen.add(id);
     ids.push(id);
-    if (ids.length === 2) {
+    if (ids.length === COMPARE_MAX) {
       break;
     }
   }
@@ -287,22 +295,26 @@ export function getEligibilityUrl(step: EligibilityStep = "start"): string {
   }
 }
 
-export function getDealUrl(dealId: string, step: DealStep = "configure"): string {
+export function getDealUrl(
+  dealId: string,
+  step: DealStep = "part-exchange",
+): string {
   const base = `${routes.deal}/${dealId}`;
 
   switch (step) {
-    case "part-exchange":
-      return `${base}/part-exchange`;
-    case "products":
-      return `${base}/products`;
-    case "application":
-      return `${base}/application`;
+    case "budget":
+      return `${base}/budget`;
     case "decision":
       return `${base}/decision`;
-    case "confirmation":
-      return `${base}/confirmation`;
+    case "cover":
+      return `${base}/cover`;
+    case "quote":
+      return `${base}/quote`;
+    case "reserve":
+      return `${base}/reserve`;
+    case "part-exchange":
     default:
-      return base;
+      return `${base}/part-exchange`;
   }
 }
 

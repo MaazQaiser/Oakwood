@@ -163,7 +163,7 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
 
   const vehicle = model.vehicle;
   const purchaseHref = model.dealSnapshot
-    ? getDealUrl(model.dealSnapshot.dealId, "application")
+    ? getDealUrl(model.dealSnapshot.dealId, "quote")
     : getEligibilityUrl();
 
   return (

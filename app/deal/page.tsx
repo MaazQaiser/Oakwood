@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { JourneyStart } from "@/components/journeys/JourneyStart";
+import { DealEntryClient } from "@/components/deal/DealEntryClient";
 import { getBoundDeal } from "@/features/deal/session";
-import { DEAL_ENTRY_BODY, DEAL_ENTRY_HEADING } from "@/lib/deal/copy";
-import { getDealUrl, getEligibilityUrl, getUsedCarsUrl, routes } from "@/config/routes";
+import { getDealUrl, routes } from "@/config/routes";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -16,15 +15,8 @@ export const metadata = createPageMetadata({
 export default async function Page() {
   const deal = await getBoundDeal();
   if (deal) {
-    redirect(getDealUrl(deal.id));
+    redirect(getDealUrl(deal.id, "part-exchange"));
   }
 
-  return (
-    <JourneyStart
-      title={DEAL_ENTRY_HEADING}
-      body={DEAL_ENTRY_BODY}
-      primary={{ href: getUsedCarsUrl(), label: "Browse cars" }}
-      secondary={{ href: getEligibilityUrl(), label: "Check my eligibility" }}
-    />
-  );
+  return <DealEntryClient />;
 }

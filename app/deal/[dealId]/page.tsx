@@ -1,5 +1,6 @@
-import { DealBuilder } from "@/components/deal/DealBuilder";
-import { loadDealPage } from "@/features/deal/load";
+import { redirect } from "next/navigation";
+import { DealStockBootstrap } from "@/components/deal/DealStockBootstrap";
+import { resolveDealId } from "@/features/deal/resolve";
 import { getDealUrl } from "@/config/routes";
 import { mockDealId } from "@/lib/mock/data";
 import { createPageMetadata } from "@/lib/seo/metadata";
@@ -27,7 +28,12 @@ export default async function Page({
 }: {
   params: Promise<{ dealId: string }>;
 }) {
-  const { dealId } = await params;
-  const model = await loadDealPage(dealId);
-  return <DealBuilder model={model} />;
+  const { dealId: param } = await params;
+  const resolved = await resolveDealId(param, "part-exchange");
+  if (resolved.kind === "bootstrap") {
+    return (
+      <DealStockBootstrap stockId={resolved.stockId} step="part-exchange" />
+    );
+  }
+  redirect(getDealUrl(resolved.dealId, "part-exchange"));
 }

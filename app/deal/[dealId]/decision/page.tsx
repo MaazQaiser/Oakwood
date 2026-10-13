@@ -1,12 +1,13 @@
-import { DealBuilderPage } from "@/components/templates/pages";
-import { getDealUrl } from "@/config/routes";
-import { mockDealId } from "@/lib/mock/data";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import {
+  dealStepMetadata,
+  dealStepStaticParams,
+  renderDealStepPage,
+} from "@/lib/deal/deal-page";
 
 const step = "decision" as const;
 
 export function generateStaticParams() {
-  return [{ dealId: mockDealId }];
+  return dealStepStaticParams();
 }
 
 export async function generateMetadata({
@@ -15,12 +16,7 @@ export async function generateMetadata({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-
-  return createPageMetadata({
-    title: "Deal decision",
-    path: getDealUrl(dealId, step),
-    indexable: false,
-  });
+  return dealStepMetadata(dealId, step);
 }
 
 export default async function Page({
@@ -29,8 +25,5 @@ export default async function Page({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-
-  return (
-    <DealBuilderPage title="Deal decision" route={getDealUrl(dealId, step)} />
-  );
+  return renderDealStepPage(dealId, step);
 }

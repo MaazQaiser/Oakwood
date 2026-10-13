@@ -14,6 +14,10 @@ import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink"
 import { getEligibilityUrl, getSearchUrl, routes } from "@/config/routes";
 import { reservationConfig } from "@/config/reservation";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import {
+  DEAL_VDP_CARD_BODY,
+  DEAL_VDP_CARD_TITLE,
+} from "@/lib/deal/copy";
 import { formatPounds, formatTerm } from "@/lib/format/money";
 import {
   formatHoldPeriod,
@@ -136,14 +140,26 @@ export function VehiclePrice() {
         </p>
       ) : null}
 
-      <div className="mt-5 hidden flex-col gap-2 lg:flex">
+      {reservable ? (
+        <div className="mt-5 rounded-lg border border-border bg-page p-4">
+          <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
+          <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
+          <StartVehicleDealButton className="mt-3 w-full" />
+        </div>
+      ) : null}
+
+      <div className="mt-4 hidden flex-col gap-2 lg:flex">
         {reservable ? (
-          <StartReservationButton stockId={vehicle.stockId} className="w-full" />
+          <StartReservationButton
+            stockId={vehicle.stockId}
+            className="w-full"
+            variant="secondary"
+          />
         ) : null}
         {displayState === "representative" ? (
           <Button
             href={getEligibilityUrl()}
-            variant={reservable ? "secondary" : "primary"}
+            variant="text"
             className="w-full"
             onClick={() =>
               trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
@@ -151,10 +167,6 @@ export function VehiclePrice() {
           >
             Check my eligibility
           </Button>
-        ) : null}
-        {reservable &&
-        (displayState === "personalised" || displayState === "ineligible") ? (
-          <StartVehicleDealButton variant="secondary" className="w-full" />
         ) : null}
         {displayState === "personalised" || displayState === "ineligible" ? (
           <Button variant="text" className="px-0" onClick={scrollToFinance}>
@@ -167,21 +179,6 @@ export function VehiclePrice() {
           </Button>
         ) : null}
       </div>
-
-      {displayState === "representative" ? (
-        <p className="mt-3 lg:hidden">
-          <Button
-            href={getEligibilityUrl()}
-            variant="text"
-            className="px-0"
-            onClick={() =>
-              trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
-            }
-          >
-            Check my eligibility
-          </Button>
-        </p>
-      ) : null}
 
       {reservable ? (
         <p className="mt-4 text-caption text-muted">

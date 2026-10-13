@@ -23,7 +23,8 @@ export function CompareTray({
   const hidden =
     !ready ||
     count === 0 ||
-    pathname === routes.compare;
+    pathname === routes.compare ||
+    pathname.startsWith(`${routes.deal}/`);
   const vehicles = resolveCompareVehicles(stockIds);
   const canCompare = count >= COMPARE_MIN_FOR_TABLE;
   const href = getCompareUrl(stockIds);

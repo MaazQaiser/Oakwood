@@ -9,6 +9,7 @@ import {
   createDealOpaqueId,
   ensureDemoDeal,
   findDealByResumeToken,
+  findLiveDealForStock,
   getDealRecord,
   isDealExpired,
   saveDealResumeToken,
@@ -49,15 +50,31 @@ export async function createDealAction(input: {
     return { ok: false, reason: "unavailable" };
   }
 
+  const existing = findLiveDealForStock(vehicle.stockId);
+  if (existing) {
+    await writeDealCookie(existing.id);
+    return { ok: true, dealId: existing.id };
+  }
+
   const eligibility = await getEligibilitySession();
+  const pxSession = await getPxSession();
+  const pendingPx =
+    pxSession && !isPxExpired(pxSession)
+      ? snapshotToDealPx(pxSession.snapshot)
+      : undefined;
+  const pxEquity = pendingPx
+    ? Math.max(0, pendingPx.value - (pendingPx.settlement ?? 0))
+    : 0;
   const deposit =
     input.cashDeposit !== undefined
       ? defaultDeposit(input.cashDeposit)
       : eligibility && !isSessionExpired(eligibility)
         ? defaultDeposit(
-            eligibility.display?.deposit ?? eligibility.answers.deposit ?? 1000,
+            eligibility.display?.deposit ??
+              eligibility.answers.deposit ??
+              pxEquity + 500,
           )
-        : 1000;
+        : defaultDeposit(pxEquity + 500);
   const term =
     input.term !== undefined
       ? Math.max(12, Math.round(input.term))
@@ -67,12 +84,6 @@ export async function createDealAction(input: {
   const financeType: FinanceProductType | undefined =
     input.financeType === "pcp" || input.financeType === "hp"
       ? input.financeType
-      : undefined;
-
-  const pxSession = await getPxSession();
-  const pendingPx =
-    pxSession && !isPxExpired(pxSession)
-      ? snapshotToDealPx(pxSession.snapshot)
       : undefined;
 
   const record = await createBoundDeal({
@@ -111,6 +122,9 @@ export async function saveDealDraftAction(input: {
     annualMileage: input.draft.annualMileage,
     px: input.draft.px,
     productIds,
+    productYears: input.draft.productYears,
+    decision: input.draft.decision,
+    stepsCompleted: input.draft.stepsCompleted,
   });
   return { ok: true };
 }

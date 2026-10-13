@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { createDealAction } from "@/features/deal/actions";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { getDealUrl, getEligibilityUrl } from "@/config/routes";
+import { getDealUrl } from "@/config/routes";
+import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import type { FinanceProductType } from "@/types/finance";
 
@@ -17,6 +18,7 @@ export function StartDealButton({
   cashDeposit,
   term,
   financeType,
+  label = DEAL_VDP_CARD_CTA,
 }: {
   stockId: string;
   className?: string;
@@ -24,26 +26,11 @@ export function StartDealButton({
   cashDeposit?: number;
   term?: number;
   financeType?: FinanceProductType;
+  label?: string;
 }) {
   const finance = useCustomerFinance();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const hasProfile = finance.mode !== "anonymous";
-
-  if (!hasProfile) {
-    return (
-      <Button
-        href={getEligibilityUrl()}
-        variant={variant}
-        className={className}
-        onClick={() =>
-          trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
-        }
-      >
-        Check my eligibility
-      </Button>
-    );
-  }
 
   return (
     <Button
@@ -52,6 +39,7 @@ export function StartDealButton({
       busy={busy}
       onClick={() => {
         setBusy(true);
+        trackEvent(analyticsEvents.financeCtaClicked, { action: "build-deal" });
         void createDealAction({
           stockId,
           cashDeposit: cashDeposit ?? finance.deposit,
@@ -62,11 +50,11 @@ export function StartDealButton({
             setBusy(false);
             return;
           }
-          router.push(getDealUrl(result.dealId));
+          router.push(getDealUrl(result.dealId, "part-exchange"));
         });
       }}
     >
-      Build my deal
+      {label}
     </Button>
   );
 }
@@ -74,9 +62,11 @@ export function StartDealButton({
 export function StartVehicleDealButton({
   className,
   variant = "primary",
+  label,
 }: {
   className?: string;
   variant?: "primary" | "secondary" | "tertiary";
+  label?: string;
 }) {
   const { vehicle, financeType, deposit, term } = useVehicleDeal();
 
@@ -88,6 +78,7 @@ export function StartVehicleDealButton({
       financeType={financeType}
       className={className}
       variant={variant}
+      label={label}
     />
   );
 }

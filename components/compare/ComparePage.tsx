@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
@@ -52,9 +52,9 @@ function CompareBackLink() {
 export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
   const { stockIds, ready, hydrateFromQuery } = useCompare();
   const router = useRouter();
-  const pathname = usePathname();
   const viewed = useRef(false);
-  const queryApplied = useRef(false);
+  const lastQueryKey = useRef<string | null>(null);
+  const allowUrlSync = useRef(false);
   const queryKey = initialIds.join(",");
   const [priceView, setPriceView] = useState<ListingPriceView>("total");
 
@@ -65,24 +65,49 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
     }
   }, []);
 
-  useEffect(() => {
+  // Re-seed whenever ?ids= changes (ComparePage can stay mounted across navigations).
+  useLayoutEffect(() => {
     if (!ready) {
       return;
     }
+    if (lastQueryKey.current === queryKey) {
+      allowUrlSync.current = true;
+      return;
+    }
+    lastQueryKey.current = queryKey;
     const fromQuery = pruneCompareIds(parseCompareIds(queryKey));
-    if (!queryApplied.current) {
-      queryApplied.current = true;
-      if (fromQuery.length > 0) {
-        hydrateFromQuery(fromQuery);
-        return;
-      }
+    if (fromQuery.length > 0) {
+      // Avoid syncing the previous selection over a longer URL list.
+      allowUrlSync.current = false;
+      hydrateFromQuery(fromQuery);
+      allowUrlSync.current = true;
+      return;
+    }
+    allowUrlSync.current = true;
+  }, [ready, queryKey, hydrateFromQuery]);
+
+  useEffect(() => {
+    if (!ready || !allowUrlSync.current) {
+      return;
     }
     const canonical = getCompareUrl(stockIds);
-    const current = `${pathname}${window.location.search}`;
-    if (current !== canonical) {
-      router.replace(canonical, { scroll: false });
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current === canonical) {
+      return;
     }
-  }, [ready, queryKey, stockIds, pathname, router, hydrateFromQuery]);
+    // Defer so hydrateFromQuery state is committed before we rewrite ?ids=.
+    const timer = window.setTimeout(() => {
+      if (!allowUrlSync.current) {
+        return;
+      }
+      const next = getCompareUrl(stockIds);
+      const live = `${window.location.pathname}${window.location.search}`;
+      if (live !== next) {
+        router.replace(next, { scroll: false });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [ready, stockIds, router]);
 
   useEffect(() => {
     if (!ready || viewed.current) {

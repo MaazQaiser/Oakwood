@@ -1,12 +1,13 @@
-import { redirect } from "next/navigation";
-import { getDealUrl } from "@/config/routes";
-import { mockDealId } from "@/lib/mock/data";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import {
+  dealStepMetadata,
+  dealStepStaticParams,
+  renderDealStepPage,
+} from "@/lib/deal/deal-page";
 
 const step = "part-exchange" as const;
 
 export function generateStaticParams() {
-  return [{ dealId: mockDealId }];
+  return dealStepStaticParams();
 }
 
 export async function generateMetadata({
@@ -15,12 +16,7 @@ export async function generateMetadata({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-
-  return createPageMetadata({
-    title: "Part exchange",
-    path: getDealUrl(dealId, step),
-    indexable: false,
-  });
+  return dealStepMetadata(dealId, step);
 }
 
 export default async function Page({
@@ -29,5 +25,5 @@ export default async function Page({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-  redirect(getDealUrl(dealId));
+  return renderDealStepPage(dealId, step);
 }

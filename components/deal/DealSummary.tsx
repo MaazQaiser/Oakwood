@@ -14,18 +14,20 @@ import {
 } from "@/lib/deal/copy";
 import { formatAprFloor, formatPounds, formatTerm } from "@/lib/format/money";
 import { listSelectedProducts } from "@/lib/deal/products";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
-import { getEligibilityUrl, getUsedCarsUrl, routes } from "@/config/routes";
+import {
+  getDealUrl,
+  getEligibilityUrl,
+  getUsedCarsUrl,
+  routes,
+} from "@/config/routes";
 import { cn } from "@/lib/cn";
 
 export function DealCta() {
   const {
     dealId,
     calculation,
-    needsEligibility,
     vehicleUnavailable,
     finance,
-    vehicle,
   } = useDealBuilder();
   const invalid = Boolean(calculation && !calculation.valid);
 
@@ -45,30 +47,18 @@ export function DealCta() {
     );
   }
 
-  if (needsEligibility) {
+  if (invalid) {
     return (
-      <Button href={getEligibilityUrl()} className="w-full">
-        Check my eligibility
+      <Button href={getDealUrl(dealId, "budget")} className="w-full" variant="secondary">
+        Adjust your budget
       </Button>
     );
   }
 
-  if (invalid) {
-    return (
-      <StartReservationButton
-        stockId={vehicle.stockId}
-        dealId={dealId}
-        className="w-full"
-      />
-    );
-  }
-
   return (
-    <StartReservationButton
-      stockId={vehicle.stockId}
-      dealId={dealId}
-      className="w-full"
-    />
+    <Button href={getDealUrl(dealId, "reserve")} className="w-full">
+      Continue to reserve
+    </Button>
   );
 }
 
