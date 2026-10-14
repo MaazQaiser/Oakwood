@@ -33,43 +33,52 @@ function WizardInner({
   return (
     <>
       <JourneyChrome />
-      <Section className="pb-[calc(10.5rem+var(--oak-consent-offset,0px))] lg:pb-[calc(8rem+var(--oak-consent-offset,0px))]">
-        <Container width="narrow">
-          <div className="sticky top-[var(--oak-header-offset,4.5rem)] z-10 -mx-1 space-y-3 bg-page/95 px-1 py-3 backdrop-blur">
-            <DealPinnedVehicle />
-            <DealProgress step={step} />
+      <Section className="pb-[calc(10.5rem+var(--oak-consent-offset,0px))] lg:pb-[var(--oak-section-y)]">
+        <Container width="wide">
+          <div className="grid gap-6 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)] lg:items-start lg:gap-8">
+            <aside className="space-y-3 lg:sticky lg:top-[calc(var(--oak-header-height)+1.25rem)]">
+              <div className="lg:hidden">
+                <DealPinnedVehicle layout="strip" />
+              </div>
+              <div className="hidden lg:block">
+                <DealPinnedVehicle layout="card" />
+              </div>
+              <DealProgress step={step} />
+              <div className="hidden lg:block">
+                <DealMonthlyBar />
+              </div>
+              <Button
+                href={getVehicleUrl(vehicle.slug)}
+                variant="text"
+                className="min-h-9 px-0 text-body-sm"
+              >
+                Back to vehicle
+              </Button>
+            </aside>
+
+            <div className="min-w-0">
+              {phase === "VEHICLE_UNAVAILABLE" ? (
+                <div className="mb-6">
+                  <DealFailureState kind="vehicle" />
+                </div>
+              ) : null}
+              {phase === "CALCULATION_ERROR" ? (
+                <div className="mb-6">
+                  <DealFailureState kind="calculation" />
+                </div>
+              ) : null}
+
+              <article className="rounded-lg border border-border bg-surface p-4 md:p-6">
+                <h1 className="text-h2">{meta.title}</h1>
+                <p className="mt-1 text-body-sm text-muted">{DEAL_SUPPORTING}</p>
+                <div className="mt-5">{children}</div>
+              </article>
+            </div>
           </div>
-
-          {phase === "VEHICLE_UNAVAILABLE" ? (
-            <div className="mt-6">
-              <DealFailureState kind="vehicle" />
-            </div>
-          ) : null}
-          {phase === "CALCULATION_ERROR" ? (
-            <div className="mt-6">
-              <DealFailureState kind="calculation" />
-            </div>
-          ) : null}
-
-          <article className="mt-4 rounded-lg border border-border bg-surface p-4 md:p-6">
-            <h1 className="text-h2">{meta.title}</h1>
-            <p className="mt-1 text-body-sm text-muted">{DEAL_SUPPORTING}</p>
-            <div className="mt-5">{children}</div>
-          </article>
-
-          <p className="mt-4">
-            <Button
-              href={getVehicleUrl(vehicle.slug)}
-              variant="text"
-              className="px-0"
-            >
-              Back to vehicle
-            </Button>
-          </p>
         </Container>
       </Section>
-      <StickyActionBar hiddenOnDesktop={false}>
-        <div className="mx-auto max-w-[var(--oak-width-narrow,40rem)]">
+      <StickyActionBar>
+        <div className="mx-auto max-w-[var(--oak-width-content)]">
           <DealMonthlyBar />
         </div>
       </StickyActionBar>

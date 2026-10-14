@@ -88,11 +88,12 @@ export function FinancePersonalisationBanner({
         aria-label="Finance eligibility"
         className={cn(
           unboxed
-            ? "flex flex-col gap-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:gap-3"
-            : "flex flex-col gap-3 rounded-[14px] border border-border bg-primary-soft px-4 py-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:gap-3 lg:py-1.5 lg:pl-4 lg:pr-1.5",
+            ? "flex flex-col gap-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:justify-between lg:gap-3"
+            : "flex flex-col gap-3 rounded-[14px] border border-border bg-primary-soft px-4 py-3 lg:h-[3.75rem] lg:flex-row lg:items-center lg:justify-between lg:gap-3 lg:py-1.5 lg:pl-4 lg:pr-1.5",
           className,
         )}
       >
+        <h2 className="min-w-0 text-label lg:truncate">{copy.bannerTitle}</h2>
         <Button
           href={routes.eligibility}
           className="btn-compact w-full shrink-0 lg:w-auto"
@@ -100,7 +101,6 @@ export function FinancePersonalisationBanner({
         >
           {copy.bannerCta}
         </Button>
-        <h2 className="min-w-0 text-label lg:truncate">{copy.bannerTitle}</h2>
       </section>
     );
   }
@@ -115,14 +115,7 @@ export function FinancePersonalisationBanner({
         className,
       )}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-        <Button
-          href={routes.eligibility}
-          className="btn-compact w-full shrink-0 sm:w-auto"
-          onClick={onEligibilityClick}
-        >
-          {copy.bannerCta}
-        </Button>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
         <div className="min-w-0">
           <h2
             className={
@@ -135,6 +128,13 @@ export function FinancePersonalisationBanner({
           </h2>
           <p className="mt-1 text-body-sm text-muted">{copy.bannerBody}</p>
         </div>
+        <Button
+          href={routes.eligibility}
+          className="btn-compact w-full shrink-0 sm:w-auto"
+          onClick={onEligibilityClick}
+        >
+          {copy.bannerCta}
+        </Button>
       </div>
     </section>
   );

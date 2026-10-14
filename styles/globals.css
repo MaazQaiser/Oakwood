@@ -232,51 +232,65 @@ select {
   padding-block: var(--oak-section-y);
 }
 
+/*
+ * Mobile: simple flex column — gallery → aside (header/price/deal) → specs.
+ * Avoid display:contents here; it was collapsing deal + specs into one box.
+ * Desktop: sticky aside in the right column; specs stay under the gallery so
+ * they never scroll underneath the sticky card.
+ */
 .vdp-hero {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
   min-width: 0;
-  grid-template-areas:
-    "gallery"
-    "header"
-    "price"
-    "specs"
-    "deal";
 }
 
-.vdp-hero__gallery { grid-area: gallery; }
-.vdp-hero__aside { display: contents; }
-.vdp-hero__header { grid-area: header; }
-.vdp-hero__price { grid-area: price; }
-.vdp-hero__specs { grid-area: specs; }
-.vdp-hero__deal { grid-area: deal; }
+.vdp-hero__aside {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.vdp-hero__gallery,
+.vdp-hero__header,
+.vdp-hero__price,
+.vdp-hero__specs,
+.vdp-hero__deal {
+  min-width: 0;
+}
 
 @media (min-width: 64rem) {
   .vdp-hero {
+    display: grid;
     align-items: start;
     gap: 1.5rem 2.25rem;
     grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
     grid-template-areas:
       "gallery aside"
-      "specs specs";
+      "specs aside";
+  }
+
+  .vdp-hero__gallery {
+    grid-area: gallery;
+    align-self: start;
   }
 
   .vdp-hero__aside {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 1.25rem;
     grid-area: aside;
+    align-self: start;
     position: sticky;
     top: calc(var(--oak-header-height) + 1.25rem);
     max-height: calc(100dvh - var(--oak-header-height) - 2rem);
+    min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-bottom: 0.25rem;
   }
 
-  .vdp-hero__gallery {
-    align-self: start;
+  .vdp-hero__specs {
+    grid-area: specs;
   }
 
   .vdp-hero__gallery-sticky {

@@ -90,7 +90,11 @@ export function VehicleDetailPage({
               ) : (
                 <VehiclePrice />
               )}
-              {listingClosed ? <div className="vdp-hero__deal" /> : <VehicleDealColumn />}
+              {listingClosed ? (
+                <div className="vdp-hero__deal" />
+              ) : (
+                <VehicleDealColumn />
+              )}
             </div>
             <VehicleSpecifications vehicle={vehicle} />
           </div>

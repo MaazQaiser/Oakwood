@@ -106,7 +106,18 @@ export function Button({
   const content = (
     <>
       {busy ? <BusySpinner /> : null}
-      {withArrow ? <span className={cn(compact && "whitespace-nowrap")}>{children}</span> : children}
+      {withArrow ? (
+        <span
+          className={cn(
+            "inline-flex items-center gap-2",
+            compact && "whitespace-nowrap",
+          )}
+        >
+          {children}
+        </span>
+      ) : (
+        children
+      )}
       {withArrow ? (
         <span
           className={

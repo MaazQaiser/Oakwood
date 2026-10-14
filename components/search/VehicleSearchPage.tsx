@@ -41,7 +41,7 @@ export function VehicleSearchPage({
   return (
     <>
       <SearchHeader context={context} query={query.q} />
-      <Section>
+      <Section className="pt-5 md:pt-6 lg:pt-8">
         <Container width="wide">
           <SearchExperience
             context={context}

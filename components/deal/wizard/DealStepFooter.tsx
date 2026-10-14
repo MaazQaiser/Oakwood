@@ -23,38 +23,36 @@ export function DealStepFooter({
   busy?: boolean;
 }) {
   return (
-    <div className="mt-6 space-y-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        {onBack ? (
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full sm:w-auto"
-            onClick={onBack}
-          >
-            {DEAL_BACK}
-          </Button>
-        ) : null}
+    <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center">
+      {onBack ? (
         <Button
           type="button"
-          className="w-full sm:flex-1"
-          busy={busy}
-          disabled={continueDisabled}
-          onClick={onContinue}
+          variant="secondary"
+          className="w-full sm:w-auto"
+          onClick={onBack}
         >
-          {continueLabel}
+          {DEAL_BACK}
         </Button>
-      </div>
+      ) : null}
       {onSkip ? (
         <Button
           type="button"
           variant="secondary"
-          className="w-full"
+          className="w-full sm:flex-1"
           onClick={onSkip}
         >
           {DEAL_SKIP_PX}
         </Button>
       ) : null}
+      <Button
+        type="button"
+        className="w-full sm:flex-1"
+        busy={busy}
+        disabled={continueDisabled}
+        onClick={onContinue}
+      >
+        {continueLabel}
+      </Button>
     </div>
   );
 }

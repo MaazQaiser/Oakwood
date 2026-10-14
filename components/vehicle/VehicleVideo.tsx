@@ -55,6 +55,7 @@ export function VehicleVideo({ vehicle }: { vehicle: VehicleDetail }) {
         {!playing ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <Button
+              className="btn-compact shadow-md"
               onClick={() => {
                 setPlaying(true);
                 trackEvent(analyticsEvents.videoPlayed, {
@@ -63,7 +64,7 @@ export function VehicleVideo({ vehicle }: { vehicle: VehicleDetail }) {
                 });
               }}
             >
-              <IconPlay />
+              <IconPlay width={18} height={18} />
               Watch video
             </Button>
           </div>

@@ -28,7 +28,7 @@ export function VehicleSpecifications({ vehicle }: { vehicle: VehicleDetail }) {
       <h2 id="key-spec-heading" className="text-h3">
         Key specification
       </h2>
-      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-4">
+      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
         {items.map((item) => (
           <div key={item.label} className="min-w-0">
             <dt className="text-caption text-muted">{item.label}</dt>
