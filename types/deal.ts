@@ -249,6 +249,8 @@ export interface DealCalculationInput {
   term: number;
   annualMileage?: number;
   productIds: string[];
+  /** Years per duration product; defaults to 1 when missing. */
+  productYears?: DealProductYearSelection;
 }
 
 export interface DealCalculation {

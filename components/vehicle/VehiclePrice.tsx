@@ -7,6 +7,7 @@ import {
 import { Skeleton } from "@/components/ui/Loading";
 import { Button } from "@/components/ui/Button";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
+import { DealEntrySteps } from "@/components/deal/DealEntrySteps";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { VehiclePriceToggle } from "@/components/vehicle/VehiclePriceToggle";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
@@ -144,7 +145,8 @@ export function VehiclePrice() {
         <div className="mt-5 rounded-lg border border-border bg-page p-4">
           <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
           <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
-          <StartVehicleDealButton className="mt-3 w-full" />
+          <DealEntrySteps />
+          <StartVehicleDealButton className="mt-3 w-full" label="Start building" />
         </div>
       ) : null}
 

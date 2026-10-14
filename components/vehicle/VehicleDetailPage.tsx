@@ -78,8 +78,8 @@ export function VehicleDetailPage({
 
           <div className="vdp-hero">
             <VehicleGallery vehicle={vehicle} />
+            <VehicleHeader vehicle={vehicle} />
             <div className="vdp-hero__aside">
-              <VehicleHeader vehicle={vehicle} />
               {listingClosed ? (
                 <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
                   <p className="text-body text-muted">
@@ -102,10 +102,8 @@ export function VehicleDetailPage({
           <div className="mt-14 space-y-14">
             <VehicleDocumentation vehicle={vehicle} />
             <VehicleVideo vehicle={vehicle} />
-            <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-              <TrustBlock />
-              <VehicleLocation vehicle={vehicle} />
-            </div>
+            <TrustBlock />
+            <VehicleLocation vehicle={vehicle} />
             <SimilarVehicles vehicles={similar} />
             <section
               aria-labelledby="vdp-final-cta-heading"

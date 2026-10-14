@@ -11,37 +11,43 @@ export const DEAL_STEPS: readonly DealStep[] = [
 
 export const DEAL_STEP_META: Record<
   DealStep,
-  { index: number; title: string; shortTitle: string }
+  { index: number; title: string; shortTitle: string; supporting: string }
 > = {
   "part-exchange": {
     index: 1,
-    title: "Your part exchange",
+    title: "Value your part exchange",
     shortTitle: "Part exchange",
+    supporting: "Optional. Our price, no middleman.",
   },
   budget: {
     index: 2,
-    title: "Your budget",
-    shortTitle: "Budget",
+    title: "Finance preferences",
+    shortTitle: "Finance",
+    supporting: "Three questions, one screen. Your monthly updates live.",
   },
   decision: {
     index: 3,
-    title: "Your decision",
+    title: "Instant decision",
     shortTitle: "Decision",
+    supporting: "Soft check, no credit footprint. About 60 seconds.",
   },
   cover: {
     index: 4,
-    title: "Your cover",
+    title: "Build your cover",
     shortTitle: "Cover",
+    supporting: "Tailored to you. Change or remove anything.",
   },
   quote: {
     index: 5,
     title: "Your quote",
     shortTitle: "Quote",
+    supporting: "HP or PCP, personal to you.",
   },
   reserve: {
     index: 6,
-    title: "Reserve",
+    title: "Reserve this car",
     shortTitle: "Reserve",
+    supporting: "Fully refundable. We take the car off sale while you finish.",
   },
 };
 

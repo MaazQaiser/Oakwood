@@ -3,7 +3,7 @@ import {
   DEAL_PROVIDER_CONFIG,
   type DealProviderConfig,
 } from "@/lib/deal/provider-config";
-import { listSelectedProducts } from "@/lib/deal/products";
+import { listSelectedProducts, productPriceForYears } from "@/lib/deal/products";
 import { formatPounds, formatTerm } from "@/lib/format/money";
 import type {
   DealCalculation,
@@ -141,10 +141,8 @@ function buildConstraints(
 
   if (input.financeType === "pcp" && config.pcpEnabled) {
     const mileage = input.annualMileage;
-    if (
-      mileage === undefined ||
-      !config.pcpMileageOptions.includes(mileage)
-    ) {
+    // Presets or a custom "Other" figure (spec Step 2) are both valid.
+    if (mileage === undefined || !(mileage > 0)) {
       messages.push({
         code: "mileage_unavailable",
         title: "Choose an annual mileage for Personal Contract Purchase.",
@@ -219,12 +217,14 @@ export function calculateDeal(
   const { equity: pxEquity, negativeEquity: pxNegativeEquity } = pxFigures(input);
   const totalDeposit = cashDeposit + pxEquity;
   const selected = listSelectedProducts(input.productIds);
+  const priceOf = (product: (typeof selected)[number]) =>
+    productPriceForYears(product, input.productYears?.[product.id]);
   const financedProducts = selected
     .filter((product) => product.financeable)
-    .reduce((sum, product) => sum + product.price, 0);
+    .reduce((sum, product) => sum + priceOf(product), 0);
   const cashProducts = selected
     .filter((product) => !product.financeable)
-    .reduce((sum, product) => sum + product.price, 0);
+    .reduce((sum, product) => sum + priceOf(product), 0);
   const productsTotal = financedProducts + cashProducts;
   const financeableNegativeEquity = config.includeNegativeEquityInAdvance
     ? pxNegativeEquity

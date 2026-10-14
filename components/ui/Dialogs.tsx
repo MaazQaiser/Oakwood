@@ -4,8 +4,11 @@ import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { IconButton } from "@/components/ui/Button";
 import { IconClose } from "@/components/ui/icons";
 
-function useDialog(open: boolean) {
+function useDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Closes we trigger ourselves (cleanup, incl. Strict Mode's dev re-run)
+  // must not reach onClose, or the dialog unmounts itself on open.
+  const programmaticClose = useRef(false);
 
   useLayoutEffect(() => {
     const node = ref.current;
@@ -13,18 +16,38 @@ function useDialog(open: boolean) {
       return;
     }
 
+    // Remember the trigger so keyboard users land back on it after closing;
+    // the dialog unmounts before close, so the browser can't restore it.
+    const trigger =
+      document.activeElement instanceof HTMLElement &&
+      !node?.contains(document.activeElement)
+        ? document.activeElement
+        : null;
+
     if (node && !node.open) {
       node.showModal();
     }
 
     return () => {
       if (node?.open) {
+        programmaticClose.current = true;
         node.close();
+      }
+      if (trigger?.isConnected) {
+        trigger.focus();
       }
     };
   }, [open]);
 
-  return ref;
+  const handleClose = () => {
+    if (programmaticClose.current) {
+      programmaticClose.current = false;
+      return;
+    }
+    onClose();
+  };
+
+  return { ref, handleClose };
 }
 
 export function Modal({
@@ -40,7 +63,7 @@ export function Modal({
   onClose: () => void;
   size?: "default" | "wide";
 }) {
-  const ref = useDialog(open);
+  const { ref, handleClose } = useDialog(open, onClose);
 
   if (!open) {
     return null;
@@ -54,7 +77,7 @@ export function Modal({
           ? "z-[var(--oak-z-modal)] w-[min(100%-1rem,72rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
           : "z-[var(--oak-z-modal)] w-[min(100%-2rem,32rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
       }
-      onClose={onClose}
+      onClose={handleClose}
     >
       <div className="flex items-start justify-between gap-4 px-5 py-4">
         <h2 className="text-h3">{title}</h2>
@@ -84,7 +107,7 @@ export function Drawer({
   footer?: ReactNode;
   headerAction?: ReactNode;
 }) {
-  const ref = useDialog(open);
+  const { ref, handleClose } = useDialog(open, onClose);
 
   if (!open) {
     return null;
@@ -101,7 +124,7 @@ export function Drawer({
           ? "fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none rounded-none border-0 bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
           : "m-0 ml-auto h-full max-h-none w-[min(100%,22rem)] max-w-none rounded-none border-0 bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
       }
-      onClose={onClose}
+      onClose={handleClose}
     >
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">

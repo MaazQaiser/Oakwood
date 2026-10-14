@@ -2,24 +2,45 @@ import type { DealProductDefinition } from "@/types/deal";
 
 export const COVER_YEAR_OPTIONS = [1, 2, 3, 4] as const;
 
+/**
+ * Spec §4 Step 4: every product is pre-ticked at its Oakwood default and the
+ * customer deselects what they don't want. Pending Automotive Compliance Ltd
+ * sign-off before launch (spec §7).
+ */
 export const RECOMMENDED_COVER_IDS = [
   "aa-warranty",
   "service-plan",
   "mot-maintenance",
+  "supagard",
 ] as const;
 
+/** AA warranty defaults to 3 years; service and MOT match the finance term, capped at 4. */
+export function defaultCoverYears(termMonths: number): Record<string, number> {
+  const termYears = Math.max(1, Math.min(4, Math.ceil(termMonths / 12)));
+  return {
+    "aa-warranty": 3,
+    "service-plan": termYears,
+    "mot-maintenance": termYears,
+  };
+}
+
+/** @deprecated Use defaultCoverYears(term) so service and MOT follow the term. */
+export const PROTOTYPE_DEFAULT_COVER_YEARS: Record<string, number> =
+  defaultCoverYears(48);
+
 /**
- * Optional products are never preselected. Financeability is a mock flag
- * until the lender confirms which products can be added to the advance.
+ * Optional products — prices and financeability are mock until Oakwood
+ * supplies cost and retail per duration (spec §7).
  */
 export const MOCK_OPTIONAL_PRODUCTS: DealProductDefinition[] = [
   {
     id: "aa-warranty",
     name: "AA warranty",
     type: "warranty",
-    summary: "Extend cover with an AA warranty for 1 to 4 years.",
+    summary:
+      "Mechanical and electrical cover, £2,000 claim limit per repair. Includes AA breakdown.",
     details:
-      "Covers listed mechanical and electrical items. Choose a term that suits your plans. Optional and removable at any time.",
+      "Oakwood standard tier. Covers listed mechanical and electrical items. Optional and removable at any time.",
     price: 499,
     financeable: true,
   },
@@ -27,9 +48,9 @@ export const MOCK_OPTIONAL_PRODUCTS: DealProductDefinition[] = [
     id: "service-plan",
     name: "Service plan",
     type: "service-plan",
-    summary: "Spread the cost of scheduled servicing over 1 to 4 years.",
+    summary: "One full service per year at an Oakwood workshop.",
     details:
-      "Covers scheduled manufacturer-style services during the plan. Exact inclusions are confirmed before application.",
+      "Covers scheduled services during the plan. Exact inclusions are confirmed before application.",
     price: 399,
     financeable: true,
   },
@@ -37,7 +58,7 @@ export const MOCK_OPTIONAL_PRODUCTS: DealProductDefinition[] = [
     id: "mot-maintenance",
     name: "MOT plan",
     type: "mot-bundle",
-    summary: "Help with MOT costs for 1 to 4 years.",
+    summary: "One MOT per year, DVSA certified test, free retest if needed.",
     details:
       "An optional MOT plan. Cover limits and financeability are confirmed by the provider.",
     price: 129,
@@ -47,7 +68,7 @@ export const MOCK_OPTIONAL_PRODUCTS: DealProductDefinition[] = [
     id: "supagard",
     name: "Supagard",
     type: "paint-fabric",
-    summary: "Paint and fabric protection treatment for your car.",
+    summary: "Paint and interior protection, with 1 year aftercare included.",
     details:
       "Helps protect painted surfaces and cabin fabrics from day-to-day wear. Optional, individually removable, and not required to continue.",
     price: 299,

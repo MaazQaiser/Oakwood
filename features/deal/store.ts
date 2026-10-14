@@ -1,5 +1,9 @@
 import { randomBytes } from "crypto";
 import { mockDealId } from "@/lib/mock/data";
+import {
+  RECOMMENDED_COVER_IDS,
+  defaultCoverYears,
+} from "@/lib/deal/products";
 import type { DealDraft, DealShareSnapshot } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
@@ -72,7 +76,9 @@ export function createDealRecord(
     term: input.term,
     annualMileage: input.annualMileage,
     px: input.px,
-    productIds: [],
+    // Spec: all cover pre-ticked at Oakwood defaults (pending compliance sign-off).
+    productIds: [...RECOMMENDED_COVER_IDS],
+    productYears: defaultCoverYears(input.term),
   };
   deals.set(input.id, record);
   return record;
@@ -260,6 +266,10 @@ export function findLiveDealForStock(
   now = Date.now(),
 ): DealSessionRecord | null {
   for (const record of deals.values()) {
+    // Never reuse the static demo session for live VDP creates.
+    if (record.id === mockDealId) {
+      continue;
+    }
     if (record.vehicleStockId === stockId && !isDealExpired(record, now)) {
       return record;
     }

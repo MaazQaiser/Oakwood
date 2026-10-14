@@ -26,6 +26,10 @@
   --oak-info-soft: #f2f4f7;
   --oak-overlay: rgb(16 24 40 / 0.4);
   --oak-header: #ffffff;
+  /* Home page surfaces, promoted from literals so journeys can share them. */
+  --oak-navy: #002852;
+  --oak-navy-deep: #001c3d;
+  --oak-surface-soft: #ecf3f8;
 
   /* Typography — Regular 400 and SemiBold 600 only */
   --oak-font-sans: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
@@ -91,6 +95,9 @@
   --oak-shadow-md: 0 16px 40px rgb(16 24 40 / 0.06);
   --oak-shadow-lg: 0 24px 56px rgb(16 24 40 / 0.08);
   --oak-shadow-focus: 0 0 0 3px rgb(0 97 162 / 0.28);
+  /* Floating white card, as on the home page proof strip and finance strip. */
+  --oak-shadow-card: 0 10px 24px rgb(16 40 72 / 0.06);
+  --oak-radius-card: 28px;
 
   /* Layout */
   --oak-width-narrow: 40rem;

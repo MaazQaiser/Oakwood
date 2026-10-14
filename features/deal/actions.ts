@@ -28,6 +28,12 @@ import { isReservable } from "@/lib/vehicles/sold";
 import type { DealDraft, DealShareSnapshot } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
+/**
+ * Spec Step 2: deposit is prefilled with PX equity plus a £500 cash default.
+ * Equity is added by calculateDeal, so the cash part stays £500.
+ */
+const DEFAULT_CASH_DEPOSIT = 500;
+
 function defaultDeposit(fallback: number): number {
   return Math.max(0, Math.round(fallback));
 }
@@ -62,9 +68,6 @@ export async function createDealAction(input: {
     pxSession && !isPxExpired(pxSession)
       ? snapshotToDealPx(pxSession.snapshot)
       : undefined;
-  const pxEquity = pendingPx
-    ? Math.max(0, pendingPx.value - (pendingPx.settlement ?? 0))
-    : 0;
   const deposit =
     input.cashDeposit !== undefined
       ? defaultDeposit(input.cashDeposit)
@@ -72,9 +75,9 @@ export async function createDealAction(input: {
         ? defaultDeposit(
             eligibility.display?.deposit ??
               eligibility.answers.deposit ??
-              pxEquity + 500,
+              DEFAULT_CASH_DEPOSIT,
           )
-        : defaultDeposit(pxEquity + 500);
+        : DEFAULT_CASH_DEPOSIT;
   const term =
     input.term !== undefined
       ? Math.max(12, Math.round(input.term))

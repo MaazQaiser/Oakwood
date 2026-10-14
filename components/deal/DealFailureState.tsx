@@ -15,9 +15,23 @@ import { toTelHref } from "@/lib/format/phone";
 export function DealFailureState({
   kind,
 }: {
-  kind: "session" | "vehicle" | "calculation" | "provider";
+  kind: "session" | "vehicle" | "calculation" | "provider" | "not_found";
 }) {
   const deal = useDealBuilderOptional();
+
+  if (kind === "not_found") {
+    return (
+      <Alert title="We couldn't find this deal" tone="info">
+        The link may be wrong or the deal may have been removed. Start a new
+        deal from any car page.
+        <div className="mt-3">
+          <Button href={getUsedCarsUrl()} size="sm">
+            Browse cars
+          </Button>
+        </div>
+      </Alert>
+    );
+  }
 
   if (kind === "session") {
     return (

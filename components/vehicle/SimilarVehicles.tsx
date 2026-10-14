@@ -48,7 +48,7 @@ export function SimilarVehicles({
         Not quite the right car? Take a look at these.
       </p>
       <div className="mt-6">
-        <Grid columns="featured">
+        <Grid columns="cards" className="sm:grid-cols-3 xl:grid-cols-3">
           {vehicles.map((vehicle) => {
             const state = getFinanceDisplayState(
               finance.mode,

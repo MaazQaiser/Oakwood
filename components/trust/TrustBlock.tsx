@@ -26,15 +26,18 @@ const points = [
 
 export function TrustBlock() {
   return (
-    <section aria-labelledby="why-oakwood-heading">
+    <section
+      aria-labelledby="why-oakwood-heading"
+      className="rounded-[32px] bg-[#ECF3F8] px-6 py-8 text-[#002852] md:px-10 md:py-10"
+    >
       <h2 id="why-oakwood-heading" className="text-h3">
         Why buy from Oakwood?
       </h2>
-      <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+      <ul className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {points.map((point) => (
-          <li key={point.title}>
+          <li key={point.title} className="min-w-0">
             <h3 className="text-h4">{point.title}</h3>
-            <p className="mt-2 text-body-sm text-muted">{point.copy}</p>
+            <p className="mt-2 text-body-sm text-secondary">{point.copy}</p>
             {point.href ? (
               <p className="mt-3">
                 <Button href={point.href} variant="text">

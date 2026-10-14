@@ -3,7 +3,7 @@ import type { Vehicle } from "@/types/vehicle";
 
 export function getSimilarVehicles(
   vehicle: Vehicle,
-  limit = 4,
+  limit = 3,
 ): Vehicle[] {
   const catalog = listVehicles(vehicle.category).filter(
     (item) =>

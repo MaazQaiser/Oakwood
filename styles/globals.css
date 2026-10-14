@@ -28,6 +28,9 @@
   --color-info: var(--oak-info);
   --color-info-soft: var(--oak-info-soft);
   --color-header: var(--oak-header);
+  --color-navy: var(--oak-navy);
+  --color-navy-deep: var(--oak-navy-deep);
+  --color-surface-soft: var(--oak-surface-soft);
   --font-sans: var(--oak-font-sans);
   --font-serif: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
   --font-mono: var(--oak-font-numeric);
@@ -36,9 +39,11 @@
   --radius-lg: var(--oak-radius-lg);
   --radius-xl: var(--oak-radius-xl);
   --radius-full: var(--oak-radius-full);
+  --radius-card: var(--oak-radius-card);
   --shadow-sm: var(--oak-shadow-sm);
   --shadow-md: var(--oak-shadow-md);
   --shadow-lg: var(--oak-shadow-lg);
+  --shadow-card: var(--oak-shadow-card);
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
@@ -58,6 +63,41 @@ html {
 
 html[data-oak-journey] footer {
   display: none;
+}
+
+/* Home-style eyebrow: small, tracked, uppercase, in the secondary blue. */
+.oak-eyebrow {
+  font-size: 0.72rem;
+  font-weight: var(--oak-weight-semibold);
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--oak-primary-secondary);
+}
+
+/*
+ * Deal wizard: keep focused fields clear of the sticky header strip and the
+ * sticky action footer (WCAG 2.4.11), for tabbing and error focus alike.
+ */
+html:has(.deal-wizard) {
+  scroll-padding-top: calc(var(--oak-header-height) + 5.5rem);
+  scroll-padding-bottom: 8.5rem;
+}
+
+/* Deal wizard: inputs share the 14px radius of its chips and buttons. */
+.deal-wizard input:not([type="radio"]):not([type="range"]):not([type="checkbox"]) {
+  border-radius: 14px;
+}
+
+/* Flush sticky header so it doesn't hang over journey content. */
+html[data-oak-journey] header.sticky {
+  top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid var(--oak-border);
+  background: var(--oak-page);
 }
 
 body {
@@ -233,10 +273,8 @@ select {
 }
 
 /*
- * Mobile: simple flex column — gallery → aside (header/price/deal) → specs.
- * Avoid display:contents here; it was collapsing deal + specs into one box.
- * Desktop: sticky aside in the right column; specs stay under the gallery so
- * they never scroll underneath the sticky card.
+ * Mobile: gallery → header → aside (price/deal) → specs.
+ * Desktop: left column gallery → header → specs; sticky price/deal on the right.
  */
 .vdp-hero {
   display: flex;
@@ -268,12 +306,17 @@ select {
     grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
     grid-template-areas:
       "gallery aside"
+      "header aside"
       "specs aside";
   }
 
   .vdp-hero__gallery {
     grid-area: gallery;
     align-self: start;
+  }
+
+  .vdp-hero__header {
+    grid-area: header;
   }
 
   .vdp-hero__aside {

@@ -2,17 +2,19 @@ import { Chip } from "@/components/ui/Badge";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber } from "@/lib/format/money";
 import { getVehicleIdentity } from "@/lib/vehicles/labels";
+import { cn } from "@/lib/cn";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
   const { title, subtitle } = getVehicleIdentity(vehicle);
+  const mileageLabel = `${formatNumber(vehicle.mileage)} miles`;
   const badges = [
-    String(vehicle.year),
-    `${formatNumber(vehicle.mileage)} miles`,
-    vehicle.fuelType,
-    vehicle.transmission,
-    vehicle.bodyStyle,
-  ].filter(Boolean);
+    { label: String(vehicle.year), emphasis: false },
+    { label: mileageLabel, emphasis: true },
+    { label: vehicle.fuelType, emphasis: false },
+    { label: vehicle.transmission, emphasis: false },
+    { label: vehicle.bodyStyle, emphasis: false },
+  ].filter((badge) => Boolean(badge.label));
 
   return (
     <header className="vdp-hero__header min-w-0">
@@ -32,8 +34,15 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
       ) : null}
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {badges.map((badge) => (
-          <Chip key={badge} className="border-transparent bg-page-tint px-2.5 py-1 text-caption text-ink">
-            {badge}
+          <Chip
+            key={badge.label}
+            className={cn(
+              badge.emphasis
+                ? "border-primary/20 bg-primary-soft px-3 py-1.5 text-body-sm font-semibold text-primary"
+                : "border-transparent bg-page-tint px-2.5 py-1 text-caption text-ink",
+            )}
+          >
+            {badge.label}
           </Chip>
         ))}
       </div>

@@ -10,10 +10,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { saveDealDraftAction } from "@/features/deal/actions";
 import { calculateDeal, productMonthlyImpact } from "@/lib/deal/calculate";
 import { valuePartExchange } from "@/lib/deal/valuation";
-import { RECOMMENDED_COVER_IDS } from "@/lib/deal/products";
+import {
+  RECOMMENDED_COVER_IDS,
+  defaultCoverYears,
+} from "@/lib/deal/products";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import type { DealPageModel } from "@/types/deal";
 import type {
@@ -22,6 +26,7 @@ import type {
   DealCalculationInput,
   DealDecisionInput,
   DealDraft,
+  DealFinanceProfileInput,
   DealPartExchangeInput,
   DealProductDefinition,
   DealStepName,
@@ -60,8 +65,18 @@ export interface DealBuilderContextValue {
   clearAllCover: () => void;
   addRecommendedCover: () => void;
   productImpact: (id: string) => number;
+  /** The same deal priced as HP or PCP, for side-by-side quote tabs. */
+  calculateFor: (type: FinanceProductType) => DealCalculation | undefined;
+  /** Monthly added by the selected cover bundle versus no cover. */
+  coverMonthly: number;
+  /** APR used for figures: decision in principle, then eligibility profile. */
+  apr?: number;
   setDecision: (decision: DealDecisionInput) => void;
   markStepComplete: (step: DealStepName) => void;
+  /** Save the latest draft, then go to `href` (use for step changes). */
+  navigateTo: (href: string) => void;
+  /** True while saving before a step change. */
+  navigating: boolean;
   retryCalculation: () => void;
   markSaved: () => void;
 }
@@ -84,7 +99,53 @@ function toInput(
     term: draft.term,
     annualMileage: draft.annualMileage,
     productIds: draft.productIds,
+    productYears: draft.productYears,
   };
+}
+
+/**
+ * Cash deposit ceiling: cash plus part-exchange equity can't exceed the
+ * price, so the total deposit never passes the car's value.
+ */
+export function maxCashDeposit(
+  cashPrice: number | undefined,
+  cap: number,
+  step: number,
+  px?: DealDraft["px"],
+): number {
+  const equity = px ? Math.max(0, px.value - (px.settlement ?? 0)) : 0;
+  const ceiling = Math.min(cap, Math.max(0, (cashPrice ?? cap) - equity));
+  return Math.floor(ceiling / step) * step;
+}
+
+/**
+ * A soft-check decision in principle sets the customer's personal APR, so it
+ * must drive the monthly figure as well as the APR label.
+ */
+function resolveProfile(
+  draft: DealDraft,
+  finance: DealPageModel["finance"],
+  termOptions: readonly number[],
+): DealFinanceProfileInput | undefined {
+  const base = finance.hasProfile ? finance.profile : undefined;
+  const decision = draft.decision;
+  const decisionApr =
+    decision?.apr &&
+    (decision.outcome === "approved" || decision.outcome === "approved_less")
+      ? decision.apr
+      : undefined;
+  if (!decisionApr) {
+    return base;
+  }
+  return base
+    ? { ...base, apr: decisionApr }
+    : {
+        apr: decisionApr,
+        maximumAdvance: Number.POSITIVE_INFINITY,
+        maximumTerm: Math.max(...termOptions),
+        productType: draft.financeType,
+        expiresAt: "",
+      };
 }
 
 export function DealBuilderProvider({
@@ -95,17 +156,28 @@ export function DealBuilderProvider({
   children: ReactNode;
 }) {
   const vehicle = model.vehicle;
-  const [draft, setDraft] = useState<DealDraft>(
-    model.draft ?? {
-      financeType: "hp",
-      cashDeposit: 500,
-      term: 48,
-      annualMileage: model.config.pcpMileageOptions[2] ?? 10000,
-      productIds: [],
-      productYears: {},
-      stepsCompleted: [],
-    },
+  const defaultMileage = model.config.pcpMileageOptions[2] ?? 10000;
+  const [draft, setDraft] = useState<DealDraft>(() =>
+    model.draft
+      ? {
+          ...model.draft,
+          // HP deals arrive without mileage; preselect the PCP default so the
+          // Step 2 chips and the PCP quote tab always have a value.
+          annualMileage: model.draft.annualMileage ?? defaultMileage,
+        }
+      : {
+          financeType: "hp",
+          cashDeposit: 500,
+          term: 48,
+          annualMileage: defaultMileage,
+          productIds: [],
+          productYears: {},
+          stepsCompleted: [],
+        },
   );
+  const pendingSave = useRef<number | null>(null);
+  const router = useRouter();
+  const [navTarget, setNavTarget] = useState<string | null>(null);
   const [pxError, setPxError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
@@ -115,9 +187,10 @@ export function DealBuilderProvider({
     vehicle && vehicle.availability !== "available",
   );
   const needsEligibility = !model.finance.hasProfile;
-  const profileForCalc = model.finance.hasProfile
-    ? model.finance.profile
-    : undefined;
+  const profileForCalc = useMemo(
+    () => resolveProfile(draft, model.finance, model.config.termOptions),
+    [draft, model.finance, model.config.termOptions],
+  );
 
   const { calculation, calcError } = useMemo(() => {
     if (!vehicle) {
@@ -149,14 +222,43 @@ export function DealBuilderProvider({
       return;
     }
     const timer = window.setTimeout(() => {
+      pendingSave.current = null;
       void saveDealDraftAction({ dealId: model.dealId, draft });
       trackEvent(analyticsEvents.dealRecalculated);
       if (calculation && !calculation.valid) {
         trackEvent(analyticsEvents.dealInvalid);
       }
     }, RECALC_MS);
+    pendingSave.current = timer;
     return () => window.clearTimeout(timer);
   }, [calculation, draft, model.dealId, vehicle]);
+
+  /**
+   * Leaving a step unmounts this provider and cancels the debounced save
+   * above, which used to drop the last edit before every Continue. Step
+   * navigation goes through here instead: once the latest draft has
+   * committed, save it, then change route.
+   */
+  useEffect(() => {
+    if (!navTarget) {
+      return;
+    }
+    let cancelled = false;
+    if (pendingSave.current !== null) {
+      window.clearTimeout(pendingSave.current);
+      pendingSave.current = null;
+    }
+    void saveDealDraftAction({ dealId: model.dealId, draft }).finally(() => {
+      if (!cancelled) {
+        router.push(navTarget);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [draft, model.dealId, navTarget, router]);
+
+  const navigateTo = useCallback((href: string) => setNavTarget(href), []);
 
   const retryCalculation = useCallback(() => {
     setRetryTick((current) => current + 1);
@@ -187,11 +289,19 @@ export function DealBuilderProvider({
   const setCashDeposit = useCallback(
     (value: number) => {
       const step = model.config.depositStep;
-      const max = vehicle
-        ? Math.min(vehicle.cashPrice, model.config.maxDepositCap)
-        : model.config.maxDepositCap;
-      const next = Math.min(max, Math.max(0, Math.round(value / step) * step));
-      setDraft((current) => ({ ...current, cashDeposit: next }));
+      setDraft((current) => {
+        const max = maxCashDeposit(
+          vehicle?.cashPrice,
+          model.config.maxDepositCap,
+          step,
+          current.px,
+        );
+        const next = Math.min(
+          max,
+          Math.max(0, Math.round(value / step) * step),
+        );
+        return { ...current, cashDeposit: next };
+      });
       trackEvent(analyticsEvents.depositChanged);
     },
     [model.config.depositStep, model.config.maxDepositCap, vehicle],
@@ -243,10 +353,6 @@ export function DealBuilderProvider({
       setDraft((current) => ({
         ...current,
         px: { ...current.px, ...next },
-        cashDeposit: Math.max(
-          current.cashDeposit,
-          Math.max(0, result.value - (current.px?.settlement ?? 0)) + 500,
-        ),
       }));
       trackEvent(analyticsEvents.pxValuationCompleted, {
         stockId: vehicle.stockId,
@@ -258,14 +364,7 @@ export function DealBuilderProvider({
   const applyPartExchange = useCallback(
     (input: DealPartExchangeInput) => {
       setPxError(undefined);
-      setDraft((current) => {
-        const equity = input.value - (input.settlement ?? 0);
-        return {
-          ...current,
-          px: input,
-          cashDeposit: Math.max(500, Math.max(0, equity) + 500),
-        };
-      });
+      setDraft((current) => ({ ...current, px: input }));
       const equity = input.value - (input.settlement ?? 0);
       trackEvent(analyticsEvents.pxAddedToDeal, { stockId: vehicle?.stockId });
       if (equity > 0) {
@@ -312,11 +411,7 @@ export function DealBuilderProvider({
       if (equity > 0) {
         trackEvent(analyticsEvents.pxEquityAdded);
       }
-      return {
-        ...current,
-        px: next,
-        cashDeposit: Math.max(500, Math.max(0, equity) + 500),
-      };
+      return { ...current, px: next };
     });
   }, []);
 
@@ -335,11 +430,11 @@ export function DealBuilderProvider({
       trackEvent(
         selected ? analyticsEvents.productRemoved : analyticsEvents.productAdded,
       );
+      // Keep the chosen duration when switching off, so switching back on
+      // restores it and the off-state price matches the card.
       const productYears = { ...current.productYears };
-      if (selected) {
-        delete productYears[id];
-      } else if (!productYears[id]) {
-        productYears[id] = 1;
+      if (!selected && !productYears[id]) {
+        productYears[id] = defaultCoverYears(current.term)[id] ?? 1;
       }
       return {
         ...current,
@@ -375,20 +470,19 @@ export function DealBuilderProvider({
   }, []);
 
   const clearAllCover = useCallback(() => {
-    setDraft((current) => ({
-      ...current,
-      productIds: [],
-      productYears: {},
-    }));
+    setDraft((current) => ({ ...current, productIds: [] }));
   }, []);
 
   const addRecommendedCover = useCallback(() => {
     setDraft((current) => {
       const productYears = { ...current.productYears };
       const productIds = new Set(current.productIds);
+      const defaults = defaultCoverYears(current.term);
       for (const id of RECOMMENDED_COVER_IDS) {
         productIds.add(id);
-        productYears[id] = productYears[id] ?? 1;
+        if (defaults[id]) {
+          productYears[id] = productYears[id] ?? defaults[id];
+        }
       }
       return {
         ...current,
@@ -403,8 +497,15 @@ export function DealBuilderProvider({
       if (!vehicle) {
         return 0;
       }
+      // Price unselected products at the duration the card shows.
       return productMonthlyImpact(
-        toInput(vehicle, draft),
+        {
+          ...toInput(vehicle, draft),
+          productYears: {
+            ...defaultCoverYears(draft.term),
+            ...draft.productYears,
+          },
+        },
         id,
         profileForCalc,
         model.config,
@@ -412,6 +513,46 @@ export function DealBuilderProvider({
     },
     [draft, model.config, profileForCalc, vehicle],
   );
+
+  const calculateFor = useCallback(
+    (type: FinanceProductType) => {
+      if (!vehicle) {
+        return undefined;
+      }
+      try {
+        return calculateDeal(
+          {
+            ...toInput(vehicle, draft),
+            financeType: type,
+            term: type === "pcp" ? Math.min(draft.term, 60) : draft.term,
+            annualMileage:
+              draft.annualMileage ?? model.config.pcpMileageOptions[2] ?? 10000,
+          },
+          profileForCalc,
+          model.config,
+        );
+      } catch {
+        return undefined;
+      }
+    },
+    [draft, model.config, profileForCalc, vehicle],
+  );
+
+  const coverMonthly = useMemo(() => {
+    if (!vehicle || !calculation || draft.productIds.length === 0) {
+      return 0;
+    }
+    try {
+      const bare = calculateDeal(
+        { ...toInput(vehicle, draft), productIds: [] },
+        profileForCalc,
+        model.config,
+      );
+      return Math.max(0, calculation.monthlyPayment - bare.monthlyPayment);
+    } catch {
+      return 0;
+    }
+  }, [calculation, draft, model.config, profileForCalc, vehicle]);
 
   const setDecision = useCallback((decision: DealDecisionInput) => {
     setDraft((current) => ({ ...current, decision }));
@@ -498,8 +639,13 @@ export function DealBuilderProvider({
       clearAllCover,
       addRecommendedCover,
       productImpact,
+      calculateFor,
+      coverMonthly,
+      apr: profileForCalc?.apr,
       setDecision,
       markStepComplete,
+      navigateTo,
+      navigating: navTarget !== null,
       retryCalculation,
       markSaved,
     };
@@ -507,10 +653,14 @@ export function DealBuilderProvider({
     addRecommendedCover,
     applyDepositGap,
     applyPartExchange,
+    calculateFor,
     calculation,
     clearAllCover,
+    coverMonthly,
     clearPartExchange,
     draft,
+    navigateTo,
+    navTarget,
     markSaved,
     markStepComplete,
     model.contact,
@@ -522,6 +672,7 @@ export function DealBuilderProvider({
     needsEligibility,
     phase,
     productImpact,
+    profileForCalc?.apr,
     pxError,
     removeProduct,
     retryCalculation,

@@ -20,58 +20,76 @@ export function VehicleLocation({ vehicle }: { vehicle: VehicleDetail }) {
   const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 
   return (
-    <section aria-labelledby="vehicle-location-heading">
-      <h2 id="vehicle-location-heading" className="text-h3">
-        {vehicle.availability === "available"
-          ? `Available at Oakwood ${name}`
-          : `Listed at Oakwood ${name}`}
-      </h2>
-      <p className="mt-2 text-body-sm text-muted">
-        {isShowroom
-          ? `This car is at our ${name} showroom.`
-          : `This car is listed at Oakwood ${name}.`}
-      </p>
-      <p className="mt-3 text-body-sm">
-        {[location?.postcode, location?.region].filter(Boolean).join(", ") || name}
-      </p>
-      {telephone ? (
-        <p className="mt-1 text-body-sm">
-          <a href={toTelHref(telephone)} className="text-primary">
-            {telephone}
-          </a>
+    <section
+      aria-labelledby="vehicle-location-heading"
+      className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[#002852] px-[var(--oak-page-x)] py-10 text-white md:py-12"
+    >
+      <div className="mx-auto w-full max-w-[var(--oak-width-wide)]">
+        <h2 id="vehicle-location-heading" className="text-h3 text-white">
+          {vehicle.availability === "available"
+            ? `Available at Oakwood ${name}`
+            : `Listed at Oakwood ${name}`}
+        </h2>
+        <p className="mt-2 text-body-sm text-white/80">
+          {isShowroom
+            ? `This car is at our ${name} showroom.`
+            : `This car is listed at Oakwood ${name}.`}
         </p>
-      ) : (
-        <p className="mt-1 text-body-sm text-muted">
-          A telephone number is not listed for this location. Send a message and we
-          will come back to you.
+        <p className="mt-3 text-body-sm text-white">
+          {[location?.postcode, location?.region].filter(Boolean).join(", ") ||
+            name}
         </p>
-      )}
-      <p className="mt-1 text-caption text-muted">
-        Opening hours are not published in this preview, so we do not mark the
-        showroom as open or closed here.
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button href={directions} className="btn-compact">
-          Get directions
-        </Button>
-        {isShowroom && location ? (
-          <Button href={getLocationUrl(location.slug)} variant="text">
-            View {name}
-          </Button>
+        {telephone ? (
+          <p className="mt-1 text-body-sm">
+            <a
+              href={toTelHref(telephone)}
+              className="text-white underline-offset-4 hover:underline"
+            >
+              {telephone}
+            </a>
+          </p>
         ) : (
-          <Button href={supportRoutes.bookingEnquiry} variant="text">
-            Message us
-          </Button>
+          <p className="mt-1 text-body-sm text-white/80">
+            A telephone number is not listed for this location. Send a message and
+            we will come back to you.
+          </p>
         )}
-        <Button
-          href={getBookingUrl({
-            source: "vdp",
-            location: isShowroom ? location?.slug : undefined,
-          })}
-          variant="text"
-        >
-          Book a service
-        </Button>
+        <p className="mt-1 text-caption text-white/70">
+          Opening hours are not published in this preview, so we do not mark the
+          showroom as open or closed here.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button href={directions} variant="secondary" className="btn-compact">
+            Get directions
+          </Button>
+          {isShowroom && location ? (
+            <Button
+              href={getLocationUrl(location.slug)}
+              variant="tertiary"
+              className="btn-compact border border-white/35! bg-transparent! text-white! hover:bg-white/10!"
+            >
+              View {name}
+            </Button>
+          ) : (
+            <Button
+              href={supportRoutes.bookingEnquiry}
+              variant="tertiary"
+              className="btn-compact border border-white/35! bg-transparent! text-white! hover:bg-white/10!"
+            >
+              Message us
+            </Button>
+          )}
+          <Button
+            href={getBookingUrl({
+              source: "vdp",
+              location: isShowroom ? location?.slug : undefined,
+            })}
+            variant="text"
+            className="text-white/80! hover:text-white!"
+          >
+            Book a service
+          </Button>
+        </div>
       </div>
     </section>
   );
