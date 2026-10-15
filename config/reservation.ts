@@ -2,18 +2,20 @@ import type { RefundReasonCode } from "@/types/reservation";
 
 /**
  * Admin/backend reservation commercial configuration.
- * Addendum 1 defaults: £49, 7-day hold, fully refundable, applied to purchase.
+ * Customer Deal Builder spec (Step 6): £99, 48-hour hold, fully refundable,
+ * applied to purchase. Supersedes the Addendum 1 defaults (£49, 7-day hold).
  * Do not copy these literals into product UI — import this config.
  */
 export const reservationConfig = {
-  amount: 49,
+  amount: 99,
   currency: "GBP",
-  holdDurationDays: 7,
+  /** 2 days = the 48-hour hold; formatHoldPeriod shows short holds in hours. */
+  holdDurationDays: 2,
   /**
    * Refund window is admin-configurable. Until an admin value is supplied,
    * it matches the hold duration. Do not treat this as a legal invention.
    */
-  refundWindowDays: 7,
+  refundWindowDays: 2,
   refundable: true,
   appliedToPurchase: true,
   immediateCapture: true,

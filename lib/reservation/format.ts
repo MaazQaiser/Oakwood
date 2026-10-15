@@ -1,8 +1,12 @@
 import { reservationConfig } from "@/config/reservation";
 import { formatPounds } from "@/lib/format/money";
 
+/** Holds under 3 days read in hours, e.g. "48 hours", as customers are told. */
 export function formatHoldPeriod(days: number = reservationConfig.holdDurationDays): string {
-  return days === 1 ? "1 day" : `${days} days`;
+  if (days < 3) {
+    return `${days * 24} hours`;
+  }
+  return `${days} days`;
 }
 
 export function reservationAmountLabel(
