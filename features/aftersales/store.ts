@@ -123,6 +123,15 @@ export function getBookingRecord(
   return record;
 }
 
+/** Re-seed from the signed state cookie, keeping whichever copy is newer. */
+export function restoreBookingRecord(record: BookingSessionRecord): void {
+  const current = bookings.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  bookings.set(record.id, record);
+}
+
 export function isBookingExpired(
   record: BookingSessionRecord,
   now = Date.now(),
@@ -180,6 +189,15 @@ export function getClaimRecord(
     return { ...record };
   }
   return record;
+}
+
+/** Re-seed from the signed state cookie, keeping whichever copy is newer. */
+export function restoreClaimRecord(record: WarrantyClaimRecord): void {
+  const current = claims.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  claims.set(record.id, record);
 }
 
 export function isClaimExpired(

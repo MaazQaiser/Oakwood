@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getBoundDeal } from "@/features/deal/session";
+import { getBoundDeal, hydrateDealsFromCookie } from "@/features/deal/session";
 import {
   ensureDemoDeal,
   findLiveDealForStock,
@@ -30,6 +30,7 @@ export async function resolveDealId(
     return { kind: "deal", dealId: mockDealId };
   }
 
+  await hydrateDealsFromCookie();
   const existing = getDealRecord(param);
   if (existing && !isDealExpired(existing)) {
     return { kind: "deal", dealId: param };

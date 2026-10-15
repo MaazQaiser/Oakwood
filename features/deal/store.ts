@@ -98,6 +98,23 @@ export function getDealRecord(
   return record;
 }
 
+/**
+ * Re-seed the in-memory store from a persisted copy (the deal state cookie).
+ * Serverless instances don't share memory, so a request can land on an
+ * instance that has never seen this deal, or holds an older copy of it.
+ */
+export function restoreDealRecord(record: DealSessionRecord): void {
+  const current = deals.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  deals.set(record.id, {
+    ...record,
+    resume: current?.resume,
+    share: current?.share,
+  });
+}
+
 export function isDealExpired(record: DealSessionRecord, now = Date.now()): boolean {
   return record.expiresAt <= now;
 }

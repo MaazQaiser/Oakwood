@@ -11,7 +11,6 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { saveDealDraftAction } from "@/features/deal/actions";
 import { calculateDeal, productMonthlyImpact } from "@/lib/deal/calculate";
 import { valuePartExchange } from "@/lib/deal/valuation";
 import {
@@ -148,6 +147,16 @@ function resolveProfile(
       };
 }
 
+/** Autosave via the Route Handler, which persists the draft without re-rendering the page. */
+function saveDealDraft(dealId: string, draft: DealDraft): Promise<unknown> {
+  return fetch("/api/deal/draft", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dealId, draft }),
+    keepalive: true,
+  }).catch(() => undefined);
+}
+
 export function DealBuilderProvider({
   model,
   children,
@@ -223,7 +232,7 @@ export function DealBuilderProvider({
     }
     const timer = window.setTimeout(() => {
       pendingSave.current = null;
-      void saveDealDraftAction({ dealId: model.dealId, draft });
+      void saveDealDraft(model.dealId, draft);
       trackEvent(analyticsEvents.dealRecalculated);
       if (calculation && !calculation.valid) {
         trackEvent(analyticsEvents.dealInvalid);
@@ -248,7 +257,7 @@ export function DealBuilderProvider({
       window.clearTimeout(pendingSave.current);
       pendingSave.current = null;
     }
-    void saveDealDraftAction({ dealId: model.dealId, draft }).finally(() => {
+    void saveDealDraft(model.dealId, draft).finally(() => {
       if (!cancelled) {
         router.push(navTarget);
       }

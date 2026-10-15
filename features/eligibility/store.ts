@@ -62,6 +62,15 @@ export function getSessionRecord(id: string, now = Date.now()): EligibilitySessi
   return record;
 }
 
+/** Re-seed from the signed state cookie, keeping whichever copy is newer. */
+export function restoreSessionRecord(record: EligibilitySessionRecord): void {
+  const current = sessions.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  sessions.set(record.id, { ...record, resume: current?.resume });
+}
+
 export function isSessionExpired(record: EligibilitySessionRecord, now = Date.now()): boolean {
   return record.expiresAt <= now;
 }

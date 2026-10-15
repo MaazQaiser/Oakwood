@@ -94,6 +94,24 @@ export function getReservationRecord(id: string): ReservationRecord | null {
   return reservations.get(id) ?? null;
 }
 
+/** Re-seed from the signed state cookie, keeping whichever copy is newer. */
+export function restoreReservationRecord(record: ReservationRecord): void {
+  const current = reservations.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  reservations.set(record.id, record);
+  if (record.reference) {
+    referenceIndex.set(record.reference.toUpperCase(), record.id);
+  }
+  // Only a confirmed hold keeps the stock lock (see applyMockWebhook).
+  if (record.stockState === "reserved") {
+    addLock(record.vehicleStockId, record.id);
+  } else {
+    releaseStock(record.vehicleStockId, record.id);
+  }
+}
+
 export function findReservationByReference(
   reference: string,
   email: string,
@@ -174,7 +192,10 @@ export function applyDueTransitions(
     next.webhookDueAt <= now &&
     next.paymentState === "pending"
   ) {
-    next = applyMockWebhook(next.id, now) ?? next;
+    // Apply at the time the webhook was due, not now: an instance restoring
+    // this record from the state cookie must derive the same reference and
+    // hold dates as the instance that applied it first.
+    next = applyMockWebhook(next.id, next.webhookDueAt) ?? next;
   }
 
   if (

@@ -1,5 +1,6 @@
 "use server";
 
+import { withSessionPersistence } from "@/lib/session/persist";
 import {
   consumeResumeToken,
   findSessionByResumeToken,
@@ -63,20 +64,20 @@ function toUiState(
   };
 }
 
-export async function ensureEligibilitySession(): Promise<{ ok: true }> {
+export const ensureEligibilitySession = withSessionPersistence(async function ensureEligibilitySession(): Promise<{ ok: true }> {
   await getOrCreateEligibilitySession();
   return { ok: true };
-}
+});
 
-export async function getEligibilityUiState(): Promise<EligibilityUiState> {
+export const getEligibilityUiState = withSessionPersistence(async function getEligibilityUiState(): Promise<EligibilityUiState> {
   const record = await getEligibilitySession();
   if (!record) {
     return { status: "empty", answers: {} };
   }
   return toUiState(record, isSessionExpired(record));
-}
+});
 
-export async function saveEligibilityProgress(input: {
+export const saveEligibilityProgress = withSessionPersistence(async function saveEligibilityProgress(input: {
   answers: EligibilityAnswers;
   questionId: EligibilityQuestionId;
 }): Promise<{ ok: true } | { ok: false; expired: true }> {
@@ -91,9 +92,9 @@ export async function saveEligibilityProgress(input: {
     email: input.answers.email?.trim().toLowerCase() ?? record.email,
   });
   return { ok: true };
-}
+});
 
-export async function saveFinanceAssumptions(input: {
+export const saveFinanceAssumptions = withSessionPersistence(async function saveFinanceAssumptions(input: {
   deposit: number;
   term: number;
 }): Promise<void> {
@@ -112,9 +113,9 @@ export async function saveFinanceAssumptions(input: {
       term,
     },
   });
-}
+});
 
-export async function submitEligibilityCheck(input: {
+export const submitEligibilityCheck = withSessionPersistence(async function submitEligibilityCheck(input: {
   answers: EligibilityAnswers;
   consentedAt: string;
 }): Promise<
@@ -178,9 +179,9 @@ export async function submitEligibilityCheck(input: {
   }
 
   return { ok: true, state: toUiState(updated) };
-}
+});
 
-export async function createEligibilityResumeLink(input: {
+export const createEligibilityResumeLink = withSessionPersistence(async function createEligibilityResumeLink(input: {
   email: string;
   answers: EligibilityAnswers;
   questionId?: EligibilityQuestionId;
@@ -198,9 +199,9 @@ export async function createEligibilityResumeLink(input: {
   });
   saveResumeToken(record.id, createOpaqueId(), email);
   return { ok: true };
-}
+});
 
-export async function resumeEligibilitySession(input: {
+export const resumeEligibilitySession = withSessionPersistence(async function resumeEligibilitySession(input: {
   token: string;
   email: string;
 }): Promise<{ ok: true; state: EligibilityUiState } | { ok: false; reason: "invalid" | "expired" }> {
@@ -219,4 +220,4 @@ export async function resumeEligibilitySession(input: {
 
   await writeSessionCookie(record.id);
   return { ok: true, state: toUiState(record, isSessionExpired(record)) };
-}
+});

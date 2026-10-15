@@ -14,12 +14,22 @@ import {
   isClaimExpired,
   listRememberedBookings,
   rememberBooking,
+  restoreBookingRecord,
+  restoreClaimRecord,
   toBookingListEntry,
   type BookingSessionRecord,
   type WarrantyClaimRecord,
 } from "@/features/aftersales/store";
+import {
+  isRecordWithId,
+  readStateCookie,
+  writeStateCookie,
+} from "@/lib/session/state-cookie";
 import type { AftersalesBookingSource } from "@/types/aftersales";
 import type { BookingListEntry } from "@/types/booking";
+
+const BOOKING_STATE_COOKIE = "oakwood_booking_state";
+const CLAIM_STATE_COOKIE = "oakwood_claim_state";
 
 function cookieOptions() {
   return {
@@ -87,11 +97,19 @@ export async function readBookingCookieId(): Promise<string | undefined> {
   return jar.get(BOOKING_SESSION_COOKIE)?.value;
 }
 
+async function hydrateBooking(id: string): Promise<void> {
+  const saved = await readStateCookie(BOOKING_STATE_COOKIE);
+  if (isRecordWithId(saved) && saved.id === id) {
+    restoreBookingRecord(saved as BookingSessionRecord);
+  }
+}
+
 export async function getBookingSession(): Promise<BookingSessionRecord | null> {
   const id = await readBookingCookieId();
   if (!id) {
     return null;
   }
+  await hydrateBooking(id);
   return getBookingRecord(id);
 }
 
@@ -119,12 +137,42 @@ export async function readClaimCookieId(): Promise<string | undefined> {
   return jar.get(CLAIM_SESSION_COOKIE)?.value;
 }
 
+async function hydrateClaim(id: string): Promise<void> {
+  const saved = await readStateCookie(CLAIM_STATE_COOKIE);
+  if (isRecordWithId(saved) && saved.id === id) {
+    restoreClaimRecord(saved as WarrantyClaimRecord);
+  }
+}
+
 export async function getClaimSession(): Promise<WarrantyClaimRecord | null> {
   const id = await readClaimCookieId();
   if (!id) {
     return null;
   }
+  await hydrateClaim(id);
   return getClaimRecord(id);
+}
+
+/** Copy the bound booking and claim to their state cookies. Server Functions only. */
+export async function persistAftersalesSessions(): Promise<void> {
+  const bookingId = await readBookingCookieId();
+  if (bookingId) {
+    await hydrateBooking(bookingId);
+    await writeStateCookie(
+      BOOKING_STATE_COOKIE,
+      getBookingRecord(bookingId),
+      AFTERSALES_SESSION_TTL_MS,
+    );
+  }
+  const claimId = await readClaimCookieId();
+  if (claimId) {
+    await hydrateClaim(claimId);
+    await writeStateCookie(
+      CLAIM_STATE_COOKIE,
+      getClaimRecord(claimId),
+      AFTERSALES_SESSION_TTL_MS,
+    );
+  }
 }
 
 export async function getOrCreateClaimSession(): Promise<WarrantyClaimRecord> {

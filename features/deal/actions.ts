@@ -7,7 +7,6 @@ import { isPxExpired, snapshotToDealPx } from "@/features/part-exchange/store";
 import {
   consumeDealResumeToken,
   createDealOpaqueId,
-  ensureDemoDeal,
   findDealByResumeToken,
   findLiveDealForStock,
   getDealRecord,
@@ -15,17 +14,17 @@ import {
   saveDealResumeToken,
   saveDealShareToken,
   toDealDraft,
-  touchDeal,
 } from "@/features/deal/store";
 import {
   createBoundDeal,
+  hydrateDealsFromCookie,
+  persistDeal,
   writeDealCookie,
 } from "@/features/deal/session";
 import { listSelectedProducts } from "@/lib/deal/products";
-import { mockDealId } from "@/lib/mock/data";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { isReservable } from "@/lib/vehicles/sold";
-import type { DealDraft, DealShareSnapshot } from "@/types/deal";
+import type { DealShareSnapshot } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 /**
@@ -56,9 +55,11 @@ export async function createDealAction(input: {
     return { ok: false, reason: "unavailable" };
   }
 
+  await hydrateDealsFromCookie();
   const existing = findLiveDealForStock(vehicle.stockId);
   if (existing) {
     await writeDealCookie(existing.id);
+    await persistDeal(existing);
     return { ok: true, dealId: existing.id };
   }
 
@@ -101,41 +102,11 @@ export async function createDealAction(input: {
   return { ok: true, dealId: record.id };
 }
 
-export async function saveDealDraftAction(input: {
-  dealId: string;
-  draft: DealDraft;
-}): Promise<{ ok: true } | { ok: false; expired: true }> {
-  const record =
-    getDealRecord(input.dealId) ??
-    (input.dealId === mockDealId ? ensureDemoDeal() : null);
-  if (!record || isDealExpired(record)) {
-    return { ok: false, expired: true };
-  }
-
-  const financeType: FinanceProductType =
-    input.draft.financeType === "pcp" ? "pcp" : "hp";
-  const productIds = Array.from(new Set(input.draft.productIds)).filter(
-    (id) => listSelectedProducts([id]).length > 0,
-  );
-
-  touchDeal(input.dealId, {
-    financeType,
-    cashDeposit: Math.max(0, Math.round(input.draft.cashDeposit)),
-    term: Math.max(12, Math.round(input.draft.term)),
-    annualMileage: input.draft.annualMileage,
-    px: input.draft.px,
-    productIds,
-    productYears: input.draft.productYears,
-    decision: input.draft.decision,
-    stepsCompleted: input.draft.stepsCompleted,
-  });
-  return { ok: true };
-}
-
 export async function createDealResumeLink(input: {
   dealId: string;
   email: string;
 }): Promise<{ ok: true } | { ok: false; expired: true }> {
+  await hydrateDealsFromCookie();
   const record = getDealRecord(input.dealId);
   if (!record || isDealExpired(record)) {
     return { ok: false, expired: true };
@@ -144,7 +115,9 @@ export async function createDealResumeLink(input: {
   if (!email || !email.includes("@")) {
     return { ok: false, expired: true };
   }
-  saveDealResumeToken(record.id, createDealOpaqueId(), email);
+  await persistDeal(
+    saveDealResumeToken(record.id, createDealOpaqueId(), email),
+  );
   return { ok: true };
 }
 
@@ -164,12 +137,14 @@ export async function resumeDealSession(input: {
     return { ok: false, reason: "invalid" };
   }
   await writeDealCookie(record.id);
+  await persistDeal(record);
   return { ok: true, dealId: record.id };
 }
 
 export async function createDealShareLink(input: {
   dealId: string;
 }): Promise<{ ok: true; token: string } | { ok: false; expired: true }> {
+  await hydrateDealsFromCookie();
   const record = getDealRecord(input.dealId);
   if (!record || isDealExpired(record)) {
     return { ok: false, expired: true };
@@ -202,6 +177,6 @@ export async function createDealShareLink(input: {
   };
 
   const token = createDealOpaqueId();
-  saveDealShareToken(record.id, token, snapshot);
+  await persistDeal(saveDealShareToken(record.id, token, snapshot));
   return { ok: true, token };
 }

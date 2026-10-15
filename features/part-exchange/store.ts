@@ -81,6 +81,15 @@ export function getPxRecord(
   return record;
 }
 
+/** Re-seed from the signed state cookie, keeping whichever copy is newer. */
+export function restorePxRecord(record: PxSessionRecord): void {
+  const current = sessions.get(record.id);
+  if (current && current.updatedAt >= record.updatedAt) {
+    return;
+  }
+  sessions.set(record.id, record);
+}
+
 export function touchPxRecord(
   id: string,
   patch: Partial<Omit<PxSessionRecord, "id" | "createdAt">>,

@@ -6,8 +6,16 @@ import {
   createPxRecord,
   getPxRecord,
   isPxExpired,
+  restorePxRecord,
   type PxSessionRecord,
 } from "@/features/part-exchange/store";
+import {
+  isRecordWithId,
+  readStateCookie,
+  writeStateCookie,
+} from "@/lib/session/state-cookie";
+
+const PX_STATE_COOKIE = "oakwood_px_state";
 import type { PxSource } from "@/types/part-exchange";
 
 function cookieOptions() {
@@ -30,11 +38,29 @@ export async function readPxCookieId(): Promise<string | undefined> {
   return jar.get(PX_SESSION_COOKIE)?.value;
 }
 
+async function hydratePxSession(id: string): Promise<void> {
+  const saved = await readStateCookie(PX_STATE_COOKIE);
+  if (isRecordWithId(saved) && saved.id === id) {
+    restorePxRecord(saved as PxSessionRecord);
+  }
+}
+
+/** Copy the bound session to its state cookie. Server Functions only. */
+export async function persistPxSession(): Promise<void> {
+  const id = await readPxCookieId();
+  if (!id) {
+    return;
+  }
+  await hydratePxSession(id);
+  await writeStateCookie(PX_STATE_COOKIE, getPxRecord(id), PX_SESSION_TTL_MS);
+}
+
 export async function getPxSession(): Promise<PxSessionRecord | null> {
   const id = await readPxCookieId();
   if (!id) {
     return null;
   }
+  await hydratePxSession(id);
   const record = getPxRecord(id);
   if (!record) {
     return null;

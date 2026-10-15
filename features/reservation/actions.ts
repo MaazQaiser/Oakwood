@@ -1,5 +1,6 @@
 "use server";
 
+import { withSessionPersistence } from "@/lib/session/persist";
 import { randomBytes } from "crypto";
 import { reservationConfig } from "@/config/reservation";
 import { calculateDeal } from "@/lib/deal/calculate";
@@ -103,7 +104,7 @@ function createIdempotencyKey(): string {
   return randomBytes(16).toString("hex");
 }
 
-export async function startReservationAction(input: {
+export const startReservationAction = withSessionPersistence(async function startReservationAction(input: {
   stockId: string;
   dealId?: string;
 }): Promise<
@@ -158,9 +159,9 @@ export async function startReservationAction(input: {
   });
 
   return { ok: true, stockId: vehicle.stockId };
-}
+});
 
-export async function submitReservationPaymentAction(input: {
+export const submitReservationPaymentAction = withSessionPersistence(async function submitReservationPaymentAction(input: {
   email: string;
   idempotencyKey?: string;
 }): Promise<
@@ -265,9 +266,9 @@ export async function submitReservationPaymentAction(input: {
   }
 
   return { ok: true, status: toStatusSnapshot(next) };
-}
+});
 
-export async function pollReservationAction(): Promise<
+export const pollReservationAction = withSessionPersistence(async function pollReservationAction(): Promise<
   ReservationStatusSnapshot | { ok: false; reason: "session" }
 > {
   const bound = await getBoundReservation();
@@ -276,9 +277,9 @@ export async function pollReservationAction(): Promise<
   }
   const record = applyDueTransitions(bound);
   return toStatusSnapshot(record);
-}
+});
 
-export async function requestReservationRefundAction(input: {
+export const requestReservationRefundAction = withSessionPersistence(async function requestReservationRefundAction(input: {
   reason: RefundReasonCode;
 }): Promise<
   | { ok: true; status: ReservationStatusSnapshot; already?: boolean }
@@ -326,9 +327,9 @@ export async function requestReservationRefundAction(input: {
     }) ?? record;
 
   return { ok: true, status: toStatusSnapshot(record) };
-}
+});
 
-export async function lookupReservationAction(input: {
+export const lookupReservationAction = withSessionPersistence(async function lookupReservationAction(input: {
   email: string;
   reference: string;
 }): Promise<{ ok: true } | { ok: false; reason: "not_found" | "invalid" }> {
@@ -343,9 +344,9 @@ export async function lookupReservationAction(input: {
   }
   await writeReservationCookie(record.id);
   return { ok: true };
-}
+});
 
-export async function confirmReservationWebhookAction(): Promise<
+export const confirmReservationWebhookAction = withSessionPersistence(async function confirmReservationWebhookAction(): Promise<
   ReservationStatusSnapshot | { ok: false; reason: "session" }
 > {
   const bound = await getBoundReservation();
@@ -354,4 +355,4 @@ export async function confirmReservationWebhookAction(): Promise<
   }
   const applied = applyMockWebhook(bound.id) ?? bound;
   return toStatusSnapshot(applyDueTransitions(applied));
-}
+});

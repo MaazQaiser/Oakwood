@@ -1,5 +1,6 @@
 "use server";
 
+import { withSessionPersistence } from "@/lib/session/persist";
 import { getShowroom } from "@/config/locations";
 import { getBookingAvailability } from "@/lib/aftersales/availability";
 import { formatBookingReference } from "@/lib/aftersales/format";
@@ -128,7 +129,7 @@ function toClaimUi(record: WarrantyClaimRecord): ClaimUiState {
   };
 }
 
-export async function getBookingUiState(): Promise<BookingUiState | { empty: true }> {
+export const getBookingUiState = withSessionPersistence(async function getBookingUiState(): Promise<BookingUiState | { empty: true }> {
   const record = await getBookingSession();
   if (!record) {
     return { empty: true };
@@ -137,9 +138,9 @@ export async function getBookingUiState(): Promise<BookingUiState | { empty: tru
     await archiveBooking(record);
   }
   return toBookingUi(record);
-}
+});
 
-export async function startBookingSession(input: {
+export const startBookingSession = withSessionPersistence(async function startBookingSession(input: {
   source: AftersalesBookingSource;
   serviceType?: AftersalesBookingType;
   locationSlug?: string;
@@ -163,9 +164,9 @@ export async function startBookingSession(input: {
     failureReason: undefined,
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function lookupBookingVehicle(input: {
+export const lookupBookingVehicle = withSessionPersistence(async function lookupBookingVehicle(input: {
   registration: string;
 }): Promise<BookingUiState | { error: string }> {
   const invalid = registrationError(input.registration);
@@ -194,9 +195,9 @@ export async function lookupBookingVehicle(input: {
     step: "confirm-vehicle",
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function confirmBookingVehicle(): Promise<BookingUiState | { error: string }> {
+export const confirmBookingVehicle = withSessionPersistence(async function confirmBookingVehicle(): Promise<BookingUiState | { error: string }> {
   const record = await getBookingSession();
   if (!record) {
     return { error: "session" };
@@ -204,9 +205,9 @@ export async function confirmBookingVehicle(): Promise<BookingUiState | { error:
   const nextStep: BookingStep = record.serviceType ? "location" : "service";
   const patched = patchBookingRecord(record.id, { step: nextStep });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function saveBookingManualVehicle(input: {
+export const saveBookingManualVehicle = withSessionPersistence(async function saveBookingManualVehicle(input: {
   year: string;
   make: string;
   model: string;
@@ -226,9 +227,9 @@ export async function saveBookingManualVehicle(input: {
     step: nextStep,
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function saveBookingServiceType(input: {
+export const saveBookingServiceType = withSessionPersistence(async function saveBookingServiceType(input: {
   serviceType: AftersalesBookingType;
 }): Promise<BookingUiState | { error: string }> {
   const invalid = serviceTypeError(input.serviceType);
@@ -241,9 +242,9 @@ export async function saveBookingServiceType(input: {
     step: "location",
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function saveBookingLocation(input: {
+export const saveBookingLocation = withSessionPersistence(async function saveBookingLocation(input: {
   locationSlug: string;
 }): Promise<BookingUiState | { error: string }> {
   const invalid = locationError(input.locationSlug);
@@ -259,17 +260,17 @@ export async function saveBookingLocation(input: {
     step: "slot",
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function refreshBookingAvailability(): Promise<BookingUiState | { error: string }> {
+export const refreshBookingAvailability = withSessionPersistence(async function refreshBookingAvailability(): Promise<BookingUiState | { error: string }> {
   const record = await getBookingSession();
   if (!record) {
     return { error: "session" };
   }
   return toBookingUi(record);
-}
+});
 
-export async function saveBookingPreference(input: {
+export const saveBookingPreference = withSessionPersistence(async function saveBookingPreference(input: {
   date?: string;
   timeWindow?: BookingTimeWindow;
   selectedSlotId?: string;
@@ -293,9 +294,9 @@ export async function saveBookingPreference(input: {
     step: "details",
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function saveBookingDetails(input: {
+export const saveBookingDetails = withSessionPersistence(async function saveBookingDetails(input: {
   name: string;
   telephone: string;
   email: string;
@@ -310,9 +311,9 @@ export async function saveBookingDetails(input: {
     step: "review",
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function submitBookingRequest(): Promise<BookingUiState | { error: string }> {
+export const submitBookingRequest = withSessionPersistence(async function submitBookingRequest(): Promise<BookingUiState | { error: string }> {
   const record = await getBookingSession();
   if (!record) {
     return { error: "session" };
@@ -355,13 +356,13 @@ export async function submitBookingRequest(): Promise<BookingUiState | { error: 
     await archiveBooking(patched);
   }
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function listBookingHistory(): Promise<BookingListEntry[]> {
+export const listBookingHistory = withSessionPersistence(async function listBookingHistory(): Promise<BookingListEntry[]> {
   return readBookingHistory();
-}
+});
 
-export async function retryBookingSubmit(): Promise<BookingUiState | { error: string }> {
+export const retryBookingSubmit = withSessionPersistence(async function retryBookingSubmit(): Promise<BookingUiState | { error: string }> {
   const record = await getBookingSession();
   if (!record) {
     return { error: "session" };
@@ -372,9 +373,9 @@ export async function retryBookingSubmit(): Promise<BookingUiState | { error: st
     failureReason: undefined,
   });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function goToBookingStep(
+export const goToBookingStep = withSessionPersistence(async function goToBookingStep(
   step: BookingStep,
 ): Promise<BookingUiState | { error: string }> {
   const record = await getBookingSession();
@@ -383,24 +384,24 @@ export async function goToBookingStep(
   }
   const patched = patchBookingRecord(record.id, { step });
   return toBookingUi(patched ?? record);
-}
+});
 
-export async function restartBooking(source: AftersalesBookingSource): Promise<BookingUiState> {
+export const restartBooking = withSessionPersistence(async function restartBooking(source: AftersalesBookingSource): Promise<BookingUiState> {
   const id = createAftersalesOpaqueId();
   const record = createBookingRecord(id, source);
   await writeBookingCookie(id);
   return toBookingUi(record);
-}
+});
 
-export async function getClaimUiState(): Promise<ClaimUiState | { empty: true }> {
+export const getClaimUiState = withSessionPersistence(async function getClaimUiState(): Promise<ClaimUiState | { empty: true }> {
   const record = await getClaimSession();
   if (!record) {
     return { empty: true };
   }
   return toClaimUi(record);
-}
+});
 
-export async function startClaimSession(input?: {
+export const startClaimSession = withSessionPersistence(async function startClaimSession(input?: {
   registration?: string;
   vehicle?: AftersalesVehicle;
 }): Promise<ClaimUiState> {
@@ -413,9 +414,9 @@ export async function startClaimSession(input?: {
     status: "started",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function lookupClaimVehicle(input: {
+export const lookupClaimVehicle = withSessionPersistence(async function lookupClaimVehicle(input: {
   registration: string;
 }): Promise<ClaimUiState | { error: string }> {
   const invalid = registrationError(input.registration);
@@ -435,18 +436,18 @@ export async function lookupClaimVehicle(input: {
     step: "confirm-vehicle",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function confirmClaimVehicle(): Promise<ClaimUiState | { error: string }> {
+export const confirmClaimVehicle = withSessionPersistence(async function confirmClaimVehicle(): Promise<ClaimUiState | { error: string }> {
   const record = await getClaimSession();
   if (!record) {
     return { error: "session" };
   }
   const patched = patchClaimRecord(record.id, { step: "issue" });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function saveClaimManualVehicle(input: {
+export const saveClaimManualVehicle = withSessionPersistence(async function saveClaimManualVehicle(input: {
   year: string;
   make: string;
   model: string;
@@ -464,9 +465,9 @@ export async function saveClaimManualVehicle(input: {
     step: "issue",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function saveClaimIssue(input: {
+export const saveClaimIssue = withSessionPersistence(async function saveClaimIssue(input: {
   issue: string;
 }): Promise<ClaimUiState | { error: string }> {
   const invalid = issueError(input.issue);
@@ -479,9 +480,9 @@ export async function saveClaimIssue(input: {
     step: "location",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function saveClaimLocation(input: {
+export const saveClaimLocation = withSessionPersistence(async function saveClaimLocation(input: {
   locationSlug: string;
 }): Promise<ClaimUiState | { error: string }> {
   const invalid = locationError(input.locationSlug);
@@ -494,9 +495,9 @@ export async function saveClaimLocation(input: {
     step: "details",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function submitClaimRequest(input: {
+export const submitClaimRequest = withSessionPersistence(async function submitClaimRequest(input: {
   name: string;
   telephone: string;
   email: string;
@@ -535,9 +536,9 @@ export async function submitClaimRequest(input: {
     reference,
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function retryClaimSubmit(): Promise<ClaimUiState | { error: string }> {
+export const retryClaimSubmit = withSessionPersistence(async function retryClaimSubmit(): Promise<ClaimUiState | { error: string }> {
   const record = await getClaimSession();
   if (!record) {
     return { error: "session" };
@@ -547,9 +548,9 @@ export async function retryClaimSubmit(): Promise<ClaimUiState | { error: string
     status: "started",
   });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function goToClaimStep(
+export const goToClaimStep = withSessionPersistence(async function goToClaimStep(
   step: WarrantyClaimStep,
 ): Promise<ClaimUiState | { error: string }> {
   const record = await getClaimSession();
@@ -558,9 +559,9 @@ export async function goToClaimStep(
   }
   const patched = patchClaimRecord(record.id, { step });
   return toClaimUi(patched ?? record);
-}
+});
 
-export async function submitCallbackEnquiry(input: {
+export const submitCallbackEnquiry = withSessionPersistence(async function submitCallbackEnquiry(input: {
   name: string;
   telephone: string;
   email: string;
@@ -592,20 +593,20 @@ export async function submitCallbackEnquiry(input: {
       : undefined,
   });
   return { ok: true, reference: record.reference };
-}
+});
 
-export async function abandonBooking(): Promise<void> {
+export const abandonBooking = withSessionPersistence(async function abandonBooking(): Promise<void> {
   const record = await getBookingSession();
   if (!record || record.status === "requested") {
     return;
   }
   patchBookingRecord(record.id, { status: "abandoned" });
-}
+});
 
-export async function abandonClaim(): Promise<void> {
+export const abandonClaim = withSessionPersistence(async function abandonClaim(): Promise<void> {
   const record = await getClaimSession();
   if (!record || record.status === "submitted") {
     return;
   }
   patchClaimRecord(record.id, { status: "abandoned" });
-}
+});

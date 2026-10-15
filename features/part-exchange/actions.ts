@@ -1,7 +1,12 @@
 "use server";
 
+import { withSessionPersistence } from "@/lib/session/persist";
 import { getDealRecord, isDealExpired, touchDeal } from "@/features/deal/store";
-import { readDealCookieId } from "@/features/deal/session";
+import {
+  hydrateDealsFromCookie,
+  persistDeal,
+  readDealCookieId,
+} from "@/features/deal/session";
 import {
   getOrCreatePxSession,
   getPxSession,
@@ -64,7 +69,7 @@ function withEquity(snapshot: PartExchange): PartExchange {
   };
 }
 
-export async function getPxUiState(): Promise<PxUiState | { empty: true }> {
+export const getPxUiState = withSessionPersistence(async function getPxUiState(): Promise<PxUiState | { empty: true }> {
   const record = await getPxSession();
   if (!record) {
     return { empty: true };
@@ -75,28 +80,29 @@ export async function getPxUiState(): Promise<PxUiState | { empty: true }> {
     expired: isPxExpired(record),
     dealId: record.dealId,
   };
-}
+});
 
-export async function getActiveDealForPx(): Promise<
+export const getActiveDealForPx = withSessionPersistence(async function getActiveDealForPx(): Promise<
   { ok: true; dealId: string } | { ok: false }
 > {
   const dealId = await readDealCookieId();
   if (!dealId) {
     return { ok: false };
   }
+  await hydrateDealsFromCookie();
   const record = getDealRecord(dealId);
   if (!record || isDealExpired(record)) {
     return { ok: false };
   }
   return { ok: true, dealId: record.id };
-}
+});
 
-export async function startPxSession(source: PxSource): Promise<{ ok: true }> {
+export const startPxSession = withSessionPersistence(async function startPxSession(source: PxSource): Promise<{ ok: true }> {
   await getOrCreatePxSession(source);
   return { ok: true };
-}
+});
 
-export async function lookupPxRegistration(input: {
+export const lookupPxRegistration = withSessionPersistence(async function lookupPxRegistration(input: {
   registration: string;
   source: PxSource;
 }): Promise<PxLookupResult> {
@@ -133,9 +139,9 @@ export async function lookupPxRegistration(input: {
   });
 
   return result;
-}
+});
 
-export async function savePxVehicle(input: {
+export const savePxVehicle = withSessionPersistence(async function savePxVehicle(input: {
   vehicle: PxIdentifiedVehicle;
   source: PxSource;
 }): Promise<{ ok: true }> {
@@ -149,9 +155,9 @@ export async function savePxVehicle(input: {
     },
   });
   return { ok: true };
-}
+});
 
-export async function valuePxVehicle(input: {
+export const valuePxVehicle = withSessionPersistence(async function valuePxVehicle(input: {
   registration: string;
   mileage: number;
   vehicle?: PxIdentifiedVehicle;
@@ -218,9 +224,9 @@ export async function valuePxVehicle(input: {
   );
 
   return result;
-}
+});
 
-export async function savePxSettlement(input: {
+export const savePxSettlement = withSessionPersistence(async function savePxSettlement(input: {
   financeOutstanding: boolean;
   settlementFigure?: string;
   source: PxSource;
@@ -257,9 +263,9 @@ export async function savePxSettlement(input: {
   });
 
   return { ok: true, snapshot };
-}
+});
 
-export async function savePxProgress(input: {
+export const savePxProgress = withSessionPersistence(async function savePxProgress(input: {
   snapshot: PartExchange;
   step: PxStep;
   source: PxSource;
@@ -274,9 +280,9 @@ export async function savePxProgress(input: {
     source: input.source,
   });
   return { ok: true };
-}
+});
 
-export async function applyPxToDealAction(input: {
+export const applyPxToDealAction = withSessionPersistence(async function applyPxToDealAction(input: {
   dealId?: string;
   px?: DealPartExchangeInput;
   source: PxSource;
@@ -303,12 +309,13 @@ export async function applyPxToDealAction(input: {
     return { ok: false, reason: "no_deal" };
   }
 
+  await hydrateDealsFromCookie();
   const deal = getDealRecord(dealId);
   if (!deal || isDealExpired(deal)) {
     return { ok: false, reason: "expired" };
   }
 
-  touchDeal(dealId, { px });
+  await persistDeal(touchDeal(dealId, { px }));
   if (session) {
     touchPxRecord(session.id, {
       dealId,
@@ -335,9 +342,9 @@ export async function applyPxToDealAction(input: {
   }
 
   return { ok: true, dealId, px };
-}
+});
 
-export async function clearPxSessionAction(): Promise<{ ok: true }> {
+export const clearPxSessionAction = withSessionPersistence(async function clearPxSessionAction(): Promise<{ ok: true }> {
   const session = await getPxSession();
   if (session) {
     touchPxRecord(session.id, {
@@ -347,9 +354,9 @@ export async function clearPxSessionAction(): Promise<{ ok: true }> {
     });
   }
   return { ok: true };
-}
+});
 
-export async function recordPxCompletionLead(input: {
+export const recordPxCompletionLead = withSessionPersistence(async function recordPxCompletionLead(input: {
   source: PxSource;
   consideredStockId?: string;
 }): Promise<{ ok: true }> {
@@ -377,4 +384,4 @@ export async function recordPxCompletionLead(input: {
     },
   });
   return { ok: true };
-}
+});

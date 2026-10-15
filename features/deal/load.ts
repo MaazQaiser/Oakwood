@@ -1,3 +1,4 @@
+import { hydrateDealsFromCookie } from "@/features/deal/session";
 import { getEligibilitySession } from "@/features/eligibility/session";
 import { isSessionExpired } from "@/features/eligibility/store";
 import {
@@ -50,6 +51,7 @@ function isProfileExpired(iso?: string, now = Date.now()): boolean {
 }
 
 export async function loadDealPage(dealId: string): Promise<DealPageModel> {
+  await hydrateDealsFromCookie();
   const record =
     dealId === mockDealId
       ? ensureDemoDeal()
