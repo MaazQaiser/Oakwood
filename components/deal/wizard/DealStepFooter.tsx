@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
@@ -36,7 +37,8 @@ export function DealStepFooter({
   note?: string;
   /** Render the primary as a form submit so Enter works inside a form. */
   submit?: boolean;
-  backLabel?: string;
+  /** Node so a step can shorten it on phones, where the bar is tight. */
+  backLabel?: ReactNode;
 }) {
   const { calculation, apr, navigating } = useDealBuilder();
 

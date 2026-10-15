@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, Lock, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
+import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import {
   DealCard,
@@ -96,36 +97,6 @@ function SecureBadge() {
           Will not affect your credit score
         </p>
       </div>
-    </div>
-  );
-}
-
-function ResultHero({
-  eyebrow,
-  title,
-  body,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  children?: ReactNode;
-}) {
-  return (
-    <div className="relative isolate overflow-hidden rounded-card bg-navy px-5 py-7 text-center text-white shadow-card">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-oakwood/25 blur-3xl"
-      />
-      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/15">
-        <Check className="h-6 w-6" strokeWidth={2.5} aria-hidden />
-      </span>
-      <p className="mt-3 text-caption uppercase tracking-[0.08em] text-white/75">
-        {eyebrow}
-      </p>
-      <h2 className="mt-1 text-h5 text-white">{title}</h2>
-      <p className="mt-1 text-body-sm text-white/80">{body}</p>
-      {children}
     </div>
   );
 }
@@ -293,7 +264,7 @@ export function DealDecisionStep() {
       return (
         <div className="flex flex-1 flex-col">
           <div className="flex-1 space-y-4 pb-5">
-            <ResultHero
+            <DealResultHero
               eyebrow="Decision in principle"
               title="You're approved"
               body="Based on the information you've given us."
@@ -310,7 +281,7 @@ export function DealDecisionStep() {
               <p className="mt-4 text-caption text-white/80">
                 No credit footprint. No obligation.
               </p>
-            </ResultHero>
+            </DealResultHero>
 
             <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
               <p className="text-label">What we&apos;ll show you next</p>

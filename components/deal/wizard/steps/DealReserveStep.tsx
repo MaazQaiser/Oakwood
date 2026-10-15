@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
-import { CircleCheck, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { useDealStepNavigation } from "@/components/deal/wizard/DealWizardShell";
 import { SaveDeal } from "@/components/deal/SaveDeal";
@@ -13,7 +14,7 @@ import { reservationConfig } from "@/config/reservation";
 import { supportRoutes } from "@/config/routes";
 import {
   DEAL_EMAIL_DEAL,
-  DEAL_RESERVE_SUCCESS_BODY,
+  DEAL_HANDOVER_WITHIN,
   DEAL_RESERVE_SUCCESS_TITLE,
 } from "@/lib/deal/copy";
 import { listSelectedProducts } from "@/lib/deal/products";
@@ -26,14 +27,15 @@ import {
 
 /** Placeholder until ops confirm the named coordinator, photo and SLA (spec §7). */
 const HANDOVER = {
-  name: "Olivia",
-  initials: "OH",
-  role: "Handover coordinator",
+  name: "Sam Wright",
+  initials: "SW",
+  role: "Customer handover",
   callbackMinutes: 20,
 };
 
+/** Mock reservation reference until Stripe/DMS confirm a real one. */
 function mockReference(dealId: string, stockId: string): string {
-  const seed = `${dealId}${stockId}`.replace(/[^a-zA-Z0-9]/g, "").slice(-6);
+  const seed = `${stockId}${dealId}`.replace(/[^a-zA-Z0-9]/g, "").slice(-6);
   return `OAK-${seed.toUpperCase() || "DEMO01"}`;
 }
 
@@ -93,15 +95,78 @@ function Coordinator({ bordered = false }: { bordered?: boolean }) {
           {HANDOVER.name} will call you in {HANDOVER.callbackMinutes} min
         </p>
         <p className="text-caption text-muted">
-          To confirm the car, answer questions and book your handover.
+          {HANDOVER.role}. To confirm the car, answer questions and book your
+          handover.
         </p>
       </div>
     </div>
   );
 }
 
+/** Vehicle, part exchange, deposit, cover and finance: before paying and on the confirmation. */
+function DealReview({ title }: { title: string }) {
+  const { vehicle, draft, calculation, coverMonthly, apr } = useDealBuilder();
+  const headingId = useId();
+  const products = listSelectedProducts(draft.productIds);
+  const vehicleDetail = [
+    vehicle.derivative,
+    `${vehicle.mileage.toLocaleString("en-GB")} miles`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const financeLine = [
+    draft.financeType.toUpperCase(),
+    formatTerm(draft.term),
+    apr !== undefined ? `${apr.toFixed(1)}% APR` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return (
+    <section
+      className="rounded-card bg-surface p-5 shadow-card sm:p-6"
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId} className="text-label">
+        {title}
+      </h2>
+      <dl className="mt-3 space-y-1.5 text-body-sm">
+        <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
+          {formatPounds(vehicle.cashPrice)}
+        </Row>
+        <p className="text-caption text-muted">{vehicleDetail}</p>
+        {draft.px ? (
+          <Row label="Part exchange">
+            −{formatPounds(calculation?.pxEquity ?? 0)}
+          </Row>
+        ) : null}
+        <Row label="Cash deposit">{formatPounds(draft.cashDeposit)}</Row>
+        <Row label="Cover">
+          {products.length ? `+${formatPounds(coverMonthly)}/mo` : "None"}
+        </Row>
+        {products.length ? (
+          <ul className="space-y-0.5 text-caption text-muted">
+            {products.map((product) => (
+              <li key={product.id}>{product.name}</li>
+            ))}
+          </ul>
+        ) : null}
+        <p className="text-caption text-muted">{financeLine}</p>
+      </dl>
+      <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
+        <span className="text-label">Monthly</span>
+        <FinancialNumber
+          value={formatPounds(calculation?.monthlyPayment ?? 0)}
+          suffix="/mo"
+          size="compact"
+        />
+      </div>
+    </section>
+  );
+}
+
 export function DealReserveStep() {
-  const { vehicle, draft, calculation, coverMonthly, apr, dealId } =
+  const { vehicle, draft, dealId, markStepComplete, navigateTo } =
     useDealBuilder();
   const { goBack } = useDealStepNavigation("reserve");
   const nameId = useId();
@@ -117,7 +182,10 @@ export function DealReserveStep() {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [errors, setErrors] = useState<Errors>({});
-  const [confirmed, setConfirmed] = useState(false);
+  // Saved with the deal, so a reload keeps showing the confirmation.
+  const [confirmed, setConfirmed] = useState(
+    draft.stepsCompleted?.includes("reserve") ?? false,
+  );
   const [emailOpen, setEmailOpen] = useState(false);
   // A transition ends before the mock timeout fires, so track it directly:
   // the Pay buttons must show busy and ignore repeat taps while processing.
@@ -133,22 +201,12 @@ export function DealReserveStep() {
     setErrors((current) =>
       current[key] ? { ...current, [key]: undefined } : current,
     );
-  const products = listSelectedProducts(draft.productIds);
   const amountLabel = reservationAmountLabel(reservationConfig.amount);
   const hold = formatHoldPeriod();
   const reference = useMemo(
     () => mockReference(dealId, vehicle.stockId),
     [dealId, vehicle.stockId],
   );
-  const monthly = calculation?.monthlyPayment ?? 0;
-  const equity = calculation?.pxEquity ?? 0;
-  const financeLine = [
-    draft.financeType.toUpperCase(),
-    formatTerm(draft.term),
-    apr !== undefined ? `${apr.toFixed(1)}% APR` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
 
   function completeReservation() {
     setErrors({});
@@ -159,6 +217,7 @@ export function DealReserveStep() {
     window.setTimeout(() => {
       setSubmitting(false);
       setConfirmed(true);
+      markStepComplete("reserve");
     }, 900);
   }
 
@@ -193,54 +252,78 @@ export function DealReserveStep() {
   }
 
   if (confirmed) {
+    const nextSteps = [
+      {
+        title: `Within ${HANDOVER.callbackMinutes} minutes`,
+        body: `${HANDOVER.name} calls you to confirm the reservation.`,
+      },
+      {
+        title: "Before collection",
+        body: "We finalise your part exchange, finance and paperwork.",
+      },
+      {
+        title: "Handover",
+        body: `Collect the car from ${vehicle.locationName} or we arrange delivery.`,
+      },
+    ];
+
     return (
-      <div className="flex-1 space-y-4 pb-6">
-        <div className="rounded-card bg-success-soft/70 p-6" role="status">
-          <CircleCheck className="h-8 w-8 text-success" aria-hidden />
-          <p className="mt-2 text-caption font-semibold! uppercase tracking-[0.08em] text-success">
-            {DEAL_RESERVE_SUCCESS_TITLE}
-          </p>
-          <h2 className="mt-1 text-h5">You&apos;re all set</h2>
-          <p className="mt-1 text-body-sm text-muted">
-            {DEAL_RESERVE_SUCCESS_BODY}
-          </p>
-          <p className="mt-3 text-body-sm">
-            Reference{" "}
-            <span className="tabular-number font-semibold! text-primary">
-              {reference}
-            </span>
-          </p>
-        </div>
-
-        <Coordinator bordered />
-
-        <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-          <p className="text-label">What happens next</p>
-          <ol className="mt-2 list-decimal space-y-1 pl-5 text-body-sm text-muted">
-            <li>
-              {HANDOVER.name} calls you within {HANDOVER.callbackMinutes}{" "}
-              minutes.
-            </li>
-            <li>We inspect your part exchange and finalise paperwork.</li>
-            <li>You collect the car or we arrange delivery.</li>
-          </ol>
-        </div>
-
-        {emailOpen ? (
-          <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-            <p className="text-label">{DEAL_EMAIL_DEAL}</p>
-            <SaveDeal defaultOpen compact />
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="tertiary"
-            className="w-full"
-            onClick={() => setEmailOpen(true)}
+      <div className="flex flex-1 flex-col">
+        <div className="flex-1 space-y-4 pb-5">
+          <DealResultHero
+            eyebrow={DEAL_RESERVE_SUCCESS_TITLE}
+            title="You're all set"
+            body={DEAL_HANDOVER_WITHIN}
           >
-            {DEAL_EMAIL_DEAL}
-          </Button>
-        )}
+            <div className="relative mt-5 rounded-[20px] bg-white/10 px-4 py-3.5">
+              <p className="text-caption text-white/75">Reservation reference</p>
+              <p className="mt-1 text-h5 tabular-number text-white">{reference}</p>
+              <p className="mt-1 text-caption text-white/75">
+                {amountLabel} paid. Your car is held for {hold}.
+              </p>
+            </div>
+          </DealResultHero>
+
+          <Coordinator bordered />
+
+          <DealReview title="Your deal" />
+
+          <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+            <p className="text-label">What happens next</p>
+            <ol className="relative mt-3 space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[5px] before:w-px before:bg-border">
+              {nextSteps.map((item) => (
+                <li key={item.title} className="relative pl-6">
+                  <span className="absolute top-1.5 left-0 h-[11px] w-[11px] rounded-full bg-primary ring-4 ring-surface" />
+                  <p className="text-body-sm font-semibold! text-ink">
+                    {item.title}
+                  </p>
+                  <p className="text-caption text-muted">{item.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {emailOpen ? (
+            <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+              <p className="text-label">{DEAL_EMAIL_DEAL}</p>
+              <SaveDeal defaultOpen compact />
+            </div>
+          ) : null}
+        </div>
+
+        {/* Same sticky action bar as every other step. */}
+        <DealStepFooter
+          showMonthly={false}
+          onBack={emailOpen ? undefined : () => setEmailOpen(true)}
+          backLabel={
+            <>
+              <span className="sm:hidden">Email deal</span>
+              <span className="hidden sm:inline">{DEAL_EMAIL_DEAL}</span>
+            </>
+          }
+          onContinue={() => navigateTo(supportRoutes.bookingEnquiry)}
+          continueLabel="Request a callback"
+        />
       </div>
     );
   }
@@ -248,50 +331,33 @@ export function DealReserveStep() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 space-y-4 pb-5">
-        <section
-          className="rounded-card bg-surface p-5 shadow-card sm:p-6"
-          aria-labelledby={`${nameId}-deal`}
-        >
-          <h2 id={`${nameId}-deal`} className="text-label">
-            Your deal
-          </h2>
-          <dl className="mt-3 space-y-1.5 text-body-sm">
-            <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
-              {formatPounds(vehicle.cashPrice)}
-            </Row>
-            {draft.px ? (
-              <Row label="Part exchange">−{formatPounds(equity)}</Row>
-            ) : null}
-            <Row label="Cash deposit">{formatPounds(draft.cashDeposit)}</Row>
-            {products.length ? (
-              <Row label={`Cover (${products.length})`}>
-                +{formatPounds(coverMonthly)}/mo
-              </Row>
-            ) : null}
-            <p className="text-caption text-muted">{financeLine}</p>
-          </dl>
-          <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
-            <span className="text-label">Monthly</span>
-            <FinancialNumber
-              value={formatPounds(monthly)}
-              suffix="/mo"
-              size="compact"
-            />
-          </div>
-        </section>
+        <DealReview title="Review your deal" />
 
         <section
           className="rounded-card bg-surface p-5 shadow-card sm:p-6"
           aria-labelledby={`${cardId}-pay`}
         >
-          <h2 id={`${cardId}-pay`} className="text-label">
-            Reserve for {amountLabel}
-          </h2>
-          <p className="mt-0.5 text-caption text-muted">
-            Fully refundable. We take the car off sale for {hold}.
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 id={`${cardId}-pay`} className="text-label">
+                Reserve for {amountLabel}
+              </h2>
+              <p className="mt-0.5 text-caption text-muted">
+                Fully refundable reservation fee, applied to your purchase.
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-page-tint px-2.5 py-1 text-caption text-muted">
+              <Lock className="h-3 w-3" aria-hidden />
+              Stripe
+            </span>
+          </div>
+          <p className="mt-3 rounded-[14px] bg-page-tint px-4 py-3 text-body-sm">
+            We hold this car for you for {hold} and take it off sale while
+            you finish.
           </p>
 
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          {/* Wallets first, stacked full width, as on Stripe Checkout. */}
+          <div className="mt-4 grid gap-2">
             <button
               type="button"
               className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white disabled:opacity-50"
@@ -302,7 +368,7 @@ export function DealReserveStep() {
             </button>
             <button
               type="button"
-              className="flex min-h-12 items-center justify-center rounded-[14px] border border-border-strong bg-surface px-4 text-button text-ink disabled:opacity-50"
+              className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white disabled:opacity-50"
               disabled={submitting}
               onClick={completeReservation}
             >
