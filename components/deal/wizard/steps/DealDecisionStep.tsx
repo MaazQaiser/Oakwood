@@ -20,6 +20,7 @@ import {
   DEAL_DECISION_REFER_BODY,
   DEAL_DECISION_REFER_TITLE,
   DEAL_RUN_SOFT_CHECK,
+  DEAL_SEE_MY_QUOTE,
   DEAL_SOFT_SEARCH,
 } from "@/lib/deal/copy";
 import { formatPounds } from "@/lib/format/money";
@@ -333,7 +334,7 @@ export function DealDecisionStep() {
             onBack={editDetails}
             backLabel="Edit details"
             onContinue={() => goNext("cover")}
-            continueLabel="Build your cover"
+            continueLabel={DEAL_SEE_MY_QUOTE}
           />
         </div>
       );
