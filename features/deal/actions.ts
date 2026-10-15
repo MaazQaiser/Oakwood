@@ -8,7 +8,6 @@ import {
   consumeDealResumeToken,
   createDealOpaqueId,
   findDealByResumeToken,
-  findLiveDealForStock,
   getDealRecord,
   isDealExpired,
   saveDealResumeToken,
@@ -55,14 +54,8 @@ export async function createDealAction(input: {
     return { ok: false, reason: "unavailable" };
   }
 
-  await hydrateDealsFromCookie();
-  const existing = findLiveDealForStock(vehicle.stockId);
-  if (existing) {
-    await writeDealCookie(existing.id);
-    await persistDeal(existing);
-    return { ok: true, dealId: existing.id };
-  }
-
+  // Every "Build your deal" from a car starts a new deal; an earlier deal on
+  // the same car is not resumed. Deal URLs (refresh, resume links) still are.
   const eligibility = await getEligibilitySession();
   const pxSession = await getPxSession();
   const pendingPx =

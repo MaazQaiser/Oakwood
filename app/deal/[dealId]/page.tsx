@@ -29,7 +29,7 @@ export default async function Page({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId: param } = await params;
-  const resolved = await resolveDealId(param, "part-exchange");
+  const resolved = await resolveDealId(param);
   if (resolved.kind === "bootstrap") {
     return (
       <DealStockBootstrap stockId={resolved.stockId} step="part-exchange" />

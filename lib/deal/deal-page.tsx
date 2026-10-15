@@ -25,7 +25,7 @@ export async function renderDealStepPage(
   dealIdParam: string,
   step: DealStep,
 ) {
-  const resolved = await resolveDealId(dealIdParam, step);
+  const resolved = await resolveDealId(dealIdParam);
   if (resolved.kind === "bootstrap") {
     return <DealStockBootstrap stockId={resolved.stockId} step={step} />;
   }
@@ -38,7 +38,7 @@ export async function redirectLegacyDealStep(
   dealIdParam: string,
   target: DealStep,
 ) {
-  const resolved = await resolveDealId(dealIdParam, target);
+  const resolved = await resolveDealId(dealIdParam);
   if (resolved.kind === "bootstrap") {
     redirect(getDealUrl(resolved.stockId, target));
   }

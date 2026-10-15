@@ -1,16 +1,12 @@
-import { redirect } from "next/navigation";
-import { getBoundDeal, hydrateDealsFromCookie } from "@/features/deal/session";
+import { hydrateDealsFromCookie } from "@/features/deal/session";
 import {
   ensureDemoDeal,
-  findLiveDealForStock,
   getDealRecord,
   isDealExpired,
 } from "@/features/deal/store";
-import { getDealUrl } from "@/config/routes";
 import { mockDealId } from "@/lib/mock/data";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { isReservable } from "@/lib/vehicles/sold";
-import type { DealStep } from "@/config/routes";
 
 export type DealResolveResult =
   | { kind: "deal"; dealId: string }
@@ -18,13 +14,11 @@ export type DealResolveResult =
 
 /**
  * Resolve a deal URL param to a live deal id.
- * Cookie writes are not allowed during RSC render, so unknown stock ids
- * return `bootstrap` for a client create+redirect instead of session expired.
+ * Cookie writes are not allowed during RSC render, so stock ids return
+ * `bootstrap` for a client create+redirect. A stock id always starts a new
+ * deal rather than resuming an earlier one on the same car.
  */
-export async function resolveDealId(
-  param: string,
-  step: DealStep = "part-exchange",
-): Promise<DealResolveResult> {
+export async function resolveDealId(param: string): Promise<DealResolveResult> {
   if (param === mockDealId) {
     ensureDemoDeal();
     return { kind: "deal", dealId: mockDealId };
@@ -38,22 +32,6 @@ export async function resolveDealId(
 
   const vehicle = findVehicleByStockId(param);
   if (vehicle && isReservable(vehicle)) {
-    const liveForStock = findLiveDealForStock(vehicle.stockId);
-    if (liveForStock) {
-      if (liveForStock.id !== param) {
-        redirect(getDealUrl(liveForStock.id, step));
-      }
-      return { kind: "deal", dealId: liveForStock.id };
-    }
-
-    const bound = await getBoundDeal();
-    if (bound && bound.vehicleStockId === vehicle.stockId) {
-      if (bound.id !== param) {
-        redirect(getDealUrl(bound.id, step));
-      }
-      return { kind: "deal", dealId: bound.id };
-    }
-
     return { kind: "bootstrap", stockId: vehicle.stockId };
   }
 

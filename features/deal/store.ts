@@ -277,19 +277,3 @@ export function toDealDraft(record: DealSessionRecord): DealDraft {
     stepsCompleted: record.stepsCompleted,
   };
 }
-
-export function findLiveDealForStock(
-  stockId: string,
-  now = Date.now(),
-): DealSessionRecord | null {
-  for (const record of deals.values()) {
-    // Never reuse the static demo session for live VDP creates.
-    if (record.id === mockDealId) {
-      continue;
-    }
-    if (record.vehicleStockId === stockId && !isDealExpired(record, now)) {
-      return record;
-    }
-  }
-  return null;
-}
