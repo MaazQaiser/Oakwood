@@ -92,8 +92,7 @@ html:has(.deal-wizard) {
 /* Flush sticky header so it doesn't hang over journey content. */
 html[data-oak-journey] header.sticky {
   top: 0;
-  margin-left: 0;
-  margin-right: 0;
+  margin: 0;
   border-radius: 0;
   box-shadow: none;
   border-bottom: 1px solid var(--oak-border);
