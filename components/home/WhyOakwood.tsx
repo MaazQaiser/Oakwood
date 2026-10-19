@@ -46,7 +46,7 @@ export function WhyOakwood() {
                 figures before a full application are illustrations.
               </p>
               <p className="mt-4 text-[0.98rem] text-[#002852]">
-                No impact on your credit score.
+                Preview eligibility is simulated — no live credit check yet.
               </p>
               <Link
                 href={routes.eligibility}
@@ -79,7 +79,7 @@ export function WhyOakwood() {
               </div>
               <div className="relative flex min-w-0 flex-col justify-center bg-[#E7F3C4] px-6 pt-24 pb-6 sm:py-8 sm:pr-6 sm:pl-16">
                 <span className="absolute top-5 left-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#002852] text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.04em] text-white tabular-nums sm:top-1/2 sm:left-0 sm:h-[4.6rem] sm:w-[4.6rem] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[1.15rem]">
-                  6
+                  12
                   <br />
                   month
                   <br />

@@ -13,8 +13,8 @@ import { routes } from "@/config/routes";
 import { useEligibilityJourney } from "@/components/eligibility/EligibilityJourneyProvider";
 
 const TRUST_POINTS = [
-  "Soft search",
-  "No impact on your credit score",
+  "Simulated soft search (preview)",
+  "No live credit check in this preview",
   "No account required",
   "Results shown immediately",
 ];
@@ -42,7 +42,7 @@ export function EligibilityIntro() {
     <>
       <PageBanner
         title="Find out what you could afford."
-        description="Check your finance eligibility in around 60 seconds. It won't affect your credit score."
+        description="Check a preview finance profile in around 60 seconds. No live credit search runs until the provider is connected."
         actions={
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button onClick={() => void start()} busy={starting} className="w-full sm:w-auto">
@@ -78,13 +78,14 @@ export function EligibilityIntro() {
         <h2 className="text-h3">What happens next?</h2>
         <ol className="mt-4 flex flex-col gap-3 text-body-sm">
           <li>1. Tell us a little about yourself</li>
-          <li>2. We perform a soft credit search</li>
+          <li>2. We simulate a soft credit search (preview only)</li>
           <li>3. See your indicative finance result</li>
           <li>4. Browse cars based on your budget</li>
         </ol>
         <div className="mt-8 border-t border-[#d0d5dd] pt-5">
           <p className="text-body-sm text-muted">
-            Required legal information is shown before we run the check.
+            Required legal information is shown before you continue. No live
+            credit check runs in this preview.
           </p>
           <ul className="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-6">
             <li>

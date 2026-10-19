@@ -62,7 +62,7 @@ const CAR_COPY: SearchCopy = {
   heroSecondary: "Browse cars",
   bannerTitle: "Know your budget before you shop.",
   bannerBody:
-    "Check your finance eligibility in around 60 seconds. It won't affect your credit score.",
+    "Check a preview finance profile in around 60 seconds. No live credit search runs until the provider is connected.",
   bannerCta: "Check my eligibility",
   personalisedTitle: "Your finance profile is ready",
   personalisedBody:
@@ -73,7 +73,7 @@ const CAR_COPY: SearchCopy = {
   affordableCta: "View affordable cars",
   financeFooterTitle: "Want to know what you could afford?",
   financeFooterBody:
-    "Check your finance eligibility before you choose a car. It takes around 60 seconds and won't affect your credit score.",
+    "Check a preview finance profile before you choose a car. No live credit search runs in this preview.",
   affordableFooterTitle: "Looking for something within your budget?",
   affordableFooterBody:
     "Show cars that fit your current finance profile. You can turn this off at any time.",
@@ -119,7 +119,7 @@ const VAN_COPY: SearchCopy = {
   affordableCta: "View affordable vans",
   financeFooterTitle: "Want to know what you could afford?",
   financeFooterBody:
-    "Check your finance eligibility before you choose a van. It takes around 60 seconds and won't affect your credit score.",
+    "Check a preview finance profile before you choose a van. No live credit search runs in this preview.",
   affordableFooterTitle: "Looking for something within your budget?",
   affordableFooterBody:
     "Show vans that fit your current finance profile. You can turn this off at any time.",

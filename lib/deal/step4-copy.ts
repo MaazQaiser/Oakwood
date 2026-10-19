@@ -12,7 +12,7 @@ export const STEP4_HUB_RESERVE_HINT = () =>
   `Fully refundable. We hold the car for ${hold()}.`;
 export const STEP4_HUB_APPLY = "Apply for finance";
 export const STEP4_HUB_APPLY_HINT =
-  "Start a finance application for this deal.";
+  "Start a mock embedded finance application. Nothing is submitted to a live lender in this prototype.";
 export const STEP4_HUB_TEST_DRIVE = "Test drive";
 export const STEP4_HUB_TEST_DRIVE_HINT =
   "Book a showroom visit for this car.";

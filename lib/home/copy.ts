@@ -6,7 +6,7 @@ import {
 
 export const HOME_HERO_HEADING = "Find the car that fits your life";
 export const HOME_HERO_DESCRIPTION =
-  "Explore 500+ cars, all AA inspected and prepared by Oakwood.";
+  "Browse AA-inspected used cars, prepared by Oakwood at our two showrooms.";
 export const HOME_HERO_PRIMARY = "Find my car";
 export const HOME_HERO_SECONDARY = "Browse all cars";
 
@@ -28,7 +28,7 @@ export const HOME_HERO_FILTER_MAX_PRICE = "Max total price";
 export const HOME_HERO_FILTER_MAX_MONTHLY = "Max monthly budget";
 export const HOME_HERO_FILTER_SELECT_MAKE = "Select make";
 export const HOME_HERO_FILTER_SELECT_MODEL = "Select model";
-export const HOME_HERO_FILTER_CTA = "Show all 500+ cars";
+export const HOME_HERO_FILTER_CTA = "Show all cars";
 export const HOME_HERO_CHIP_UNDER_10K = "Under £10k";
 export const HOME_HERO_CHIP_SUV = "SUV";
 export const HOME_HERO_CHIP_AUTOMATIC = "Automatic";
@@ -45,7 +45,7 @@ export const HOME_PART_EXCHANGE_SUPPORT =
 export const HOME_PROOF_ITEMS = [
   {
     id: "stock",
-    lead: "500+ cars",
+    lead: "Used cars",
     detail: "across our two locations",
     accent: true,
   },
@@ -85,7 +85,7 @@ export const HOME_ZERO_PERCENT_SHORT =
 
 export const HOME_FINANCE_ELIGIBILITY_TITLE = "Unsure on your APR?";
 export const HOME_FINANCE_ELIGIBILITY_DESCRIPTION =
-  "Find out in 60 seconds, with no impact on your credit score.";
+  "Find out in 60 seconds. Preview only — no live credit check yet.";
 export const HOME_FINANCE_ELIGIBILITY_CTA = "Check my eligibility";
 export const HOME_FINANCE_ELIGIBILITY =
   `${HOME_FINANCE_ELIGIBILITY_TITLE} ${HOME_FINANCE_ELIGIBILITY_DESCRIPTION}`.trim();

@@ -14,17 +14,15 @@ import { cookies } from "next/headers";
  */
 
 const DEV_SECRET = "oakwood-dev-session-secret";
-let warnedMissingSecret = false;
 
 function secret(): string {
-  const value = process.env.SESSION_COOKIE_SECRET;
+  const value = process.env.SESSION_COOKIE_SECRET?.trim();
   if (value) {
     return value;
   }
-  if (process.env.NODE_ENV === "production" && !warnedMissingSecret) {
-    warnedMissingSecret = true;
-    console.warn(
-      "SESSION_COOKIE_SECRET is not set; session cookies are signed with the development secret.",
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "SESSION_COOKIE_SECRET must be set in production. Refusing to sign session cookies with the development secret.",
     );
   }
   return DEV_SECRET;

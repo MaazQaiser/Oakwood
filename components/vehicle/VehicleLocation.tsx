@@ -1,14 +1,26 @@
 import { Button } from "@/components/ui/Button";
-import { getStockLocation } from "@/config/locations";
+import {
+  getShowroomProfile,
+  getStockLocation,
+} from "@/config/locations";
 import { getLocationUrl, getBookingUrl, supportRoutes } from "@/config/routes";
 import { toTelHref } from "@/lib/format/phone";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VehicleLocation({ vehicle }: { vehicle: VehicleDetail }) {
   const location = getStockLocation(vehicle.locationSlug);
+  const profile = getShowroomProfile(vehicle.locationSlug);
   const name = location?.name ?? vehicle.locationName;
   const isShowroom = location?.isShowroom ?? false;
-  const telephone = location?.telephone;
+  const telephone = location?.telephone ?? profile?.telephone;
+  const salesHours =
+    profile?.hoursStatus === "published"
+      ? profile.openingHours.filter((row) => row.department === "sales")
+      : [];
+  const hoursLabel =
+    salesHours.length > 0
+      ? salesHours.map((row) => `${row.days} ${row.hours}`).join(" · ")
+      : null;
   const query = [
     "Oakwood Motor Company",
     name,
@@ -54,10 +66,15 @@ export function VehicleLocation({ vehicle }: { vehicle: VehicleDetail }) {
             we will come back to you.
           </p>
         )}
-        <p className="mt-1 text-caption text-white/70">
-          Opening hours are not published in this preview, so we do not mark the
-          showroom as open or closed here.
-        </p>
+        {hoursLabel ? (
+          <p className="mt-1 text-caption text-white/70">
+            Sales hours: {hoursLabel}
+          </p>
+        ) : (
+          <p className="mt-1 text-caption text-white/70">
+            Opening hours are not published for this location yet.
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Button href={directions} variant="secondary" className="btn-compact">
             Get directions

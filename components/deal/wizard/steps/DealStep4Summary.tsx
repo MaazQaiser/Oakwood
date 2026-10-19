@@ -4,7 +4,7 @@ import { useId, type ReactNode } from "react";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { listSelectedProducts } from "@/lib/deal/products";
-import { formatPounds, formatTerm } from "@/lib/format/money";
+import { formatNumber, formatPounds, formatTerm } from "@/lib/format/money";
 
 function Row({
   label,
@@ -28,7 +28,7 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
   const products = listSelectedProducts(draft.productIds);
   const vehicleDetail = [
     vehicle.derivative,
-    `${vehicle.mileage.toLocaleString("en-GB")} miles`,
+    `${formatNumber(vehicle.mileage)} miles`,
     vehicle.locationName,
   ]
     .filter(Boolean)
@@ -53,7 +53,10 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
         <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
           {formatPounds(vehicle.cashPrice)}
         </Row>
-        <p className="text-caption text-muted">{vehicleDetail}</p>
+        <div>
+          <dt className="sr-only">Vehicle details</dt>
+          <dd className="text-caption text-muted">{vehicleDetail}</dd>
+        </div>
         {draft.px ? (
           <Row label="Part exchange">
             −{formatPounds(calculation?.pxEquity ?? 0)}
@@ -65,11 +68,16 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
           {products.length ? `+${formatPounds(coverMonthly)}/mo` : "None"}
         </Row>
         {products.length ? (
-          <ul className="space-y-0.5 text-caption text-muted">
-            {products.map((product) => (
-              <li key={product.id}>{product.name}</li>
-            ))}
-          </ul>
+          <div>
+            <dt className="sr-only">Selected products</dt>
+            <dd>
+              <ul className="space-y-0.5 text-caption text-muted">
+                {products.map((product) => (
+                  <li key={product.id}>{product.name}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
         ) : null}
       </dl>
       <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">

@@ -123,8 +123,8 @@ export function EligibilityAcceptedResult({
     <div>
       <h1 className="text-h2">Your finance profile is ready.</h1>
       <p className="mt-3 text-body text-muted">
-        Based on your soft search, you have an indicative finance profile to
-        start shopping with.
+        Based on this preview soft-search simulation, you have an indicative
+        finance profile to start shopping with.
       </p>
       <dl className="mt-8 grid gap-3 sm:grid-cols-2">
         {[

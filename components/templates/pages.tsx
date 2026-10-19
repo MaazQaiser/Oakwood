@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { PageTemplate } from "@/components/content/PageTemplate";
 import { FinanceHubPage } from "@/components/finance/FinanceHubPage";
 import { VehicleSearchPage } from "@/components/search/VehicleSearchPage";
@@ -227,9 +228,15 @@ export function TrustPage({
 export function EnquiryPage({
   title,
   route,
+  children,
 }: {
   title: string;
   route: string;
+  children?: ReactNode;
 }) {
-  return <PageTemplate title={title} route={route} template="EnquiryPage" />;
+  return (
+    <PageTemplate title={title} route={route} template="EnquiryPage">
+      {children}
+    </PageTemplate>
+  );
 }

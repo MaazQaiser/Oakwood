@@ -431,8 +431,9 @@ export function EligibilityQuestionsFlow() {
           <EligibilitySummary answers={journey.answers} />
         </div>
         <p className="mt-4 text-caption text-muted">
-          By continuing you agree we can run a soft search using the details
-          you&apos;ve provided.{" "}
+          By continuing you agree we can simulate a soft search using the
+          details you&apos;ve provided. No live credit check runs in this
+          preview.{" "}
           <a className="text-primary underline-offset-4 hover:underline" href={routes.privacyPolicy}>
             Privacy policy
           </a>

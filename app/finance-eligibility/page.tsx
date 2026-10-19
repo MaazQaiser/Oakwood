@@ -6,7 +6,7 @@ export const metadata = createPageMetadata({
   title: "Finance eligibility",
   path: routes.eligibility,
   description:
-    "Check your finance eligibility in around 60 seconds. Soft search, no account required, and no impact on your credit score.",
+    "Check a preview finance profile in around 60 seconds. Simulated soft search only — no live credit check until the provider is connected.",
   indexable: false,
 });
 

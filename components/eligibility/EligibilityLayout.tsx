@@ -4,7 +4,10 @@ import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
 import { JourneyChrome } from "@/components/layout/JourneyChrome";
 import { Button } from "@/components/ui/Button";
-import { MOCK_SCHEMA_NOTICE } from "@/lib/eligibility/copy";
+import {
+  ELIGIBILITY_TRUST_LINE,
+  MOCK_SCHEMA_NOTICE,
+} from "@/lib/eligibility/copy";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
 
@@ -19,7 +22,7 @@ export function EligibilityTrustMessage({
 }) {
   return (
     <p className={cn("text-caption text-muted", className)}>
-      Soft search. No impact on your credit score. No account required.
+      {ELIGIBILITY_TRUST_LINE}
     </p>
   );
 }

@@ -31,7 +31,7 @@ export const CONTENT_VIEW_MODEL = "View available cars";
 
 export const CONTENT_FINANCE_CTA_TITLE = "Know what you could afford?";
 export const CONTENT_FINANCE_CTA_BODY =
-  "Check your finance eligibility before you choose a car. It takes around 60 seconds and won't affect your credit score.";
+  "Check a preview finance profile before you choose a car. No live credit search runs until the provider is connected.";
 export const CONTENT_FINANCE_CTA_LABEL = "Check your eligibility";
 
 export const CONTENT_STOCK_CTA_TITLE = "Looking for this model?";
