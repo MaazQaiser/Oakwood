@@ -89,14 +89,14 @@ html:has(.deal-wizard) {
   border-radius: 14px;
 }
 
-/* Flush sticky header so it doesn't hang over journey content. */
-html[data-oak-journey] header.sticky {
-  top: 0;
-  margin: 0;
-  border-radius: 0;
-  box-shadow: none;
-  border-bottom: 1px solid var(--oak-border);
+/* Journey pages: same sticky inset as the rest of the site, solid surface. */
+html[data-oak-journey] [data-oak-header-shell] {
   background: var(--oak-page);
+  border-bottom: 1px solid var(--oak-border);
+}
+
+html[data-oak-journey] [data-oak-header-shell] header {
+  box-shadow: none;
 }
 
 body {

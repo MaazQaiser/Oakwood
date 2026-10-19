@@ -76,7 +76,8 @@
   --oak-space-12: 3rem;
   --oak-space-16: 4rem;
   --oak-space-20: 5rem;
-  --oak-page-x: 1.25rem;
+  /* Mobile gutters: was 1.25rem; +12px for cleaner side spacing sitewide. */
+  --oak-page-x: 2rem;
   --oak-section-y: 3rem;
 
   /* Radius — soft marketplace, not luxury */
@@ -147,7 +148,7 @@
     --oak-leading-h2: 3rem;
     --oak-leading-h3: 2.75rem;
     --oak-leading-h4: 2.25rem;
-    --oak-page-x: 1.5rem;
+    --oak-page-x: 2rem;
     --oak-section-y: 4.5rem;
     --oak-header-height: 4.5rem;
   }
@@ -155,7 +156,7 @@
 
 @media (min-width: 64rem) {
   :root {
-    --oak-page-x: 2rem;
+    --oak-page-x: 2.5rem;
     --oak-section-y: 5.5rem;
   }
 }

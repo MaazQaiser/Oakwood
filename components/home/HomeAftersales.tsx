@@ -72,7 +72,7 @@ export function HomeAftersales() {
               </p>
               <h2
                 id="aftersales-heading"
-                className="mt-3 text-[1.85rem] font-semibold leading-tight tracking-[-0.03em] text-primary sm:text-[2.15rem]"
+                className="mt-3 text-[1.85rem] font-semibold leading-tight tracking-[-0.03em] text-navy sm:text-[2.15rem]"
               >
                 {HOME_AFTERSALES_HEADING}
               </h2>

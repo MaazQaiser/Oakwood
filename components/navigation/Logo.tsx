@@ -1,41 +1,75 @@
 import Link from "next/link";
 import { routes } from "@/config/routes";
+import { cn } from "@/lib/cn";
 
 const COMPACT_MAX = 40;
 
 /**
- * Lockup follows rendered height.
- * 40px and under: compact mark.
- * Above 40px: full lockup.
- * Above 80px: the supplied asset already stacks the descriptor under the wordmark.
- * With no height, the header uses the compact mark below 48rem and the full lockup above it.
+ * Mobile header: padded square mark (object-contain — never cropped).
+ * Desktop: full wordmark lockup (object-contain).
+ * Compact: square mark only.
  */
 export function Logo({
   compact = false,
   height,
+  className,
 }: {
   compact?: boolean;
   height?: number;
+  className?: string;
 }) {
   const compactOnly = compact || (height !== undefined && height <= COMPACT_MAX);
-  const sized = height !== undefined && height > COMPACT_MAX;
+  const sizedLockup = height !== undefined && height > COMPACT_MAX;
 
   return (
-    <Link href={routes.home} className="inline-flex items-center no-underline">
-      <img
-        src="/brand/oakwood-logo.png"
-        alt="Oakwood Motor Company"
-        width={300}
-        height={55}
-        className={
-          compactOnly
-            ? "h-9 w-11 object-cover object-left"
-            : sized
-              ? "w-auto"
-              : "h-8 w-10 object-cover object-left md:h-9 md:w-auto md:object-contain"
-        }
-        style={sized ? { height } : undefined}
-      />
+    <Link
+      href={routes.home}
+      className={cn(
+        "inline-flex shrink-0 items-center overflow-visible no-underline",
+        className,
+      )}
+    >
+      {compactOnly ? (
+        <img
+          src="/brand/oakwood-mark.png"
+          alt="Oakwood Motor Company"
+          width={594}
+          height={594}
+          className="object-contain"
+          style={{
+            height: height ?? 56,
+            width: height ?? 56,
+          }}
+        />
+      ) : sizedLockup ? (
+        <img
+          src="/brand/oakwood-logo.png"
+          alt="Oakwood Motor Company"
+          width={300}
+          height={55}
+          className="h-auto w-auto object-contain"
+          style={{ height }}
+        />
+      ) : (
+        <>
+          {/* Mobile: square mark, a step above the header icon size */}
+          <img
+            src="/brand/oakwood-mark.png"
+            alt="Oakwood Motor Company"
+            width={594}
+            height={594}
+            className="h-14 w-14 object-contain md:hidden"
+          />
+          {/* Desktop: full lockup */}
+          <img
+            src="/brand/oakwood-logo.png"
+            alt="Oakwood Motor Company"
+            width={300}
+            height={55}
+            className="hidden h-9 w-auto object-contain md:block"
+          />
+        </>
+      )}
     </Link>
   );
 }

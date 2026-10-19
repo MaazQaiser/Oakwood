@@ -26,9 +26,11 @@ export function HomeHero() {
   return (
     <>
       {variant === "filters" ? <FilterHero /> : <CurrentHero />}
-      <div className="mx-3 flex flex-col gap-5 pb-8 pt-6 sm:mx-4 sm:gap-6 lg:mx-6 lg:gap-8 lg:pb-10 lg:pt-8">
+      <div className="mx-[var(--oak-page-x)] flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
         <HomeProofStrip />
-        {variant === "current" ? <HomeSearchCard /> : null}
+        {variant === "current" ? (
+          <HomeSearchCard className="mt-4 sm:mt-5 lg:mt-6" />
+        ) : null}
         <HomeFinanceStrip />
       </div>
     </>
@@ -41,7 +43,7 @@ function CurrentHero() {
   const ineligible = mode === "ineligible";
 
   const heading = eligible
-    ? "Your finance profile is ready."
+    ? "Your finance profile is ready"
     : HOME_HERO_HEADING;
   const copy = eligible
     ? `Browse cars using your personalised finance profile. Current APR from ${formatApr(apr)}.`
@@ -52,7 +54,7 @@ function CurrentHero() {
   const primaryHref = eligible ? getSearchUrl({ affordable: 1 }) : routes.search;
 
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] sm:mx-4 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6 lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"
@@ -66,7 +68,7 @@ function CurrentHero() {
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-1 flex-col justify-center">
         <div className="max-w-md">
-          <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-ink sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
+          <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
             {heading}
           </h1>
           <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
@@ -114,7 +116,7 @@ function CurrentHero() {
 
 function FilterHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-5 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] sm:mx-4 sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6 lg:min-h-[calc(100dvh-9rem)] lg:px-8 lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-5 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:px-8 lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"

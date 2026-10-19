@@ -11,7 +11,7 @@ export function LocationSection() {
   return (
     <Section id="locations" aria-label="Locations">
       <Container>
-        <SectionIntro align="center" heading="Find your nearest Oakwood.">
+        <SectionIntro align="center" heading="Find your nearest Oakwood">
           Visit us in Bury or Chorley and see your next car in person.
         </SectionIntro>
         <Grid columns="two" className="mt-8">
@@ -24,7 +24,7 @@ export function LocationSection() {
             />
           ))}
         </Grid>
-        <p className="mt-6 text-center">
+        <p className="mt-6 text-left md:text-center">
           <Button href={routes.locations} variant="text">
             All locations
           </Button>

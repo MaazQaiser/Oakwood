@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getMakeUrl } from "@/config/routes";
+import { cn } from "@/lib/cn";
 
 const MAKE_LOGOS: Record<string, string> = {
   audi: "/images/brand-logos/audi.png",
@@ -17,6 +18,8 @@ const MAKE_LOGOS: Record<string, string> = {
   nissan: "/images/brand-logos/nissan.png",
   kia: "/images/brand-logos/kia.png",
 };
+
+const VISIBLE = 3;
 
 function MakeLogo({ slug }: { slug: string }) {
   const src = MAKE_LOGOS[slug];
@@ -35,19 +38,62 @@ export function MakeCarousel({
   makes: { slug: string; name: string }[];
 }) {
   const scroller = useRef<HTMLUListElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState({ max: 0, value: 0 });
+  const dragging = useRef(false);
+
+  const syncProgress = useCallback(() => {
+    const node = scroller.current;
+    if (!node) return;
+    const max = Math.max(0, node.scrollWidth - node.clientWidth);
+    setProgress({ max, value: node.scrollLeft });
+  }, []);
+
+  useEffect(() => {
+    const node = scroller.current;
+    if (!node) return;
+    syncProgress();
+    node.addEventListener("scroll", syncProgress, { passive: true });
+    const ro = new ResizeObserver(syncProgress);
+    ro.observe(node);
+    return () => {
+      node.removeEventListener("scroll", syncProgress);
+      ro.disconnect();
+    };
+  }, [makes, syncProgress]);
 
   function scrollByPage(direction: -1 | 1) {
     const node = scroller.current;
     if (!node) return;
-    const distance = Math.round(node.clientWidth * 0.6) * direction;
-    node.scrollTo({ left: node.scrollLeft + distance, behavior: "smooth" });
+    node.scrollBy({ left: node.clientWidth * direction, behavior: "smooth" });
   }
+
+  function scrollToRatio(ratio: number) {
+    const node = scroller.current;
+    if (!node || progress.max <= 0) return;
+    node.scrollLeft = Math.min(progress.max, Math.max(0, ratio * progress.max));
+  }
+
+  function pointerToRatio(clientX: number) {
+    const el = track.current;
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0) return 0;
+    return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+  }
+
+  const thumbRatio =
+    progress.max > 0 ? Math.min(1, VISIBLE / makes.length) : 1;
+  const thumbLeft =
+    progress.max > 0
+      ? (progress.value / progress.max) * (1 - thumbRatio)
+      : 0;
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-h3 text-oakwood">Browse by make</h2>
-        <div className="flex gap-2">
+      <div className="flex items-center justify-between gap-4 px-[var(--oak-page-x)]">
+        <h2 className="text-h3 text-navy">Browse by make</h2>
+        <div className="flex shrink-0 gap-2">
           <button
             type="button"
             aria-label="Show previous makes"
@@ -70,24 +116,81 @@ export function MakeCarousel({
           </button>
         </div>
       </div>
+
       <ul
+        id="browse-by-make-scroller"
         ref={scroller}
-        className="mt-8 flex gap-2 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+        className="mt-8 flex gap-2 overflow-x-auto scroll-smooth px-[var(--oak-page-x)] pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {makes.map((make) => (
-            <li key={make.slug} className="w-[9.5rem] shrink-0 sm:w-[10.5rem] lg:w-auto lg:min-w-0 lg:flex-1">
+          <li
+            key={make.slug}
+            className="w-[calc((100%-1rem)/3)] shrink-0 sm:w-[calc((100%-1rem)/3)]"
+          >
             <Link
               href={getMakeUrl(make.name)}
-              className="flex flex-col items-center px-2 py-3 text-center no-underline"
+              className="flex flex-col items-center px-1 py-3 text-center no-underline sm:px-2"
             >
               <MakeLogo slug={make.slug} />
-              <span className="mt-2 flex min-h-10 w-full items-center justify-center px-1 text-center text-caption font-medium leading-snug text-ink">
+              <span className="mt-2 flex min-h-10 w-full items-center justify-center px-0.5 text-center text-caption font-medium leading-snug text-ink">
                 {make.name}
               </span>
             </Link>
           </li>
         ))}
       </ul>
+
+      {/* Dragable scroller line under the logos */}
+      <div className="mt-4 px-[var(--oak-page-x)]">
+        <div
+          ref={track}
+          role="scrollbar"
+          aria-controls="browse-by-make-scroller"
+          aria-orientation="horizontal"
+          aria-valuemin={0}
+          aria-valuemax={Math.round(progress.max)}
+          aria-valuenow={Math.round(progress.value)}
+          aria-label="Scroll makes"
+          tabIndex={0}
+          className="relative h-2 cursor-pointer rounded-full bg-border touch-none"
+          onPointerDown={(event) => {
+            dragging.current = true;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            scrollToRatio(pointerToRatio(event.clientX));
+          }}
+          onPointerMove={(event) => {
+            if (!dragging.current) return;
+            scrollToRatio(pointerToRatio(event.clientX));
+          }}
+          onPointerUp={(event) => {
+            dragging.current = false;
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }}
+          onPointerCancel={() => {
+            dragging.current = false;
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              scrollByPage(1);
+            } else if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              scrollByPage(-1);
+            }
+          }}
+        >
+          <div
+            className={cn(
+              "absolute top-0 h-full rounded-full bg-primary transition-[left] duration-75",
+              dragging.current && "transition-none",
+            )}
+            style={{
+              width: `${thumbRatio * 100}%`,
+              left: `${thumbLeft * 100}%`,
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

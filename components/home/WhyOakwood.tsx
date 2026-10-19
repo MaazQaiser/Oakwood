@@ -29,7 +29,7 @@ export function WhyOakwood() {
   return (
     <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING}>
       <Container width="wide">
-        <SectionIntro heading={`${WHY_OAKWOOD_HEADING}.`} headingClassName="text-[#002852]">
+        <SectionIntro heading={WHY_OAKWOOD_HEADING} headingClassName="text-navy">
           {WHY_OAKWOOD_INTRO}
         </SectionIntro>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
@@ -38,8 +38,8 @@ export function WhyOakwood() {
             className="flex flex-col gap-8 rounded-[28px] bg-[#ECF3F8] p-7 sm:p-9 lg:min-h-[28rem] lg:justify-between lg:gap-0"
           >
             <div className="max-w-md">
-              <h3 className="text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-[#002852] sm:text-[2.35rem]">
-                Flexible finance that starts with your budget.
+              <h3 className="text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-navy sm:text-[2.35rem]">
+                Flexible finance that starts with your budget
               </h3>
               <p className="mt-4 text-[0.98rem] leading-relaxed text-secondary">
                 Check eligibility and see a personalised finance profile. Monthly
@@ -85,7 +85,7 @@ export function WhyOakwood() {
                   <br />
                   warranty
                 </span>
-                <h3 className="text-xl font-semibold leading-snug text-[#002852]">
+                <h3 className="text-xl font-semibold leading-snug text-navy">
                   {WHY_OAKWOOD_WARRANTY}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#3d4d34]">
@@ -104,7 +104,7 @@ export function WhyOakwood() {
               href={WHY_OAKWOOD_LINKS.garage}
               className="flex min-h-36 flex-col justify-center rounded-[28px] bg-page-tint p-7 no-underline"
             >
-              <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#002852]">
+              <h3 className="text-2xl font-semibold tracking-[-0.02em] text-navy">
                 Checked, verified, and prepared
               </h3>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-secondary">
@@ -125,7 +125,7 @@ export function WhyOakwood() {
 
           <article className="flex flex-col rounded-[28px] bg-page-tint p-7">
             <PiggyIcon />
-            <h3 className="mt-5 text-xl font-semibold text-[#002852]">Clear pricing</h3>
+            <h3 className="mt-5 text-xl font-semibold text-navy">Clear pricing</h3>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Each car shows a cash price and an example monthly payment together, so you can compare before you enquire.
             </p>
@@ -142,7 +142,7 @@ export function WhyOakwood() {
 
           <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-7">
             <ExchangeIcon />
-            <h3 className="mt-5 text-xl font-semibold text-[#002852]">Part exchange</h3>
+            <h3 className="mt-5 text-xl font-semibold text-navy">Part exchange</h3>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Get a valuation you can put towards your deposit. The online figure is an estimate.
             </p>

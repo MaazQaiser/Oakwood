@@ -52,7 +52,7 @@ export function PageBanner({
   return (
     <section
       className={cn(
-        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-3 overflow-hidden rounded-[32px] bg-[#ECF3F8] px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+1.75rem)] sm:mx-4 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-6",
+        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] overflow-hidden rounded-[32px] bg-[#ECF3F8] px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+1.75rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)]",
         hideTitle ? "pb-6 lg:pb-7" : "pb-10 lg:pb-12",
       )}
     >

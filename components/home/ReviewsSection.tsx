@@ -54,7 +54,7 @@ export function ReviewsSection() {
   return (
     <Section id="reviews" aria-label="Reviews">
       <Container>
-        <SectionIntro align="center" heading={`${reviewsCopy.title}.`}>
+        <SectionIntro align="center" heading={reviewsCopy.title}>
           {reviewsCopy.description}
         </SectionIntro>
 
@@ -65,7 +65,7 @@ export function ReviewsSection() {
         ) : null}
 
         <div className="mt-10">
-          <h3 className="text-h4 text-oakwood">Video reviews</h3>
+          <h3 className="text-h4 text-navy">Video reviews</h3>
           <p className="mt-2 max-w-2xl text-body-sm text-muted">
             Watch customers on collection day, from the showroom to driving away.
           </p>

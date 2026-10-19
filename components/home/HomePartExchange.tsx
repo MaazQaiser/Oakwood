@@ -15,7 +15,7 @@ export function HomePartExchange() {
     >
       <Container>
         <SectionIntro
-          heading={`${HOME_PART_EXCHANGE}.`}
+          heading={HOME_PART_EXCHANGE}
           headingClassName="text-white"
           bodyClassName="text-white/80"
         >

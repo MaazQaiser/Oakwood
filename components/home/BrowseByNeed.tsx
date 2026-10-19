@@ -44,7 +44,7 @@ export function BrowseByNeed() {
   return (
     <Section id="shop-by-need" aria-label="Shop by what you need">
       <Container>
-        <SectionIntro align="center" heading="Shop by what you need.">
+        <SectionIntro align="center" heading="Shop by what you need">
           Start with the type of car that suits your everyday life.
         </SectionIntro>
         <Grid columns="budget" className="mt-8">

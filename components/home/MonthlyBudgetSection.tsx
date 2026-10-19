@@ -53,13 +53,12 @@ export function MonthlyBudgetSection() {
       className="bg-[#ECF3F8] [background-image:radial-gradient(ellipse_at_88%_0%,#ffffff_0%,transparent_46%)]"
     >
       <Container>
-        <header className="mx-auto max-w-3xl text-center">
-          <h2 className="text-h2 text-ink">
+        <header className="max-w-3xl text-left md:mx-auto md:text-center">
+          <h2 className="text-h2 text-navy">
             Browse by{" "}
-            <span className="inline-block whitespace-nowrap rounded-md bg-[#8EBFDF] px-1.5 text-[#002852]">
+            <span className="inline-block whitespace-nowrap rounded-md bg-[#8EBFDF] px-1.5 text-navy">
               monthly budget
             </span>
-            .
           </h2>
         </header>
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-4">

@@ -4,7 +4,7 @@ import {
   getZeroPercentLabel,
 } from "@/lib/finance/representative-example";
 
-export const HOME_HERO_HEADING = "Find the car that fits your life.";
+export const HOME_HERO_HEADING = "Find the car that fits your life";
 export const HOME_HERO_DESCRIPTION =
   "Explore 500+ cars, all AA inspected and prepared by Oakwood.";
 export const HOME_HERO_PRIMARY = "Find my car";
@@ -44,20 +44,28 @@ export const HOME_PART_EXCHANGE_SUPPORT =
 
 export const HOME_PROOF_ITEMS = [
   {
+    id: "stock",
     lead: "500+ cars",
-    detail: "In stock across our two locations",
+    detail: "across our two locations",
+    accent: true,
   },
   {
-    lead: "Every car AA inspected",
+    id: "aa",
+    lead: "AA inspected",
     detail: "Checked, prepared and ready to drive",
+    accent: false,
   },
   {
-    lead: "12-month warranty included",
+    id: "warranty",
+    lead: "12-month warranty",
     detail: "AA warranty available up to 4 years",
+    accent: false,
   },
   {
-    lead: "Two showrooms + own workshop",
-    detail: "Bury and Chorley",
+    id: "locations",
+    lead: "Two showrooms",
+    detail: "Bury, Chorley + own workshop",
+    accent: false,
   },
 ] as const;
 
@@ -90,7 +98,7 @@ export const HOME_FINANCE_BEAT_CTA = "Compare my offer";
 export const HOME_FINANCE_BEAT_OFFER =
   `${HOME_FINANCE_BEAT_TITLE} ${HOME_FINANCE_BEAT_DESCRIPTION}`.trim();
 
-export const HOME_REPRESENTATIVE_HEADING = "Finance that fits your budget.";
+export const HOME_REPRESENTATIVE_HEADING = "Finance that fits your budget";
 export const HOME_REPRESENTATIVE_DESCRIPTION =
   "Find a car you love and explore a payment option that works for you.";
 export const HOME_REPRESENTATIVE_CTA = "Find cars from £200 a month";
@@ -106,7 +114,7 @@ export const HOME_WARRANTY_AA_UPGRADE =
 
 export const HOME_AFTERSALES_EYEBROW = "Aftersales";
 export const HOME_AFTERSALES_HEADING =
-  "MOT, servicing and mechanical support from Oakwood.";
+  "MOT, servicing and mechanical support from Oakwood";
 export const HOME_AFTERSALES_SUPPORT =
   "Keep your car running after you buy.";
 export const HOME_AFTERSALES_CTA = "Book a service";

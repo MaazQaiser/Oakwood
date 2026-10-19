@@ -108,8 +108,8 @@ export function FinalFinanceCTA() {
             <div className="flex min-w-0 flex-col justify-center">
               <h2 className="max-w-xl text-[1.7rem] font-semibold leading-tight tracking-[-0.03em] md:text-[2rem]">
                 {eligible
-                  ? "Your finance profile is ready. Browse cars that fit your budget."
-                  : "Know your budget before you shop, then browse cars that fit."}
+                  ? "Your finance profile is ready — browse cars that fit your budget"
+                  : "Know your budget before you shop, then browse cars that fit"}
               </h2>
               <p className="mt-4 max-w-lg text-[0.98rem] leading-relaxed text-white/80">
                 No impact on your credit score.

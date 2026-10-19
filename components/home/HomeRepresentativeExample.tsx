@@ -48,7 +48,7 @@ export function HomeRepresentativeExample() {
       <header className="max-w-2xl">
         <h3
           id="home-representative-example-heading"
-          className="text-h2 text-primary"
+          className="text-h2 text-navy"
         >
           {HOME_REPRESENTATIVE_HEADING}
         </h3>

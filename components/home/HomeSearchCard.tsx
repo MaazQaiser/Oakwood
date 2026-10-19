@@ -29,7 +29,7 @@ export function HomeSearchCard({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="p-4 sm:p-5 md:p-7 lg:p-8">
+      <div className="p-6 sm:p-7 md:p-8 lg:p-10">
         <KnowYourBudgetPanel />
       </div>
     </div>
@@ -101,21 +101,21 @@ function KnowYourBudgetPanel() {
   return (
     <div className="flex flex-col justify-start">
       <form
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-5"
         onSubmit={(event) => {
           event.preventDefault();
           submitSearch();
         }}
       >
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-6">
           <div>
             <h2
               id="home-hero-budget-heading"
-              className="text-[1.35rem] font-semibold tracking-[-0.03em] text-ink lg:text-[1.5rem] lg:text-oakwood"
+              className="text-[1.35rem] font-semibold tracking-[-0.03em] text-navy lg:text-[1.5rem]"
             >
               {HOME_BUDGET_HEADING}
             </h2>
-            <p className="mt-1 text-sm leading-relaxed text-secondary">
+            <p className="mt-1.5 text-sm leading-relaxed text-secondary">
               {HOME_BUDGET_DESCRIPTION}
             </p>
           </div>
@@ -149,7 +149,7 @@ function KnowYourBudgetPanel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(12rem,1.3fr)_minmax(8rem,1fr)_minmax(8rem,1fr)_auto] lg:items-center">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(12rem,1.3fr)_minmax(8rem,1fr)_minmax(8rem,1fr)_auto] lg:items-center">
           <div className="min-w-0">
             <label htmlFor="home-budget-amount" className="sr-only">
               {HOME_BUDGET_FIELD}
@@ -228,7 +228,7 @@ function KnowYourBudgetPanel() {
           </Button>
         </div>
       </form>
-      <HomeFinanceRateLine className="mt-3 text-[0.8rem] leading-relaxed text-muted" />
+      <HomeFinanceRateLine className="mt-5 text-[0.8rem] leading-relaxed text-muted" />
     </div>
   );
 }

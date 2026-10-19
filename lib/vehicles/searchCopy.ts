@@ -103,7 +103,8 @@ const VAN_COPY: SearchCopy = {
   browseAllLabel: "Browse all vans",
   requestLabel: "Request a van",
   showNotify: false,
-  showHeroActions: true,
+  // Keep false so the banner is the only hero eligibility CTA (no duplicate buttons).
+  showHeroActions: false,
   heroPrimary: "Check my eligibility",
   heroSecondary: "Browse vans",
   bannerTitle: "Know what you could afford",
@@ -190,11 +191,11 @@ export function getSearchCopy(category: VehicleCategory = "car"): SearchCopy {
 }
 
 export function countLabel(count: number, copy: SearchCopy): string {
-  if (copy.category === "van") {
-    return `${count} ${count === 1 ? "used van" : "used vans"}`;
+  if (count === 1) {
+    return `1 ${copy.noun} matches your search`;
   }
 
-  return `${count} ${count === 1 ? "used car" : "used cars"}`;
+  return `${count} ${copy.nounPlural} match your search`;
 }
 
 export function fewResultsLabel(count: number, copy: SearchCopy): string {

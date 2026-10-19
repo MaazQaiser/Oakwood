@@ -349,7 +349,7 @@ export function SearchExperience({
   }
 
   return (
-    <div className="mt-8">
+    <div>
       <div className="sticky top-[calc(0.75rem+var(--oak-header-height))] z-30 border-b border-border bg-page py-3 lg:hidden">
         <div className="flex gap-3">
           <Button
@@ -376,7 +376,7 @@ export function SearchExperience({
         </div>
       </div>
 
-      <div className="mt-6 lg:flex lg:items-stretch lg:gap-8">
+      <div className="mt-4 lg:mt-0 lg:flex lg:items-stretch lg:gap-8">
         <FilterSidebar
           query={resolved}
           locked={context.locked}
@@ -392,11 +392,11 @@ export function SearchExperience({
               <h2 className="text-[1.375rem] font-medium leading-tight tracking-[-0.02em] sm:text-2xl" aria-live="polite">
                 {countLabel(total, copy)}
               </h2>
-              <p className="mt-1 text-body-sm text-muted">
-                {recovery
-                  ? describeShowingWithout(recovery.constraints)
-                  : copy.resultsShowing}
-              </p>
+              {recovery ? (
+                <p className="mt-1 text-body-sm text-muted">
+                  {describeShowingWithout(recovery.constraints)}
+                </p>
+              ) : null}
             </div>
             <div className="hidden shrink-0 items-center gap-2 lg:flex lg:flex-nowrap lg:justify-end">
               <PriceViewToggle

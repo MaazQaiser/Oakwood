@@ -23,8 +23,8 @@ export function FeaturedVehicles() {
         <SectionIntro
           heading={
             eligible
-              ? "Cars that fit your finance profile."
-              : "Cars worth taking a look at."
+              ? "Cars that fit your finance profile"
+              : "Cars worth taking a look at"
           }
           action={
             featuredVehicles.length > 0 ? (

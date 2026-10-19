@@ -1,4 +1,4 @@
-import { Container, Section } from "@/components/layout/Container";
+import { Container } from "@/components/layout/Container";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchExperience } from "@/components/search/SearchExperience";
 import { SearchSeoContent } from "@/components/search/SearchSeoContent";
@@ -41,7 +41,8 @@ export function VehicleSearchPage({
   return (
     <>
       <SearchHeader context={context} query={query.q} />
-      <Section className="pt-5 md:pt-6 lg:pt-8">
+      {/* Avoid Section/space-section — its padding-block left a large white gap under the blue banner. */}
+      <section className="pt-3 pb-10 md:pt-4 md:pb-12 lg:pb-14">
         <Container width="wide">
           <SearchExperience
             context={context}
@@ -53,7 +54,7 @@ export function VehicleSearchPage({
             loadFailed={loadFailed}
           />
         </Container>
-      </Section>
+      </section>
       <SearchSeoContent context={context} />
       <FinanceSearchCTA basePath={context.basePath} category={category} />
     </>

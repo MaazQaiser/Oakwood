@@ -18,29 +18,34 @@ function isCurrentPath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/** Menu type ~20% smaller than text-body-sm / text-label (0.875rem → 0.7rem). */
+const menuFont = "text-[0.7rem] leading-snug";
+const menuLabelFont = "text-[0.7rem] font-semibold leading-snug";
+
 export function MobileNav({ onNavigate }: { onNavigate: () => void }) {
   const groups = visibleGroups(primaryNavigation);
   const pathname = usePathname();
 
   return (
     <nav aria-label="Mobile">
-      <div className="mb-6" onClick={onNavigate}>
-        <Button href={financeCta.href} className="w-full">
+      <div className="mb-5" onClick={onNavigate}>
+        <Button href={financeCta.href} className="btn-compact justify-start gap-2">
           {financeCta.anonymousLabel}
         </Button>
       </div>
-      <ul className="flex flex-col gap-4">
+      <ul className="flex flex-col gap-3.5">
         {groups.map((group) => (
           <li key={group.id}>
-            <p className="text-label">{group.label}</p>
-            <ul className="mt-1">
+            <p className={menuLabelFont}>{group.label}</p>
+            <ul className="mt-0.5">
               {group.href ? (
                 <li>
                   <Link
                     href={group.href}
                     aria-current={isCurrentPath(pathname, group.href) ? "page" : undefined}
                     className={cn(
-                      "flex min-h-11 items-center text-body-sm",
+                      "flex min-h-10 items-center",
+                      menuFont,
                       isCurrentPath(pathname, group.href) && "text-primary",
                     )}
                     onClick={onNavigate}
@@ -56,7 +61,8 @@ export function MobileNav({ onNavigate }: { onNavigate: () => void }) {
                       href={item.href}
                       aria-current={isCurrentPath(pathname, item.href) ? "page" : undefined}
                       className={cn(
-                        "flex min-h-11 items-center text-body-sm",
+                        "flex min-h-10 items-center",
+                        menuFont,
                         isCurrentPath(pathname, item.href) && "text-primary",
                       )}
                       onClick={onNavigate}

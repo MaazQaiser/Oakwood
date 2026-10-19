@@ -25,7 +25,7 @@ export interface WhyOakwoodTechnician {
 export const WHY_OAKWOOD_HEADING = "Why Oakwood";
 
 export const WHY_OAKWOOD_INTRO =
-  "Oakwood selects used cars, inspects them, prepares them in-house, and supports them with warranty and aftersales from two showrooms and our own workshop.";
+  "Every car is carefully selected by Oakwood. We inspect and prepare each vehicle in-house, so we know what we're putting on the road. With two showrooms, our own workshop and warranty and aftersales support, we're here for you long after you drive away.";
 
 export const WHY_OAKWOOD_CMS_NOTICE = CMS_TRUST_NOTICE;
 
