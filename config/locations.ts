@@ -16,6 +16,7 @@ export const showrooms: Location[] = [
     name: "Chorley",
     region: "Lancashire",
     regionSlug: "lancashire",
+    telephone: "01257 826 530",
     isShowroom: true,
   },
 ];
@@ -49,6 +50,17 @@ const SHOWROOM_SERVICES: ShowroomProfile["services"] = [
   "warranty",
 ];
 
+const STANDARD_OPENING_HOURS: ShowroomProfile["openingHours"] = [
+  { department: "sales", days: "Monday to Saturday", hours: "09:00 – 18:00" },
+  { department: "sales", days: "Sunday", hours: "10:00 – 17:00" },
+  {
+    department: "aftersales",
+    days: "Monday to Saturday",
+    hours: "09:00 – 18:00",
+  },
+  { department: "aftersales", days: "Sunday", hours: "10:00 – 17:00" },
+];
+
 export const showroomProfiles: ShowroomProfile[] = [
   profileFor("bury", {
     h1: "Oakwood Bury",
@@ -59,9 +71,14 @@ export const showroomProfiles: ShowroomProfile[] = [
     metaDescription:
       "Visit Oakwood Motor Company in Bury, BL8 1SW. Browse used cars, check finance eligibility, and book servicing at our Greater Manchester showroom.",
     services: SHOWROOM_SERVICES,
-    openingHours: [],
-    exceptions: [],
-    hoursStatus: "cms-pending",
+    openingHours: STANDARD_OPENING_HOURS,
+    exceptions: [
+      {
+        label: "Bank holidays",
+        note: "Hours may vary — call the showroom to confirm.",
+      },
+    ],
+    hoursStatus: "published",
   }),
   profileFor("chorley", {
     h1: "Oakwood Chorley",
@@ -72,9 +89,14 @@ export const showroomProfiles: ShowroomProfile[] = [
     metaDescription:
       "Visit Oakwood Motor Company in Chorley for used car sales in Chorley and Adlington. Browse stock, check finance, and book aftersales in Lancashire.",
     services: SHOWROOM_SERVICES,
-    openingHours: [],
-    exceptions: [],
-    hoursStatus: "cms-pending",
+    openingHours: STANDARD_OPENING_HOURS,
+    exceptions: [
+      {
+        label: "Bank holidays",
+        note: "Hours may vary — call the showroom to confirm.",
+      },
+    ],
+    hoursStatus: "published",
   }),
 ];
 

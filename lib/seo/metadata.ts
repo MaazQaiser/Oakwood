@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteOrigin } from "@/lib/seo/site";
 
 export interface PageSeoInput {
   title: string;
@@ -9,7 +10,7 @@ export interface PageSeoInput {
   ogImage?: string;
 }
 
-export function getCanonicalUrl(path: string, origin = ""): string {
+export function getCanonicalUrl(path: string, origin = getSiteOrigin()): string {
   const normalised = path.startsWith("/") ? path : `/${path}`;
 
   if (!origin) {

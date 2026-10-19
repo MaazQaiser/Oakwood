@@ -1,5 +1,6 @@
 export { createDynamicTitle, createPageMetadata, getCanonicalUrl } from "./metadata";
 export type { PageSeoInput } from "./metadata";
+export { getSiteOrigin } from "./site";
 export { createFaqJsonLd, createLocalBusinessJsonLd, createVehicleJsonLd, createArticleJsonLd, createBreadcrumbJsonLd } from "./json-ld";
 
 export interface BreadcrumbItem {
@@ -27,7 +28,7 @@ export function getSitemapPlaceholder(): [] {
 export { shouldIndexVehicle } from "@/lib/vehicles/sold";
 
 /**
- * Robots rules are deferred until the SEO/GEO specification is supplied.
+ * @deprecated Prefer app/robots.ts. Kept for call sites that still import the placeholder.
  */
 export function getRobotsPlaceholder(): null {
   return null;

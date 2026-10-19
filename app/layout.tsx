@@ -6,6 +6,7 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { CompareTray } from "@/components/compare/CompareTray";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Poppins } from "next/font/google";
+import { getSiteOrigin } from "@/lib/seo/site";
 import "@/styles/globals.css";
 
 const poppins = Poppins({
@@ -20,6 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteOrigin()),
   title: {
     default: "Oakwood Motor Company",
     template: "%s | Oakwood Motor Company",

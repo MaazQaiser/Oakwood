@@ -52,7 +52,7 @@ export const HOME_PROOF_ITEMS = [
     detail: "Checked, prepared and ready to drive",
   },
   {
-    lead: "6-month warranty included",
+    lead: "12-month warranty included",
     detail: "AA warranty available up to 4 years",
   },
   {
@@ -100,7 +100,7 @@ export const HOME_META_TITLE = "Used cars in stock";
 export const HOME_META_DESCRIPTION =
   "Find a used car in Oakwood stock, or search by monthly budget or total price. AA-inspected cars, two showrooms and our own workshop.";
 
-export const HOME_WARRANTY_INCLUDED = "6-month warranty included";
+export const HOME_WARRANTY_INCLUDED = "12-month warranty included";
 export const HOME_WARRANTY_AA_UPGRADE =
   "AA warranty available — upgrade up to 4 years";
 

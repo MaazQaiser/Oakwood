@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { HeroVariantToggle } from "@/components/home/HeroVariantToggle";
 import { HomeFilterSearchCard } from "@/components/home/HomeFilterSearchCard";
 import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
 import { HomeProofStrip } from "@/components/home/HomeProofStrip";
@@ -22,7 +21,7 @@ import {
 } from "@/lib/home/copy";
 
 export function HomeHero() {
-  const { variant, changeVariant } = useHomeHeroVariant();
+  const { variant } = useHomeHeroVariant();
 
   return (
     <>
@@ -32,7 +31,6 @@ export function HomeHero() {
         {variant === "current" ? <HomeSearchCard /> : null}
         <HomeFinanceStrip />
       </div>
-      <HeroVariantToggle variant={variant} onChange={changeVariant} />
     </>
   );
 }
@@ -71,7 +69,7 @@ function CurrentHero() {
           <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-ink sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
             {heading}
           </h1>
-          <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-[#8b95a3]">
+          <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
             {copy}
           </p>
           <HomeSearchBar className="mt-6" />

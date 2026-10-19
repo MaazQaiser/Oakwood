@@ -41,7 +41,11 @@ export function LocationCard({
         <p className="mt-1 min-h-5 text-body-sm tabular-nums">
           {profile.telephone ?? "\u00a0"}
         </p>
-        <p className="mt-2 text-body-sm text-muted">{LOCATION_HOURS_NOTICE}</p>
+        <p className="mt-2 text-body-sm text-muted">
+          {profile.hoursStatus === "published" && profile.openingHours[0]
+            ? `${profile.openingHours[0].days}: ${profile.openingHours[0].hours}`
+            : LOCATION_HOURS_NOTICE}
+        </p>
         <p className="mt-2 text-body-sm text-muted">
           Used cars, finance, part exchange, servicing, MOT and warranty.
         </p>
