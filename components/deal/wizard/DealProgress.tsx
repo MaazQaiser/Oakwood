@@ -39,7 +39,8 @@ export function DealProgressBar({ step }: { step: DealStep }) {
       aria-valuemax={steps.length}
       aria-valuenow={meta.index}
       aria-valuetext={`Step ${meta.index} of ${steps.length}: ${meta.shortTitle}`}
-      className="grid grid-cols-6 gap-1.5"
+      className="grid gap-1.5"
+      style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
     >
       {steps.map(({ item, isCurrent, isDone }) => (
         <span

@@ -3,18 +3,26 @@
 import { useState, type ComponentType } from "react";
 import {
   Check,
-  ChevronRight,
   FileCheck,
   ShieldCheck,
   Sparkles,
   Wrench,
   X,
 } from "lucide-react";
-import { Drawer } from "@/components/ui/Dialogs";
-import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { FinancialNumber } from "@/components/finance/FinancePrimitives";
+import { Alert } from "@/components/ui/Alert";
+import { LoadingState } from "@/components/ui/Loading";
+import {
+  ILLUSTRATIVE_TIER_APR,
+  useDealBuilder,
+} from "@/components/deal/DealBuilderProvider";
+import { SaveDeal } from "@/components/deal/SaveDeal";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
-import { useDealStepNavigation } from "@/components/deal/wizard/DealWizardShell";
+import {
+  DealCard,
+  useDealStepNavigation,
+} from "@/components/deal/wizard/DealWizardShell";
 import {
   COVER_INFO,
   COVER_YEAR_OPTIONS,
@@ -22,13 +30,23 @@ import {
   productPriceForYears,
 } from "@/lib/deal/products";
 import {
+  DEAL_AA_BADGE,
+  DEAL_AA_BREAKDOWN,
   DEAL_ADD_RECOMMENDED_COVER,
+  DEAL_BUDGET_HP_LEAD,
+  DEAL_BUDGET_PCP_LEAD,
   DEAL_CLEAR_ALL_COVER,
-  DEAL_SEE_MY_QUOTE,
+  DEAL_CONTINUE_TO_RESERVE,
+  DEAL_YOUR_DEAL_APR_DISCLAIMER,
+  DEAL_YOUR_DEAL_MOCK_PRICE,
+  DEAL_YOUR_DEAL_TIER_HINT,
 } from "@/lib/deal/copy";
-import { formatPounds } from "@/lib/format/money";
 import { cn } from "@/lib/cn";
-import type { DealProductDefinition } from "@/types/deal";
+import { formatNumber, formatPounds, formatTerm } from "@/lib/format/money";
+import type {
+  DealCreditTier,
+  DealProductDefinition,
+} from "@/types/deal";
 
 type InfoTab = "covered" | "not" | "terms" | "faq" | "video";
 
@@ -39,130 +57,12 @@ const PRODUCT_ICON: Record<string, ComponentType<{ className?: string }>> = {
   supagard: Sparkles,
 };
 
-function CoverInfoDrawer({
-  product,
-  initialTab,
-  onClose,
-}: {
-  product: DealProductDefinition;
-  initialTab?: InfoTab;
-  onClose: () => void;
-}) {
-  const info = COVER_INFO[product.id];
-  const [tab, setTab] = useState<InfoTab>(
-    initialTab ?? (info?.videoSrc ? "video" : "covered"),
-  );
-  const [videoFailed, setVideoFailed] = useState(false);
-
-  if (!info) {
-    return null;
-  }
-
-  const tabs: { id: InfoTab; label: string }[] = [
-    ...(info.videoSrc ? [{ id: "video" as const, label: "Video" }] : []),
-    { id: "covered", label: "Included" },
-    { id: "not", label: "Not covered" },
-    { id: "terms", label: "T&Cs" },
-    { id: "faq", label: "FAQ" },
-  ];
-
-  return (
-    <Drawer open title={product.name} onClose={onClose} size="side">
-      <div
-        role="tablist"
-        aria-label={`${product.name} information`}
-        className="flex gap-1 rounded-[14px] bg-page-tint p-1"
-      >
-        {tabs.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
-            className={cn(
-              "min-h-9 flex-1 rounded-lg px-2 text-caption font-semibold! whitespace-nowrap",
-              tab === item.id
-                ? "bg-surface text-ink shadow-sm"
-                : "text-muted hover:text-ink",
-            )}
-            onClick={() => setTab(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" className="mt-4 space-y-3 text-body-sm">
-        {tab === "video" && info.videoSrc ? (
-          <div>
-            <div className="aspect-video overflow-hidden rounded-xl bg-ink">
-              {videoFailed ? (
-                <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center text-white">
-                  <p className="text-body-sm font-semibold! text-white">
-                    Video coming soon
-                  </p>
-                  <p className="text-caption text-white/75">
-                    Use the other tabs to see what&apos;s included.
-                  </p>
-                </div>
-              ) : (
-                <video
-                  className="h-full w-full object-cover"
-                  controls
-                  playsInline
-                  preload="metadata"
-                >
-                  <source
-                    src={info.videoSrc}
-                    type="video/mp4"
-                    onError={() => setVideoFailed(true)}
-                  />
-                </video>
-              )}
-            </div>
-            {videoFailed ? null : (
-              <p className="mt-2 text-caption text-muted">
-                See {product.name} applied. Plays here, nothing links away.
-              </p>
-            )}
-          </div>
-        ) : null}
-        {tab === "covered" || tab === "not" ? (
-          <ul className="space-y-2">
-            {(tab === "covered" ? info.covered : info.notCovered).map(
-              (item) => (
-                <li key={item} className="flex gap-2">
-                  {tab === "covered" ? (
-                    <Check
-                      className="mt-0.5 h-4 w-4 shrink-0 text-success"
-                      aria-hidden
-                    />
-                  ) : (
-                    <X
-                      className="mt-0.5 h-4 w-4 shrink-0 text-muted"
-                      aria-hidden
-                    />
-                  )}
-                  {item}
-                </li>
-              ),
-            )}
-          </ul>
-        ) : null}
-        {tab === "terms" ? <p className="text-muted">{info.terms}</p> : null}
-        {tab === "faq" ? (
-          <div className="space-y-4">
-            {info.faq.map((item) => (
-              <div key={item.q}>
-                <p className="text-label">{item.q}</p>
-                <p className="mt-1 text-muted">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </Drawer>
-  );
-}
+const TIER_OPTIONS: { value: DealCreditTier; label: string }[] = [
+  { value: "excellent", label: "Excellent" },
+  { value: "good", label: "Good" },
+  { value: "average", label: "Average" },
+  { value: "poor", label: "Poor" },
+];
 
 function Switch({
   checked,
@@ -196,15 +96,133 @@ function Switch({
   );
 }
 
-function CoverCard({
+function ProductInfoPanel({
   product,
-  onInfo,
+  defaultTab,
 }: {
   product: DealProductDefinition;
-  onInfo: (tab?: InfoTab) => void;
+  defaultTab?: InfoTab;
+}) {
+  const info = COVER_INFO[product.id];
+  const [tab, setTab] = useState<InfoTab>(
+    defaultTab ?? (info?.videoSrc ? "video" : "covered"),
+  );
+  const [videoFailed, setVideoFailed] = useState(false);
+
+  if (!info) {
+    return (
+      <p className="mt-3 text-caption text-muted">
+        Product details are not available in this prototype.
+      </p>
+    );
+  }
+
+  const tabs: { id: InfoTab; label: string }[] = [
+    ...(info.videoSrc ? [{ id: "video" as const, label: "Video" }] : []),
+    { id: "covered", label: "Included" },
+    { id: "not", label: "Not covered" },
+    { id: "terms", label: "T&Cs" },
+    { id: "faq", label: "FAQs" },
+  ];
+
+  return (
+    <div className="mt-4 rounded-[16px] border border-border bg-page-tint p-3">
+      <div
+        role="tablist"
+        aria-label={`${product.name} information`}
+        className="flex flex-wrap gap-1"
+      >
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.id}
+            className={cn(
+              "min-h-9 rounded-lg px-2.5 text-caption font-semibold!",
+              tab === item.id
+                ? "bg-surface text-ink shadow-sm"
+                : "text-muted hover:text-ink",
+            )}
+            onClick={() => setTab(item.id)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" className="mt-3 space-y-3 text-body-sm">
+        {tab === "video" && info.videoSrc ? (
+          <div className="aspect-video overflow-hidden rounded-xl bg-ink">
+            {videoFailed ? (
+              <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center text-white">
+                <p className="text-body-sm font-semibold!">Video placeholder</p>
+                <p className="text-caption text-white/75">
+                  Mock asset unavailable. Use the other tabs for product details.
+                </p>
+              </div>
+            ) : (
+              <video
+                className="h-full w-full object-cover"
+                controls
+                playsInline
+                preload="metadata"
+                onError={() => setVideoFailed(true)}
+              >
+                <source src={info.videoSrc} type="video/mp4" />
+              </video>
+            )}
+          </div>
+        ) : null}
+        {tab === "covered" || tab === "not" ? (
+          <ul className="space-y-2">
+            {(tab === "covered" ? info.covered : info.notCovered).map((item) => (
+              <li key={item} className="flex gap-2">
+                {tab === "covered" ? (
+                  <Check
+                    className="mt-0.5 h-4 w-4 shrink-0 text-success"
+                    aria-hidden
+                  />
+                ) : (
+                  <X className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden />
+                )}
+                {item}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {tab === "terms" ? (
+          <p className="text-muted">
+            {info.terms}{" "}
+            <span className="text-caption">
+              (Prototype wording — final T&amp;Cs subject to supplier sign-off.)
+            </span>
+          </p>
+        ) : null}
+        {tab === "faq" ? (
+          <div className="space-y-4">
+            {info.faq.map((item) => (
+              <div key={item.q}>
+                <p className="text-label">{item.q}</p>
+                <p className="mt-1 text-muted">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function ProductCard({
+  product,
+  hero = false,
+}: {
+  product: DealProductDefinition;
+  hero?: boolean;
 }) {
   const { draft, toggleProduct, setProductYears, productImpact } =
     useDealBuilder();
+  const [infoOpen, setInfoOpen] = useState(false);
   const selected = draft.productIds.includes(product.id);
   const isOneOff = product.id === "supagard";
   const years =
@@ -219,28 +237,55 @@ function CoverCard({
   return (
     <article
       className={cn(
-        "rounded-[24px] p-5 transition-[background-color,box-shadow]",
-        selected
-          ? "bg-surface shadow-card ring-1 ring-primary/15"
-          : "bg-surface/60 ring-1 ring-border/70",
+        "relative rounded-[24px] p-5 transition-[background-color,box-shadow]",
+        hero
+          ? "bg-navy text-white shadow-[0_12px_28px_rgb(0_40_82/0.28)]"
+          : selected
+            ? "bg-surface shadow-card ring-1 ring-primary/15"
+            : "bg-surface/60 ring-1 ring-border/70",
       )}
     >
-      <div className="flex items-center gap-3">
+      <button
+        type="button"
+        aria-expanded={infoOpen}
+        aria-label={`${product.name} information`}
+        onClick={() => setInfoOpen((open) => !open)}
+        className={cn(
+          "absolute top-4 right-4 grid h-5 w-5 place-items-center rounded-full text-[0.7rem] font-semibold! italic",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+          hero
+            ? "bg-[#FFD100] text-navy"
+            : "bg-page-tint text-primary ring-1 ring-border",
+        )}
+      >
+        i
+      </button>
+
+      <div className="flex items-center gap-3 pr-8">
         <span
           className={cn(
             "grid h-9 w-9 shrink-0 place-items-center rounded-lg",
-            selected
-              ? "bg-surface-soft text-primary"
-              : "bg-page-tint text-muted",
+            hero
+              ? "bg-white/10 text-[#FFD100]"
+              : selected
+                ? "bg-surface-soft text-primary"
+                : "bg-page-tint text-muted",
           )}
         >
           <Icon className="h-[1.125rem] w-[1.125rem]" />
         </span>
-        <h3 className="min-w-0 flex-1 text-label">{product.name}</h3>
+        <div className="min-w-0 flex-1">
+          <h3 className={cn("text-label", hero && "text-white")}>
+            {product.name}
+          </h3>
+          {hero ? (
+            <p className="mt-0.5 text-caption text-[#FFD100]">{DEAL_AA_BADGE}</p>
+          ) : null}
+        </div>
         <span
           className={cn(
             "tabular-number text-body-sm font-semibold!",
-            selected ? "text-primary" : "text-muted",
+            hero ? "text-white" : selected ? "text-primary" : "text-muted",
           )}
         >
           +{formatPounds(impact)}/mo
@@ -252,10 +297,17 @@ function CoverCard({
         />
       </div>
 
-      <p className="mt-2 text-body-sm text-muted">{product.summary}</p>
+      <p className={cn("mt-2 text-body-sm", hero ? "text-white/85" : "text-muted")}>
+        {product.summary}
+      </p>
+      {hero ? (
+        <p className="mt-2 text-caption font-semibold! text-[#FFD100]">
+          {DEAL_AA_BREAKDOWN}
+        </p>
+      ) : null}
 
       {!isOneOff ? (
-        <div className={cn("mt-3", !selected && "opacity-70")}>
+        <div className={cn("mt-3", !selected && "opacity-70", hero && "[&_legend]:text-white [&_.text-muted]:text-white/70")}>
           <DealChipGroup
             label="Duration"
             value={selected ? years : undefined}
@@ -269,23 +321,162 @@ function CoverCard({
         </div>
       ) : null}
 
-      <div className="mt-3 flex items-center justify-between gap-3 text-caption">
-        <span className="text-muted">
-          {formatPounds(price)}
-          {isOneOff
-            ? " one-off"
-            : ` for ${years} year${years === 1 ? "" : "s"}`}
-        </span>
-        <button
-          type="button"
-          className="inline-flex min-h-9 items-center gap-0.5 font-semibold! text-primary hover:underline"
-          onClick={() => onInfo(hasVideo ? "video" : undefined)}
-        >
-          {hasVideo ? "Watch video" : "Info"}
-          <ChevronRight className="h-4 w-4" aria-hidden />
-        </button>
-      </div>
+      <p
+        className={cn(
+          "mt-3 text-caption",
+          hero ? "text-white/70" : "text-muted",
+        )}
+      >
+        {formatPounds(price)}
+        {isOneOff ? " one-off" : ` for ${years} year${years === 1 ? "" : "s"}`}
+        {" · "}
+        {DEAL_YOUR_DEAL_MOCK_PRICE}
+      </p>
+
+      {infoOpen ? (
+        <div className={hero ? "[&_*]:text-ink" : undefined}>
+          <ProductInfoPanel
+            product={product}
+            defaultTab={hasVideo ? "video" : "covered"}
+          />
+        </div>
+      ) : null}
     </article>
+  );
+}
+
+function FinanceSummaryHero() {
+  const {
+    draft,
+    calculation,
+    apr,
+    phase,
+    setFinanceType,
+    setCreditTier,
+  } = useDealBuilder();
+  const monthly = calculation?.monthlyPayment ?? 0;
+  const equity = calculation?.pxEquity ?? 0;
+  const cash = calculation?.cashDeposit ?? draft.cashDeposit;
+  const totalDeposit = calculation?.totalDeposit ?? cash;
+  const tier = draft.creditTier ?? "average";
+  const displayApr = apr ?? ILLUSTRATIVE_TIER_APR[tier];
+  const updating = phase === "RECALCULATING";
+
+  return (
+    <div className="space-y-4">
+      <DealCard className="space-y-4 !bg-navy !text-white !shadow-[0_12px_28px_rgb(0_40_82/0.25)]">
+        <div>
+          <p className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-white/70">
+            {draft.financeType === "hp"
+              ? "Hire Purchase"
+              : "Personal Contract Purchase"}
+          </p>
+          {updating ? (
+            <div className="mt-3 text-white/80">
+              <LoadingState label="Updating your deal…" />
+            </div>
+          ) : (
+            <p className="mt-2">
+              <FinancialNumber
+                value={formatPounds(monthly)}
+                suffix="/mo"
+                size="lg"
+                className="text-white"
+              />
+            </p>
+          )}
+          <p className="mt-2 text-caption text-white/75">
+            Est. {displayApr.toFixed(1)}% APR · illustrative
+          </p>
+        </div>
+
+        <dl className="grid grid-cols-2 gap-2 text-body-sm sm:grid-cols-4">
+          <SummaryStat label="Cash deposit" value={formatPounds(cash)} />
+          <SummaryStat label="Part exchange" value={formatPounds(equity)} />
+          <SummaryStat
+            label="Total deposit"
+            value={formatPounds(totalDeposit)}
+          />
+          <SummaryStat label="Term" value={formatTerm(draft.term)} />
+          {draft.financeType === "pcp" && draft.annualMileage ? (
+            <SummaryStat
+              label="Annual mileage"
+              value={`${formatNumber(draft.annualMileage)} miles`}
+            />
+          ) : null}
+        </dl>
+
+        <p className="text-caption text-white/75">{DEAL_YOUR_DEAL_APR_DISCLAIMER}</p>
+      </DealCard>
+
+      <DealCard className="space-y-5">
+        <DealChipGroup
+          label="Credit tier (illustration)"
+          value={tier}
+          options={TIER_OPTIONS}
+          columns={4}
+          onChange={setCreditTier}
+          hint={DEAL_YOUR_DEAL_TIER_HINT}
+        />
+
+        <div>
+          <p className="text-label">Finance type</p>
+          <div
+            role="tablist"
+            aria-label="Finance type"
+            className="mt-2 grid grid-cols-2 gap-2"
+          >
+            {(
+              [
+                { id: "hp" as const, lead: DEAL_BUDGET_HP_LEAD },
+                { id: "pcp" as const, lead: DEAL_BUDGET_PCP_LEAD },
+              ] as const
+            ).map((item) => {
+              const selected = draft.financeType === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setFinanceType(item.id)}
+                  className={cn(
+                    "rounded-[16px] px-3 py-3 text-left transition-colors",
+                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+                    selected
+                      ? "bg-navy text-white"
+                      : "bg-page-tint text-ink hover:bg-surface-soft",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block text-[0.68rem] font-semibold! uppercase tracking-[0.1em]",
+                      selected ? "text-white/75" : "text-muted",
+                    )}
+                  >
+                    {item.id.toUpperCase()}
+                  </span>
+                  <span className="mt-0.5 block text-body-sm font-semibold!">
+                    {item.lead}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </DealCard>
+    </div>
+  );
+}
+
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[14px] bg-white/10 px-3 py-2.5">
+      <dt className="text-caption text-white/70">{label}</dt>
+      <dd className="mt-0.5 tabular-number text-body-sm font-semibold! text-white">
+        {value}
+      </dd>
+    </div>
   );
 }
 
@@ -295,34 +486,51 @@ export function DealCoverStep() {
     draft,
     calculation,
     coverMonthly,
+    phase,
     clearAllCover,
     addRecommendedCover,
   } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("cover");
-  const [info, setInfo] = useState<{
-    product: DealProductDefinition;
-    tab?: InfoTab;
-  } | null>(null);
   const count = draft.productIds.length;
+  const aa = products.find((product) => product.id === "aa-warranty");
+  const rest = products.filter((product) => product.id !== "aa-warranty");
+  const calcError = phase === "CALCULATION_ERROR";
+  const emptyProducts = products.length === 0;
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex-1 space-y-3 pb-5">
-        {products.map((product) => (
-          <CoverCard
-            key={product.id}
-            product={product}
-            onInfo={(tab) => setInfo({ product, tab })}
-          />
-        ))}
+      <div className="flex-1 space-y-4 pb-5">
+        <FinanceSummaryHero />
 
-        <div className="flex items-center justify-between gap-3 rounded-[24px] bg-navy px-5 py-4 text-white">
+        {calcError ? (
+          <Alert title="We couldn't update your figures" tone="warning">
+            Check your selections and try again. Illustrative quotes may be
+            temporarily unavailable.
+          </Alert>
+        ) : null}
+
+        {emptyProducts ? (
+          <DealCard>
+            <p className="text-body-sm text-muted">
+              Optional products are not loaded in this session.
+            </p>
+          </DealCard>
+        ) : (
+          <div className="space-y-3">
+            {aa ? <ProductCard product={aa} hero /> : null}
+            {rest.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between gap-3 rounded-[24px] bg-surface px-5 py-4 shadow-card">
           <div className="min-w-0">
-            <p className="text-caption text-white/75">Your bundle</p>
+            <p className="text-caption text-muted">Optional products</p>
             {count > 0 ? (
               <button
                 type="button"
-                className="mt-0.5 min-h-8 text-caption font-semibold! text-white underline underline-offset-2"
+                className="mt-0.5 min-h-8 text-caption font-semibold! text-primary underline underline-offset-2"
                 onClick={clearAllCover}
               >
                 {DEAL_CLEAR_ALL_COVER}
@@ -330,7 +538,7 @@ export function DealCoverStep() {
             ) : (
               <button
                 type="button"
-                className="mt-0.5 min-h-8 text-caption font-semibold! text-white underline underline-offset-2"
+                className="mt-0.5 min-h-8 text-caption font-semibold! text-primary underline underline-offset-2"
                 onClick={addRecommendedCover}
               >
                 {DEAL_ADD_RECOMMENDED_COVER}
@@ -338,13 +546,11 @@ export function DealCoverStep() {
             )}
           </div>
           <div className="text-right">
-            <p className="financial-number financial-number--compact text-white">
+            <p className="financial-number financial-number--compact text-navy">
               +{formatPounds(coverMonthly)}
-              <span className="text-body-sm font-normal text-white/75">
-                /mo
-              </span>
+              <span className="text-body-sm font-normal text-muted">/mo</span>
             </p>
-            <p className="text-caption text-white/75">
+            <p className="text-caption text-muted">
               {count > 0
                 ? `${formatPounds(calculation?.productsTotal ?? 0)} total · ${count} product${count === 1 ? "" : "s"}`
                 : "No cover added"}
@@ -353,19 +559,15 @@ export function DealCoverStep() {
         </div>
       </div>
 
-      {info ? (
-        <CoverInfoDrawer
-          key={`${info.product.id}-${info.tab ?? "default"}`}
-          product={info.product}
-          initialTab={info.tab}
-          onClose={() => setInfo(null)}
-        />
-      ) : null}
+      <div className="mb-3">
+        <SaveDeal />
+      </div>
 
       <DealStepFooter
-        onBack={() => goBack("decision")}
-        onContinue={() => goNext("quote")}
-        continueLabel={DEAL_SEE_MY_QUOTE}
+        onBack={() => goBack("budget")}
+        onContinue={() => goNext("reserve")}
+        continueLabel={DEAL_CONTINUE_TO_RESERVE}
+        continueDisabled={calcError}
       />
     </div>
   );

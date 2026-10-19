@@ -1,513 +1,320 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
-import { Lock } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Phone, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Field, Input } from "@/components/forms/FormControls";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
+import { SaveDeal } from "@/components/deal/SaveDeal";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { useDealStepNavigation } from "@/components/deal/wizard/DealWizardShell";
-import { SaveDeal } from "@/components/deal/SaveDeal";
+import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summary";
+import { DealReservePaymentPanel } from "@/components/deal/wizard/steps/DealReservePaymentPanel";
+import { DealTestDrivePanel } from "@/components/deal/wizard/steps/DealTestDrivePanel";
+import { DealCallbackPanel } from "@/components/deal/wizard/steps/DealCallbackPanel";
+import { markStep4CtaEngaged } from "@/components/deal/DealAbandonmentModal";
+import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import { reservationConfig } from "@/config/reservation";
-import { supportRoutes } from "@/config/routes";
+import { getDealApplicationUrl } from "@/config/routes";
 import {
-  DEAL_EMAIL_DEAL,
-  DEAL_HANDOVER_WITHIN,
-  DEAL_RESERVE_SUCCESS_TITLE,
-} from "@/lib/deal/copy";
-import { listSelectedProducts } from "@/lib/deal/products";
-import { formatPounds, formatTerm } from "@/lib/format/money";
+  getMockShowroomOpenStatus,
+  resolveShowroomSlug,
+} from "@/lib/deal/opening-status";
 import {
-  formatHoldPeriod,
-  payAndReserveLabel,
-  reservationAmountLabel,
-} from "@/lib/reservation/format";
+  STEP4_BACK_HUB,
+  STEP4_CLOSED_BODY,
+  STEP4_CLOSED_HOURS_REF,
+  STEP4_CLOSED_TITLE,
+  STEP4_HUB_APPLY,
+  STEP4_HUB_APPLY_HINT,
+  STEP4_HUB_CALL_BACK,
+  STEP4_HUB_CALL_BACK_HINT,
+  STEP4_HUB_CALL_NOW,
+  STEP4_HUB_CALL_NOW_OPEN,
+  STEP4_HUB_RESERVE,
+  STEP4_HUB_RESERVE_HINT,
+  STEP4_HUB_TEST_DRIVE,
+  STEP4_HUB_TEST_DRIVE_HINT,
+} from "@/lib/deal/step4-copy";
+import { reservationAmountLabel } from "@/lib/reservation/format";
+import { cn } from "@/lib/cn";
 
-/** Placeholder until ops confirm the named coordinator, photo and SLA (spec §7). */
-const HANDOVER = {
-  name: "Sam Wright",
-  initials: "SW",
-  role: "Customer handover",
-  callbackMinutes: 20,
-};
+type Panel =
+  | "hub"
+  | "reserve"
+  | "test-drive"
+  | "callback"
+  | "call-closed";
 
-/** Mock reservation reference until Stripe/DMS confirm a real one. */
-function mockReference(dealId: string, stockId: string): string {
-  const seed = `${stockId}${dealId}`.replace(/[^a-zA-Z0-9]/g, "").slice(-6);
-  return `OAK-${seed.toUpperCase() || "DEMO01"}`;
+function readInitialPanel(): Panel {
+  if (typeof window === "undefined") return "hub";
+  const value = new URLSearchParams(window.location.search).get("panel");
+  if (
+    value === "reserve" ||
+    value === "test-drive" ||
+    value === "callback" ||
+    value === "call-closed"
+  ) {
+    return value;
+  }
+  return "hub";
 }
 
-function formatCard(value: string): string {
-  return value
-    .replace(/\D/g, "")
-    .slice(0, 19)
-    .replace(/(.{4})/g, "$1 ")
-    .trim();
-}
-
-function formatExpiry(value: string): string {
-  const digits = value.replace(/\D/g, "").slice(0, 4);
-  return digits.length > 2
-    ? `${digits.slice(0, 2)} / ${digits.slice(2)}`
-    : digits;
-}
-
-type Errors = Partial<
-  Record<"name" | "email" | "phone" | "card" | "expiry" | "cvc", string>
->;
-
-function Row({
-  label,
-  children,
-  strong,
-}: {
-  label: string;
-  children: ReactNode;
-  strong?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className={strong ? "text-label" : "text-muted"}>{label}</dt>
-      <dd className="text-right tabular-number">{children}</dd>
-    </div>
-  );
-}
-
-function Coordinator({ bordered = false }: { bordered?: boolean }) {
-  return (
-    <div
-      className={
-        bordered
-          ? "flex items-center gap-3 rounded-card bg-surface p-5 shadow-card"
-          : "flex items-center gap-3 rounded-[24px] bg-surface-soft p-4"
-      }
-    >
-      <span
-        aria-hidden
-        className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary-soft text-body-sm font-semibold! text-primary"
-      >
-        {HANDOVER.initials}
-      </span>
-      <div className="min-w-0">
-        <p className="text-label">
-          {HANDOVER.name} will call you in {HANDOVER.callbackMinutes} min
-        </p>
-        <p className="text-caption text-muted">
-          {HANDOVER.role}. To confirm the car, answer questions and book your
-          handover.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Vehicle, part exchange, deposit, cover and finance: before paying and on the confirmation. */
-function DealReview({ title }: { title: string }) {
-  const { vehicle, draft, calculation, coverMonthly, apr } = useDealBuilder();
-  const headingId = useId();
-  const products = listSelectedProducts(draft.productIds);
-  const vehicleDetail = [
-    vehicle.derivative,
-    `${vehicle.mileage.toLocaleString("en-GB")} miles`,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-  const financeLine = [
-    draft.financeType.toUpperCase(),
-    formatTerm(draft.term),
-    apr !== undefined ? `${apr.toFixed(1)}% APR` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  return (
-    <section
-      className="rounded-card bg-surface p-5 shadow-card sm:p-6"
-      aria-labelledby={headingId}
-    >
-      <h2 id={headingId} className="text-label">
-        {title}
-      </h2>
-      <dl className="mt-3 space-y-1.5 text-body-sm">
-        <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
-          {formatPounds(vehicle.cashPrice)}
-        </Row>
-        <p className="text-caption text-muted">{vehicleDetail}</p>
-        {draft.px ? (
-          <Row label="Part exchange">
-            −{formatPounds(calculation?.pxEquity ?? 0)}
-          </Row>
-        ) : null}
-        <Row label="Cash deposit">{formatPounds(draft.cashDeposit)}</Row>
-        <Row label="Cover">
-          {products.length ? `+${formatPounds(coverMonthly)}/mo` : "None"}
-        </Row>
-        {products.length ? (
-          <ul className="space-y-0.5 text-caption text-muted">
-            {products.map((product) => (
-              <li key={product.id}>{product.name}</li>
-            ))}
-          </ul>
-        ) : null}
-        <p className="text-caption text-muted">{financeLine}</p>
-      </dl>
-      <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
-        <span className="text-label">Monthly</span>
-        <FinancialNumber
-          value={formatPounds(calculation?.monthlyPayment ?? 0)}
-          suffix="/mo"
-          size="compact"
-        />
-      </div>
-    </section>
-  );
-}
+const IDLE_SAVE_KEY = "oakwood-step4-idle-save-shown";
+const IDLE_MS = 30_000;
 
 export function DealReserveStep() {
-  const { vehicle, draft, dealId, markStepComplete, navigateTo } =
-    useDealBuilder();
+  const { vehicle, dealId, navigateTo } = useDealBuilder();
   const { goBack } = useDealStepNavigation("reserve");
-  const nameId = useId();
-  const emailId = useId();
-  const phoneId = useId();
-  const cardId = useId();
-  const expiryId = useId();
-  const cvcId = useId();
-  const [name, setName] = useState(draft.decision?.fullName ?? "");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [errors, setErrors] = useState<Errors>({});
-  // Saved with the deal, so a reload keeps showing the confirmation.
-  const [confirmed, setConfirmed] = useState(
-    draft.stepsCompleted?.includes("reserve") ?? false,
-  );
-  const [emailOpen, setEmailOpen] = useState(false);
-  // A transition ends before the mock timeout fires, so track it directly:
-  // the Pay buttons must show busy and ignore repeat taps while processing.
-  const [submitting, setSubmitting] = useState(false);
+  const [panel, setPanel] = useState<Panel>("hub");
+  const [idleSaveOpen, setIdleSaveOpen] = useState(false);
 
   useEffect(() => {
-    if (confirmed) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [confirmed]);
+    setPanel(readInitialPanel());
+  }, []);
 
-  const clear = (key: keyof Errors) =>
-    setErrors((current) =>
-      current[key] ? { ...current, [key]: undefined } : current,
-    );
-  const amountLabel = reservationAmountLabel(reservationConfig.amount);
-  const hold = formatHoldPeriod();
-  const reference = useMemo(
-    () => mockReference(dealId, vehicle.stockId),
-    [dealId, vehicle.stockId],
+  // Spec §13: Step 4 CTA screen without CTA click after 30 seconds idle.
+  useEffect(() => {
+    if (panel !== "hub") return;
+    let shown = false;
+    try {
+      shown = sessionStorage.getItem(IDLE_SAVE_KEY) === "1";
+    } catch {
+      // ignore
+    }
+    if (shown) return;
+    const timer = window.setTimeout(() => {
+      try {
+        if (sessionStorage.getItem(IDLE_SAVE_KEY) === "1") return;
+        sessionStorage.setItem(IDLE_SAVE_KEY, "1");
+      } catch {
+        // ignore
+      }
+      setIdleSaveOpen(true);
+    }, IDLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [panel]);
+
+  const openStatus = useMemo(
+    () =>
+      getMockShowroomOpenStatus(
+        resolveShowroomSlug(vehicle.locationSlug),
+      ),
+    [vehicle.locationSlug],
   );
 
-  function completeReservation() {
-    setErrors({});
-    if (submitting) {
-      return;
+  function openPanel(next: Panel) {
+    markStep4CtaEngaged();
+    setIdleSaveOpen(false);
+    try {
+      sessionStorage.setItem(IDLE_SAVE_KEY, "1");
+    } catch {
+      // ignore
     }
-    setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
-      setConfirmed(true);
-      markStepComplete("reserve");
-    }, 900);
+    setPanel(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function payByCard() {
-    const next: Errors = {};
-    if (name.trim().length < 2) next.name = "Enter the name on your card.";
-    if (!/^\S+@\S+\.\S+$/.test(email.trim()))
-      next.email = "Enter a valid email address.";
-    if (phone.replace(/\D/g, "").length < 10)
-      next.phone = "Enter a UK phone number so we can call you.";
-    if (cardNumber.replace(/\D/g, "").length < 12)
-      next.card = "Enter your card number.";
-    if (expiry.replace(/\D/g, "").length !== 4) next.expiry = "Use MM / YY.";
-    if (cvc.trim().length < 3) next.cvc = "3 or 4 digits.";
-    setErrors(next);
-    const order: [keyof Errors, string][] = [
-      ["name", nameId],
-      ["email", emailId],
-      ["phone", phoneId],
-      ["card", cardId],
-      ["expiry", expiryId],
-      ["cvc", cvcId],
-    ];
-    const first = order.find(([key]) => next[key]);
-    if (first) {
-      // The Pay button is in the sticky footer; take the customer to the problem.
-      document.getElementById(first[1])?.focus();
-    }
-    if (Object.keys(next).length === 0) {
-      completeReservation();
-    }
+  function backToHub() {
+    setPanel("hub");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (confirmed) {
-    const nextSteps = [
-      {
-        title: `Within ${HANDOVER.callbackMinutes} minutes`,
-        body: `${HANDOVER.name} calls you to confirm the reservation.`,
-      },
-      {
-        title: "Before collection",
-        body: "We finalise your part exchange, finance and paperwork.",
-      },
-      {
-        title: "Handover",
-        body: `Collect the car from ${vehicle.locationName} or we arrange delivery.`,
-      },
-    ];
-
+  if (panel === "reserve") {
+    return <DealReservePaymentPanel onBack={backToHub} />;
+  }
+  if (panel === "test-drive") {
+    return <DealTestDrivePanel onBack={backToHub} />;
+  }
+  if (panel === "callback" || panel === "call-closed") {
     return (
-      <div className="flex flex-1 flex-col">
-        <div className="flex-1 space-y-4 pb-5">
-          <DealResultHero
-            eyebrow={DEAL_RESERVE_SUCCESS_TITLE}
-            title="You're all set"
-            body={DEAL_HANDOVER_WITHIN}
-          >
-            <div className="relative mt-5 rounded-[20px] bg-white/10 px-4 py-3.5">
-              <p className="text-caption text-white/75">Reservation reference</p>
-              <p className="mt-1 text-h5 tabular-number text-white">{reference}</p>
-              <p className="mt-1 text-caption text-white/75">
-                {amountLabel} paid. Your car is held for {hold}.
-              </p>
-            </div>
-          </DealResultHero>
-
-          <Coordinator bordered />
-
-          <DealReview title="Your deal" />
-
-          <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-            <p className="text-label">What happens next</p>
-            <ol className="relative mt-3 space-y-4 before:absolute before:top-2 before:bottom-2 before:left-[5px] before:w-px before:bg-border">
-              {nextSteps.map((item) => (
-                <li key={item.title} className="relative pl-6">
-                  <span className="absolute top-1.5 left-0 h-[11px] w-[11px] rounded-full bg-primary ring-4 ring-surface" />
-                  <p className="text-body-sm font-semibold! text-ink">
-                    {item.title}
-                  </p>
-                  <p className="text-caption text-muted">{item.body}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          {emailOpen ? (
-            <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-              <p className="text-label">{DEAL_EMAIL_DEAL}</p>
-              <SaveDeal defaultOpen compact />
-            </div>
-          ) : null}
-        </div>
-
-        {/* Same sticky action bar as every other step. */}
-        <DealStepFooter
-          showMonthly={false}
-          onBack={emailOpen ? undefined : () => setEmailOpen(true)}
-          backLabel={
-            <>
-              <span className="sm:hidden">Email deal</span>
-              <span className="hidden sm:inline">{DEAL_EMAIL_DEAL}</span>
-            </>
-          }
-          onContinue={() => navigateTo(supportRoutes.bookingEnquiry)}
-          continueLabel="Request a callback"
-        />
-      </div>
+      <DealCallbackPanel
+        onBack={backToHub}
+        mode={panel === "call-closed" ? "closed" : "callback"}
+        closedStatus={panel === "call-closed" ? openStatus : undefined}
+      />
     );
   }
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 space-y-4 pb-5">
-        <DealReview title="Review your deal" />
+        <DealStep4Summary title="Your deal" />
 
+        {/* Primary — Reserve */}
         <section
-          className="rounded-card bg-surface p-5 shadow-card sm:p-6"
-          aria-labelledby={`${cardId}-pay`}
+          className="rounded-card bg-navy p-5 text-white shadow-card sm:p-6"
+          aria-labelledby="step4-reserve"
         >
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 id={`${cardId}-pay`} className="text-label">
-                Reserve for {amountLabel}
-              </h2>
-              <p className="mt-0.5 text-caption text-muted">
-                Fully refundable reservation fee, applied to your purchase.
-              </p>
-            </div>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-page-tint px-2.5 py-1 text-caption text-muted">
-              <Lock className="h-3 w-3" aria-hidden />
-              Stripe
-            </span>
-          </div>
-          <p className="mt-3 rounded-[14px] bg-page-tint px-4 py-3 text-body-sm">
-            We hold this car for you for {hold} and take it off sale while
-            you finish.
+          <h2 id="step4-reserve" className="text-h5 text-white">
+            {STEP4_HUB_RESERVE()}
+          </h2>
+          <p className="mt-1 text-caption text-white/75">
+            {STEP4_HUB_RESERVE_HINT()}
           </p>
-
-          {/* Wallets first, stacked full width, as on Stripe Checkout. */}
-          <div className="mt-4 grid gap-2">
-            <button
-              type="button"
-              className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white disabled:opacity-50"
-              disabled={submitting}
-              onClick={completeReservation}
-            >
-              Apple Pay
-            </button>
-            <button
-              type="button"
-              className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white disabled:opacity-50"
-              disabled={submitting}
-              onClick={completeReservation}
-            >
-              Google Pay
-            </button>
-          </div>
-
-          <div className="my-4 flex items-center gap-3 text-caption text-muted">
-            <span className="h-px flex-1 bg-border" />
-            or pay with card
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <div className="space-y-3">
-            <Field htmlFor={nameId} label="Name on card" error={errors.name}>
-              <Input
-                id={nameId}
-                value={name}
-                autoComplete="cc-name"
-                error={Boolean(errors.name)}
-                onChange={(event) => {
-                  setName(event.target.value);
-                  clear("name");
-                }}
-              />
-            </Field>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field htmlFor={emailId} label="Email" error={errors.email}>
-                <Input
-                  id={emailId}
-                  type="email"
-                  value={email}
-                  autoComplete="email"
-                  error={Boolean(errors.email)}
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    clear("email");
-                  }}
-                />
-              </Field>
-              <Field htmlFor={phoneId} label="Mobile" error={errors.phone}>
-                <Input
-                  id={phoneId}
-                  type="tel"
-                  value={phone}
-                  autoComplete="tel"
-                  error={Boolean(errors.phone)}
-                  onChange={(event) => {
-                    setPhone(event.target.value);
-                    clear("phone");
-                  }}
-                />
-              </Field>
-            </div>
-            <Field htmlFor={cardId} label="Card number" error={errors.card}>
-              <Input
-                id={cardId}
-                inputMode="numeric"
-                autoComplete="cc-number"
-                className="tabular-number"
-                placeholder="1234 1234 1234 1234"
-                value={cardNumber}
-                error={Boolean(errors.card)}
-                onChange={(event) => {
-                  setCardNumber(formatCard(event.target.value));
-                  clear("card");
-                }}
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field htmlFor={expiryId} label="Expiry" error={errors.expiry}>
-                <Input
-                  id={expiryId}
-                  inputMode="numeric"
-                  placeholder="MM / YY"
-                  autoComplete="cc-exp"
-                  className="tabular-number"
-                  value={expiry}
-                  error={Boolean(errors.expiry)}
-                  onChange={(event) => {
-                    setExpiry(formatExpiry(event.target.value));
-                    clear("expiry");
-                  }}
-                />
-              </Field>
-              <Field htmlFor={cvcId} label="CVC" error={errors.cvc}>
-                <Input
-                  id={cvcId}
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  maxLength={4}
-                  placeholder="123"
-                  className="tabular-number"
-                  value={cvc}
-                  error={Boolean(errors.cvc)}
-                  onChange={(event) => {
-                    setCvc(event.target.value.replace(/\D/g, ""));
-                    clear("cvc");
-                  }}
-                />
-              </Field>
-            </div>
-          </div>
-
-          <p className="mt-3 flex items-center gap-1.5 text-caption text-muted">
-            <Lock className="h-3.5 w-3.5" aria-hidden />
-            Secured by Stripe. Prototype: no payment is taken.
-          </p>
+          <Button
+            type="button"
+            className="mt-4 w-full bg-primary hover:bg-primary-hover"
+            onClick={() => openPanel("reserve")}
+          >
+            {STEP4_HUB_RESERVE()}
+          </Button>
         </section>
 
-        <Coordinator />
-
-        <div className="flex flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-4">
-          {emailOpen ? (
-            <div className="w-full rounded-card bg-surface p-5 shadow-card sm:p-6">
-              <p className="text-label">{DEAL_EMAIL_DEAL}</p>
-              <SaveDeal defaultOpen compact />
-            </div>
-          ) : (
-            <Button
-              type="button"
-              variant="text"
-              onClick={() => setEmailOpen(true)}
-            >
-              {DEAL_EMAIL_DEAL}
-            </Button>
-          )}
-          <Button href={supportRoutes.bookingEnquiry} variant="text">
-            Request a callback
+        {/* Secondary — Apply */}
+        <section
+          className="rounded-card bg-surface p-5 shadow-card sm:p-6"
+          aria-labelledby="step4-apply"
+        >
+          <h2 id="step4-apply" className="text-label">
+            {STEP4_HUB_APPLY}
+          </h2>
+          <p className="mt-1 text-caption text-muted">{STEP4_HUB_APPLY_HINT}</p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-4 w-full"
+            onClick={() => {
+              markStep4CtaEngaged();
+              navigateTo(getDealApplicationUrl(dealId));
+            }}
+          >
+            {STEP4_HUB_APPLY}
           </Button>
+        </section>
+
+        {/* Tertiary — Test drive */}
+        <section
+          className="rounded-[20px] border border-border bg-surface-soft p-5"
+          aria-labelledby="step4-td"
+        >
+          <h2 id="step4-td" className="text-label">
+            {STEP4_HUB_TEST_DRIVE}
+          </h2>
+          <p className="mt-1 text-caption text-muted">
+            {STEP4_HUB_TEST_DRIVE_HINT}
+          </p>
+          <Button
+            type="button"
+            variant="tertiary"
+            className="mt-3 w-full"
+            onClick={() => openPanel("test-drive")}
+          >
+            {STEP4_HUB_TEST_DRIVE}
+          </Button>
+        </section>
+
+        {/* Contact row — Call now / Call me back (distinct from equal CTAs) */}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <section
+            className={cn(
+              "rounded-[20px] border p-4",
+              openStatus.open
+                ? "border-success/30 bg-success-soft/40"
+                : "border-border bg-page-tint",
+            )}
+            aria-labelledby="step4-call-now"
+          >
+            <div className="flex items-start gap-3">
+              <PhoneCall
+                className="mt-0.5 h-5 w-5 shrink-0 text-primary"
+                aria-hidden
+              />
+              <div className="min-w-0 flex-1">
+                <h2 id="step4-call-now" className="text-label">
+                  {openStatus.open
+                    ? STEP4_HUB_CALL_NOW_OPEN
+                    : STEP4_HUB_CALL_NOW}
+                </h2>
+                {openStatus.open ? (
+                  <>
+                    <p className="mt-1 text-caption text-muted">
+                      {openStatus.locationName} is open ({openStatus.todayHours}
+                      ).
+                    </p>
+                    {openStatus.telephone ? (
+                      <Button
+                        href={`tel:${openStatus.telephone.replace(/\s/g, "")}`}
+                        variant="text"
+                        className="mt-2 min-h-9 px-0"
+                        onClick={() => markStep4CtaEngaged()}
+                      >
+                        Call {openStatus.telephone}
+                      </Button>
+                    ) : (
+                      <p className="mt-2 text-caption text-muted">
+                        Telephone not configured for this showroom yet.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-1 text-caption text-muted">
+                      {STEP4_CLOSED_TITLE}. {STEP4_CLOSED_BODY(openStatus.nextOpenLabel)}
+                    </p>
+                    <p className="mt-1 text-caption text-muted">
+                      {STEP4_CLOSED_HOURS_REF}: {openStatus.todayHours}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="text"
+                      className="mt-2 min-h-9 px-0"
+                      onClick={() => openPanel("call-closed")}
+                    >
+                      Book a callback
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="rounded-[20px] border border-border bg-surface p-4"
+            aria-labelledby="step4-callback"
+          >
+            <div className="flex items-start gap-3">
+              <Phone
+                className="mt-0.5 h-5 w-5 shrink-0 text-muted"
+                aria-hidden
+              />
+              <div className="min-w-0 flex-1">
+                <h2 id="step4-callback" className="text-label">
+                  {STEP4_HUB_CALL_BACK}
+                </h2>
+                <p className="mt-1 text-caption text-muted">
+                  {STEP4_HUB_CALL_BACK_HINT}
+                </p>
+                <Button
+                  type="button"
+                  variant="text"
+                  className="mt-2 min-h-9 px-0"
+                  onClick={() => openPanel("callback")}
+                >
+                  {STEP4_HUB_CALL_BACK}
+                </Button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+          <p className="text-label">Save your deal</p>
+          <SaveDeal defaultOpen compact />
         </div>
       </div>
 
+      <SaveProgressPrompt
+        open={idleSaveOpen}
+        onContinue={() => setIdleSaveOpen(false)}
+        onDismiss={() => setIdleSaveOpen(false)}
+      />
+
       <DealStepFooter
         showMonthly={false}
-        onBack={() => goBack("quote")}
-        onContinue={payByCard}
-        continueLabel={payAndReserveLabel(reservationConfig.amount)}
-        busy={submitting}
+        onBack={() => goBack("cover")}
+        backLabel={STEP4_BACK_HUB}
+        onContinue={() => openPanel("reserve")}
+        continueLabel={`Reserve for ${reservationAmountLabel(reservationConfig.amount)}`}
       />
     </div>
   );

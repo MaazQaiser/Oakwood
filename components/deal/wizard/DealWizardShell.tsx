@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { DealFailureState } from "@/components/deal/DealFailureState";
 import { FinanceConstraintMessage } from "@/components/deal/FinanceConstraintMessage";
@@ -22,6 +21,10 @@ import { getDealUrl, getVehicleUrl } from "@/config/routes";
 import { DEAL_STEP_META, DEAL_STEPS } from "@/lib/deal/steps";
 import type { DealPageModel } from "@/types/deal";
 import { Button } from "@/components/ui/Button";
+import {
+  DealAbandonmentModal,
+  requestDealAbandonment,
+} from "@/components/deal/DealAbandonmentModal";
 import { cn } from "@/lib/cn";
 
 function WizardInner({
@@ -42,10 +45,13 @@ function WizardInner({
         {/* Mobile: one slim sticky strip instead of the full sidebar. */}
         <div className="sticky top-[var(--oak-header-height)] z-20 space-y-2.5 bg-surface px-4 pt-2.5 pb-3 shadow-card lg:hidden">
           {/* Tapping the car returns to its page; the sidebar link is desktop-only. */}
-          <Link
-            href={getVehicleUrl(vehicle.slug)}
+          <button
+            type="button"
             aria-label={`Back to the ${vehicle.make} ${vehicle.model} page`}
-            className="block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="block w-full rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            onClick={() =>
+              requestDealAbandonment(getVehicleUrl(vehicle.slug))
+            }
           >
             <DealPinnedVehicle
               layout="strip"
@@ -55,7 +61,7 @@ function WizardInner({
                 </span>
               }
             />
-          </Link>
+          </button>
           <DealProgressBar step={step} />
         </div>
 
@@ -65,9 +71,12 @@ function WizardInner({
           <DealProgress step={step} />
           <DealMonthlyBar />
           <Button
-            href={getVehicleUrl(vehicle.slug)}
+            type="button"
             variant="text"
             className="min-h-9 self-start px-1 text-caption"
+            onClick={() =>
+              requestDealAbandonment(getVehicleUrl(vehicle.slug))
+            }
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
             Back to vehicle
@@ -109,6 +118,10 @@ function WizardInner({
           </div>
         </section>
       </div>
+      <DealAbandonmentModal
+        vehicleHref={getVehicleUrl(vehicle.slug)}
+        step={step}
+      />
     </>
   );
 }

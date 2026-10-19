@@ -81,6 +81,7 @@ function toVehicleSummary(vehicle: Vehicle): DealVehicleSummary {
     mileage: vehicle.mileage,
     fuelType: vehicle.fuelType,
     transmission: vehicle.transmission,
+    locationSlug: vehicle.locationSlug,
     locationName: vehicle.locationName,
     cashPrice: vehicle.cashPrice,
     representativeMonthly: vehicle.monthlyPayment,

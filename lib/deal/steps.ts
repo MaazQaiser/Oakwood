@@ -1,13 +1,17 @@
 import type { DealStep } from "@/config/routes";
 
-export const DEAL_STEPS: readonly DealStep[] = [
+/**
+ * Customer Deal Builder v4 primary journey (four steps).
+ * Legacy decision/quote routes redirect into Your deal.
+ */
+export const DEAL_STEPS = [
   "part-exchange",
   "budget",
-  "decision",
   "cover",
-  "quote",
   "reserve",
-] as const;
+] as const satisfies readonly DealStep[];
+
+export type PrimaryDealStep = (typeof DEAL_STEPS)[number];
 
 export const DEAL_STEP_META: Record<
   DealStep,
@@ -17,37 +21,43 @@ export const DEAL_STEP_META: Record<
     index: 1,
     title: "Value your part exchange",
     shortTitle: "Part exchange",
-    supporting: "Optional. Our price, no middleman.",
+    supporting:
+      "Optional. See valuation, outstanding finance and what goes towards your deposit.",
   },
   budget: {
     index: 2,
     title: "Finance preferences",
     shortTitle: "Finance",
-    supporting: "Three questions, one screen. Your monthly updates live.",
+    supporting:
+      "Compare HP and PCP, set your deposit and term. Figures are illustrative.",
   },
-  decision: {
-    index: 3,
-    title: "Instant decision",
-    shortTitle: "Decision",
-    supporting: "Soft check, no credit footprint. About 60 seconds.",
-  },
+  /** Merged Your deal screen (v4 Step 3) — finance summary + optional products. */
   cover: {
-    index: 4,
-    title: "Build your cover",
-    shortTitle: "Cover",
-    supporting: "Tailored to you. Change or remove anything.",
-  },
-  quote: {
-    index: 5,
-    title: "Your quote",
-    shortTitle: "Quote",
-    supporting: "HP or PCP, personal to you.",
+    index: 3,
+    title: "Your deal",
+    shortTitle: "Your deal",
+    supporting:
+      "Review your finance, add optional cover, and continue when you're ready.",
   },
   reserve: {
-    index: 6,
-    title: "Reserve this car",
-    shortTitle: "Reserve",
-    supporting: "Fully refundable. We take the car off sale while you finish.",
+    index: 4,
+    title: "Choose your next step",
+    shortTitle: "Next step",
+    supporting:
+      "Reserve, apply for finance, book a test drive, or speak to Oakwood.",
+  },
+  // Legacy steps kept for redirects / completed-step history only.
+  decision: {
+    index: 3,
+    title: "Your deal",
+    shortTitle: "Your deal",
+    supporting: "Continue on the combined Your deal screen.",
+  },
+  quote: {
+    index: 3,
+    title: "Your deal",
+    shortTitle: "Your deal",
+    supporting: "Continue on the combined Your deal screen.",
   },
 };
 
@@ -56,7 +66,7 @@ export function getDealStepIndex(step: DealStep): number {
 }
 
 export function getNextDealStep(step: DealStep): DealStep | null {
-  const index = DEAL_STEPS.indexOf(step);
+  const index = DEAL_STEPS.indexOf(step as PrimaryDealStep);
   if (index < 0 || index >= DEAL_STEPS.length - 1) {
     return null;
   }
@@ -64,7 +74,7 @@ export function getNextDealStep(step: DealStep): DealStep | null {
 }
 
 export function getPreviousDealStep(step: DealStep): DealStep | null {
-  const index = DEAL_STEPS.indexOf(step);
+  const index = DEAL_STEPS.indexOf(step as PrimaryDealStep);
   if (index <= 0) {
     return null;
   }

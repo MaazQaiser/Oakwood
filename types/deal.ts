@@ -1,6 +1,7 @@
 import type { FinanceProductType } from "./finance";
 import type { Vehicle, VehicleAvailability } from "./vehicle";
 import type { DealProviderConfig } from "@/lib/deal/provider-config";
+import type { DealFinanceApplicationDraft } from "@/types/deal-application";
 
 export type DealState =
   | "draft"
@@ -103,6 +104,27 @@ export type DealPxCondition =
 
 export type DealPxServiceHistory = "full" | "partial" | "none";
 
+export type DealPxExtraId =
+  | "panoramic-roof"
+  | "full-service-history"
+  | "two-keys"
+  | "heated-seats"
+  | "leather"
+  | "sat-nav"
+  | "reversing-camera"
+  | "private-plate"
+  | "non-standard-modifications"
+  | "known-damage"
+  | "other";
+
+export type DealPxPrivatePlateDisposition = "retain" | "sell";
+
+export interface DealPartExchangeExtras {
+  selected: DealPxExtraId[];
+  privatePlateDisposition?: DealPxPrivatePlateDisposition;
+  otherNotes?: string;
+}
+
 export interface DealPartExchangeInput {
   registration: string;
   mileage: number;
@@ -114,7 +136,10 @@ export interface DealPartExchangeInput {
   outstandingFinanceLender?: string;
   condition?: DealPxCondition;
   serviceHistory?: DealPxServiceHistory;
+  extras?: DealPartExchangeExtras;
   valuationDate?: string;
+  /** Mock indicative deductions shown on the valuation result (prototype only). */
+  deductions?: Array<{ label: string; amount: number }>;
 }
 
 export type DealDecisionOutcome = "approved" | "approved_less" | "refer";
@@ -150,6 +175,9 @@ export interface Deal {
   state: DealState;
 }
 
+/** Illustrative credit tier for mock APR on Your deal (not a soft-check result). */
+export type DealCreditTier = "excellent" | "good" | "average" | "poor";
+
 export interface DealDraft {
   financeType: FinanceProductType;
   cashDeposit: number;
@@ -158,7 +186,11 @@ export interface DealDraft {
   px?: DealPartExchangeInput;
   productIds: string[];
   productYears?: DealProductYearSelection;
+  /** Prototype-only tier for illustrative APR until a real soft check exists. */
+  creditTier?: DealCreditTier;
   decision?: DealDecisionInput;
+  /** Embedded finance application progress (v4 §8). Persisted with the deal. */
+  financeApplication?: DealFinanceApplicationDraft;
   stepsCompleted?: DealStepName[];
 }
 
@@ -188,6 +220,7 @@ export interface DealVehicleSummary {
   mileage: number;
   fuelType: string;
   transmission: string;
+  locationSlug: string;
   locationName: string;
   cashPrice: number;
   representativeMonthly: number;

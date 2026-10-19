@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
 import { createDealResumeLink } from "@/features/deal/actions";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { DEAL_EMAIL_DEAL, DEAL_SAVE_INTRO } from "@/lib/deal/copy";
+import {
+  DEAL_EMAIL_DEAL,
+  DEAL_SAVE_CONFIRM,
+  DEAL_SAVE_CTA,
+  DEAL_SAVE_INTRO,
+  DEAL_SAVE_MOBILE_HINT,
+  DEAL_SAVE_RESUME_LABEL,
+} from "@/lib/deal/copy";
 import { cn } from "@/lib/cn";
+import { getDealResumeUrl } from "@/config/routes";
 
 export function SaveDeal({
   defaultOpen = false,
@@ -20,18 +28,30 @@ export function SaveDeal({
   const { dealId, markSaved } = useDealBuilder();
   const [open, setOpen] = useState(defaultOpen);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState<string>();
+  const [phoneError, setPhoneError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resumePath, setResumePath] = useState("");
 
   async function save() {
     if (!email.includes("@")) {
       setError("Enter a valid email address.");
       return;
     }
+    if (phone.replace(/\D/g, "").length < 10) {
+      setPhoneError("Enter a UK mobile number.");
+      return;
+    }
     setSaving(true);
     setError(undefined);
-    const result = await createDealResumeLink({ dealId, email });
+    setPhoneError(undefined);
+    const result = await createDealResumeLink({
+      dealId,
+      email,
+      phone,
+    });
     setSaving(false);
     if (!result.ok) {
       setError(
@@ -39,16 +59,28 @@ export function SaveDeal({
       );
       return;
     }
+    setResumePath(result.resumePath);
     setSaved(true);
     markSaved();
   }
 
   if (saved) {
+    const absolute =
+      typeof window !== "undefined"
+        ? `${window.location.origin}${resumePath || getDealResumeUrl()}`
+        : resumePath;
     return (
-      <p className="text-caption text-muted" role="status">
-        We&apos;ve sent a secure link. It doesn&apos;t include your finance
-        result or monthly payment.
-      </p>
+      <div className="space-y-2" role="status">
+        <p className="text-body-sm font-semibold! text-ink">{DEAL_SAVE_CONFIRM}</p>
+        <p className="text-caption text-muted">{DEAL_SAVE_RESUME_LABEL}</p>
+        <p className="break-all rounded-[14px] bg-page-tint px-3 py-2 text-caption text-ink">
+          {absolute || resumePath}
+        </p>
+        <p className="text-caption text-muted">
+          Prototype only — no email or SMS was sent. The link expires after
+          seven days.
+        </p>
+      </div>
     );
   }
 
@@ -76,7 +108,7 @@ export function SaveDeal({
       ) : (
         <p className="text-caption text-muted">{DEAL_SAVE_INTRO}</p>
       )}
-      <div className="mt-3">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Field htmlFor="deal-save-email" label="Email" error={error}>
           <Input
             id="deal-save-email"
@@ -88,10 +120,26 @@ export function SaveDeal({
             onChange={(event) => setEmail(event.target.value)}
           />
         </Field>
+        <Field
+          htmlFor="deal-save-phone"
+          label="Mobile"
+          hint={DEAL_SAVE_MOBILE_HINT}
+          error={phoneError}
+        >
+          <Input
+            id="deal-save-phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={phone}
+            error={Boolean(phoneError)}
+            onChange={(event) => setPhone(event.target.value)}
+          />
+        </Field>
       </div>
       <div className="mt-3 flex flex-wrap gap-3">
         <Button onClick={() => void save()} disabled={saving} size="sm">
-          Email me a link
+          {DEAL_SAVE_CTA}
         </Button>
         {!defaultOpen ? (
           <Button variant="text" size="sm" onClick={() => setOpen(false)}>

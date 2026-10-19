@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { DealEntrySteps } from "@/components/deal/DealEntrySteps";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
+import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
 import { VehiclePriceToggle } from "@/components/vehicle/VehiclePriceToggle";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
@@ -140,6 +141,8 @@ export function VehiclePrice() {
           within your current profile.
         </p>
       ) : null}
+
+      {reservable ? <ValuationEntryCard /> : null}
 
       {reservable ? (
         <div className="mt-5 rounded-lg border border-border bg-page p-4">

@@ -55,6 +55,7 @@ export async function POST(request: Request) {
     productIds,
     productYears: draft.productYears,
     decision: draft.decision,
+    financeApplication: draft.financeApplication,
     stepsCompleted: draft.stepsCompleted,
   });
   await persistDeal(updated);

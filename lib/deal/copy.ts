@@ -47,12 +47,52 @@ export const DEAL_NEGATIVE_EQUITY =
   "This amount may need to be included in your new deal.";
 
 export const DEAL_SAVE_INTRO =
-  "We'll send you a secure link so you can continue where you left off.";
+  "We'll keep a mock resume link ready for seven days. Nothing is emailed or texted in this prototype.";
+
+export const DEAL_SAVE_MOBILE_HINT =
+  "Mobile is stored with the mock resume only — no SMS is sent.";
+
+export const DEAL_SAVE_CONFIRM =
+  "Saved. Your deal is ready to resume for seven days. Use the mock link below — no email or SMS was sent.";
+
+export const DEAL_SAVE_RESUME_LABEL = "Mock resume link";
+
+export const DEAL_SAVE_CTA = "Save and get a resume link";
+
+export const DEAL_RESUME_EXPIRED_TITLE = "This resume link has expired";
+
+export const DEAL_RESUME_EXPIRED_BODY =
+  "Resume links stay active for seven days. Start again from the vehicle, or save a new link from the deal builder.";
+
+export const DEAL_RESUME_EXPIRED_RESTART = "Browse cars to start again";
+
+export const DEAL_RESUME_EXPIRED_REQUEST =
+  "Open a vehicle and use Save this deal for a new seven-day link.";
+
+export const DEAL_ABANDON_TITLE = "Leaving your deal?";
+
+export const DEAL_ABANDON_BODY =
+  "Your progress is still here. Save a resume link, keep building, or leave — nothing is lost until this session ends.";
+
+export const DEAL_ABANDON_SAVE = "Save and continue later";
+
+export const DEAL_ABANDON_STAY = "Keep building my deal";
+
+export const DEAL_ABANDON_LEAVE = "Leave without saving";
+
+export const DEAL_SAVE_PROGRESS_TITLE = "Save your progress?";
+
+export const DEAL_SAVE_PROGRESS_BODY =
+  "Keep a mock resume link for seven days so you can pick up this deal later. Nothing is emailed or texted in this prototype.";
+
+export const DEAL_SAVE_PROGRESS_CONTINUE = "Continue without saving";
+
+export const DEAL_SAVE_PROGRESS_SAVE = "Save then continue";
 
 export const DEAL_SHARE_INTRO =
   "The shared summary includes the vehicle and your configuration. It does not include your rate, approval or finance profile.";
 
-export const DEAL_SKIP_PX = "Skip for now";
+export const DEAL_SKIP_PX = "Skip part exchange";
 
 export const DEAL_ADD_TO_DEAL = "Add to my deal";
 
@@ -66,6 +106,63 @@ export const DEAL_RUN_SOFT_CHECK = "Run my soft check";
 
 export const DEAL_PX_EQUITY_LINE = (amount: string) =>
   `${amount} goes towards your deposit`;
+
+export const DEAL_PX_NOT_YOUR_VEHICLE = "Not your vehicle?";
+
+export const DEAL_PX_VALUATION_LABEL = "Vehicle valuation";
+
+export const DEAL_PX_FINANCE_LABEL = "Outstanding finance";
+
+export const DEAL_PX_TOTAL_LABEL = "Total towards your deposit";
+
+export const DEAL_PX_INSPECTION =
+  "This valuation is subject to inspection. It is not a guaranteed final purchase price.";
+
+export const DEAL_PX_HELP_TITLE = "How do I find my outstanding finance?";
+
+export const DEAL_PX_HELP_BODY =
+  "Check your latest finance statement, online account, or call your lender and ask for a settlement figure. Use the amount needed to settle the agreement today, not your monthly payment.";
+
+export const DEAL_PX_NEGATIVE_TITLE = "Please contact us about your part exchange";
+
+export const DEAL_PX_NEGATIVE_BODY =
+  "Your outstanding finance is higher than the vehicle valuation. The shortfall is shown above. Speak to Oakwood before continuing — we can talk through options for your part exchange.";
+
+export const DEAL_PX_CALLBACK = "Request a callback";
+
+export const DEAL_PX_VALUING = "Getting your valuation…";
+
+export const DEAL_PX_GET_OFFER = "Get my valuation";
+
+export const DEAL_PX_DEPOSIT_CASH = "Cash deposit";
+
+export const DEAL_PX_DEPOSIT_EQUITY = "Part exchange";
+
+export const DEAL_PX_DEPOSIT_TOTAL = "Total deposit";
+
+export const DEAL_BUDGET_ILLUSTRATIVE =
+  "Illustrative mock quotes for this prototype. Not an approved offer. APR and monthly payments are confirmed when you apply.";
+
+export const DEAL_BUDGET_HP_LEAD = "Own it";
+
+export const DEAL_BUDGET_HP_BODY =
+  "Hire Purchase. Own the car at the end. No balloon payment.";
+
+export const DEAL_BUDGET_PCP_LEAD = "Lowest monthly";
+
+export const DEAL_BUDGET_PCP_BODY =
+  "Personal Contract Purchase. Lower payments, then pay, part-exchange or hand back.";
+
+export const DEAL_BUDGET_PCP_TERM_BLOCK =
+  "72 and 84 months are HP only. We've switched you to Hire Purchase for this term.";
+
+export const DEAL_BUDGET_PCP_UNAVAILABLE =
+  "PCP is not available at 72 or 84 months. Choose a term up to 60 months, or continue with HP.";
+
+export const DEAL_BUDGET_SWITCH_HP = "Use Hire Purchase";
+
+export const DEAL_BUDGET_DEFAULT_DEPOSIT =
+  "Default is about 10% of the cash price, plus any part-exchange equity towards your deposit.";
 
 export const DEAL_DECISION_LOADING = "Running your soft check…";
 
@@ -87,9 +184,51 @@ export const DEAL_DECISION_REFER_BODY =
 
 export const DEAL_SEE_MY_QUOTE = "See my quote";
 
+export const DEAL_CONTINUE_TO_RESERVE = "Continue to next step";
+
+export const DEAL_STEP4_RESERVE = (amount: string) =>
+  `Reserve this car for ${amount}`;
+
+export const DEAL_STEP4_APPLY = "Apply for finance";
+
+export const DEAL_STEP4_TEST_DRIVE = "Test drive";
+
+export const DEAL_STEP4_CALL_NOW = "Call now";
+
+export const DEAL_STEP4_CALL_BACK = "Call me back";
+
+export const DEAL_STEP4_OPEN_NOW = "Showroom is open";
+
+export const DEAL_STEP4_CLOSED =
+  "The showroom is closed right now. Book a callback for the next available day.";
+
+export const DEAL_STEP4_APPLY_INTRO =
+  "Start a mock embedded finance application. Nothing is submitted to a live lender in this prototype.";
+
+export const DEAL_STEP4_APPLY_CONFIRM =
+  "Application started (mock). An Oakwood advisor can continue this with you.";
+
+export const DEAL_STEP4_TEST_DRIVE_CONFIRM =
+  "Test drive requested (mock). We'll confirm by SMS and email.";
+
+export const DEAL_STEP4_CALLBACK_CONFIRM =
+  "Callback booked (mock). We'll call you at the time you chose.";
+
 export const DEAL_ADD_RECOMMENDED_COVER = "Add recommended cover";
 
 export const DEAL_CLEAR_ALL_COVER = "Clear all cover";
+
+export const DEAL_YOUR_DEAL_APR_DISCLAIMER =
+  "Estimated APR for illustration only. Subject to finance approval and a full application. Not an approved offer.";
+
+export const DEAL_YOUR_DEAL_TIER_HINT =
+  "Estimated with a soft check illustration. Confirmed when you apply.";
+
+export const DEAL_YOUR_DEAL_MOCK_PRICE = "Mock price — final retail TBC";
+
+export const DEAL_AA_BADGE = "Backed by the AA";
+
+export const DEAL_AA_BREAKDOWN = "Includes free AA breakdown";
 
 export const DEAL_COVER_COMPLIANCE_NOTE =
   "Prototype default: recommended cover is preselected for design review. Confirm with compliance before production — products must not be preselected without approval.";
@@ -106,7 +245,8 @@ export const DEAL_RESERVE_HOLD =
 
 export const DEAL_VDP_CARD_TITLE = "Build your deal";
 
-export const DEAL_VDP_CARD_BODY = "Six steps, about two minutes. The deal is yours.";
+export const DEAL_VDP_CARD_BODY =
+  "Four steps, about two minutes. The deal is yours.";
 
 export const DEAL_VDP_CARD_CTA = "Build your deal";
 

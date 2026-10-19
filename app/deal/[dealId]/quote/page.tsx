@@ -1,29 +1,11 @@
-import {
-  dealStepMetadata,
-  dealStepStaticParams,
-  renderDealStepPage,
-} from "@/lib/deal/deal-page";
+import { redirectLegacyDealStep } from "@/lib/deal/deal-page";
 
-const step = "quote" as const;
-
-export function generateStaticParams() {
-  return dealStepStaticParams();
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ dealId: string }>;
-}) {
-  const { dealId } = await params;
-  return dealStepMetadata(dealId, step);
-}
-
+/** Legacy quote step — merged into Your deal (cover). */
 export default async function Page({
   params,
 }: {
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-  return renderDealStepPage(dealId, step);
+  await redirectLegacyDealStep(dealId, "cover");
 }

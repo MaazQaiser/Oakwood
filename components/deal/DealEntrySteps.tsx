@@ -1,26 +1,21 @@
 import { reservationConfig } from "@/config/reservation";
 import { DEAL_STEPS } from "@/lib/deal/steps";
-import {
-  formatHoldPeriod,
-  reservationAmountLabel,
-} from "@/lib/reservation/format";
+import { reservationAmountLabel } from "@/lib/reservation/format";
 
 const ENTRY_COPY: Record<(typeof DEAL_STEPS)[number], [string, string]> = {
   "part-exchange": [
     "Value your part exchange",
-    "Optional. Our price, no middleman.",
+    "Valuation, finance and deposit contribution.",
   ],
-  budget: ["Finance preferences", "Deposit, term, miles. One screen."],
-  decision: ["Instant decision", "Soft check, no credit score impact."],
-  cover: ["Build your cover", "Warranty, service, MOT, Supagard."],
-  quote: ["Your quote", "HP or PCP, your real rate."],
+  budget: ["Finance preferences", "Compare HP and PCP on one screen."],
+  cover: ["Your deal", "Finance summary plus optional cover."],
   reserve: [
-    `Reserve for ${reservationAmountLabel(reservationConfig.amount)}`,
-    `Fully refundable. Car held ${formatHoldPeriod()}.`,
+    "Choose your next step",
+    `Reserve for ${reservationAmountLabel(reservationConfig.amount)}, apply, test drive or call.`,
   ],
 };
 
-/** The six-step preview on the vehicle page's "Build your deal" card (spec §2). */
+/** Four-step preview on the vehicle page's "Build your deal" card (v4). */
 export function DealEntrySteps() {
   return (
     <ol className="mt-3 divide-y divide-border">

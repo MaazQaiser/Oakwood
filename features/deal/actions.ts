@@ -10,8 +10,10 @@ import {
   findDealByResumeToken,
   getDealRecord,
   isDealExpired,
+  peekDealResumeToken,
   saveDealResumeToken,
   saveDealShareToken,
+  saveExpiredDealResumeToken,
   toDealDraft,
 } from "@/features/deal/store";
 import {
@@ -23,17 +25,23 @@ import {
 import { listSelectedProducts } from "@/lib/deal/products";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { isReservable } from "@/lib/vehicles/sold";
-import type { DealShareSnapshot } from "@/types/deal";
+import { getDealResumeUrl } from "@/config/routes";
+import type { DealDraft, DealShareSnapshot } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 /**
- * Spec Step 2: deposit is prefilled with PX equity plus a £500 cash default.
- * Equity is added by calculateDeal, so the cash part stays £500.
+ * Spec Step 2: cash deposit defaults to ~10% of the vehicle price.
+ * Part-exchange equity is added separately in calculateDeal.
  */
-const DEFAULT_CASH_DEPOSIT = 500;
+const DEPOSIT_STEP = 250;
 
 function defaultDeposit(fallback: number): number {
   return Math.max(0, Math.round(fallback));
+}
+
+function tenPercentCashDeposit(cashPrice: number): number {
+  const raw = cashPrice * 0.1;
+  return Math.max(0, Math.round(raw / DEPOSIT_STEP) * DEPOSIT_STEP);
 }
 
 export async function createDealAction(input: {
@@ -42,6 +50,8 @@ export async function createDealAction(input: {
   term?: number;
   financeType?: FinanceProductType;
   annualMileage?: number;
+  /** When provided (e.g. VDP valuation entry hook), preferred over PX session. */
+  px?: DealDraft["px"];
 }): Promise<
   | { ok: true; dealId: string }
   | { ok: false; reason: "not_found" | "unavailable" }
@@ -59,9 +69,14 @@ export async function createDealAction(input: {
   const eligibility = await getEligibilitySession();
   const pxSession = await getPxSession();
   const pendingPx =
-    pxSession && !isPxExpired(pxSession)
+    input.px ??
+    (pxSession && !isPxExpired(pxSession)
       ? snapshotToDealPx(pxSession.snapshot)
-      : undefined;
+      : undefined);
+  const financeType: FinanceProductType | undefined =
+    input.financeType === "pcp" || input.financeType === "hp"
+      ? input.financeType
+      : "hp";
   const deposit =
     input.cashDeposit !== undefined
       ? defaultDeposit(input.cashDeposit)
@@ -69,19 +84,17 @@ export async function createDealAction(input: {
         ? defaultDeposit(
             eligibility.display?.deposit ??
               eligibility.answers.deposit ??
-              DEFAULT_CASH_DEPOSIT,
+              tenPercentCashDeposit(vehicle.cashPrice),
           )
-        : DEFAULT_CASH_DEPOSIT;
+        : tenPercentCashDeposit(vehicle.cashPrice);
   const term =
     input.term !== undefined
       ? Math.max(12, Math.round(input.term))
       : eligibility && !isSessionExpired(eligibility)
-        ? eligibility.display?.term ?? 48
-        : 48;
-  const financeType: FinanceProductType | undefined =
-    input.financeType === "pcp" || input.financeType === "hp"
-      ? input.financeType
-      : undefined;
+        ? eligibility.display?.term ?? (financeType === "pcp" ? 60 : 84)
+        : financeType === "pcp"
+          ? 60
+          : 84;
 
   const record = await createBoundDeal({
     vehicleStockId: vehicle.stockId,
@@ -98,7 +111,13 @@ export async function createDealAction(input: {
 export async function createDealResumeLink(input: {
   dealId: string;
   email: string;
-}): Promise<{ ok: true } | { ok: false; expired: true }> {
+  phone?: string;
+  /** QA helper — creates an already-expired token for the expired-link screen. */
+  forceExpired?: boolean;
+}): Promise<
+  | { ok: true; token: string; resumePath: string }
+  | { ok: false; expired: true }
+> {
   await hydrateDealsFromCookie();
   const record = getDealRecord(input.dealId);
   if (!record || isDealExpired(record)) {
@@ -108,21 +127,49 @@ export async function createDealResumeLink(input: {
   if (!email || !email.includes("@")) {
     return { ok: false, expired: true };
   }
-  await persistDeal(
-    saveDealResumeToken(record.id, createDealOpaqueId(), email),
-  );
-  return { ok: true };
+  const phoneDigits = input.phone?.replace(/\D/g, "") ?? "";
+  if (phoneDigits && phoneDigits.length < 10) {
+    return { ok: false, expired: true };
+  }
+  const token = createDealOpaqueId();
+  const saved = input.forceExpired
+    ? saveExpiredDealResumeToken(record.id, token, email)
+    : saveDealResumeToken(record.id, token, email, phoneDigits || undefined);
+  if (!saved) {
+    return { ok: false, expired: true };
+  }
+  await persistDeal(saved);
+  return {
+    ok: true,
+    token,
+    resumePath: getDealResumeUrl(token),
+  };
+}
+
+export async function inspectDealResumeToken(input: {
+  token: string;
+}): Promise<{ status: "ok" | "expired" | "invalid" | "used" }> {
+  return { status: peekDealResumeToken(input.token).status };
 }
 
 export async function resumeDealSession(input: {
   token: string;
   email: string;
-}): Promise<{ ok: true; dealId: string } | { ok: false; reason: "invalid" | "expired" }> {
+}): Promise<
+  | { ok: true; dealId: string }
+  | { ok: false; reason: "invalid" | "expired" | "used" }
+> {
+  if (input.token === "mock-expired") {
+    return { ok: false, reason: "expired" };
+  }
   const pending = findDealByResumeToken(input.token);
   if (!pending?.resume) {
     return { ok: false, reason: "invalid" };
   }
-  if (pending.resume.expiresAt <= Date.now() || pending.resume.used) {
+  if (pending.resume.used) {
+    return { ok: false, reason: "used" };
+  }
+  if (pending.resume.expiresAt <= Date.now()) {
     return { ok: false, reason: "expired" };
   }
   const record = consumeDealResumeToken(input.token, input.email);

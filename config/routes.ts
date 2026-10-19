@@ -318,13 +318,19 @@ export function getDealUrl(
   }
 }
 
+/** Embedded finance application — outside the four primary wizard steps. */
+export function getDealApplicationUrl(dealId: string): string {
+  return `${routes.deal}/${dealId}/application`;
+}
+
 export function getDealShareUrl(token: string): string {
   return `${routes.deal}/share/${token}`;
 }
 
 export function getDealResumeUrl(token?: string): string {
   const base = routes.dealResume;
-  return token ? `${base}?token=${encodeURIComponent(token)}` : base;
+  // Spec pattern: /deal/resume/{token} (query ?token= still supported by the page).
+  return token ? `${base}/${encodeURIComponent(token)}` : base;
 }
 
 export function getReserveUrl(

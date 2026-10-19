@@ -23,6 +23,7 @@ import type {
   DealBuilderPhase,
   DealCalculation,
   DealCalculationInput,
+  DealCreditTier,
   DealDecisionInput,
   DealDraft,
   DealFinanceProfileInput,
@@ -30,9 +31,18 @@ import type {
   DealProductDefinition,
   DealStepName,
 } from "@/types/deal";
+import type { DealFinanceApplicationDraft } from "@/types/deal-application";
 import type { FinanceProductType } from "@/types/finance";
 
 const RECALC_MS = 220;
+
+/** Prototype APR bands for Your deal credit-tier chips — not lender rates. */
+export const ILLUSTRATIVE_TIER_APR: Record<DealCreditTier, number> = {
+  excellent: 9.9,
+  good: 12.9,
+  average: 16.9,
+  poor: 21.9,
+};
 
 export interface DealBuilderContextValue {
   dealId: string;
@@ -53,6 +63,7 @@ export interface DealBuilderContextValue {
   applyDepositGap: () => void;
   setTerm: (value: number) => void;
   setAnnualMileage: (value: number) => void;
+  setCreditTier: (tier: DealCreditTier) => void;
   startPartExchange: (registration: string, mileage: number) => void;
   applyPartExchange: (input: DealPartExchangeInput) => void;
   updatePartExchange: (patch: Partial<DealPartExchangeInput>) => void;
@@ -71,6 +82,7 @@ export interface DealBuilderContextValue {
   /** APR used for figures: decision in principle, then eligibility profile. */
   apr?: number;
   setDecision: (decision: DealDecisionInput) => void;
+  setFinanceApplication: (application: DealFinanceApplicationDraft) => void;
   markStepComplete: (step: DealStepName) => void;
   /** Save the latest draft, then go to `href` (use for step changes). */
   navigateTo: (href: string) => void;
@@ -133,13 +145,17 @@ function resolveProfile(
     (decision.outcome === "approved" || decision.outcome === "approved_less")
       ? decision.apr
       : undefined;
-  if (!decisionApr) {
+  const tierApr = draft.creditTier
+    ? ILLUSTRATIVE_TIER_APR[draft.creditTier]
+    : undefined;
+  const apr = decisionApr ?? tierApr;
+  if (!apr) {
     return base;
   }
   return base
-    ? { ...base, apr: decisionApr }
+    ? { ...base, apr }
     : {
-        apr: decisionApr,
+        apr,
         maximumAdvance: Number.POSITIVE_INFINITY,
         maximumTerm: Math.max(...termOptions),
         productType: draft.financeType,
@@ -176,8 +192,14 @@ export function DealBuilderProvider({
         }
       : {
           financeType: "hp",
-          cashDeposit: 500,
-          term: 48,
+          cashDeposit: vehicle
+            ? Math.max(
+                0,
+                Math.round((vehicle.cashPrice * 0.1) / model.config.depositStep) *
+                  model.config.depositStep,
+              )
+            : 500,
+          term: 84,
           annualMileage: defaultMileage,
           productIds: [],
           productYears: {},
@@ -276,8 +298,8 @@ export function DealBuilderProvider({
   const setFinanceType = useCallback(
     (type: FinanceProductType) => {
       setDraft((current) => {
-        const nextTerm =
-          type === "pcp" && current.term > 60 ? 60 : current.term;
+        // Spec defaults: PCP 60 months, HP 84 months.
+        const nextTerm = type === "pcp" ? 60 : 84;
         return {
           ...current,
           financeType: type,
@@ -327,13 +349,24 @@ export function DealBuilderProvider({
   }, [calculation, draft.cashDeposit, setCashDeposit]);
 
   const setTerm = useCallback((value: number) => {
-    setDraft((current) => ({ ...current, term: value }));
-    trackEvent(analyticsEvents.termChanged);
+    setDraft((current) => {
+      // 72/84 are HP only — switch finance type rather than invent a PCP quote.
+      if (current.financeType === "pcp" && value > 60) {
+        return { ...current, financeType: "hp", term: value };
+      }
+      return { ...current, term: value };
+    });
+    trackEvent(analyticsEvents.termChanged, { term: value });
   }, []);
 
   const setAnnualMileage = useCallback((value: number) => {
     setDraft((current) => ({ ...current, annualMileage: value }));
     trackEvent(analyticsEvents.annualMileageChanged);
+  }, []);
+
+  const setCreditTier = useCallback((tier: DealCreditTier) => {
+    setDraft((current) => ({ ...current, creditTier: tier }));
+    trackEvent(analyticsEvents.dealConfigured, { creditTier: tier });
   }, []);
 
   const startPartExchange = useCallback(
@@ -358,6 +391,10 @@ export function DealBuilderProvider({
         outstandingFinanceAmount: draft.px?.outstandingFinanceAmount,
         outstandingFinanceLender: draft.px?.outstandingFinanceLender,
         settlement: draft.px?.settlement,
+        vehicle: draft.px?.vehicle,
+        extras: draft.px?.extras,
+        deductions: draft.px?.deductions,
+        valuationDate: draft.px?.valuationDate,
       };
       setDraft((current) => ({
         ...current,
@@ -528,12 +565,16 @@ export function DealBuilderProvider({
       if (!vehicle) {
         return undefined;
       }
+      // Never invent a PCP quote for HP-only terms.
+      if (type === "pcp" && draft.term > 60) {
+        return undefined;
+      }
       try {
         return calculateDeal(
           {
             ...toInput(vehicle, draft),
             financeType: type,
-            term: type === "pcp" ? Math.min(draft.term, 60) : draft.term,
+            term: draft.term,
             annualMileage:
               draft.annualMileage ?? model.config.pcpMileageOptions[2] ?? 10000,
           },
@@ -566,6 +607,13 @@ export function DealBuilderProvider({
   const setDecision = useCallback((decision: DealDecisionInput) => {
     setDraft((current) => ({ ...current, decision }));
   }, []);
+
+  const setFinanceApplication = useCallback(
+    (application: DealFinanceApplicationDraft) => {
+      setDraft((current) => ({ ...current, financeApplication: application }));
+    },
+    [],
+  );
 
   const markStepComplete = useCallback((step: DealStepName) => {
     setDraft((current) => {
@@ -637,6 +685,7 @@ export function DealBuilderProvider({
       applyDepositGap,
       setTerm,
       setAnnualMileage,
+      setCreditTier,
       startPartExchange,
       applyPartExchange,
       updatePartExchange,
@@ -652,6 +701,7 @@ export function DealBuilderProvider({
       coverMonthly,
       apr: profileForCalc?.apr,
       setDecision,
+      setFinanceApplication,
       markStepComplete,
       navigateTo,
       navigating: navTarget !== null,
@@ -672,6 +722,7 @@ export function DealBuilderProvider({
     navTarget,
     markSaved,
     markStepComplete,
+    setFinanceApplication,
     model.contact,
     model.dealId,
     model.finance,
@@ -687,6 +738,7 @@ export function DealBuilderProvider({
     retryCalculation,
     setAnnualMileage,
     setCashDeposit,
+    setCreditTier,
     setDecision,
     setFinanceType,
     setProductYears,

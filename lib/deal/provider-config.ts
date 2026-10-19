@@ -21,6 +21,11 @@ export interface DealProviderConfig {
   pcpBaseResidualRate: number;
   pcpMileageResidualStep: number;
   includeNegativeEquityInAdvance: boolean;
+  /**
+   * Maximum negative equity that may be rolled into finance.
+   * Unset until the lender confirms a rule — do not invent a figure in UI.
+   */
+  maxNegativeEquityInAdvance?: number;
   /** OD3 — unset until the lender returns a vehicle-age rule. */
   maxVehicleAgeAtTermEndYears?: number;
   /** OD3 — unset until the lender returns an end-of-term mileage cap. */
@@ -40,4 +45,6 @@ export const DEAL_PROVIDER_CONFIG: DealProviderConfig = {
   pcpBaseResidualRate: 0.4,
   pcpMileageResidualStep: 0.012,
   includeNegativeEquityInAdvance: true,
+  // Intentionally unset — lender-dependent; UI must not invent a cap.
+  maxNegativeEquityInAdvance: undefined,
 };

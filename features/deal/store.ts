@@ -9,7 +9,8 @@ import type { FinanceProductType } from "@/types/finance";
 
 export const DEAL_SESSION_COOKIE = "oakwood_deal_session";
 export const DEAL_SESSION_TTL_MS = 4 * 60 * 60 * 1000;
-export const DEAL_RESUME_TTL_MS = 24 * 60 * 60 * 1000;
+/** Resume deep-links remain valid for seven days (Deal Builder v4). */
+export const DEAL_RESUME_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const DEAL_SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface DealSessionRecord {
@@ -26,11 +27,14 @@ export interface DealSessionRecord {
   productIds: string[];
   productYears?: DealDraft["productYears"];
   decision?: DealDraft["decision"];
+  financeApplication?: DealDraft["financeApplication"];
   stepsCompleted?: DealDraft["stepsCompleted"];
   email?: string;
   resume?: {
     token: string;
     email: string;
+    /** Optional mobile for mock SMS resume — never sent externally in prototype. */
+    phone?: string;
     expiresAt: number;
     used: boolean;
   };
@@ -144,10 +148,44 @@ export function saveDealResumeToken(
   dealId: string,
   token: string,
   email: string,
+  phone?: string,
   now = Date.now(),
 ): DealSessionRecord | null {
   const current = deals.get(dealId);
   if (!current || isDealExpired(current, now)) {
+    return null;
+  }
+  if (current.resume?.token) {
+    resumeIndex.delete(current.resume.token);
+  }
+  const normalisedPhone = phone?.replace(/\D/g, "") || undefined;
+  const record = touchDeal(
+    dealId,
+    {
+      email,
+      resume: {
+        token,
+        email: email.trim().toLowerCase(),
+        phone: normalisedPhone,
+        expiresAt: now + DEAL_RESUME_TTL_MS,
+        used: false,
+      },
+    },
+    now,
+  );
+  resumeIndex.set(token, dealId);
+  return record;
+}
+
+/** Prototype-only: force an already-expired resume token for QA of the expired state. */
+export function saveExpiredDealResumeToken(
+  dealId: string,
+  token: string,
+  email: string,
+  now = Date.now(),
+): DealSessionRecord | null {
+  const current = deals.get(dealId);
+  if (!current) {
     return null;
   }
   if (current.resume?.token) {
@@ -160,7 +198,7 @@ export function saveDealResumeToken(
       resume: {
         token,
         email: email.trim().toLowerCase(),
-        expiresAt: now + DEAL_RESUME_TTL_MS,
+        expiresAt: now - 1,
         used: false,
       },
     },
@@ -168,6 +206,32 @@ export function saveDealResumeToken(
   );
   resumeIndex.set(token, dealId);
   return record;
+}
+
+export function peekDealResumeToken(token: string): {
+  status: "ok" | "expired" | "invalid" | "used";
+  dealId?: string;
+  email?: string;
+} {
+  const dealId = resumeIndex.get(token);
+  if (!dealId) {
+    // Special mock token for expired-link demos without a live session.
+    if (token === "mock-expired") {
+      return { status: "expired" };
+    }
+    return { status: "invalid" };
+  }
+  const record = deals.get(dealId);
+  if (!record?.resume) {
+    return { status: "invalid" };
+  }
+  if (record.resume.used) {
+    return { status: "used", dealId, email: record.resume.email };
+  }
+  if (record.resume.expiresAt <= Date.now()) {
+    return { status: "expired", dealId, email: record.resume.email };
+  }
+  return { status: "ok", dealId, email: record.resume.email };
 }
 
 export function consumeDealResumeToken(
@@ -274,6 +338,7 @@ export function toDealDraft(record: DealSessionRecord): DealDraft {
     productIds: record.productIds,
     productYears: record.productYears,
     decision: record.decision,
+    financeApplication: record.financeApplication,
     stepsCompleted: record.stepsCompleted,
   };
 }
