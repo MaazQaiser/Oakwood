@@ -139,23 +139,24 @@ export function DealReserveStep() {
           >
             {STEP4_HUB_RESERVE()}
           </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            className="w-full border border-border"
-            onClick={() => {
-              markStep4CtaEngaged();
-              navigateTo(getDealApplicationUrl(dealId));
-            }}
-          >
-            {STEP4_HUB_APPLY}
-          </Button>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             <Button
               type="button"
-              variant="text"
-              className="w-full px-1"
+              variant="secondary"
+              size="sm"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+              onClick={() => {
+                markStep4CtaEngaged();
+                navigateTo(getDealApplicationUrl(dealId));
+              }}
+            >
+              {STEP4_HUB_APPLY}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
               onClick={() => openPanel("test-drive")}
             >
               {STEP4_HUB_TEST_DRIVE}
@@ -163,29 +164,32 @@ export function DealReserveStep() {
             {openStatus.open && openStatus.telephone ? (
               <Button
                 href={`tel:${openStatus.telephone.replace(/\s/g, "")}`}
-                variant="text"
-                className="w-full px-1"
+                variant="secondary"
+                size="sm"
+                className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
                 onClick={() => markStep4CtaEngaged()}
               >
                 {STEP4_HUB_CALL_NOW}
               </Button>
             ) : (
-            <Button
-              type="button"
-              variant="text"
-              className="w-full px-1"
-              onClick={() => {
-                markStep4CtaEngaged();
-                setClosedModal(true);
-              }}
-            >
-              {STEP4_HUB_CALL_NOW}
-            </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+                onClick={() => {
+                  markStep4CtaEngaged();
+                  setClosedModal(true);
+                }}
+              >
+                {STEP4_HUB_CALL_NOW}
+              </Button>
             )}
             <Button
               type="button"
-              variant="text"
-              className="w-full px-1"
+              variant="secondary"
+              size="sm"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
               onClick={() => openPanel("callback")}
             >
               {STEP4_HUB_CALL_BACK}

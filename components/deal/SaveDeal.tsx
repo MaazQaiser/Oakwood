@@ -20,10 +20,13 @@ export function SaveDeal({
   defaultOpen = false,
   triggerLabel = "Save this deal",
   compact = false,
+  prompt = false,
 }: {
   defaultOpen?: boolean;
   triggerLabel?: string;
   compact?: boolean;
+  /** Popup layout: stacked fields and a text link instead of a save button. */
+  prompt?: boolean;
 } = {}) {
   const { dealId, markSaved } = useDealBuilder();
   const [open, setOpen] = useState(defaultOpen);
@@ -100,15 +103,15 @@ export function SaveDeal({
         compact && "mt-2",
       )}
     >
-      {!compact ? (
+      {!compact && !prompt ? (
         <>
           <p className="text-label">{DEAL_EMAIL_DEAL}</p>
           <p className="mt-1 text-caption text-muted">{DEAL_SAVE_INTRO}</p>
         </>
-      ) : (
+      ) : compact && !prompt ? (
         <p className="text-caption text-muted">{DEAL_SAVE_INTRO}</p>
-      )}
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      ) : null}
+      <div className={cn("grid gap-3", prompt ? "grid-cols-1" : "mt-3 sm:grid-cols-2")}>
         <Field htmlFor="deal-save-email" label="Email" error={error}>
           <Input
             id="deal-save-email"
@@ -137,11 +140,22 @@ export function SaveDeal({
           />
         </Field>
       </div>
-      <div className="mt-3 flex flex-wrap gap-3">
-        <Button onClick={() => void save()} disabled={saving} size="sm">
-          {DEAL_SAVE_CTA}
-        </Button>
-        {!defaultOpen ? (
+      <div className={cn("mt-3 flex flex-wrap gap-3", prompt && "mt-4")}>
+        {prompt ? (
+          <button
+            type="button"
+            className="text-body-sm font-semibold text-primary underline-offset-4 hover:underline disabled:opacity-50"
+            disabled={saving}
+            onClick={() => void save()}
+          >
+            {saving ? "Saving…" : DEAL_SAVE_CTA}
+          </button>
+        ) : (
+          <Button onClick={() => void save()} disabled={saving} size="sm">
+            {DEAL_SAVE_CTA}
+          </Button>
+        )}
+        {!defaultOpen && !prompt ? (
           <Button variant="text" size="sm" onClick={() => setOpen(false)}>
             Cancel
           </Button>
