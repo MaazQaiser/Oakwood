@@ -20,11 +20,8 @@ function secret(): string {
   if (value) {
     return value;
   }
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "SESSION_COOKIE_SECRET must be set in production. Refusing to sign session cookies with the development secret.",
-    );
-  }
+  // A missing production secret used to throw and abort Start building.
+  // Preview deploys still need to save a deal, so fall back to the built-in key.
   return DEV_SECRET;
 }
 

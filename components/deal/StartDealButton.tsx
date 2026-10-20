@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { createDealAction } from "@/features/deal/actions";
@@ -29,33 +28,49 @@ export function StartDealButton({
   label?: string;
 }) {
   const finance = useCustomerFinance();
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   return (
-    <Button
-      className={className}
-      variant={variant}
-      busy={busy}
-      onClick={() => {
-        setBusy(true);
-        trackEvent(analyticsEvents.financeCtaClicked, { action: "build-deal" });
-        void createDealAction({
-          stockId,
-          cashDeposit: cashDeposit ?? finance.deposit,
-          term: term ?? finance.term,
-          financeType,
-        }).then((result) => {
-          if (!result.ok) {
-            setBusy(false);
-            return;
-          }
-          router.push(getDealUrl(result.dealId, "part-exchange"));
-        });
-      }}
-    >
-      {label}
-    </Button>
+    <div className={className}>
+      <Button
+        className="w-full"
+        variant={variant}
+        busy={busy}
+        onClick={() => {
+          setBusy(true);
+          setFailed(false);
+          trackEvent(analyticsEvents.financeCtaClicked, { action: "build-deal" });
+          void createDealAction({
+            stockId,
+            cashDeposit: cashDeposit ?? finance.deposit,
+            term: term ?? finance.term,
+            financeType,
+          })
+            .then((result) => {
+              if (!result.ok) {
+                setBusy(false);
+                setFailed(true);
+                return;
+              }
+              // Full navigation. A client router push after this action was
+              // getting dropped, so the button looked like it did nothing.
+              window.location.assign(getDealUrl(result.dealId, "part-exchange"));
+            })
+            .catch(() => {
+              setBusy(false);
+              setFailed(true);
+            });
+        }}
+      >
+        {label}
+      </Button>
+      {failed ? (
+        <p className="mt-2 text-caption text-danger" role="alert">
+          We couldn&apos;t open your deal. Please try again.
+        </p>
+      ) : null}
+    </div>
   );
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { createDealAction } from "@/features/deal/actions";
 import { getDealUrl } from "@/config/routes";
@@ -24,7 +23,6 @@ export function DealBuilderCTA({
   annualMileage?: number;
   onClick?: () => void;
 }) {
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 
@@ -48,14 +46,19 @@ export function DealBuilderCTA({
             term,
             financeType,
             annualMileage: financeType === "pcp" ? annualMileage : undefined,
-          }).then((result) => {
-            if (!result.ok) {
+          })
+            .then((result) => {
+              if (!result.ok) {
+                setBusy(false);
+                setError(true);
+                return;
+              }
+              window.location.assign(getDealUrl(result.dealId));
+            })
+            .catch(() => {
               setBusy(false);
               setError(true);
-              return;
-            }
-            router.push(getDealUrl(result.dealId));
-          });
+            });
         }}
       >
         {CALCULATOR_DEAL_BUILDER_CTA}
