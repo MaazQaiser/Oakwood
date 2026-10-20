@@ -144,7 +144,7 @@ export function DealReserveStep() {
               type="button"
               variant="secondary"
               size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
               onClick={() => {
                 markStep4CtaEngaged();
                 navigateTo(getDealApplicationUrl(dealId));
@@ -156,7 +156,7 @@ export function DealReserveStep() {
               type="button"
               variant="secondary"
               size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
               onClick={() => openPanel("test-drive")}
             >
               {STEP4_HUB_TEST_DRIVE}
@@ -166,7 +166,7 @@ export function DealReserveStep() {
                 href={`tel:${openStatus.telephone.replace(/\s/g, "")}`}
                 variant="secondary"
                 size="sm"
-                className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+                className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
                 onClick={() => markStep4CtaEngaged()}
               >
                 {STEP4_HUB_CALL_NOW}
@@ -176,7 +176,7 @@ export function DealReserveStep() {
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+                className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
                 onClick={() => {
                   markStep4CtaEngaged();
                   setClosedModal(true);
@@ -189,7 +189,7 @@ export function DealReserveStep() {
               type="button"
               variant="secondary"
               size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-normal rounded-[14px]! border border-border px-2! py-2 text-center text-caption leading-tight"
+              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
               onClick={() => openPanel("callback")}
             >
               {STEP4_HUB_CALL_BACK}

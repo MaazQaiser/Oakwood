@@ -447,7 +447,7 @@ function FinanceSummaryHero() {
                     "rounded-[16px] px-3 py-3 text-left transition-colors",
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
                     selected
-                      ? "bg-navy text-white"
+                      ? "bg-primary text-white shadow-[0_6px_16px_rgb(0_97_162/0.22)]"
                       : "bg-page-tint text-ink hover:bg-surface-soft",
                   )}
                 >
