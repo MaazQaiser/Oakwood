@@ -84,6 +84,19 @@ html:has(.deal-wizard) {
   scroll-padding-bottom: 8.5rem;
 }
 
+/*
+ * Modals. Tailwind's margin reset drops the browser's dialog centering,
+ * which pins showModal() to the top left. Keep every prompt in the centre.
+ */
+dialog.oak-modal {
+  position: fixed;
+  inset: 0;
+  height: fit-content;
+  max-height: min(85dvh, 42rem);
+  margin: auto;
+  overflow: auto;
+}
+
 /* Deal wizard: inputs share the 14px radius of its chips and buttons. */
 .deal-wizard input:not([type="radio"]):not([type="range"]):not([type="checkbox"]) {
   border-radius: 14px;

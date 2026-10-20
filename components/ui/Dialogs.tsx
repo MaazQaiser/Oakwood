@@ -69,14 +69,15 @@ export function Modal({
     return null;
   }
 
+  const width =
+    size === "wide"
+      ? "w-[min(100%-1rem,72rem)]"
+      : "w-[min(100%-2rem,32rem)]";
+
   return (
     <dialog
       ref={ref}
-      className={
-        size === "wide"
-          ? "z-[var(--oak-z-modal)] w-[min(100%-1rem,72rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
-          : "z-[var(--oak-z-modal)] w-[min(100%-2rem,32rem)] rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]"
-      }
+      className={`oak-modal z-[var(--oak-z-modal)] ${width} rounded-xl border border-border bg-surface p-0 shadow-lg backdrop:bg-[var(--oak-overlay)]`}
       onClose={handleClose}
     >
       <div className="flex items-start justify-between gap-4 px-5 py-4">
