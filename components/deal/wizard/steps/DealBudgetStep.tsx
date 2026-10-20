@@ -23,7 +23,6 @@ import {
   DEAL_BUDGET_HP_BODY,
   DEAL_BUDGET_HP_LEAD,
   DEAL_BUDGET_HP_ROLE,
-  DEAL_BUDGET_ILLUSTRATIVE,
   DEAL_BUDGET_PCP_BODY,
   DEAL_BUDGET_PCP_LEAD,
   DEAL_BUDGET_PCP_ROLE,
@@ -328,10 +327,6 @@ export function DealBudgetStep() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 space-y-4 pb-5">
-        <Alert title="Illustrative figures" tone="info">
-          {DEAL_BUDGET_ILLUSTRATIVE}
-        </Alert>
-
         {neExceedsCap ? (
           <div className="space-y-3 rounded-[20px] border border-warning/30 bg-warning-soft/50 px-4 py-4">
             <p className="text-label text-ink">{DEAL_PX_NEGATIVE_TITLE}</p>

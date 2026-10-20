@@ -167,9 +167,6 @@ export const DEAL_PX_DEPOSIT_EQUITY = "Part exchange";
 
 export const DEAL_PX_DEPOSIT_TOTAL = "Total deposit";
 
-export const DEAL_BUDGET_ILLUSTRATIVE =
-  "Illustrative mock quotes for this prototype. Not an approved offer. APR and monthly payments are confirmed when you apply.";
-
 export const DEAL_BUDGET_HP_ROLE = "Primary";
 
 export const DEAL_BUDGET_PCP_ROLE = "Alternative";
