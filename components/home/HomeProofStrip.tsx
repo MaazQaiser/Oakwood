@@ -1,6 +1,6 @@
 import {
   IconAaBadge,
-  IconProofCar,
+  IconGoogleReview,
   IconProofLocations,
   IconWarrantyBadge,
 } from "@/components/home/HomeProofIcons";
@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { HOME_PROOF_ITEMS } from "@/lib/home/copy";
 
 const PROOF_ICONS = {
-  stock: IconProofCar,
+  reviews: IconGoogleReview,
   aa: IconAaBadge,
   warranty: IconWarrantyBadge,
   locations: IconProofLocations,
@@ -19,7 +19,7 @@ export function HomeProofStrip({ className }: { className?: string }) {
     <ul
       aria-label="Oakwood at a glance"
       className={cn(
-        "grid w-full grid-cols-2 gap-3 md:grid-cols-4 md:gap-4",
+        "my-4 grid w-full grid-cols-2 gap-3 md:my-6 md:grid-cols-4 md:gap-4",
         className,
       )}
     >

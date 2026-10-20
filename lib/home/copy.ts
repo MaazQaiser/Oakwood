@@ -44,9 +44,9 @@ export const HOME_PART_EXCHANGE_SUPPORT =
 
 export const HOME_PROOF_ITEMS = [
   {
-    id: "stock",
-    lead: "Used cars",
-    detail: "across our two locations",
+    id: "reviews",
+    lead: "5-star rated",
+    detail: "On Google",
     accent: true,
   },
   {

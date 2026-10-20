@@ -2,8 +2,8 @@ import type { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
-/** Stock / cars count. */
-export function IconProofCar(props: IconProps) {
+/** Google review mark for the 5-star proof box. */
+export function IconGoogleReview(props: IconProps) {
   return (
     <svg
       viewBox="0 0 40 40"
@@ -14,21 +14,24 @@ export function IconProofCar(props: IconProps) {
       {...props}
     >
       <rect width="40" height="40" rx="12" fill="#E6F4FB" />
-      <path
-        d="M12 24.5h16.5M14.2 24.5l1.4-6.2c.2-.8.9-1.4 1.7-1.4h6.8c.8 0 1.5.6 1.7 1.4l1.4 6.2"
-        stroke="#0061A2"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M15.5 18.2h9.5"
-        stroke="#0061A2"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="15.2" cy="24.5" r="1.6" fill="#0061A2" />
-      <circle cx="25.3" cy="24.5" r="1.6" fill="#0061A2" />
+      <g transform="translate(8 8) scale(0.5)">
+        <path
+          fill="#FFC107"
+          d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
+        />
+        <path
+          fill="#FF3D00"
+          d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"
+        />
+        <path
+          fill="#4CAF50"
+          d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"
+        />
+        <path
+          fill="#1976D2"
+          d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"
+        />
+      </g>
     </svg>
   );
 }
