@@ -39,7 +39,7 @@ export function HomeHero() {
 
 function CurrentHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] flex flex-col overflow-hidden bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:min-h-[calc(100dvh-9rem)] lg:rounded-[32px] lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"
@@ -70,7 +70,7 @@ function CurrentHero() {
                 <IconArrow width={20} height={20} />
               </span>
             </Link>
-            <div>
+            <div className="hidden lg:block">
               <Link
                 href={routes.partExchange}
                 className="text-sm font-semibold text-primary-secondary underline-offset-2 no-underline hover:underline"
@@ -91,7 +91,7 @@ function CurrentHero() {
 
 function FilterHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-5 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:px-8 lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] flex flex-col overflow-hidden bg-[#ECF3F8] px-5 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:min-h-[calc(100dvh-9rem)] lg:rounded-[32px] lg:px-8 lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"
