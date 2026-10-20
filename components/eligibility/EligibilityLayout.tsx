@@ -47,7 +47,7 @@ export function EligibilityNavigation({
   return (
     <div
       className={cn(
-        "sticky bottom-[var(--oak-consent-offset,0px)] z-10 mt-8 bg-page py-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "relative z-10 mt-8 bg-page py-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
         className,
       )}
     >
@@ -68,6 +68,7 @@ export function EligibilityNavigation({
             onClick={onContinue}
             disabled={continueDisabled}
             className="w-full sm:w-auto"
+            aria-label={continueLabel}
           >
             {continueLabel}
           </Button>
@@ -87,7 +88,7 @@ export function EligibilityLayout({
   return (
     <div className="bg-page">
       <JourneyChrome />
-      <Container width="narrow" className="flex min-h-[calc(100dvh-8rem)] flex-col py-6 md:py-10">
+      <Container width="narrow" className="flex min-h-[calc(100dvh-8rem)] flex-col py-6 pb-[calc(1.5rem+var(--oak-consent-offset,0px))] md:py-10">
         <div className="mx-auto flex w-full max-w-[32rem] flex-1 flex-col">
           {children}
           {footer}

@@ -17,6 +17,9 @@ export function FinanceControls() {
     extraDeposit,
     term,
     termOptions,
+    annualMileage,
+    mileageOptions,
+    setAnnualMileage,
     setTermValue,
     adjustDeposit,
     setDepositValue,
@@ -129,6 +132,30 @@ export function FinanceControls() {
               </Select>
             </Field>
           </div>
+
+          {financeType === "pcp" ? (
+            <div className="mt-6">
+              <Field label="Annual mileage" htmlFor="vdp-mileage">
+                <Select
+                  id="vdp-mileage"
+                  name="annualMileage"
+                  value={annualMileage}
+                  onChange={(event) => setAnnualMileage(Number(event.target.value))}
+                >
+                  {mileageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option.toLocaleString("en-GB")} miles
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <p className="mt-2 text-caption text-muted">
+                PCP runs up to 60 months. HP can run up to 84 months.
+              </p>
+            </div>
+          ) : (
+            <p className="mt-2 text-caption text-muted">HP can run up to 84 months.</p>
+          )}
 
           <dl className="mt-6 grid grid-cols-2 gap-3 text-body-sm">
             <div>

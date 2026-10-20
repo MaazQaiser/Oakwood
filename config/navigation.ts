@@ -24,6 +24,7 @@ export const primaryNavigation: NavigationGroup[] = [
       { id: "used-cars", label: "Used cars", href: routes.usedCars },
       { id: "used-vans", label: "Used vans", href: routes.usedVans },
       { id: "search", label: "Search cars", href: routes.search },
+      { id: "saved-cars", label: "Your cars", href: routes.savedCars },
     ],
   },
   {
@@ -128,6 +129,7 @@ export const footerNavigation: NavigationGroup[] = [
       { id: "used-cars", label: "Used cars", href: routes.usedCars },
       { id: "used-vans", label: "Used vans", href: routes.usedVans },
       { id: "search", label: "Search cars", href: routes.search },
+      { id: "saved-cars", label: "Your cars", href: routes.savedCars },
       { id: "compare", label: "Compare cars", href: routes.compare },
     ],
   },

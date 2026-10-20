@@ -15,7 +15,7 @@ const ENTRY_COPY: Record<(typeof DEAL_STEPS)[number], [string, string]> = {
   ],
 };
 
-/** Four-step preview on the vehicle page's "Build your deal" card (v4). */
+/** Step preview on the vehicle page's "Build your deal" card. */
 export function DealEntrySteps() {
   return (
     <ol className="mt-3 divide-y divide-border">

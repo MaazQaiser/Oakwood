@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { Accordion } from "@/components/ui/Accordion";
-import { Button } from "@/components/ui/Button";
 import {
   Checkbox,
   Field,
@@ -442,38 +442,32 @@ export function FilterFields({
       </Accordion>
 
       <Accordion title="Affordable to me" defaultOpen>
-        {eligible ? (
-          <>
-            <Toggle
-              id={fid("affordable-to-me")}
-              label="Show affordable cars only"
-              hideLabel
-              checked={query.affordable === "1"}
-              onChange={(event) =>
-                onChange({
-                  affordable: event.target.checked ? "1" : undefined,
-                })
-              }
-            />
-            <p className="text-caption">{copy.affordableHintEligible}</p>
-            {query.affordable === "1" ? (
-              <button
-                type="button"
-                className="min-h-11 text-left text-body-sm text-primary"
-                onClick={() => onChange({ affordable: undefined })}
+        <Toggle
+          id={fid("affordable-to-me")}
+          label="Show affordable cars only"
+          hideLabel
+          checked={query.affordable === "1"}
+          onChange={(event) =>
+            onChange({
+              affordable: event.target.checked ? "1" : undefined,
+            })
+          }
+        />
+        <p className="text-caption text-muted">
+          {eligible ? (
+            copy.affordableHintEligible
+          ) : (
+            <>
+              {copy.affordableHintGuest}{" "}
+              <Link
+                href={getEligibilityUrl()}
+                className="font-semibold text-primary underline-offset-2 hover:underline"
               >
-                Clear affordable filter
-              </button>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <p className="text-body-sm text-muted">{copy.affordableHintGuest}</p>
-            <Button href={getEligibilityUrl()} className="w-full">
-              Check eligibility
-            </Button>
-          </>
-        )}
+                Check eligibility
+              </Link>
+            </>
+          )}
+        </p>
       </Accordion>
     </div>
   );

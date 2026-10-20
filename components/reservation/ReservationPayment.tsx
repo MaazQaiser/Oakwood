@@ -28,7 +28,11 @@ function createIdempotencyKey(): string {
 export function ReservationPayment({ model }: { model: ReservationPageModel }) {
   const router = useRouter();
   const emailId = useId();
+  const nameId = useId();
+  const phoneId = useId();
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, startTransition] = useTransition();
   const [processing, setProcessing] = useState(false);
@@ -56,7 +60,7 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
     });
     setProcessing(true);
     startTransition(() => {
-      void submitReservationPaymentAction({ email, idempotencyKey }).then(
+      void submitReservationPaymentAction({ email, name, telephone, idempotencyKey }).then(
         (result) => {
           if (!result.ok) {
             setProcessing(false);
@@ -73,6 +77,10 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
             }
             if (result.reason === "invalid_email") {
               setError("Enter a valid email address so we can send your confirmation.");
+              return;
+            }
+            if (result.reason === "invalid_contact") {
+              setError("Enter your name and a phone number.");
               return;
             }
             setError("We could not start payment. Try again.");
@@ -115,7 +123,39 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
         </div>
       </dl>
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor={nameId} className="text-label">
+            Name
+          </label>
+          <input
+            id={nameId}
+            name="name"
+            autoComplete="name"
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
+          />
+        </div>
+        <div>
+          <label htmlFor={phoneId} className="text-label">
+            Phone
+          </label>
+          <input
+            id={phoneId}
+            name="tel"
+            type="tel"
+            autoComplete="tel"
+            required
+            value={telephone}
+            onChange={(event) => setTelephone(event.target.value)}
+            className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4">
         <label htmlFor={emailId} className="text-label">
           Email for confirmation
         </label>

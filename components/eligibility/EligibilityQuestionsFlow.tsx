@@ -237,6 +237,10 @@ export function EligibilityQuestionsFlow() {
   const current = visible[index] ?? visible[0];
 
   useEffect(() => {
+    setError(undefined);
+  }, [current?.id]);
+
+  useEffect(() => {
     if (journey.machine !== "QUESTION" || !current) {
       return;
     }

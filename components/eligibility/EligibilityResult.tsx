@@ -163,7 +163,9 @@ export function EligibilityConditionalResult({
 
   return (
     <div>
-      <h1 className="text-h2">Your finance profile is ready.</h1>
+      <h1 className="text-h2">
+        {shortfall > 0 ? "Approved for a lower amount" : "Your finance profile is ready."}
+      </h1>
       <p className="mt-3 text-body text-muted">
         Your current finance profile covers up to{" "}
         {formatPounds(display.maxAdvance)}.
@@ -227,7 +229,7 @@ export function EligibilityReferResult() {
         options.
       </h1>
       <p className="mt-3 text-body text-muted">
-        A member of the Oakwood team will review this and contact you.
+        This check is being passed to Hero for a manual review. Oakwood will contact you with the outcome.
       </p>
       <div className="mt-6 rounded-lg border border-border bg-surface p-4">
         <p className="text-label">The Oakwood finance team</p>
@@ -263,8 +265,8 @@ export function EligibilityAlternativeFinanceResult() {
     <div>
       <h1 className="text-h2">Let&apos;s look at your options.</h1>
       <p className="mt-3 text-body text-muted">
-        We couldn&apos;t confirm a finance option through this route, but there
-        may still be other ways we can help.
+        This route did not approve finance. The application can be passed to Hero
+        to look at other options, and you can still browse cars.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button href={routes.finance}>Explore other finance options</Button>

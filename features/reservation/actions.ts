@@ -163,6 +163,8 @@ export const startReservationAction = withSessionPersistence(async function star
 
 export const submitReservationPaymentAction = withSessionPersistence(async function submitReservationPaymentAction(input: {
   email: string;
+  name?: string;
+  telephone?: string;
   idempotencyKey?: string;
 }): Promise<
   | { ok: true; status: ReservationStatusSnapshot }
@@ -173,13 +175,19 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
         | "unavailable"
         | "conflict"
         | "invalid_email"
+        | "invalid_contact"
         | "already_requested";
       status?: ReservationStatusSnapshot;
     }
 > {
   const email = input.email.trim().toLowerCase();
+  const name = input.name?.trim() ?? "";
+  const telephone = input.telephone?.replace(/[^\d+]/g, "") ?? "";
   if (!email.includes("@") || email.length < 5) {
     return { ok: false, reason: "invalid_email" };
+  }
+  if (name.length < 2 || telephone.length < 10) {
+    return { ok: false, reason: "invalid_contact" };
   }
 
   const bound = await getBoundReservation();
@@ -223,6 +231,8 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
     const next =
       patchReservation(record.id, {
         email,
+        customerName: name,
+        telephone,
         mockOutcome: outcome,
         paymentState: "pending",
         stockState: "available",
@@ -252,6 +262,8 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
   const next =
     patchReservation(record.id, {
       email,
+      customerName: name,
+      telephone,
       mockOutcome: outcome,
       idempotencyKey,
       paymentIntentId: intent.paymentIntentId,

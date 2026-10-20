@@ -1,8 +1,8 @@
 import type { DealStep } from "@/config/routes";
 
 /**
- * Customer Deal Builder v4 primary journey (four steps).
- * Legacy decision/quote routes redirect into Your deal.
+ * Customer Deal Builder primary journey (four steps).
+ * Decision and quote routes redirect into Your deal.
  */
 export const DEAL_STEPS = [
   "part-exchange",
@@ -31,7 +31,6 @@ export const DEAL_STEP_META: Record<
     supporting:
       "Compare HP and PCP, set your deposit and term. Figures are illustrative.",
   },
-  /** Merged Your deal screen (v4 Step 3) — finance summary + optional products. */
   cover: {
     index: 3,
     title: "Your deal",
@@ -46,7 +45,6 @@ export const DEAL_STEP_META: Record<
     supporting:
       "Reserve, apply for finance, book a test drive, or speak to Oakwood.",
   },
-  // Legacy steps kept for redirects / completed-step history only.
   decision: {
     index: 3,
     title: "Your deal",

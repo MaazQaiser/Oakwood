@@ -1,6 +1,6 @@
 import { redirectLegacyDealStep } from "@/lib/deal/deal-page";
 
-/** Legacy quote step — merged into Your deal (cover). */
+/** Quote step — merged into Your deal (cover). */
 export default async function Page({
   params,
 }: {

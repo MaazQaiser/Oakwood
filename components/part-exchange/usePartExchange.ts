@@ -275,8 +275,13 @@ export function usePartExchange({
       return;
     }
     void savePxVehicle({ vehicle, source });
+    // Mileage is collected with the registration. Don't ask for it again.
+    if (parseMileage(mileage) !== undefined) {
+      setStep("valuing");
+      return;
+    }
     setStep("mileage");
-  }, [source, vehicle]);
+  }, [mileage, source, vehicle]);
 
   const saveManual = useCallback(async () => {
     const issue = manualVehicleError(manual);
@@ -296,8 +301,12 @@ export function usePartExchange({
     setVehicle(next);
     setError(undefined);
     void savePxVehicle({ vehicle: next, source });
+    if (parseMileage(mileage) !== undefined) {
+      setStep("valuing");
+      return;
+    }
     setStep("mileage");
-  }, [manual, source]);
+  }, [manual, mileage, source]);
 
   const valueVehicle = useCallback(async () => {
     const issue = mileageError(mileage);
@@ -338,6 +347,16 @@ export function usePartExchange({
     track(analyticsEvents.pxValuationCompleted);
     setStep("valuation");
   }, [mileage, registration, source, track, vehicle]);
+
+  useEffect(() => {
+    if (step !== "valuing" || loading) {
+      return;
+    }
+    if (parseMileage(mileage) === undefined) {
+      return;
+    }
+    void valueVehicle();
+  }, [loading, mileage, step, valueVehicle]);
 
   const continueFromValuation = useCallback(() => {
     track(analyticsEvents.pxSettlementStarted);
@@ -471,7 +490,7 @@ export function usePartExchange({
     }
     if (result.reason === "no_deal") {
       track(analyticsEvents.pxCompleted);
-      router.push(getUsedCarsUrl());
+      router.push(result.href || getUsedCarsUrl());
       return;
     }
     if (result.reason === "expired") {

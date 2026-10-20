@@ -13,6 +13,7 @@ import { DealCallbackPanel } from "@/components/deal/wizard/steps/DealCallbackPa
 import { markStep4CtaEngaged } from "@/components/deal/DealAbandonmentModal";
 import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import { getDealApplicationUrl } from "@/config/routes";
+import { formatPounds } from "@/lib/format/money";
 import {
   getMockShowroomOpenStatus,
   resolveShowroomSlug,
@@ -34,6 +35,9 @@ type Panel =
   | "callback"
   | "call-closed";
 
+const hubActionClass =
+  "h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-3! py-2 text-center text-[13px]! font-semibold leading-none";
+
 function readInitialPanel(): Panel {
   if (typeof window === "undefined") return "hub";
   const value = new URLSearchParams(window.location.search).get("panel");
@@ -52,7 +56,7 @@ const IDLE_SAVE_KEY = "oakwood-step4-idle-save-shown";
 const IDLE_MS = 30_000;
 
 export function DealReserveStep() {
-  const { vehicle, dealId, navigateTo } = useDealBuilder();
+  const { vehicle, dealId, navigateTo, calculation } = useDealBuilder();
   const { goBack } = useDealStepNavigation("reserve");
   const [panel, setPanel] = useState<Panel>("hub");
   const [closedModal, setClosedModal] = useState(false);
@@ -139,24 +143,42 @@ export function DealReserveStep() {
           >
             {STEP4_HUB_RESERVE()}
           </Button>
-          <div className="grid grid-cols-4 gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className={hubActionClass}
+            onClick={() => {
+              markStep4CtaEngaged();
+              navigateTo(getDealApplicationUrl(dealId));
+            }}
+          >
+            {STEP4_HUB_APPLY}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className={hubActionClass}
+            onClick={() => {
+              const monthly = formatPounds(calculation?.monthlyPayment ?? 0);
+              const subject = encodeURIComponent(
+                `My Oakwood quote for the ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+              );
+              const body = encodeURIComponent(
+                `Quote for stock ${vehicle.stockId}: ${monthly} a month. Cash price ${formatPounds(vehicle.cashPrice)}. Resume this deal from the page you are on.`,
+              );
+              window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            }}
+          >
+            Email my quote
+          </Button>
+          <div className="grid grid-cols-3 gap-2">
             <Button
               type="button"
               variant="secondary"
               size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
-              onClick={() => {
-                markStep4CtaEngaged();
-                navigateTo(getDealApplicationUrl(dealId));
-              }}
-            >
-              {STEP4_HUB_APPLY}
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
+              className={hubActionClass}
               onClick={() => openPanel("test-drive")}
             >
               {STEP4_HUB_TEST_DRIVE}
@@ -166,7 +188,7 @@ export function DealReserveStep() {
                 href={`tel:${openStatus.telephone.replace(/\s/g, "")}`}
                 variant="secondary"
                 size="sm"
-                className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
+                className={hubActionClass}
                 onClick={() => markStep4CtaEngaged()}
               >
                 {STEP4_HUB_CALL_NOW}
@@ -176,7 +198,7 @@ export function DealReserveStep() {
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
+                className={hubActionClass}
                 onClick={() => {
                   markStep4CtaEngaged();
                   setClosedModal(true);
@@ -189,7 +211,7 @@ export function DealReserveStep() {
               type="button"
               variant="secondary"
               size="sm"
-              className="h-auto min-h-11! w-full min-w-0 whitespace-nowrap rounded-[14px]! border border-border px-2! py-2 text-center text-[13px]! font-semibold leading-none"
+              className={hubActionClass}
               onClick={() => openPanel("callback")}
             >
               {STEP4_HUB_CALL_BACK}

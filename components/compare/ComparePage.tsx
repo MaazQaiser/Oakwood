@@ -190,7 +190,7 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
                 </div>
               ) : null}
 
-              <div className="-mx-[var(--oak-page-x)] mt-6 overflow-x-auto px-[var(--oak-page-x)] overscroll-x-contain [scrollbar-width:thin] md:mx-0 md:overflow-visible md:px-0">
+              <div className="-mx-[var(--oak-page-x)] mt-6 min-w-0 max-w-[100vw] overflow-x-auto px-[var(--oak-page-x)] overscroll-x-contain [scrollbar-width:thin] md:mx-0 md:max-w-none md:overflow-visible md:px-0">
                 <div
                   className={cn(
                     "grid gap-4",

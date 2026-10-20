@@ -16,7 +16,7 @@ export function HeroVariantToggle({
   onChange: (variant: HomeHeroVariant) => void;
 }) {
   return (
-    <div className="fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 rounded-full border border-border bg-white p-1 shadow-[0_12px_32px_rgba(16,40,72,0.18)]">
+    <div className="inline-flex rounded-full border border-border bg-white p-1 shadow-[0_8px_20px_rgba(16,40,72,0.08)]">
       <div className="flex" role="group" aria-label="Hero variation">
         {options.map((option) => (
           <button

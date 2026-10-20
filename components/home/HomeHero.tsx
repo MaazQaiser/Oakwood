@@ -7,6 +7,7 @@ import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
 import { HomeProofStrip } from "@/components/home/HomeProofStrip";
 import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { HomeSearchCard } from "@/components/home/HomeSearchCard";
+import { HeroVariantToggle } from "@/components/home/HeroVariantToggle";
 import { useHomeHeroVariant } from "@/components/home/useHomeHeroVariant";
 import { IconArrow } from "@/components/ui/icons";
 import { routes } from "@/config/routes";
@@ -19,12 +20,13 @@ import {
 } from "@/lib/home/copy";
 
 export function HomeHero() {
-  const { variant } = useHomeHeroVariant();
+  const { variant, changeVariant } = useHomeHeroVariant();
 
   return (
     <>
       {variant === "filters" ? <FilterHero /> : <CurrentHero />}
       <div className="mx-[var(--oak-page-x)] flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
+        <HeroVariantToggle variant={variant} onChange={changeVariant} />
         <HomeProofStrip />
         {variant === "current" ? (
           <HomeSearchCard className="mt-4 sm:mt-5 lg:mt-6" />
@@ -37,7 +39,7 @@ export function HomeHero() {
 
 function CurrentHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"
@@ -49,7 +51,7 @@ function CurrentHero() {
           className="object-cover object-[34%_center] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)]"
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-1 flex-col justify-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col pb-8 lg:flex-1 lg:justify-center lg:pb-0 [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
         <div className="max-w-md">
           <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
             {HOME_HERO_HEADING}
@@ -82,24 +84,14 @@ function CurrentHero() {
           </div>
         </div>
       </div>
-      <div className="relative -mx-6 -mb-8 mt-8 aspect-[4/3] lg:hidden">
-        <Image
-          src="/images/hero/open-sky-mobile.png"
-          alt="A smiling customer giving a thumbs up beside a car under an open sky"
-          fill
-          priority
-          quality={92}
-          sizes="100vw"
-          className="object-cover object-center [mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)] [-webkit-mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)]"
-        />
-      </div>
+      <HeroCompactPhoto bleedClassName="-mx-6" />
     </section>
   );
 }
 
 function FilterHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-5 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:px-8 lg:pb-10">
+    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-5 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:px-8 lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
         <Image
           src="/images/hero/open-sky.png"
@@ -111,20 +103,28 @@ function FilterHero() {
           className="object-cover object-[34%_center] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)]"
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-1 flex-col justify-center py-4">
+      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col py-4 lg:flex-1 lg:justify-center [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
         <HomeFilterSearchCard />
       </div>
-      <div className="relative -mx-5 -mb-8 mt-8 aspect-[4/3] sm:-mx-6 lg:hidden">
-        <Image
-          src="/images/hero/open-sky-mobile.png"
-          alt="A smiling customer giving a thumbs up beside a car under an open sky"
-          fill
-          priority
-          quality={92}
-          sizes="100vw"
-          className="object-cover object-center [mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)] [-webkit-mask-image:linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.45)_12%,#000_28%)]"
-        />
-      </div>
+      <HeroCompactPhoto bleedClassName="-mx-5 sm:-mx-6" />
     </section>
+  );
+}
+
+function HeroCompactPhoto({ bleedClassName }: { bleedClassName: string }) {
+  return (
+    <div
+      className={`relative mt-2 h-60 shrink-0 overflow-hidden lg:hidden [@media(max-height:560px)]:pointer-events-none [@media(max-height:560px)]:absolute [@media(max-height:560px)]:top-0 [@media(max-height:560px)]:right-0 [@media(max-height:560px)]:bottom-auto [@media(max-height:560px)]:left-auto [@media(max-height:560px)]:mx-0 [@media(max-height:560px)]:mt-0 [@media(max-height:560px)]:h-[min(100%,100dvh)] [@media(max-height:560px)]:w-[42%] ${bleedClassName}`}
+    >
+      <Image
+        src="/images/hero/open-sky-mobile.png"
+        alt="A smiling customer giving a thumbs up beside a car under an open sky"
+        fill
+        priority
+        quality={92}
+        sizes="(max-width: 1024px) 100vw, 46vw"
+        className="object-cover object-[center_28%] [@media(max-height:560px)]:object-[center_45%] [mask-image:linear-gradient(to_bottom,transparent,#000_12%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,#000_12%)] [@media(max-height:560px)]:[mask-image:linear-gradient(to_right,transparent,#000_18%)] [@media(max-height:560px)]:[-webkit-mask-image:linear-gradient(to_right,transparent,#000_18%)]"
+      />
+    </div>
   );
 }

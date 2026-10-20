@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { IconButton } from "@/components/ui/Button";
 import { IconClose, IconMenu, IconSearch } from "@/components/ui/icons";
 import { CustomerFinanceControl } from "@/components/finance/CustomerFinanceControl";
+import { SavedCarsLink } from "@/components/saved/SavedCarsLink";
 import { DesktopNav } from "@/components/navigation/DesktopNav";
 import { MobileNav } from "@/components/navigation/MobileNav";
 import { Logo } from "@/components/navigation/Logo";
@@ -101,6 +102,7 @@ export function SiteHeader() {
             >
               <IconSearch width={24} height={24} />
             </Link>
+            <SavedCarsLink />
             <CustomerFinanceControl />
             <div ref={menuWrapRef} className="relative lg:hidden">
               <IconButton

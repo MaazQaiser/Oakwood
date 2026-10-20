@@ -35,6 +35,11 @@ export type EligibilityQuestionId =
   | "deposit"
   | "partExchange"
   | "firstName"
+  | "surname"
+  | "dateOfBirth"
+  | "addressLine"
+  | "timeAtAddress"
+  | "timeInJob"
   | "email"
   | "mobile"
   | "postcode"
@@ -73,6 +78,11 @@ export interface EligibilityAnswers {
   deposit?: number;
   partExchange?: EligibilityPartExchange;
   firstName?: string;
+  surname?: string;
+  dateOfBirth?: string;
+  addressLine?: string;
+  timeAtAddress?: number;
+  timeInJob?: number;
   email?: string;
   mobile?: string;
   postcode?: string;
@@ -102,7 +112,8 @@ export type EligibilityFieldType =
   | "postcode"
   | "yesno"
   | "consent"
-  | "deposit";
+  | "deposit"
+  | "date";
 
 export interface EligibilityQuestion {
   id: EligibilityQuestionId;
@@ -115,6 +126,7 @@ export interface EligibilityQuestion {
   options?: EligibilityChoiceOption[];
   inputMode?: "decimal" | "numeric" | "tel" | "email" | "text";
   showIf?: (answers: EligibilityAnswers) => boolean;
+  optional?: boolean;
 }
 
 export interface EligibilityBorrowingRow {

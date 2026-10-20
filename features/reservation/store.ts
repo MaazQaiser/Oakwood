@@ -20,6 +20,8 @@ export interface ReservationRecord {
   dealId?: string;
   dealSnapshot?: ReservationDealSnapshot;
   email?: string;
+  customerName?: string;
+  telephone?: string;
   stockState: ReservationStockState;
   paymentState: ReservationPaymentState;
   amount: number;

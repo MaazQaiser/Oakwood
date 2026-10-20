@@ -114,8 +114,7 @@ export function CompareVehicleCard({
                   value={formatPounds(vehicle.cashPrice)}
                   size="sm"
                   className="text-muted"
-                />{" "}
-                cash price
+                />
               </>
             ) : (
               <>

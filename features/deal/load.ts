@@ -101,10 +101,12 @@ export async function loadDealPage(dealId: string): Promise<DealPageModel> {
   }
 
   if (isDealExpired(record) && dealId !== mockDealId) {
+    const expiredVehicle = findVehicleByStockId(record.vehicleStockId);
     return {
       status: "expired",
       dealId,
-      similar: [],
+      vehicle: expiredVehicle ? toVehicleSummary(expiredVehicle) : undefined,
+      similar: expiredVehicle ? getSimilarVehicles(expiredVehicle) : [],
       finance,
       products: MOCK_OPTIONAL_PRODUCTS,
       config: DEAL_PROVIDER_CONFIG,

@@ -319,7 +319,7 @@ select {
     grid-template-areas:
       "gallery aside"
       "header aside"
-      "specs aside";
+      "specs specs";
   }
 
   .vdp-hero__gallery {
@@ -353,8 +353,9 @@ select {
   }
 }
 
-body[data-vehicle-lightbox] header {
-  z-index: var(--oak-z-base);
+body[data-vehicle-lightbox] [data-oak-header-shell] {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

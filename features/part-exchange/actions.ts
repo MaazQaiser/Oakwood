@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { withSessionPersistence } from "@/lib/session/persist";
 import { getDealRecord, isDealExpired, touchDeal } from "@/features/deal/store";
 import {
@@ -19,7 +20,10 @@ import {
   snapshotToDealPx,
   touchPxRecord,
 } from "@/features/part-exchange/store";
+import { getUsedCarsUrl, getVehicleUrl } from "@/config/routes";
 import { lookupPartExchangeVehicle } from "@/lib/part-exchange/lookup";
+import { LAST_VIEWED_STOCK_COOKIE } from "@/lib/vehicles/last-viewed";
+import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { calculatePxEquity } from "@/lib/part-exchange/equity";
 import { valuePartExchangeVehicle } from "@/lib/part-exchange/valuation";
 import {
@@ -289,7 +293,7 @@ export const applyPxToDealAction = withSessionPersistence(async function applyPx
   consideredStockId?: string;
 }): Promise<
   | { ok: true; dealId: string; px: DealPartExchangeInput }
-  | { ok: false; reason: "no_deal" | "expired" | "incomplete" }
+  | { ok: false; reason: "no_deal" | "expired" | "incomplete"; href?: string }
 > {
   const session = await getPxSession();
   const fromSession = session ? snapshotToDealPx(session.snapshot) : undefined;
@@ -306,7 +310,18 @@ export const applyPxToDealAction = withSessionPersistence(async function applyPx
         snapshot: { ...session.snapshot, status: "ready" },
       });
     }
-    return { ok: false, reason: "no_deal" };
+    const jar = await cookies();
+    const lastViewed = jar.get(LAST_VIEWED_STOCK_COOKIE)?.value;
+    const stockId =
+      input.consideredStockId ||
+      session?.consideredStockId ||
+      (lastViewed ? decodeURIComponent(lastViewed) : undefined);
+    const vehicle = stockId ? findVehicleByStockId(stockId) : undefined;
+    return {
+      ok: false,
+      reason: "no_deal",
+      href: vehicle ? getVehicleUrl(vehicle) : getUsedCarsUrl(),
+    };
   }
 
   await hydrateDealsFromCookie();

@@ -9,7 +9,8 @@ import {
   DEAL_SESSION_EXPIRED,
   DEAL_VEHICLE_UNAVAILABLE,
 } from "@/lib/deal/copy";
-import { getEligibilityUrl, getUsedCarsUrl, supportRoutes } from "@/config/routes";
+import { StartDealButton } from "@/components/deal/StartDealButton";
+import { getEligibilityUrl, getUsedCarsUrl, getVehicleUrl, supportRoutes } from "@/config/routes";
 import { toTelHref } from "@/lib/format/phone";
 
 export function DealFailureState({
@@ -34,13 +35,27 @@ export function DealFailureState({
   }
 
   if (kind === "session") {
+    const stockId = deal?.vehicle.stockId;
     return (
       <Alert title={DEAL_SESSION_EXPIRED} tone="warning">
-        Save a new deal from the vehicle page, or check eligibility again.
+        Start a new deal for this car, or check eligibility again.
         <div className="mt-3 flex flex-wrap gap-2">
-          <Button href={getUsedCarsUrl()} size="sm">
-            Browse cars
-          </Button>
+          {stockId ? (
+            <StartDealButton stockId={stockId} label="Start a new deal" />
+          ) : (
+            <Button href={getUsedCarsUrl()} size="sm">
+              Browse cars
+            </Button>
+          )}
+          {deal?.vehicle ? (
+            <Button
+              href={getVehicleUrl(deal.vehicle.slug)}
+              variant="secondary"
+              size="sm"
+            >
+              Back to this car
+            </Button>
+          ) : null}
           <Button href={getEligibilityUrl()} variant="secondary" size="sm">
             Check my eligibility
           </Button>

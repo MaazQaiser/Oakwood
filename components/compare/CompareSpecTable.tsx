@@ -20,8 +20,10 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
   }
 
   const columnCount = vehicles.length;
+  const labelColumn = "6.25rem";
+  const valueColumn = "7rem";
   const gridStyle = {
-    gridTemplateColumns: `minmax(7.5rem, 10rem) repeat(${columnCount}, minmax(10rem, 1fr))`,
+    gridTemplateColumns: `${labelColumn} repeat(${columnCount}, minmax(${valueColumn}, 1fr))`,
   };
 
   function cellValue(rowId: string, vehicle: Vehicle): string {
@@ -40,7 +42,7 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
   }
 
   return (
-    <section aria-labelledby="compare-spec-heading" className="mt-10">
+    <section aria-labelledby="compare-spec-heading" className="mt-10 min-w-0 max-w-full">
       <h2 id="compare-spec-heading" className="text-h3">
         Specification
       </h2>
@@ -49,8 +51,12 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
         spot changes without relying on colour alone.
       </p>
 
-      <div className="mt-4 overflow-x-auto overscroll-x-contain rounded-[22px] border border-border bg-surface">
-        <div className="min-w-[40rem]">
+      <div className="mt-4 max-w-full overflow-x-auto overscroll-x-contain rounded-[22px] border border-border bg-surface">
+        <div
+          style={{
+            minWidth: `calc(${labelColumn} + ${columnCount} * ${valueColumn})`,
+          }}
+        >
           {compareSpecGroups.map((group) => {
             const rows = compareSpecRows.filter((row) => row.group === group.id);
             if (rows.length === 0) {
@@ -59,8 +65,10 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
 
             return (
               <div key={group.id}>
-                <div className="border-b border-border bg-page-tint px-4 py-3">
-                  <h3 className="text-label text-ink">{group.label}</h3>
+                <div className="border-b border-border bg-page-tint">
+                  <h3 className="sticky left-0 w-fit bg-page-tint px-3 py-3 text-label text-ink">
+                    {group.label}
+                  </h3>
                 </div>
                 {rows.map((row) => {
                   const values = vehicles.map((vehicle) =>
@@ -71,11 +79,11 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
                   return (
                     <div
                       key={row.id}
-                      className="grid gap-3 border-b border-border px-4 py-4 last:border-b-0"
+                      className="grid border-b border-border last:border-b-0"
                       style={gridStyle}
                     >
-                      <div className="min-w-0">
-                        <p className="text-caption font-semibold uppercase tracking-[0.06em] text-muted">
+                      <div className="sticky left-0 z-10 min-w-0 border-r border-border bg-surface px-3 py-4">
+                        <p className="text-caption font-semibold uppercase tracking-[0.04em] text-muted">
                           {row.label}
                         </p>
                         {differs ? (
@@ -92,7 +100,7 @@ export function CompareSpecTable({ vehicles }: { vehicles: Vehicle[] }) {
                         <p
                           key={`${row.id}-${vehicles[index]?.stockId ?? index}`}
                           className={cn(
-                            "text-body-sm",
+                            "min-w-0 px-3 py-4 text-body-sm",
                             differs
                               ? "font-medium text-ink"
                               : "text-muted",

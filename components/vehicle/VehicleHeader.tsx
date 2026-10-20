@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { Chip } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber } from "@/lib/format/money";
 import { getVehicleIdentity } from "@/lib/vehicles/labels";
@@ -6,6 +10,7 @@ import { cn } from "@/lib/cn";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
+  const [shared, setShared] = useState<"idle" | "copied">("idle");
   const { title, subtitle } = getVehicleIdentity(vehicle);
   const mileageLabel = `${formatNumber(vehicle.mileage)} miles`;
   const badges = [
@@ -45,6 +50,24 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
             {badge.label}
           </Chip>
         ))}
+      </div>
+      <div className="mt-3">
+        <Button
+          type="button"
+          variant="text"
+          className="px-0"
+          onClick={() => {
+            const url = window.location.href;
+            const text = `${title} at Oakwood`;
+            if (navigator.share) {
+              void navigator.share({ title: text, url }).catch(() => undefined);
+              return;
+            }
+            void navigator.clipboard.writeText(url).then(() => setShared("copied"));
+          }}
+        >
+          {shared === "copied" ? "Link copied" : "Share this car"}
+        </Button>
       </div>
     </header>
   );

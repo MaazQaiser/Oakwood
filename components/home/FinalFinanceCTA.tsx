@@ -12,10 +12,7 @@ import {
   getRepresentativeFinanceExample,
 } from "@/lib/finance/representative-example";
 import { formatApr, formatPounds, formatTerm } from "@/lib/format/money";
-import {
-  HOME_FINANCE_ELIGIBILITY_CTA,
-  HOME_FINANCE_RATES_CTA,
-} from "@/lib/home/copy";
+import { HOME_FINANCE_ELIGIBILITY_CTA } from "@/lib/home/copy";
 import { representativeExamplePhotography } from "@/lib/home/photography";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 
@@ -104,17 +101,14 @@ export function FinalFinanceCTA() {
     <Section>
       <Container>
         <div className="overflow-hidden rounded-[28px] bg-[linear-gradient(105deg,#001c3d_0%,#002852_48%,#0a3a6b_100%)] px-6 py-8 text-white md:px-10 md:py-10 lg:px-12">
-          <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
-            <div className="flex min-w-0 flex-col justify-center">
+          <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:grid-rows-[1fr_auto] lg:gap-x-12 lg:gap-y-8">
+            <div className="flex min-w-0 flex-col justify-center lg:col-start-1 lg:row-start-1">
               <h2 className="max-w-xl text-[1.7rem] font-semibold leading-tight tracking-[-0.03em] md:text-[2rem]">
                 {eligible
                   ? "Your finance profile is ready — browse cars that fit your budget"
                   : "Know your budget before you shop, then browse cars that fit"}
               </h2>
-              <p className="mt-4 max-w-lg text-[0.98rem] leading-relaxed text-white/80">
-                No impact on your credit score.
-              </p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="mt-7">
                 <Link
                   href={primaryHref}
                   className="inline-flex h-11 w-full max-w-xs items-center justify-between gap-2 rounded-[14px] bg-white py-1 pl-4 pr-1 text-sm font-semibold text-[#002852] no-underline hover:bg-[#E7F1F8] sm:w-auto"
@@ -124,17 +118,22 @@ export function FinalFinanceCTA() {
                     <IconArrow width={16} height={16} />
                   </span>
                 </Link>
-                <Link
-                  href={getFinanceCalculatorUrl(
-                    example ? { stockId: example.stockId } : undefined,
-                  )}
-                  className="inline-flex min-h-11 items-center text-sm font-semibold text-white no-underline hover:underline"
-                >
-                  {HOME_FINANCE_RATES_CTA} →
-                </Link>
               </div>
             </div>
-            <ExampleCard />
+            <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+              <ExampleCard />
+            </div>
+            <p className="text-sm leading-relaxed text-white/80 lg:col-start-1 lg:row-start-2 lg:self-end">
+              No impact on your credit score.{" "}
+              <Link
+                href={getFinanceCalculatorUrl(
+                  example ? { stockId: example.stockId } : undefined,
+                )}
+                className="font-semibold text-white underline underline-offset-2 hover:text-white"
+              >
+                Finance calculator
+              </Link>
+            </p>
           </div>
         </div>
       </Container>

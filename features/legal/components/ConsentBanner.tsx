@@ -67,7 +67,12 @@ export function ConsentBanner() {
           .
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <Button type="button" onClick={saveNecessaryOnly} className="w-full sm:w-auto">
+          <Button
+            type="button"
+            onClick={saveNecessaryOnly}
+            className="w-full sm:w-auto"
+            aria-label={CONSENT_NECESSARY_ONLY}
+          >
             {CONSENT_NECESSARY_ONLY}
           </Button>
           <Button
@@ -75,6 +80,7 @@ export function ConsentBanner() {
             variant="secondary"
             onClick={openSettings}
             className="w-full sm:w-auto"
+            aria-label={CONSENT_OPEN_SETTINGS}
           >
             {CONSENT_OPEN_SETTINGS}
           </Button>

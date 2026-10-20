@@ -1,6 +1,6 @@
 import { redirectLegacyDealStep } from "@/lib/deal/deal-page";
 
-/** Legacy soft-check step — merged into Your deal (cover). */
+/** Soft-check step — merged into Your deal (cover). */
 export default async function Page({
   params,
 }: {

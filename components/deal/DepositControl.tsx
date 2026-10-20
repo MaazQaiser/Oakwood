@@ -1,11 +1,19 @@
 "use client";
 
 import { DepositControl as DepositControlInput } from "@/components/finance/DepositControl";
-import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import {
+  maxCashDeposit,
+  useDealBuilder,
+} from "@/components/deal/DealBuilderProvider";
 
 export function DepositControl() {
   const { draft, calculation, config, vehicle, setCashDeposit } = useDealBuilder();
-  const maxDeposit = Math.min(vehicle.cashPrice, config.maxDepositCap);
+  const maxDeposit = maxCashDeposit(
+    vehicle.cashPrice,
+    config.maxDepositCap,
+    config.depositStep,
+    draft.px,
+  );
 
   return (
     <DepositControlInput

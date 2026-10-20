@@ -11,6 +11,8 @@ import { VehicleSpecifications } from "@/components/vehicle/VehicleSpecification
 import { VehicleDocumentation } from "@/components/vehicle/VehicleDocumentation";
 import { VehicleVideo } from "@/components/vehicle/VehicleVideo";
 import { VehicleLocation } from "@/components/vehicle/VehicleLocation";
+import { VehicleViewingCard } from "@/components/vehicle/VehicleViewingCard";
+import { VehicleAskPanel } from "@/components/vehicle/VehicleAskPanel";
 import { SimilarVehicles } from "@/components/vehicle/SimilarVehicles";
 import { MobileVehicleActionBar } from "@/components/vehicle/MobileVehicleActionBar";
 import { VehicleViewTracker } from "@/components/vehicle/VehicleViewTracker";
@@ -102,6 +104,8 @@ export function VehicleDetailPage({
           </div>
 
           <div className="mt-14 space-y-14">
+            <VehicleViewingCard vehicle={vehicle} />
+            <VehicleAskPanel vehicle={vehicle} />
             <VehicleDocumentation vehicle={vehicle} />
             <VehicleVideo vehicle={vehicle} />
             <TrustBlock />

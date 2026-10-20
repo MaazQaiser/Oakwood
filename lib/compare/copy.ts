@@ -4,11 +4,11 @@ export const COMPARE_MIN_FOR_TABLE = 2;
 
 export const compareCopy = {
   title: "Compare cars",
-  emptyDescription: "Choose between 2 and 4 cars to compare side by side.",
+  emptyDescription: "Compare up to 4 cars side by side.",
   countDescription: (count: number) =>
     count === 1
-      ? "You’re comparing 1 car. Add another to see differences."
-      : `You’re comparing ${count} cars.`,
+      ? "You’re comparing 1 of 4 cars. Add another to see differences."
+      : `You’re comparing ${count} of ${COMPARE_MAX} cars.`,
   emptyTitle: "No cars to compare yet",
   emptyBody:
     "Add cars from search or a vehicle page using the heart icon, then come back here.",

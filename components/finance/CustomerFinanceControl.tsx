@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Dialogs";
 import { Slider } from "@/components/forms/FormControls";
@@ -13,6 +13,7 @@ import { formatApr, formatPounds } from "@/lib/format/money";
 
 export function CustomerFinanceControl() {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     mode,
     apr,
@@ -102,9 +103,12 @@ export function CustomerFinanceControl() {
           />
           {eligibilityAction ? (
             <Button
-              variant="secondary"
-              href={eligibilityAction.href}
-              onClick={() => setAssumptionsOpen(false)}
+              variant="text"
+              className="w-full font-semibold text-primary"
+              onClick={() => {
+                router.push(eligibilityAction.href);
+                setAssumptionsOpen(false);
+              }}
             >
               {eligibilityAction.label}
             </Button>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { StickyActionBar } from "@/components/ui/StickyActionBar";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { IconPhone } from "@/components/ui/icons";
+import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { getUsedCarsUrl } from "@/config/routes";
@@ -58,10 +59,17 @@ export function MobileVehicleActionBar() {
           </p>
         </div>
         {reservable ? (
-          <StartReservationButton
-            stockId={vehicle.stockId}
-            className="btn-compact min-w-0 shrink-0"
-          />
+          <>
+            <StartVehicleDealButton
+              className="btn-compact min-w-0 shrink-0"
+              variant="secondary"
+              label="Build deal"
+            />
+            <StartReservationButton
+              stockId={vehicle.stockId}
+              className="btn-compact min-w-0 shrink-0"
+            />
+          </>
         ) : (
           <Button href={getUsedCarsUrl()} className="btn-compact min-w-0 shrink-0" variant="secondary">
             View similar cars

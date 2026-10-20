@@ -52,6 +52,7 @@ export const routes = {
 
   usedCars: "/used-cars",
   usedVans: "/used-vans",
+  savedCars: "/saved-cars",
   search: "/search",
 
   locations: "/locations",

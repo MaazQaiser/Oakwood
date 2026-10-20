@@ -108,8 +108,7 @@ export function VehiclePrice() {
             value={formatPounds(cashPrice)}
             size="sm"
             className="text-muted"
-          />{" "}
-          cash price
+          />
         </p>
       ) : !showMonthly && !financeUnavailable ? (
         <p className="mt-2 text-body-sm text-muted">
@@ -153,7 +152,7 @@ export function VehiclePrice() {
         </div>
       ) : null}
 
-      <div className="mt-4 hidden flex-col gap-2 lg:flex">
+      <div className="mt-4 hidden flex-col gap-2 bg-[#ECF3F8] lg:sticky lg:bottom-0 lg:z-10 lg:flex lg:pt-2">
         {reservable ? (
           <StartReservationButton
             stockId={vehicle.stockId}

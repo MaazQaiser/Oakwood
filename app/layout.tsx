@@ -6,6 +6,7 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { CompareTray } from "@/components/compare/CompareTray";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Poppins } from "next/font/google";
+import { loadCustomerFinanceSeed } from "@/features/eligibility/customer-finance-seed";
 import { getSiteOrigin } from "@/lib/seo/site";
 import "@/styles/globals.css";
 
@@ -33,14 +34,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const initialFinance = await loadCustomerFinanceSeed();
   return (
     <html
       lang="en-GB"
       className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full w-full min-w-0 flex-col bg-page text-ink">
-        <AppProviders>
+        <AppProviders initialFinance={initialFinance}>
           <SkipLink />
           <SiteHeader />
           <main

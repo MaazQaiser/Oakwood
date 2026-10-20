@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
+import { getPxUiState } from "@/features/part-exchange/actions";
 import { getDepositGap, getFinanceDisplayState } from "@/lib/finance/display";
 import { illustrateFinance } from "@/lib/finance/illustration";
 import { getMockValuation } from "@/lib/mock/vehicle-detail";
@@ -23,7 +24,9 @@ import {
 import type { FinanceDisplayState } from "@/components/finance/FinancePrimitives";
 import type { FinanceType, VehicleDetail } from "@/types/vehicle-detail";
 
-const TERM_OPTIONS = [24, 36, 48, 60] as const;
+const HP_TERMS = [24, 36, 48, 60, 72, 84] as const;
+const PCP_TERMS = [24, 36, 48, 60] as const;
+const PCP_MILEAGE = [6000, 8000, 10000, 12000, 15000] as const;
 const DEPOSIT_STEP = 500;
 
 export interface PartExchangeValuation {
@@ -39,6 +42,8 @@ interface VehicleDealContextValue {
   deposit: number;
   term: number;
   termOptions: readonly number[];
+  annualMileage: number;
+  mileageOptions: readonly number[];
   displayState: FinanceDisplayState;
   gapAmount?: number;
   monthlyPayment: number;
@@ -56,6 +61,7 @@ interface VehicleDealContextValue {
   adjustDeposit: (delta: number) => void;
   setDepositValue: (value: number) => void;
   setTermValue: (value: number) => void;
+  setAnnualMileage: (value: number) => void;
   applyPartExchange: (input: PartExchangeValuation) => void;
   startValuation: (registration: string, mileage: number) => void;
   setSettlement: (value?: number) => void;
@@ -75,6 +81,7 @@ export function VehicleDealProvider({
 }) {
   const finance = useCustomerFinance();
   const [financeType, setFinanceTypeState] = useState<FinanceType>("hp");
+  const [annualMileage, setAnnualMileageState] = useState(10000);
   const [px, setPx] = useState<PartExchangeValuation | undefined>();
   const [opened, setOpened] = useState(false);
   const [priceView, setPriceViewState] = useState<ListingPriceView>("total");
@@ -84,6 +91,32 @@ export function VehicleDealProvider({
     if (stored) {
       setPriceViewState(stored);
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getPxUiState().then((state) => {
+      if (cancelled || "empty" in state || state.expired) {
+        return;
+      }
+      const snapshot = state.snapshot;
+      if (
+        !snapshot.registration ||
+        snapshot.mileage === undefined ||
+        snapshot.estimatedValue === undefined
+      ) {
+        return;
+      }
+      setPx({
+        registration: snapshot.registration,
+        mileage: snapshot.mileage,
+        value: snapshot.estimatedValue,
+        settlement: snapshot.settlementFigure,
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const setPriceView = useCallback((view: ListingPriceView) => {
@@ -131,13 +164,18 @@ export function VehicleDealProvider({
         )
       : undefined;
 
+  const termOptions = financeType === "pcp" ? PCP_TERMS : HP_TERMS;
+
   const setFinanceType = useCallback(
     (type: FinanceType) => {
       markOpened();
       setFinanceTypeState(type);
+      if (type === "pcp" && finance.term > 60) {
+        finance.setTerm(60);
+      }
       trackEvent(analyticsEvents.financeTypeChanged, { type });
     },
-    [markOpened],
+    [finance, markOpened],
   );
 
   const setDepositValue = useCallback(
@@ -160,11 +198,18 @@ export function VehicleDealProvider({
   const setTermValue = useCallback(
     (value: number) => {
       markOpened();
-      finance.setTerm(value);
-      trackEvent(analyticsEvents.termChanged, { term: value });
+      const cap = financeType === "pcp" ? 60 : 84;
+      const next = Math.min(cap, Math.max(24, value));
+      finance.setTerm(next);
+      trackEvent(analyticsEvents.termChanged, { term: next });
     },
-    [finance, markOpened],
+    [finance, financeType, markOpened],
   );
+
+  const setAnnualMileage = useCallback((value: number) => {
+    setAnnualMileageState(value);
+    trackEvent(analyticsEvents.annualMileageChanged, { annualMileage: value });
+  }, []);
 
   const applyPartExchange = useCallback(
     (input: PartExchangeValuation) => {
@@ -215,7 +260,9 @@ export function VehicleDealProvider({
       financeType,
       deposit: cashDeposit,
       term: finance.term,
-      termOptions: TERM_OPTIONS,
+      termOptions,
+      annualMileage,
+      mileageOptions: PCP_MILEAGE,
       displayState,
       gapAmount,
       monthlyPayment: illustration.monthlyPayment,
@@ -233,6 +280,7 @@ export function VehicleDealProvider({
       adjustDeposit,
       setDepositValue,
       setTermValue,
+      setAnnualMileage,
       applyPartExchange,
       startValuation,
       setSettlement,
@@ -245,6 +293,8 @@ export function VehicleDealProvider({
       financeType,
       cashDeposit,
       finance.term,
+      termOptions,
+      annualMileage,
       displayState,
       gapAmount,
       illustration,
@@ -258,6 +308,7 @@ export function VehicleDealProvider({
       adjustDeposit,
       setDepositValue,
       setTermValue,
+      setAnnualMileage,
       applyPartExchange,
       startValuation,
       setSettlement,

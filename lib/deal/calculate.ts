@@ -207,11 +207,16 @@ export function calculateDeal(
   financeProfile?: DealFinanceProfileInput,
   config: DealProviderConfig = DEAL_PROVIDER_CONFIG,
 ): DealCalculation {
-  const maxDeposit = Math.min(input.vehiclePrice, config.maxDepositCap);
+  const { equity: pxEquity, negativeEquity: pxNegativeEquity } = pxFigures(input);
+  // Cash plus part-exchange equity cannot pass the price. Otherwise the
+  // amount left to finance is zero and the estimate sticks on £0.
+  const maxDeposit = Math.max(
+    0,
+    Math.min(input.vehiclePrice, config.maxDepositCap) - pxEquity,
+  );
   const cashDeposit = roundPounds(
     Math.min(maxDeposit, Math.max(0, input.cashDeposit)),
   );
-  const { equity: pxEquity, negativeEquity: pxNegativeEquity } = pxFigures(input);
   const totalDeposit = cashDeposit + pxEquity;
   const selected = listSelectedProducts(input.productIds);
   const priceOf = (product: (typeof selected)[number]) =>

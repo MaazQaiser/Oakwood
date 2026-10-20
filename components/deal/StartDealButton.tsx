@@ -15,6 +15,7 @@ export function StartDealButton({
   cashDeposit,
   term,
   financeType,
+  annualMileage,
   label = DEAL_VDP_CARD_CTA,
 }: {
   stockId: string;
@@ -23,6 +24,7 @@ export function StartDealButton({
   cashDeposit?: number;
   term?: number;
   financeType?: FinanceProductType;
+  annualMileage?: number;
   label?: string;
 }) {
   const finance = useCustomerFinance();
@@ -50,6 +52,9 @@ export function StartDealButton({
         {financeType ? (
           <input type="hidden" name="financeType" value={financeType} />
         ) : null}
+        {annualMileage ? (
+          <input type="hidden" name="annualMileage" value={String(annualMileage)} />
+        ) : null}
         <Button className="w-full" variant={variant} type="submit">
           {label}
         </Button>
@@ -72,7 +77,7 @@ export function StartVehicleDealButton({
   variant?: "primary" | "secondary" | "tertiary";
   label?: string;
 }) {
-  const { vehicle, financeType, deposit, term } = useVehicleDeal();
+  const { vehicle, financeType, deposit, term, annualMileage } = useVehicleDeal();
 
   return (
     <StartDealButton
@@ -80,6 +85,7 @@ export function StartVehicleDealButton({
       cashDeposit={deposit}
       term={term}
       financeType={financeType}
+      annualMileage={financeType === "pcp" ? annualMileage : undefined}
       className={className}
       variant={variant}
       label={label}

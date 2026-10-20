@@ -237,8 +237,7 @@ export function VehicleCard({
               value={formatPounds(vehicle.cashPrice)}
               size="sm"
               className="text-muted"
-            />{" "}
-            cash price
+            />
           </p>
         ) : (
           <p className="text-body-sm text-muted">

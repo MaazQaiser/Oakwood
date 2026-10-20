@@ -11,7 +11,12 @@ export function EligibilitySummary({
   answers: EligibilityAnswers;
 }) {
   const rows = [
-    { label: "Your details", value: answers.firstName ?? "—" },
+    {
+      label: "Your details",
+      value: [answers.firstName, answers.surname].filter(Boolean).join(" ") || "—",
+    },
+    { label: "Date of birth", value: answers.dateOfBirth ?? "—" },
+    { label: "Address", value: answers.addressLine ?? "—" },
     { label: "Employment", value: getEmploymentLabel(answers.employment) },
     {
       label: "Income",

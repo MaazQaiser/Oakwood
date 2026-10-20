@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { IconButton } from "@/components/ui/Button";
 import { IconClose, IconHeart } from "@/components/ui/icons";
@@ -18,6 +18,7 @@ export function CompareTray({
 }: {
   variant: "header" | "mobile";
 }) {
+  const trayRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { count, stockIds, ready, remove } = useCompare();
   const hidden =
@@ -38,14 +39,21 @@ export function CompareTray({
       root.style.setProperty("--oak-compare-offset", "0px");
       return;
     }
-    root.style.setProperty(
-      "--oak-compare-offset",
-      "calc(5.75rem + env(safe-area-inset-bottom))",
-    );
+    const tray = trayRef.current;
+    const apply = () => {
+      const height = tray?.offsetHeight ?? 0;
+      root.style.setProperty("--oak-compare-offset", height > 0 ? `${height}px` : "0px");
+    };
+    apply();
+    const observer = tray ? new ResizeObserver(apply) : null;
+    if (tray) {
+      observer?.observe(tray);
+    }
     return () => {
+      observer?.disconnect();
       root.style.setProperty("--oak-compare-offset", "0px");
     };
-  }, [hidden, variant]);
+  }, [hidden, variant, count]);
 
   if (hidden) {
     return null;
@@ -99,8 +107,9 @@ export function CompareTray({
 
   return (
     <div
+      ref={trayRef}
       className={cn(
-        "fixed inset-x-0 z-[32] border-t border-border bg-surface px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden",
+        "fixed inset-x-0 z-[28] border-t border-border bg-surface px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden",
         "bottom-[var(--oak-consent-offset,0px)]",
       )}
       role="region"

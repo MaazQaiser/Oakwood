@@ -95,7 +95,8 @@ export const ELIGIBILITY_QUESTIONS: EligibilityQuestion[] = [
     stage: "finance",
     type: "single",
     question: "Do you have a car to part exchange?",
-    support: "This is optional. You can get a valuation after this check.",
+    support: "Optional. You can skip this and get a valuation later.",
+    optional: true,
     options: [
       { value: "yes", label: "Yes" },
       { value: "no", label: "No" },
@@ -109,6 +110,46 @@ export const ELIGIBILITY_QUESTIONS: EligibilityQuestion[] = [
     question: "What's your first name?",
     why: "We'll use this so we can send your result to the right person.",
     placeholder: "First name",
+  },
+  {
+    id: "surname",
+    stage: "contact",
+    type: "text",
+    question: "What's your surname?",
+    placeholder: "Surname",
+  },
+  {
+    id: "dateOfBirth",
+    stage: "contact",
+    type: "date",
+    question: "What's your date of birth?",
+    support: "We use this for the soft search.",
+    placeholder: "DD/MM/YYYY",
+  },
+  {
+    id: "addressLine",
+    stage: "contact",
+    type: "text",
+    question: "What's your home address?",
+    support: "House number and street. Postcode comes next.",
+    placeholder: "Address",
+  },
+  {
+    id: "timeAtAddress",
+    stage: "contact",
+    type: "number",
+    question: "How many months have you lived there?",
+    placeholder: "Months",
+    inputMode: "numeric",
+  },
+  {
+    id: "timeInJob",
+    stage: "employment",
+    type: "number",
+    question: "How many months have you been in this job?",
+    placeholder: "Months",
+    inputMode: "numeric",
+    showIf: (answers) => answers.employment === "employed",
   },
   {
     id: "email",
@@ -210,7 +251,7 @@ export function validateQuestion(
   }
 
   if (value === undefined || value === "") {
-    return "This information is required to continue.";
+    return question.optional ? undefined : "This information is required to continue.";
   }
 
   if (question.type === "single" || question.type === "yesno") {
@@ -231,7 +272,9 @@ export function validateQuestion(
 
   if (question.type === "number") {
     const amount = typeof value === "number" ? value : Number(value);
-    if (!Number.isFinite(amount) || amount < 1 || amount > 600) {
+    const minimum =
+      question.id === "timeAtAddress" || question.id === "timeInJob" ? 0 : 1;
+    if (!Number.isFinite(amount) || amount < minimum || amount > 600) {
       return "Enter a valid number of months.";
     }
     return undefined;
@@ -254,6 +297,24 @@ export function validateQuestion(
     return UK_POSTCODE.test(String(value).trim())
       ? undefined
       : "Enter a valid UK postcode.";
+  }
+
+  if (question.type === "date") {
+    const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(value).trim());
+    if (!match) {
+      return "Enter your date of birth as DD/MM/YYYY.";
+    }
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+    const valid =
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day &&
+      year > 1900 &&
+      date.getTime() < Date.now();
+    return valid ? undefined : "Enter a valid date of birth.";
   }
 
   if (question.type === "text") {

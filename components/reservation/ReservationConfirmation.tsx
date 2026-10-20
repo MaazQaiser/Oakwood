@@ -212,6 +212,9 @@ export function ReservationConfirmation({
         <Button href={getReserveUrl(vehicle.stockId, "manage")} variant="secondary">
           View my reservation
         </Button>
+        <Button href={getReserveUrl(vehicle.stockId, "refund")} variant="secondary">
+          Request a deposit refund
+        </Button>
         <Button
           href={supportRoutes.bookingEnquiry}
           variant="text"

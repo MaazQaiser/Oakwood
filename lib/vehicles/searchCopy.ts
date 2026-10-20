@@ -84,7 +84,7 @@ const CAR_COPY: SearchCopy = {
   depositHint:
     "Deposit and term update your finance assumptions. They do not hide cars on their own.",
   affordableHintEligible: "Show cars within my current finance profile.",
-  affordableHintGuest: "Check eligibility to personalise affordability.",
+  affordableHintGuest: "Shows cars within the example budget on this page.",
 };
 
 const VAN_COPY: SearchCopy = {
@@ -130,7 +130,7 @@ const VAN_COPY: SearchCopy = {
   depositHint:
     "Deposit and term update your finance assumptions. They do not hide vans on their own.",
   affordableHintEligible: "Show vans within my current finance profile.",
-  affordableHintGuest: "Check eligibility to personalise affordability.",
+  affordableHintGuest: "Shows vans within the example budget on this page.",
 };
 
 export const PRICE_VIEW_TOTAL = "Total price";

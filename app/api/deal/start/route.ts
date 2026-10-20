@@ -3,14 +3,34 @@ import { getDealUrl } from "@/config/routes";
 import { createDealAction } from "@/features/deal/actions";
 import type { FinanceProductType } from "@/types/finance";
 
-function sameOriginBack(request: Request, reason: string): URL {
+/**
+ * The dev server rewrites `request.url` to localhost even when the visitor
+ * is on 127.0.0.1. A redirect to that rewritten host drops the deal cookie
+ * (it was set on the host that received the POST), so the next page cannot
+ * see the deal that was just created.
+ */
+function browserOrigin(request: Request): string {
   const current = new URL(request.url);
-  let target = new URL("/", current.origin);
+  const host =
+    request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() ||
+    request.headers.get("host")?.trim();
+  if (!host) {
+    return current.origin;
+  }
+  const proto =
+    request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ||
+    current.protocol.replace(":", "");
+  return `${proto}://${host}`;
+}
+
+function sameOriginBack(request: Request, reason: string): URL {
+  const origin = browserOrigin(request);
+  let target = new URL("/", origin);
   const referer = request.headers.get("referer");
   if (referer) {
     try {
       const candidate = new URL(referer);
-      if (candidate.origin === current.origin) {
+      if (candidate.origin === origin) {
         target = candidate;
       }
     } catch {
@@ -52,7 +72,7 @@ export async function POST(request: Request) {
       return NextResponse.redirect(sameOriginBack(request, result.reason), 303);
     }
     return NextResponse.redirect(
-      new URL(getDealUrl(result.dealId, "part-exchange"), request.url),
+      new URL(getDealUrl(result.dealId, "part-exchange"), browserOrigin(request)),
       303,
     );
   } catch (error) {

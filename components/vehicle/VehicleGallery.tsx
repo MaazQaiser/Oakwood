@@ -273,8 +273,8 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
       {lightbox && current.kind === "image" && portalReady
         ? createPortal(
             <div
-              className="fixed inset-0 isolate z-[var(--oak-z-lightbox)] h-dvh w-screen bg-[#101828]"
-              style={{ zIndex: "var(--oak-z-lightbox)" }}
+              className="fixed inset-0 z-[200] h-dvh w-screen bg-[#101828]"
+              style={{ zIndex: 200 }}
               role="dialog"
               aria-modal="true"
               aria-label={current.alt}
@@ -285,9 +285,20 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
                 aria-label="Close zoomed image"
                 onClick={() => setLightbox(false)}
               />
+              <div className="pointer-events-none absolute inset-3 sm:inset-8">
+                <Image
+                  src={current.src}
+                  alt={current.alt}
+                  fill
+                  sizes="100vw"
+                  unoptimized={isSvg(current.src)}
+                  className="object-contain"
+                  priority
+                />
+              </div>
               <IconButton
                 label="Close"
-                className="absolute right-4 top-4 z-10 bg-white text-ink shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:bg-[#E7F1F8] sm:right-5 sm:top-5"
+                className="absolute top-4 right-4 z-20 bg-white text-ink shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:bg-[#E7F1F8] sm:top-5 sm:right-5"
                 onClick={(event) => {
                   event.stopPropagation();
                   setLightbox(false);
@@ -299,7 +310,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
                 <>
                   <IconButton
                     label="Previous image"
-                    className="absolute left-3 top-1/2 z-10 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:left-5"
+                    className="absolute top-1/2 left-3 z-20 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:left-5"
                     onClick={(event) => {
                       event.stopPropagation();
                       goTo(index - 1);
@@ -309,7 +320,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
                   </IconButton>
                   <IconButton
                     label="Next image"
-                    className="absolute right-3 top-1/2 z-10 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:right-5"
+                    className="absolute top-1/2 right-3 z-20 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:right-5"
                     onClick={(event) => {
                       event.stopPropagation();
                       goTo(index + 1);
@@ -317,23 +328,10 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
                   >
                     <IconArrow />
                   </IconButton>
+                  <p className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-[rgb(16_24_40/0.72)] px-3 py-1 text-caption text-white">
+                    {index + 1} / {items.length}
+                  </p>
                 </>
-              ) : null}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 top-16 sm:top-20">
-                <Image
-                  src={current.src}
-                  alt={current.alt}
-                  fill
-                  sizes="100vw"
-                  unoptimized={isSvg(current.src)}
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              {items.length > 1 ? (
-                <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-[rgb(16_24_40/0.72)] px-3 py-1 text-caption text-white">
-                  {index + 1} / {items.length}
-                </p>
               ) : null}
             </div>,
             document.body,

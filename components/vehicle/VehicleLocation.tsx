@@ -3,7 +3,7 @@ import {
   getShowroomProfile,
   getStockLocation,
 } from "@/config/locations";
-import { getLocationUrl, getBookingUrl, supportRoutes } from "@/config/routes";
+import { getLocationUrl, supportRoutes } from "@/config/routes";
 import { toTelHref } from "@/lib/format/phone";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
@@ -97,14 +97,11 @@ export function VehicleLocation({ vehicle }: { vehicle: VehicleDetail }) {
             </Button>
           )}
           <Button
-            href={getBookingUrl({
-              source: "vdp",
-              location: isShowroom ? location?.slug : undefined,
-            })}
+            href="#view-this-car"
             variant="text"
             className="text-white/80! hover:text-white!"
           >
-            Book a service
+            Book a test drive or viewing
           </Button>
         </div>
       </div>

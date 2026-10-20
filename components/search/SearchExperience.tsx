@@ -149,7 +149,8 @@ export function SearchExperience({
 
   const eligible =
     finance.mode === "personalised" || finance.mode === "ineligible";
-  const maxAdvance = eligible ? finance.maxAdvance : undefined;
+  const maxAdvance =
+    eligible || query.affordable === "1" ? finance.maxAdvance : undefined;
 
   const unmatchedRemainder = useMemo(
     () => unmatchedRemainderFrom(resolved, catalog),

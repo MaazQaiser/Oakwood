@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { IconBookmark } from "@/components/ui/icons";
+import { IconHeart } from "@/components/ui/icons";
 import { IconButton } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-import { analyticsEvents, trackEvent } from "@/lib/analytics";
-import { cn } from "@/lib/cn";
+import { routes } from "@/config/routes";
+import { useSavedVehicles } from "@/features/saved/SavedVehiclesProvider";
 import { getVanSearchEvents } from "@/features/vans/analytics";
+import { trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 import type { VehicleCategory } from "@/types/vehicle";
 
 export function SaveVehicleButton({
@@ -18,14 +19,16 @@ export function SaveVehicleButton({
   stockId?: string;
   category?: VehicleCategory;
 }) {
-  const [saved, setSaved] = useState(false);
+  const { has, toggle, ready } = useSavedVehicles();
   const { pushToast } = useToast();
+  const saved = Boolean(stockId && ready && has(stockId));
+  const listLabel = category === "van" ? "your vans" : "your cars";
 
   return (
     <IconButton
       label={
         saved
-          ? `Remove ${vehicleName} from saved ${category === "van" ? "vans" : "cars"}`
+          ? `Remove ${vehicleName} from ${listLabel}`
           : `Save ${vehicleName}`
       }
       aria-pressed={saved}
@@ -35,27 +38,39 @@ export function SaveVehicleButton({
         saved ? "text-primary" : "text-ink hover:bg-page-tint",
       )}
       onClick={() => {
-        const next = !saved;
-        setSaved(next);
-        if (next) {
+        if (!stockId) {
+          return;
+        }
+        const result = toggle(stockId, category);
+        if (result.action === "added") {
           pushToast(
             category === "van" ? "Saved to your vans" : "Saved to your cars",
             "success",
+            { href: routes.savedCars, label: "View your cars" },
           );
-          trackEvent(analyticsEvents.vehicleSaved, {
-            stockId,
-            vehicleName,
-            category,
-          });
-          trackEvent(analyticsEvents.saveVehicle, { stockId, category });
           const vanEvents = getVanSearchEvents(category);
           if (vanEvents) {
             trackEvent(vanEvents.saved, { stockId });
           }
+          return;
+        }
+        if (result.action === "removed") {
+          pushToast(
+            category === "van" ? "Removed from your vans" : "Removed from your cars",
+            "info",
+            { href: routes.savedCars, label: "View your cars" },
+          );
+          return;
+        }
+        if (result.action === "limit") {
+          pushToast("Your cars list is full", "info", {
+            href: routes.savedCars,
+            label: "View your cars",
+          });
         }
       }}
     >
-      <IconBookmark filled={saved} className={saved ? "text-primary" : undefined} />
+      <IconHeart filled={saved} className={saved ? "text-primary" : undefined} />
     </IconButton>
   );
 }

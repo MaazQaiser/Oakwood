@@ -66,15 +66,33 @@ function normaliseAssumptionTerm(months: number): number {
   return Math.min(ASSUMPTION_TERM_MAX, stepped);
 }
 
-export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<CustomerFinanceMode>("anonymous");
-  const [apr, setApr] = useState(16.9);
-  const [maxAdvance, setMaxAdvance] = useState(26500);
-  const [deposit, setDeposit] = useState(ILLUSTRATION_BASE_DEPOSIT);
-  const [term, setTerm] = useState(ILLUSTRATION_BASE_TERM);
+export function CustomerFinanceProvider({
+  children,
+  initialProfile = null,
+}: {
+  children: ReactNode;
+  initialProfile?: EligibilityProfileInput | null;
+}) {
+  const [mode, setMode] = useState<CustomerFinanceMode>(
+    initialProfile?.mode ?? "anonymous",
+  );
+  const [apr, setApr] = useState(initialProfile?.apr ?? 16.9);
+  const [maxAdvance, setMaxAdvance] = useState(initialProfile?.maxAdvance ?? 26500);
+  const [deposit, setDeposit] = useState(
+    initialProfile?.deposit ?? ILLUSTRATION_BASE_DEPOSIT,
+  );
+  const [term, setTerm] = useState(
+    initialProfile
+      ? normaliseAssumptionTerm(initialProfile.term)
+      : ILLUSTRATION_BASE_TERM,
+  );
   const [assumptionsOpen, setAssumptionsOpenState] = useState(false);
-  const [profileTerm, setProfileTerm] = useState<number | null>(null);
-  const [profileDeposit, setProfileDeposit] = useState<number | null>(null);
+  const [profileTerm, setProfileTerm] = useState<number | null>(
+    initialProfile ? normaliseAssumptionTerm(initialProfile.term) : null,
+  );
+  const [profileDeposit, setProfileDeposit] = useState<number | null>(
+    initialProfile?.deposit ?? null,
+  );
   const hydrated = useRef(false);
 
   const setModeSafe = useCallback((next: CustomerFinanceMode) => {
@@ -100,18 +118,20 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
 
   const setAssumptionsOpen = useCallback(
     (open: boolean) => {
-      if (open && (mode === "personalised" || mode === "ineligible")) {
-        if (profileTerm !== null) {
-          setTerm(profileTerm);
-        } else {
-          setTerm((current) => normaliseAssumptionTerm(current));
-        }
-        if (profileDeposit !== null) {
+      if (open) {
+        // 24 months is the first stop. Opening there looks unset, so use the
+        // saved profile term, or the 48-month illustration when nothing longer is set.
+        setTerm((current) => {
+          const saved = profileTerm ?? current;
+          const next = normaliseAssumptionTerm(saved);
+          return next <= ASSUMPTION_TERM_MIN ? ILLUSTRATION_BASE_TERM : next;
+        });
+        if (
+          (mode === "personalised" || mode === "ineligible") &&
+          profileDeposit !== null
+        ) {
           setDeposit(profileDeposit);
         }
-      }
-      if (open && mode === "anonymous") {
-        setTerm((current) => normaliseAssumptionTerm(current));
       }
       setAssumptionsOpenState(open);
     },
@@ -119,7 +139,7 @@ export function CustomerFinanceProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (hydrated.current) {
+    if (hydrated.current || initialProfile) {
       return;
     }
     hydrated.current = true;

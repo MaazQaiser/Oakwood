@@ -1,4 +1,5 @@
 import type { OakwoodImageSlot } from "@/lib/media/oakwood";
+import { needCategoryImage } from "@/lib/media/stock";
 import type { Vehicle } from "@/types/vehicle";
 import { listVehicles } from "@/lib/vehicles/query";
 
@@ -92,42 +93,6 @@ function withVehicleImage(
   };
 }
 
-function vehicleForNeed(id: string): Vehicle | undefined {
-  const vehicles = listVehicles();
-
-  switch (id) {
-    case "small":
-      return vehicles.find(
-        (vehicle) => vehicle.category === "car" && vehicle.bodyStyle === "Hatchback",
-      );
-    case "family":
-      return vehicles.find(
-        (vehicle) => vehicle.category === "car" && (vehicle.seats ?? 0) >= 5,
-      );
-    case "suv":
-      return vehicles.find((vehicle) => vehicle.bodyStyle === "SUV");
-    case "automatic":
-      return vehicles.find(
-        (vehicle) =>
-          vehicle.category === "car" && vehicle.transmission === "Automatic",
-      );
-    case "hybrid-electric":
-      return vehicles.find(
-        (vehicle) =>
-          vehicle.fuelType === "Electric" || vehicle.fuelType === "Hybrid",
-      );
-    case "low-mileage":
-      return vehicles
-        .filter((vehicle) => vehicle.category === "car")
-        .slice()
-        .sort((left, right) => left.mileage - right.mileage)[0];
-    case "vans":
-      return vehicles.find((vehicle) => vehicle.category === "van");
-    default:
-      return undefined;
-  }
-}
-
 export function showroomPhotography(slug: string): OakwoodImageSlot {
   return (
     HOME_SHOWROOM_IMAGES[slug] ?? {
@@ -144,7 +109,11 @@ export function needPhotography(id: string): OakwoodImageSlot {
       intended: "Oakwood vehicle photography",
     };
 
-  return withVehicleImage(slot, vehicleForNeed(id));
+  return {
+    ...slot,
+    src: needCategoryImage(id),
+    alt: slot.intended,
+  };
 }
 
 export function financeWarrantyPhotography(): OakwoodImageSlot {

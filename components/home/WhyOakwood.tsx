@@ -35,7 +35,7 @@ export function WhyOakwood() {
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
           <article
             id="finance"
-            className="flex flex-col gap-8 rounded-[28px] bg-[#ECF3F8] p-7 sm:p-9 lg:min-h-[28rem] lg:justify-between lg:gap-0"
+            className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-7 sm:p-9 lg:min-h-[28rem]"
           >
             <div className="max-w-md">
               <h3 className="text-[2rem] font-semibold leading-tight tracking-[-0.03em] text-navy sm:text-[2.35rem]">
@@ -50,35 +50,37 @@ export function WhyOakwood() {
               </p>
               <Link
                 href={routes.eligibility}
-                className="mt-6 inline-flex min-h-11 shrink-0 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d] sm:mt-8"
+                className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d]"
               >
                 Check eligibility
               </Link>
             </div>
-            <div className="grid shrink-0 grid-cols-3 gap-2 border-t border-ink/10 pt-5 text-center">
-              {financePoints.map((point) => (
-                <Link
-                  key={point.label}
-                  href={point.href}
-                  className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary no-underline hover:underline sm:tracking-[0.12em]"
-                >
-                  {point.label}
-                </Link>
-              ))}
+            <div className="pt-8 lg:mt-auto">
+              <div className="grid grid-cols-3 gap-x-3 gap-y-2 border-t border-ink/10 pt-5 text-center">
+                {financePoints.map((point) => (
+                  <Link
+                    key={point.label}
+                    href={point.href}
+                    className="min-w-0 px-1 text-[0.68rem] font-semibold uppercase leading-snug tracking-[0.04em] text-primary-secondary no-underline hover:underline sm:tracking-[0.08em]"
+                  >
+                    {point.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </article>
 
           <div className="grid gap-4">
-            <article className="grid min-h-[16.5rem] overflow-hidden rounded-[28px] bg-white sm:grid-cols-2">
-              <div className="relative min-h-52 min-w-0 max-h-64 sm:h-full sm:max-h-none">
+            <article className="grid overflow-hidden rounded-[28px] bg-white lg:min-h-[16.5rem] lg:grid-cols-2">
+              <div className="relative h-52 min-w-0 lg:h-auto">
                 <OakwoodPhotoSlot
                   slot={financeWarrantyPhotography()}
                   fill
                   sizes="(max-width: 1024px) 100vw, 22rem"
                 />
               </div>
-              <div className="relative flex min-w-0 flex-col justify-center bg-[#E7F3C4] px-6 pt-24 pb-6 sm:py-8 sm:pr-6 sm:pl-16">
-                <span className="absolute top-5 left-6 grid h-16 w-16 place-items-center rounded-2xl bg-[#002852] text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.04em] text-white tabular-nums sm:top-1/2 sm:left-0 sm:h-[4.6rem] sm:w-[4.6rem] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[1.15rem]">
+              <div className="relative flex min-w-0 flex-col justify-center bg-[#E7F3C4] px-6 py-6 lg:py-8 lg:pr-6 lg:pl-16">
+                <span className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-[#002852] text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.04em] text-white tabular-nums lg:absolute lg:top-1/2 lg:left-0 lg:mb-0 lg:h-[4.6rem] lg:w-[4.6rem] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[1.15rem]">
                   12
                   <br />
                   month

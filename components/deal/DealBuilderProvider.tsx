@@ -221,8 +221,11 @@ export function DealBuilderProvider({
   const [retryTick, setRetryTick] = useState(0);
   const started = useRef(false);
 
+  // Only a sold or expired car is unavailable. A missing status on the first
+  // client payload used to paint "no longer available" for a car that is in stock.
   const vehicleUnavailable = Boolean(
-    vehicle && vehicle.availability !== "available",
+    vehicle &&
+      (vehicle.availability === "sold" || vehicle.availability === "expired"),
   );
   const needsEligibility = !model.finance.hasProfile;
   const profileForCalc = useMemo(
@@ -336,6 +339,29 @@ export function DealBuilderProvider({
     },
     [model.config.pcpMileageOptions],
   );
+
+  useEffect(() => {
+    if (!vehicle) {
+      return;
+    }
+    const max = maxCashDeposit(
+      vehicle.cashPrice,
+      model.config.maxDepositCap,
+      model.config.depositStep,
+      draft.px,
+    );
+    if (draft.cashDeposit > max) {
+      setDraft((current) =>
+        current.cashDeposit > max ? { ...current, cashDeposit: max } : current,
+      );
+    }
+  }, [
+    draft.cashDeposit,
+    draft.px,
+    model.config.depositStep,
+    model.config.maxDepositCap,
+    vehicle,
+  ]);
 
   const setCashDeposit = useCallback(
     (value: number) => {
