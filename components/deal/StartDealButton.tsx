@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
-import { createDealAction } from "@/features/deal/actions";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { getDealUrl } from "@/config/routes";
 import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import type { FinanceProductType } from "@/types/finance";
@@ -28,43 +26,34 @@ export function StartDealButton({
   label?: string;
 }) {
   const finance = useCustomerFinance();
-  const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  const deposit = cashDeposit ?? finance.deposit;
+  const months = term ?? finance.term;
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("dealError")) setFailed(true);
+  }, []);
 
   return (
     <div className={className}>
-      <Button
-        className="w-full"
-        variant={variant}
-        busy={busy}
-        onClick={() => {
-          setBusy(true);
-          setFailed(false);
+      <form
+        action="/api/deal/start"
+        method="post"
+        onSubmit={() => {
           trackEvent(analyticsEvents.financeCtaClicked, { action: "build-deal" });
-          void createDealAction({
-            stockId,
-            cashDeposit: cashDeposit ?? finance.deposit,
-            term: term ?? finance.term,
-            financeType,
-          })
-            .then((result) => {
-              if (!result.ok) {
-                setBusy(false);
-                setFailed(true);
-                return;
-              }
-              // Full navigation. A client router push after this action was
-              // getting dropped, so the button looked like it did nothing.
-              window.location.assign(getDealUrl(result.dealId, "part-exchange"));
-            })
-            .catch(() => {
-              setBusy(false);
-              setFailed(true);
-            });
         }}
       >
-        {label}
-      </Button>
+        <input type="hidden" name="stockId" value={stockId} />
+        <input type="hidden" name="cashDeposit" value={String(deposit)} />
+        <input type="hidden" name="term" value={String(months)} />
+        {financeType ? (
+          <input type="hidden" name="financeType" value={financeType} />
+        ) : null}
+        <Button className="w-full" variant={variant} type="submit">
+          {label}
+        </Button>
+      </form>
       {failed ? (
         <p className="mt-2 text-caption text-danger" role="alert">
           We couldn&apos;t open your deal. Please try again.
