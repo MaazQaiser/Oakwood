@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { useRouter } from "next/navigation";
-import { CircleAlert, CircleCheck } from "lucide-react";
 import { Field, Input } from "@/components/forms/FormControls";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { Accordion } from "@/components/ui/Accordion";
@@ -17,23 +15,26 @@ import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
-import { getContactUrl } from "@/config/routes";
 import {
   DEAL_ADD_TO_DEAL,
-  DEAL_PX_CALLBACK,
   DEAL_PX_DEPOSIT_CASH,
   DEAL_PX_DEPOSIT_EQUITY,
   DEAL_PX_DEPOSIT_TOTAL,
   DEAL_PX_FINANCE_LABEL,
+  DEAL_PX_FINANCE_SOURCE,
   DEAL_PX_GET_OFFER,
   DEAL_PX_HELP_BODY,
   DEAL_PX_HELP_TITLE,
   DEAL_PX_INSPECTION,
   DEAL_PX_NEGATIVE_BODY,
-  DEAL_PX_NEGATIVE_TITLE,
   DEAL_PX_NOT_YOUR_VEHICLE,
+  DEAL_PX_RESULT_INTRO,
+  DEAL_PX_RESULT_TITLE,
+  DEAL_PX_SETTLEMENT_CHECK,
   DEAL_PX_TOTAL_LABEL,
+  DEAL_PX_TOTAL_SOURCE,
   DEAL_PX_VALUATION_LABEL,
+  DEAL_PX_VALUE_SOURCE,
   DEAL_PX_VALUING,
   DEAL_SKIP_PX,
 } from "@/lib/deal/copy";
@@ -92,7 +93,6 @@ function normaliseReg(value: string): string {
 
 export function DealPartExchangeStep() {
   const {
-    vehicle,
     draft,
     pxError,
     calculation,
@@ -101,7 +101,6 @@ export function DealPartExchangeStep() {
     clearPartExchange,
   } = useDealBuilder();
   const { goNext } = useDealStepNavigation("part-exchange");
-  const router = useRouter();
   const regId = useId();
   const milesId = useId();
   const settleId = useId();
@@ -278,15 +277,15 @@ export function DealPartExchangeStep() {
       : valued && settlementMissing
         ? "Enter the outstanding finance amount from your lender."
         : valued && !answered
-          ? "Answer condition, service history and finance to continue."
-          : owes
-            ? DEAL_PX_NEGATIVE_TITLE
-            : undefined;
+        ? "Answer condition, service history and finance to continue."
+        : owes
+          ? DEAL_PX_NEGATIVE_BODY
+          : undefined;
 
   const continueDisabled =
     valuing ||
     !hasVehicle ||
-    (valued && (!answered || owes)) ||
+    (valued && !answered) ||
     Boolean(pxError && !valued);
 
   return (
@@ -349,12 +348,6 @@ export function DealPartExchangeStep() {
             </Field>
           </div>
 
-          {valuing ? (
-            <div className="rounded-[16px] bg-page-tint px-4 py-5">
-              <LoadingState label={DEAL_PX_VALUING} />
-            </div>
-          ) : null}
-
           {pxError ? (
             <Alert title="Valuation unavailable" tone="warning">
               {pxError} You can skip part exchange and continue with £0 equity,
@@ -366,96 +359,6 @@ export function DealPartExchangeStep() {
             <p className="text-caption text-danger" role="alert">
               {localError}
             </p>
-          ) : null}
-
-          {valued && px ? (
-            <>
-              <div
-                className={cn(
-                  "rounded-[20px] px-4 py-4",
-                  owes ? "bg-warning-soft/70" : "bg-success-soft/50",
-                )}
-                role="status"
-                aria-live="polite"
-              >
-                <p
-                  className={cn(
-                    "flex items-center gap-1.5 text-caption font-semibold!",
-                    owes ? "text-ink" : "text-success",
-                  )}
-                >
-                  {owes ? (
-                    <CircleAlert className="h-4 w-4 text-warning" aria-hidden />
-                  ) : (
-                    <CircleCheck className="h-4 w-4" aria-hidden />
-                  )}
-                  Indicative valuation
-                </p>
-
-                <dl className="mt-3 space-y-2.5 text-body-sm">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <dt className="text-muted">{DEAL_PX_VALUATION_LABEL}</dt>
-                    <dd>
-                      <FinancialNumber
-                        value={formatPounds(px.value)}
-                        size="sm"
-                        className="text-ink"
-                      />
-                    </dd>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-4">
-                    <dt className="text-muted">{DEAL_PX_FINANCE_LABEL}</dt>
-                    <dd>
-                      <FinancialNumber
-                        value={
-                          settlement > 0
-                            ? `−${formatPounds(settlement)}`
-                            : formatPounds(0)
-                        }
-                        size="sm"
-                        className="text-ink"
-                      />
-                    </dd>
-                  </div>
-                  <div className="flex items-baseline justify-between gap-4 border-t border-border/70 pt-2.5">
-                    <dt className="text-label text-ink">{DEAL_PX_TOTAL_LABEL}</dt>
-                    <dd>
-                      <FinancialNumber
-                        value={formatPounds(owes ? 0 : equity)}
-                        size="sm"
-                        className={owes ? "text-ink" : "text-success"}
-                      />
-                    </dd>
-                  </div>
-                </dl>
-
-                {owes ? (
-                  <p className="mt-3 text-caption text-ink">
-                    Negative equity: −{formatPounds(negativeEquity)}. Outstanding
-                    finance is higher than the valuation, so £0 goes towards your
-                    deposit from this car.
-                  </p>
-                ) : null}
-
-                <p className="mt-3 text-caption text-muted">{DEAL_PX_INSPECTION}</p>
-              </div>
-
-              {owes ? (
-                <div className="space-y-3 rounded-[20px] border border-warning/30 bg-warning-soft/40 px-4 py-4">
-                  <p className="text-label text-ink">{DEAL_PX_NEGATIVE_TITLE}</p>
-                  <p className="text-body-sm text-ink">{DEAL_PX_NEGATIVE_BODY}</p>
-                  <Button
-                    href={getContactUrl({
-                      stockId: vehicle.stockId,
-                      topic: "part-exchange",
-                    })}
-                    className="w-full sm:w-auto"
-                  >
-                    {DEAL_PX_CALLBACK}
-                  </Button>
-                </div>
-              ) : null}
-            </>
           ) : null}
 
           <DealChipGroup
@@ -609,6 +512,77 @@ export function DealPartExchangeStep() {
               </Field>
             ) : null}
           </div>
+
+          {valuing ? (
+            <div className="rounded-[16px] bg-page-tint px-4 py-5">
+              <LoadingState label={DEAL_PX_VALUING} />
+            </div>
+          ) : null}
+
+          {valued && px ? (
+            <div
+              className="overflow-hidden rounded-2xl border border-navy/15"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="bg-navy px-3 py-2.5 text-white">
+                <p className="text-label">{DEAL_PX_RESULT_TITLE}</p>
+                <p className="mt-0.5 text-caption text-white/75">
+                  {DEAL_PX_RESULT_INTRO}
+                </p>
+              </div>
+              <dl className="divide-y divide-border text-body-sm">
+                <div className="flex items-center justify-between gap-4 px-3 py-2">
+                  <div className="min-w-0">
+                    <dt>{DEAL_PX_VALUATION_LABEL}</dt>
+                    <p className="text-caption text-muted">
+                      {DEAL_PX_VALUE_SOURCE(
+                        normaliseReg(registration),
+                        withCommas(String(miles)),
+                      )}
+                    </p>
+                  </div>
+                  <dd className="shrink-0">
+                    <FinancialNumber value={formatPounds(px.value)} size="sm" />
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 px-3 py-2">
+                  <div className="min-w-0">
+                    <dt>{DEAL_PX_FINANCE_LABEL}</dt>
+                    <p className="text-caption text-muted">{DEAL_PX_FINANCE_SOURCE}</p>
+                  </div>
+                  <dd className="shrink-0">
+                    <FinancialNumber
+                      value={`−${formatPounds(settlement)}`}
+                      size="sm"
+                    />
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 bg-success-soft px-3 py-2">
+                  <div className="min-w-0">
+                    <dt className="font-semibold text-success">{DEAL_PX_TOTAL_LABEL}</dt>
+                    <p className="text-caption text-success/80">{DEAL_PX_TOTAL_SOURCE}</p>
+                  </div>
+                  <dd className="shrink-0">
+                    <FinancialNumber
+                      value={formatPounds(owes ? 0 : equity)}
+                      size="sm"
+                      className="text-success"
+                    />
+                  </dd>
+                </div>
+              </dl>
+              {owes ? (
+                <p className="border-t border-border px-3 py-2 text-caption text-ink">
+                  {DEAL_PX_NEGATIVE_BODY} The difference is{" "}
+                  {formatPounds(negativeEquity)}.
+                </p>
+              ) : null}
+              <p className="border-t border-border px-3 py-2 text-caption text-muted">
+                {DEAL_PX_INSPECTION} {DEAL_PX_SETTLEMENT_CHECK}
+              </p>
+            </div>
+          ) : null}
         </DealCard>
 
         <DealCard className="space-y-2.5">
@@ -648,8 +622,8 @@ export function DealPartExchangeStep() {
           </dl>
           {owes ? (
             <p className="text-caption text-muted">
-              Negative equity −{formatPounds(negativeEquity)} is flagged for
-              discussion — it is not added to your deposit.
+              The outstanding difference of {formatPounds(negativeEquity)} may
+              be included in the finance. It is not added to your deposit.
             </p>
           ) : null}
         </DealCard>
@@ -666,26 +640,11 @@ export function DealPartExchangeStep() {
           goNext("budget");
         }}
         skipLabel={DEAL_SKIP_PX}
-        continueLabel={
-          owes
-            ? DEAL_PX_CALLBACK
-            : valued
-              ? DEAL_ADD_TO_DEAL
-              : DEAL_PX_GET_OFFER
-        }
-        continueDisabled={owes ? false : continueDisabled}
+        continueLabel={valued ? DEAL_ADD_TO_DEAL : DEAL_PX_GET_OFFER}
+        continueDisabled={continueDisabled}
         note={note}
         busy={valuing}
         onContinue={() => {
-          if (owes) {
-            router.push(
-              getContactUrl({
-                stockId: vehicle.stockId,
-                topic: "part-exchange",
-              }),
-            );
-            return;
-          }
           if (!valued) {
             valueNow();
             return;

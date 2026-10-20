@@ -18,6 +18,7 @@ import { Container } from "@/components/layout/Container";
 import { JourneyChrome } from "@/components/layout/JourneyChrome";
 import type { DealStep } from "@/config/routes";
 import { getDealUrl, getVehicleUrl } from "@/config/routes";
+import { DEAL_AUTOSAVE_SAVED, DEAL_AUTOSAVE_SAVING } from "@/lib/deal/copy";
 import { DEAL_STEP_META, DEAL_STEPS } from "@/lib/deal/steps";
 import type { DealPageModel } from "@/types/deal";
 import { Button } from "@/components/ui/Button";
@@ -34,7 +35,7 @@ function WizardInner({
   step: DealStep;
   children: ReactNode;
 }) {
-  const { vehicle, phase } = useDealBuilder();
+  const { vehicle, phase, autosave } = useDealBuilder();
   const meta = DEAL_STEP_META[step];
   const total = DEAL_STEPS.length;
 
@@ -95,6 +96,13 @@ function WizardInner({
               <p className="mt-2 text-body-sm text-secondary">
                 {meta.supporting}
               </p>
+              {autosave !== "idle" ? (
+                <p className="mt-2 text-caption text-muted" role="status">
+                  {autosave === "saving"
+                    ? DEAL_AUTOSAVE_SAVING
+                    : DEAL_AUTOSAVE_SAVED}
+                </p>
+              ) : null}
             </header>
 
             {phase === "VEHICLE_UNAVAILABLE" ? (

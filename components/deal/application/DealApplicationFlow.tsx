@@ -169,9 +169,12 @@ export function DealApplicationFlow() {
     trackEvent(analyticsEvents.applicationStarted, { dealId });
   }, [dealId]);
 
+  const [savedNote, setSavedNote] = useState(false);
+
   function persist(next: DealFinanceApplicationDraft) {
     setAppDraft(next);
     setFinanceApplication(next);
+    setSavedNote(true);
   }
 
   function updateForm(form: DealApplicationFormState) {
@@ -305,6 +308,11 @@ export function DealApplicationFlow() {
             </header>
 
             <ApplicationProgress sectionId={sectionId} sections={sections} />
+            {savedNote ? (
+              <p className="text-caption text-muted" role="status">
+                Progress saved on this deal.
+              </p>
+            ) : null}
 
             {appDraft.submitError ? (
               <Alert title={appDraft.submitError} tone="danger">

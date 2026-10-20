@@ -258,7 +258,7 @@ export function consumeDealResumeToken(
     { resume: { ...record.resume, used: true } },
     now,
   );
-  resumeIndex.delete(token);
+  // Keep the token so a second visit can ask for the email again.
   return next;
 }
 

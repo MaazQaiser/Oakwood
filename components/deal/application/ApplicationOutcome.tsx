@@ -29,7 +29,6 @@ import {
 } from "@/lib/deal/application/copy";
 import { reservationAmountLabel } from "@/lib/reservation/format";
 import type { DealApplicationResult } from "@/types/deal-application";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 
 function OliviaCard() {
   const { name, initials, role, withinMinutes } =
@@ -59,7 +58,7 @@ export function ApplicationOutcome({
 }: {
   result: DealApplicationResult;
 }) {
-  const { dealId, vehicle, contact, navigateTo } = useDealBuilder();
+  const { dealId, contact, navigateTo } = useDealBuilder();
   const telephone = contact.telephone;
 
   const copy =
@@ -114,11 +113,15 @@ export function ApplicationOutcome({
       {result.customerOutcome === "pre_approved" ? (
         <div className="space-y-3 rounded-card bg-surface p-5 shadow-card sm:p-6">
           <p className="text-label">While you wait</p>
-          <StartReservationButton
-            stockId={vehicle.stockId}
-            dealId={dealId}
+          <Button
+            type="button"
             className="w-full"
-          />
+            onClick={() =>
+              navigateTo(`${getDealUrl(dealId, "reserve")}?panel=reserve`)
+            }
+          >
+            Reserve this car for {reservationAmountLabel(reservationConfig.amount)}
+          </Button>
           <Button
             type="button"
             variant="secondary"

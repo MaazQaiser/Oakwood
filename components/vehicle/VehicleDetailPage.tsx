@@ -21,6 +21,7 @@ import {
   UnavailableVehicleNotice,
 } from "@/components/vehicle/ReservationCTA";
 import { getUsedCarsUrl, getEligibilityUrl } from "@/config/routes";
+import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
@@ -86,6 +87,7 @@ export function VehicleDetailPage({
                     This listing is kept available so you can still see the car and
                     compare similar stock.
                   </p>
+                  <ValuationEntryCard />
                 </div>
               ) : (
                 <VehiclePrice />

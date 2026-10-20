@@ -22,12 +22,13 @@ import {
   DEAL_BUDGET_DEFAULT_DEPOSIT,
   DEAL_BUDGET_HP_BODY,
   DEAL_BUDGET_HP_LEAD,
+  DEAL_BUDGET_HP_ROLE,
   DEAL_BUDGET_ILLUSTRATIVE,
   DEAL_BUDGET_PCP_BODY,
   DEAL_BUDGET_PCP_LEAD,
+  DEAL_BUDGET_PCP_ROLE,
   DEAL_BUDGET_PCP_TERM_BLOCK,
   DEAL_BUDGET_PCP_UNAVAILABLE,
-  DEAL_BUDGET_SWITCH_HP,
   DEAL_CONTINUE,
   DEAL_PX_CALLBACK,
   DEAL_PX_NEGATIVE_TITLE,
@@ -60,7 +61,7 @@ function FinanceTypeCard({
   term,
   deposit,
   finalPayment,
-  available,
+  note,
   onSelect,
 }: {
   type: FinanceProductType;
@@ -69,14 +70,20 @@ function FinanceTypeCard({
   term: number;
   deposit: number;
   finalPayment?: number;
-  available: boolean;
+  note?: string;
   onSelect: () => void;
 }) {
   const copy =
     type === "hp"
-      ? { name: "Hire Purchase", lead: DEAL_BUDGET_HP_LEAD, body: DEAL_BUDGET_HP_BODY }
+      ? {
+          name: "Hire Purchase",
+          role: DEAL_BUDGET_HP_ROLE,
+          lead: DEAL_BUDGET_HP_LEAD,
+          body: DEAL_BUDGET_HP_BODY,
+        }
       : {
           name: "Personal Contract Purchase",
+          role: DEAL_BUDGET_PCP_ROLE,
           lead: DEAL_BUDGET_PCP_LEAD,
           body: DEAL_BUDGET_PCP_BODY,
         };
@@ -86,29 +93,39 @@ function FinanceTypeCard({
       type="button"
       role="tab"
       aria-selected={selected}
-      aria-disabled={!available}
-      disabled={!available}
       onClick={onSelect}
       className={cn(
         "flex w-full flex-col rounded-[20px] border p-4 text-left transition-colors",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         selected
           ? "border-navy bg-navy text-white shadow-[0_10px_24px_rgb(0_40_82/0.22)]"
-          : available
-            ? "border-border bg-surface text-ink hover:border-primary/40 hover:bg-page-tint"
-            : "cursor-not-allowed border-dashed border-border bg-page-tint text-muted opacity-80",
+          : "border-border bg-surface text-ink hover:border-primary/40 hover:bg-page-tint",
       )}
     >
-      <span
-        className={cn(
-          "text-[0.68rem] font-semibold! uppercase tracking-[0.12em]",
-          selected ? "text-white/75" : "text-muted",
-        )}
-      >
-        {type === "hp" ? "HP" : "PCP"} · {copy.lead}
+      <span className="flex items-center justify-between gap-2">
+        <span
+          className={cn(
+            "text-[0.68rem] font-semibold! uppercase tracking-[0.12em]",
+            selected ? "text-white/75" : "text-muted",
+          )}
+        >
+          {type === "hp" ? "HP" : "PCP"} · {copy.lead}
+        </span>
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[0.65rem] font-semibold! uppercase tracking-[0.08em]",
+            selected
+              ? "bg-white/15 text-white"
+              : type === "hp"
+                ? "bg-navy text-white"
+                : "bg-page-tint text-navy",
+          )}
+        >
+          {copy.role}
+        </span>
       </span>
       <span className="mt-1 text-label">{copy.name}</span>
-      {available && monthly !== undefined ? (
+      {monthly !== undefined ? (
         <p className="mt-3">
           <FinancialNumber
             value={formatPounds(monthly)}
@@ -117,30 +134,26 @@ function FinanceTypeCard({
             className={selected ? "text-white" : "text-navy"}
           />
         </p>
-      ) : (
-        <p className={cn("mt-3 text-body-sm", selected ? "text-white/85" : "text-muted")}>
-          Not available at this term
-        </p>
-      )}
+      ) : null}
       <p className={cn("mt-2 text-caption", selected ? "text-white/80" : "text-muted")}>
         {copy.body}
       </p>
-      {available ? (
-        <dl className="mt-4 grid grid-cols-2 gap-2">
-          <QuoteStat
-            label="Deposit"
-            value={formatPounds(deposit)}
-          />
-          <QuoteStat label="Term" value={formatTerm(term)} />
-          {type === "pcp" && finalPayment !== undefined ? (
-            <div className="col-span-2">
-              <QuoteStat
-                label="Optional final payment"
-                value={formatPounds(finalPayment)}
-              />
-            </div>
-          ) : null}
-        </dl>
+      <dl className="mt-4 grid grid-cols-2 gap-2">
+        <QuoteStat label="Deposit" value={formatPounds(deposit)} />
+        <QuoteStat label="Term" value={formatTerm(term)} />
+        {type === "pcp" && finalPayment !== undefined ? (
+          <div className="col-span-2">
+            <QuoteStat
+              label="Optional final payment"
+              value={formatPounds(finalPayment)}
+            />
+          </div>
+        ) : null}
+      </dl>
+      {note ? (
+        <p className={cn("mt-3 text-caption", selected ? "text-white/80" : "text-navy")}>
+          {note}
+        </p>
       ) : null}
     </button>
   );
@@ -256,7 +269,6 @@ export function DealBudgetStep() {
     vehicle,
     draft,
     config,
-    finance,
     calculation,
     calculateFor,
     setFinanceType,
@@ -289,25 +301,20 @@ export function DealBudgetStep() {
     prevType.current = draft.financeType;
   }, [draft.financeType, draft.term]);
 
-  const maxTerm = Math.min(
-    finance.profile?.maximumTerm ?? Infinity,
-    Math.max(...config.termOptions),
-  );
   const isPcp = draft.financeType === "pcp";
-  const pcpBlockedByTerm = draft.term > PCP_MAX_TERM;
+  const pcpTerm = Math.min(draft.term, PCP_MAX_TERM);
   const negativeEquity = calculation?.pxNegativeEquity ?? 0;
   const neCap = config.maxNegativeEquityInAdvance;
   const neExceedsCap =
     neCap !== undefined && negativeEquity > neCap;
 
-  const hpQuote = calculateFor("hp");
-  const pcpQuote = calculateFor("pcp");
+  const hpQuote = calculateFor("hp", draft.term);
+  const pcpQuote = calculateFor("pcp", pcpTerm);
   const totalDeposit = calculation?.totalDeposit ?? draft.cashDeposit;
 
   const termOptions = config.termOptions.map((term) => ({
     value: term,
     label: String(term),
-    disabled: term > maxTerm,
   }));
 
   const mileageOptions = [
@@ -348,8 +355,8 @@ export function DealBudgetStep() {
           <div>
             <h2 className="text-label">Compare HP and PCP</h2>
             <p className="mt-1 text-caption text-muted">
-              Both quotes use your current deposit and term. Select a card to
-              choose that product.
+              Both quotes use the deposit and term below. Choosing a card keeps
+              that term.
             </p>
           </div>
 
@@ -364,47 +371,45 @@ export function DealBudgetStep() {
               monthly={hpQuote?.monthlyPayment}
               term={draft.term}
               deposit={totalDeposit}
-              available
               onSelect={() => {
                 setPcpTermNotice(false);
                 setFinanceType("hp");
               }}
             />
-            <FinanceTypeCard
-              type="pcp"
-              selected={draft.financeType === "pcp"}
-              monthly={pcpQuote?.monthlyPayment}
-              term={Math.min(draft.term, PCP_MAX_TERM)}
-              deposit={totalDeposit}
-              finalPayment={pcpQuote?.finalPayment}
-              available={!pcpBlockedByTerm && config.pcpEnabled}
-              onSelect={() => {
-                setPcpTermNotice(false);
-                setFinanceType("pcp");
-              }}
-            />
+            {config.pcpEnabled ? (
+              <FinanceTypeCard
+                type="pcp"
+                selected={draft.financeType === "pcp"}
+                monthly={pcpQuote?.monthlyPayment}
+                term={pcpTerm}
+                deposit={totalDeposit}
+                finalPayment={pcpQuote?.finalPayment}
+                note={
+                  draft.term > PCP_MAX_TERM
+                    ? "72 and 84 months are HP only. This quote is at 60 months."
+                    : undefined
+                }
+                onSelect={() => {
+                  setPcpTermNotice(draft.term > PCP_MAX_TERM);
+                  setFinanceType("pcp");
+                }}
+              />
+            ) : null}
           </div>
 
-          {pcpTermNotice || pcpBlockedByTerm ? (
-            <div className="space-y-2">
-              <Alert title="72/84 is HP only" tone="warning">
-                {pcpTermNotice
-                  ? DEAL_BUDGET_PCP_TERM_BLOCK
-                  : DEAL_BUDGET_PCP_UNAVAILABLE}
-              </Alert>
-              {draft.financeType !== "hp" ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setPcpTermNotice(false);
-                    setFinanceType("hp");
-                  }}
-                >
-                  {DEAL_BUDGET_SWITCH_HP}
-                </Button>
-              ) : null}
-            </div>
+          {pcpTermNotice ? (
+            <Alert
+              title={
+                draft.financeType === "hp"
+                  ? "72/84 is HP only"
+                  : "60 months for PCP"
+              }
+              tone="warning"
+            >
+              {draft.financeType === "hp"
+                ? DEAL_BUDGET_PCP_TERM_BLOCK
+                : DEAL_BUDGET_PCP_UNAVAILABLE}
+            </Alert>
           ) : null}
 
           <DepositCard />

@@ -77,10 +77,15 @@ export function ValuationEntryDrawer({
       }
     };
 
+    const onBackground = () => {
+      if (document.visibilityState === "hidden") onPageHide();
+    };
     window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onBackground);
     document.documentElement.addEventListener("mouseleave", onMouseLeave);
     return () => {
       window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onBackground);
       document.documentElement.removeEventListener("mouseleave", onMouseLeave);
     };
   }, [open, coolDownElapsed]);

@@ -26,7 +26,7 @@ export function DealStepFooter({
   backLabel = DEAL_BACK,
 }: {
   onBack?: () => void;
-  onContinue: () => void;
+  onContinue?: () => void;
   onSkip?: () => void;
   continueLabel?: string;
   skipLabel?: string;
@@ -45,7 +45,7 @@ export function DealStepFooter({
   return (
     // Mobile: full-width bar lifted by a soft shadow. Desktop: a floating
     // rounded bar, like the home page's white panels.
-    <div className="sticky bottom-0 z-10 -mx-4 mt-auto bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_rgb(16_40_72/0.06)] backdrop-blur sm:-mx-6 sm:px-6 lg:bottom-5 lg:mx-0 lg:mb-5 lg:rounded-[22px] lg:px-4 lg:pb-3 lg:shadow-card">
+    <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_rgb(16_40_72/0.06)] backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:z-auto lg:mx-0 lg:mt-6 lg:mb-5 lg:rounded-[22px] lg:px-4 lg:pb-3 lg:shadow-card">
       {showMonthly ? (
         <div className="mb-2 flex items-baseline justify-between gap-3 lg:hidden">
           <span className="text-caption text-muted">
@@ -88,15 +88,17 @@ export function DealStepFooter({
             {skipLabel}
           </Button>
         ) : null}
-        <Button
-          type={submit ? "submit" : "button"}
-          className="btn-compact w-full min-w-0 [&>span:first-child]:min-w-0"
-          busy={busy || navigating}
-          disabled={continueDisabled}
-          onClick={submit ? undefined : onContinue}
-        >
-          <span className="truncate">{continueLabel}</span>
-        </Button>
+        {onContinue || submit ? (
+          <Button
+            type={submit ? "submit" : "button"}
+            className="btn-compact w-full min-w-0 [&>span:first-child]:min-w-0"
+            busy={busy || navigating}
+            disabled={continueDisabled}
+            onClick={submit ? undefined : onContinue}
+          >
+            <span className="truncate">{continueLabel}</span>
+          </Button>
+        ) : null}
       </div>
       {note ? (
         <p className="mt-2 text-center text-caption text-muted">{note}</p>

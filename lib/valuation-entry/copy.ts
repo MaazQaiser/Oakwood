@@ -79,14 +79,14 @@ export const VE_DECLINE_TITLE = "Before you go";
 export const VE_DECLINE_INTRO =
   "Optional questions help our buyers follow up. You can skip any field.";
 
-export const VE_DECLINE_EXPECTED = "What value were you expecting?";
+export const VE_DECLINE_EXPECTED = "What were you expecting?";
 
-export const VE_DECLINE_ELSEWHERE = "Have you been offered more elsewhere?";
+export const VE_DECLINE_ELSEWHERE = "Been offered more elsewhere?";
 
 export const VE_DECLINE_CHANGE = "What would change your mind?";
 
 export const VE_DECLINE_CALLBACK =
-  "If you share contact details, a buyer will aim to call you back the same day.";
+  "If you leave your details, a buyer can contact you about this.";
 
 export const VE_DECLINE_SUBMIT = "Send and get a callback";
 

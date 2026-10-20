@@ -126,15 +126,12 @@ function buildConstraints(
     });
   }
 
-  const maxTerm = profile?.maximumTerm
-    ? Math.min(profile.maximumTerm, Math.max(...config.termOptions))
-    : Math.max(...config.termOptions);
-
-  if (!config.termOptions.includes(input.term) || input.term > maxTerm) {
+  if (!config.termOptions.includes(input.term)) {
+    const longest = Math.max(...config.termOptions);
     messages.push({
       code: "term_unavailable",
       title: "This term is not available for this vehicle.",
-      body: `Choose a term of ${formatTerm(maxTerm)} or less. The term is not changed automatically.`,
+      body: `Choose one of the available terms, up to ${formatTerm(longest)}.`,
       action: "change_term",
     });
   }

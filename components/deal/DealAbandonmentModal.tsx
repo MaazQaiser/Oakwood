@@ -17,8 +17,10 @@ import {
 const SESSION_KEY = "oakwood-deal-abandon-shown";
 const INTEL_SESSION_KEY = "oakwood-deal-step4-intel-shown";
 const CTA_ENGAGED_KEY = "oakwood-step4-cta-engaged";
-/** Do not interrupt until the customer has been on the journey briefly. */
+/** Do not interrupt steps 1–3 until the customer has been on the journey briefly. */
 const ENGAGE_MS = 8000;
+/** Same two-second pause used after the valuation result appears. */
+const STEP4_COOLDOWN_MS = 2000;
 
 /** Call when the customer opens a Step 4 action panel (reserve / test drive / callback). */
 export function markStep4CtaEngaged() {
@@ -85,11 +87,41 @@ export function DealAbandonmentModal({
   const canPromptIntel = useCallback(() => {
     if (intelShownRef.current) return false;
     if (step4Engaged) return false;
-    if (Date.now() - engagedAt.current < ENGAGE_MS) {
+    if (Date.now() - engagedAt.current < STEP4_COOLDOWN_MS) {
       return false;
     }
     return true;
   }, [step4Engaged]);
+
+  const canPromptIntelRef = useRef(canPromptIntel);
+  const vehicleHrefRef = useRef(vehicleHref);
+  canPromptIntelRef.current = canPromptIntel;
+  vehicleHrefRef.current = vehicleHref;
+
+  useEffect(() => {
+    if (!isStep4) return;
+
+    const marker = { oakwoodStep4Guard: pathname };
+    window.history.pushState(marker, "");
+
+    const onPop = () => {
+      if (!canPromptIntelRef.current()) return;
+      window.history.pushState(marker, "");
+      setPendingHref(vehicleHrefRef.current);
+      setIntelOpen(true);
+      intelShownRef.current = true;
+      try {
+        sessionStorage.setItem(INTEL_SESSION_KEY, "1");
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener("popstate", onPop);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+    };
+  }, [isStep4, pathname]);
 
   const markSaveShown = () => {
     saveShownRef.current = true;
@@ -151,9 +183,17 @@ export function DealAbandonmentModal({
       setSaveOpen(true);
       markSaveShown();
     };
+    const onBackground = () => {
+      if (document.visibilityState === "visible") return;
+      onMouseLeave({ clientY: 0 } as MouseEvent);
+    };
     document.documentElement.addEventListener("mouseleave", onMouseLeave);
+    document.addEventListener("visibilitychange", onBackground);
+    window.addEventListener("pagehide", onBackground);
     return () => {
       document.documentElement.removeEventListener("mouseleave", onMouseLeave);
+      document.removeEventListener("visibilitychange", onBackground);
+      window.removeEventListener("pagehide", onBackground);
     };
   }, [canPromptIntel, canPromptSave, isStep4, vehicleHref]);
 

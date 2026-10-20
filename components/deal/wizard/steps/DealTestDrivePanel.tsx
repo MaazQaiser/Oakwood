@@ -10,6 +10,7 @@ import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summar
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { dealSettings } from "@/config/deal-settings";
 import {
   formatShowroomAddress,
   getShowroomProfile,
@@ -197,14 +198,16 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
           </div>
         </section>
 
-        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-          <p className="text-label">Walkaround video</p>
-          <div className="mt-3 flex aspect-[9/16] max-h-72 items-center justify-center rounded-xl bg-ink px-6 text-center">
-            <p className="text-caption text-white/80">
-              {STEP4_TD_WALKAROUND_PLACEHOLDER}
-            </p>
-          </div>
-        </section>
+        {dealSettings.walkaroundVideo === "on" ? (
+          <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+            <p className="text-label">Walkaround video</p>
+            <div className="mt-3 flex aspect-[9/16] max-h-72 items-center justify-center rounded-xl bg-ink px-6 text-center">
+              <p className="text-caption text-white/80">
+                {STEP4_TD_WALKAROUND_PLACEHOLDER}
+              </p>
+            </div>
+          </section>
+        ) : null}
 
         <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
           <p className="text-label">What to bring</p>
@@ -215,11 +218,12 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
           </ul>
         </section>
 
-        <Alert title="Confirmation channels (prototype)" tone="info">
+        <Alert title="Confirmation messages" tone="info">
           <ul className="mt-1 list-disc space-y-1 pl-4 text-body-sm">
-            <li>Email — full pack with map links and what to bring</li>
-            <li>SMS — short confirmation + map link</li>
-            <li>WhatsApp — location and car details</li>
+            <li>Email — not sent</li>
+            <li>SMS — not sent</li>
+            <li>WhatsApp — not sent</li>
+            <li>Reminder two hours before — not scheduled</li>
           </ul>
           <p className="mt-2 text-caption">{STEP4_TD_CHANNELS}</p>
         </Alert>

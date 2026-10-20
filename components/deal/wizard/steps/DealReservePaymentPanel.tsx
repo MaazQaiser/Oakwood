@@ -32,7 +32,9 @@ import {
 
 type PayPhase = "form" | "loading" | "failed" | "success";
 
-type Errors = Partial<Record<"name" | "email" | "phone", string>>;
+type Errors = Partial<
+  Record<"name" | "email" | "phone" | "card" | "expiry" | "cvc", string>
+>;
 
 function mockReference(dealId: string, stockId: string): string {
   const seed = `${stockId}${dealId}`.replace(/[^a-zA-Z0-9]/g, "").slice(-6);
@@ -46,6 +48,9 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
   const emailId = useId();
   const phoneId = useId();
   const failId = useId();
+  const cardId = useId();
+  const expiryId = useId();
+  const cvcId = useId();
   const formId = useId();
 
   const [phase, setPhase] = useState<PayPhase>(
@@ -54,6 +59,9 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
   const [name, setName] = useState(draft.decision?.fullName ?? "");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [card, setCard] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
   const [simulateFail, setSimulateFail] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -85,31 +93,48 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
     return next;
   }
 
-  function runMockPayment(source: "contact" | "apple" | "google") {
+  function validateCard(): Errors {
+    const next = validate();
+    const digits = card.replace(/\D/g, "");
+    if (digits.length < 15 || digits.length > 16) {
+      next.card = "Enter the card number.";
+    }
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry.trim())) {
+      next.expiry = "Use MM/YY.";
+    }
+    if (!/^\d{3,4}$/.test(cvc.trim())) {
+      next.cvc = "Enter the security code.";
+    }
+    return next;
+  }
+
+  function runMockPayment(source: "card" | "apple" | "google") {
     if (phase === "loading") return;
 
-    if (source === "contact") {
-      const found = validate();
+    if (source === "card") {
+      const found = validateCard();
       setErrors(found);
       const order: [keyof Errors, string][] = [
         ["name", nameId],
         ["email", emailId],
         ["phone", phoneId],
+        ["card", cardId],
+        ["expiry", expiryId],
+        ["cvc", cvcId],
       ];
       const first = order.find(([key]) => found[key]);
       if (first) {
         document.getElementById(first[1])?.focus();
         return;
       }
-      if (simulateFail) {
-        setPhase("loading");
-        window.setTimeout(() => setPhase("failed"), 900);
-        return;
-      }
     }
 
     setPhase("loading");
     window.setTimeout(() => {
+      if (source === "card" && simulateFail) {
+        setPhase("failed");
+        return;
+      }
       setPhase("success");
       markStepComplete("reserve");
     }, 1100);
@@ -207,9 +232,9 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
           </p>
           <div className="mt-4">
             <Alert title="Prototype payment" tone="info">
-              Stripe is not connected. No card details are collected and no
-              charge is taken. Confirm with your contact details to simulate a
-              reservation.
+              Stripe is not connected. Card details stay in this browser and
+              no charge is taken. Apple Pay and Google Pay run the same mock
+              confirmation.
             </Alert>
           </div>
 
@@ -219,20 +244,20 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
               className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white"
               onClick={() => runMockPayment("apple")}
             >
-              Simulate Apple Pay
+              Apple Pay
             </button>
             <button
               type="button"
               className="flex min-h-12 items-center justify-center rounded-[14px] bg-black px-4 text-button text-white"
               onClick={() => runMockPayment("google")}
             >
-              Simulate Google Pay
+              Google Pay
             </button>
           </div>
 
           <div className="my-4 flex items-center gap-3 text-caption text-muted">
             <span className="h-px flex-1 bg-border" />
-            or confirm with contact details
+            or pay by card
             <span className="h-px flex-1 bg-border" />
           </div>
 
@@ -277,6 +302,56 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
                 />
               </Field>
             </div>
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1.4fr)_7rem_6rem]">
+              <Field htmlFor={cardId} label="Card number" error={errors.card}>
+                <Input
+                  id={cardId}
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  placeholder="•••• •••• •••• ••••"
+                  value={card}
+                  error={Boolean(errors.card)}
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/\D/g, "").slice(0, 16);
+                    setCard(digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim());
+                    clear("card");
+                  }}
+                />
+              </Field>
+              <Field htmlFor={expiryId} label="Expiry" error={errors.expiry}>
+                <Input
+                  id={expiryId}
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
+                  placeholder="MM/YY"
+                  value={expiry}
+                  error={Boolean(errors.expiry)}
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/\D/g, "").slice(0, 4);
+                    setExpiry(
+                      digits.length > 2
+                        ? `${digits.slice(0, 2)}/${digits.slice(2)}`
+                        : digits,
+                    );
+                    clear("expiry");
+                  }}
+                />
+              </Field>
+              <Field htmlFor={cvcId} label="CVC" error={errors.cvc}>
+                <Input
+                  id={cvcId}
+                  inputMode="numeric"
+                  autoComplete="cc-csc"
+                  placeholder="123"
+                  value={cvc}
+                  error={Boolean(errors.cvc)}
+                  onChange={(event) => {
+                    setCvc(event.target.value.replace(/\D/g, "").slice(0, 4));
+                    clear("cvc");
+                  }}
+                />
+              </Field>
+            </div>
             <Checkbox
               id={failId}
               checked={simulateFail}
@@ -294,7 +369,7 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
         showMonthly={false}
         onBack={onBack}
         backLabel={STEP4_BACK_HUB}
-        onContinue={() => runMockPayment("contact")}
+        onContinue={() => runMockPayment("card")}
         continueLabel={payAndReserveLabel(reservationConfig.amount)}
       />
     </div>

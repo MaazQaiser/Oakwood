@@ -43,6 +43,7 @@ export function ExitIntelModal({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string>();
 
   function resetAndClose() {
@@ -51,12 +52,16 @@ export function ExitIntelModal({
     onClose();
   }
 
-  function submit() {
+  async function submit() {
     if (email && !email.includes("@")) {
       setError("Enter a valid email address, or leave it blank.");
       return;
     }
     setError(undefined);
+    setSending(true);
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 700);
+    });
     trackEvent(analyticsEvents.pxValuationCompleted, {
       source,
       path:
@@ -68,6 +73,7 @@ export function ExitIntelModal({
       changeMind: changeMind || undefined,
       hasContact: Boolean(email || phone),
     });
+    setSending(false);
     setSubmitted(true);
   }
 
@@ -91,8 +97,7 @@ export function ExitIntelModal({
           >
             <Input
               id={`${idPrefix}-expected`}
-              inputMode="numeric"
-              placeholder="e.g. £2,500"
+              placeholder="Optional"
               value={expected}
               onChange={(event) => setExpected(event.target.value)}
             />
@@ -147,8 +152,12 @@ export function ExitIntelModal({
             </Field>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row-reverse">
-            <Button className="w-full sm:w-auto" onClick={submit}>
-              {VE_DECLINE_SUBMIT}
+            <Button
+              className="w-full sm:w-auto"
+              busy={sending}
+              onClick={() => void submit()}
+            >
+              {sending ? "Sending" : VE_DECLINE_SUBMIT}
             </Button>
             <Button
               className="w-full sm:w-auto"

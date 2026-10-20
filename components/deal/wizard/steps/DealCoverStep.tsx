@@ -104,9 +104,7 @@ function ProductInfoPanel({
   defaultTab?: InfoTab;
 }) {
   const info = COVER_INFO[product.id];
-  const [tab, setTab] = useState<InfoTab>(
-    defaultTab ?? (info?.videoSrc ? "video" : "covered"),
-  );
+  const [tab, setTab] = useState<InfoTab>(defaultTab ?? "covered");
   const [videoFailed, setVideoFailed] = useState(false);
 
   if (!info) {
@@ -118,11 +116,10 @@ function ProductInfoPanel({
   }
 
   const tabs: { id: InfoTab; label: string }[] = [
-    ...(info.videoSrc ? [{ id: "video" as const, label: "Video" }] : []),
     { id: "covered", label: "Included" },
     { id: "not", label: "Not covered" },
     { id: "terms", label: "T&Cs" },
-    { id: "faq", label: "FAQs" },
+    { id: "faq", label: "FAQ" },
   ];
 
   return (
@@ -151,26 +148,31 @@ function ProductInfoPanel({
         ))}
       </div>
       <div role="tabpanel" className="mt-3 space-y-3 text-body-sm">
-        {tab === "video" && info.videoSrc ? (
-          <div className="aspect-video overflow-hidden rounded-xl bg-ink">
-            {videoFailed ? (
-              <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center text-white">
-                <p className="text-body-sm font-semibold!">Video placeholder</p>
-                <p className="text-caption text-white/75">
-                  Mock asset unavailable. Use the other tabs for product details.
-                </p>
-              </div>
-            ) : (
-              <video
-                className="h-full w-full object-cover"
-                controls
-                playsInline
-                preload="metadata"
-                onError={() => setVideoFailed(true)}
-              >
-                <source src={info.videoSrc} type="video/mp4" />
-              </video>
-            )}
+        {info.videoSrc ? (
+          <div className="space-y-2">
+            <p className="text-caption font-semibold! text-ink">
+              90-second product overview
+            </p>
+            <div className="aspect-video overflow-hidden rounded-xl bg-ink">
+              {videoFailed ? (
+                <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center text-white">
+                  <p className="text-body-sm font-semibold!">90-second overview</p>
+                  <p className="text-caption text-white/75">
+                    The product video plays here on Oakwood. The file is not in this prototype yet.
+                  </p>
+                </div>
+              ) : (
+                <video
+                  className="h-full w-full object-cover"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  onError={() => setVideoFailed(true)}
+                >
+                  <source src={info.videoSrc} type="video/mp4" />
+                </video>
+              )}
+            </div>
           </div>
         ) : null}
         {tab === "covered" || tab === "not" ? (
@@ -232,7 +234,6 @@ function ProductCard({
   const price = productPriceForYears(product, years);
   const impact = productImpact(product.id);
   const Icon = PRODUCT_ICON[product.id] ?? ShieldCheck;
-  const hasVideo = Boolean(COVER_INFO[product.id]?.videoSrc);
 
   return (
     <article
@@ -279,7 +280,9 @@ function ProductCard({
             {product.name}
           </h3>
           {hero ? (
-            <p className="mt-0.5 text-caption text-[#FFD100]">{DEAL_AA_BADGE}</p>
+            <p className="mt-1 inline-flex rounded-full bg-[#FFD100] px-2 py-0.5 text-[0.65rem] font-semibold! uppercase tracking-[0.08em] text-navy">
+              {DEAL_AA_BADGE}
+            </p>
           ) : null}
         </div>
         <span
@@ -335,10 +338,7 @@ function ProductCard({
 
       {infoOpen ? (
         <div className={hero ? "[&_*]:text-ink" : undefined}>
-          <ProductInfoPanel
-            product={product}
-            defaultTab={hasVideo ? "video" : "covered"}
-          />
+          <ProductInfoPanel product={product} />
         </div>
       ) : null}
     </article>
@@ -364,19 +364,17 @@ function FinanceSummaryHero() {
 
   return (
     <div className="space-y-4">
-      <DealCard className="space-y-4 !bg-navy !text-white !shadow-[0_12px_28px_rgb(0_40_82/0.25)]">
-        <div>
+      <div className="sticky top-[calc(var(--oak-header-height)+4.75rem)] z-10 lg:top-[calc(var(--oak-header-height)+1rem)]">
+        <DealCard className="!bg-navy !text-white !shadow-[0_12px_28px_rgb(0_40_82/0.25)]">
           <p className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-white/70">
-            {draft.financeType === "hp"
-              ? "Hire Purchase"
-              : "Personal Contract Purchase"}
+            Your monthly
           </p>
           {updating ? (
-            <div className="mt-3 text-white/80">
+            <div className="mt-2 text-white/80">
               <LoadingState label="Updating your deal…" />
             </div>
           ) : (
-            <p className="mt-2">
+            <p className="mt-1">
               <FinancialNumber
                 value={formatPounds(monthly)}
                 suffix="/mo"
@@ -385,18 +383,28 @@ function FinanceSummaryHero() {
               />
             </p>
           )}
-          <p className="mt-2 text-caption text-white/75">
-            Est. {displayApr.toFixed(1)}% APR · illustrative
+        </DealCard>
+      </div>
+
+      <DealCard className="space-y-5">
+        <div>
+          <p className="text-label">
+            {draft.financeType === "hp"
+              ? "Hire Purchase"
+              : "Personal Contract Purchase"}
+          </p>
+          <p className="mt-1 text-body-sm text-ink">
+            Estimated {displayApr.toFixed(1)}% APR
+          </p>
+          <p className="mt-1 text-caption text-muted">
+            {DEAL_YOUR_DEAL_APR_DISCLAIMER}
           </p>
         </div>
 
         <dl className="grid grid-cols-2 gap-2 text-body-sm sm:grid-cols-4">
           <SummaryStat label="Cash deposit" value={formatPounds(cash)} />
           <SummaryStat label="Part exchange" value={formatPounds(equity)} />
-          <SummaryStat
-            label="Total deposit"
-            value={formatPounds(totalDeposit)}
-          />
+          <SummaryStat label="Total deposit" value={formatPounds(totalDeposit)} />
           <SummaryStat label="Term" value={formatTerm(draft.term)} />
           {draft.financeType === "pcp" && draft.annualMileage ? (
             <SummaryStat
@@ -405,13 +413,8 @@ function FinanceSummaryHero() {
             />
           ) : null}
         </dl>
-
-        <p className="text-caption text-white/75">{DEAL_YOUR_DEAL_APR_DISCLAIMER}</p>
-      </DealCard>
-
-      <DealCard className="space-y-5">
         <DealChipGroup
-          label="Credit tier (illustration)"
+          label="Credit tier"
           value={tier}
           options={TIER_OPTIONS}
           columns={4}
@@ -471,9 +474,9 @@ function FinanceSummaryHero() {
 
 function SummaryStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[14px] bg-white/10 px-3 py-2.5">
-      <dt className="text-caption text-white/70">{label}</dt>
-      <dd className="mt-0.5 tabular-number text-body-sm font-semibold! text-white">
+    <div className="rounded-[14px] bg-page-tint px-3 py-2.5">
+      <dt className="text-caption text-muted">{label}</dt>
+      <dd className="mt-0.5 tabular-number text-body-sm font-semibold! text-ink">
         {value}
       </dd>
     </div>

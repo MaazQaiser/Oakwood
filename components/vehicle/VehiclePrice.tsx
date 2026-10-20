@@ -142,7 +142,7 @@ export function VehiclePrice() {
         </p>
       ) : null}
 
-      {reservable ? <ValuationEntryCard /> : null}
+      <ValuationEntryCard />
 
       {reservable ? (
         <div className="mt-5 rounded-lg border border-border bg-page p-4">

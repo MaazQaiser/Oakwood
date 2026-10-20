@@ -181,6 +181,41 @@ export async function resumeDealSession(input: {
   return { ok: true, dealId: record.id };
 }
 
+/**
+ * A redeemed link stays single-use. Matching the saved email reopens the
+ * same deal. An expired link is confirmed, not reopened.
+ */
+export async function reopenUsedDealSession(input: {
+  token: string;
+  email: string;
+}): Promise<
+  | { ok: true; dealId: string; status: "used" }
+  | { ok: true; status: "expired" }
+  | { ok: false; reason: "invalid" | "mismatch" }
+> {
+  const pending = peekDealResumeToken(input.token);
+  if (pending.status === "invalid" || !pending.dealId || !pending.email) {
+    return { ok: false, reason: "invalid" };
+  }
+  if (pending.email !== input.email.trim().toLowerCase()) {
+    return { ok: false, reason: "mismatch" };
+  }
+  if (pending.status === "expired") {
+    return { ok: true, status: "expired" };
+  }
+  if (pending.status !== "used") {
+    return { ok: false, reason: "invalid" };
+  }
+  await hydrateDealsFromCookie();
+  const record = getDealRecord(pending.dealId);
+  if (!record) {
+    return { ok: false, reason: "invalid" };
+  }
+  await writeDealCookie(record.id);
+  await persistDeal(record);
+  return { ok: true, dealId: record.id, status: "used" };
+}
+
 export async function createDealShareLink(input: {
   dealId: string;
 }): Promise<{ ok: true; token: string } | { ok: false; expired: true }> {

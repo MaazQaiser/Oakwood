@@ -41,15 +41,29 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
     .filter(Boolean)
     .join(" · ");
 
+  const monthly = calculation?.monthlyPayment ?? 0;
+
   return (
     <section
       className="rounded-card bg-surface p-5 shadow-card sm:p-6"
       aria-labelledby={headingId}
     >
-      <h2 id={headingId} className="text-label">
+      <h2
+        id={headingId}
+        className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-muted"
+      >
         {title}
       </h2>
-      <dl className="mt-3 space-y-1.5 text-body-sm">
+      <p className="mt-2">
+        <FinancialNumber
+          value={formatPounds(monthly)}
+          suffix="/mo"
+          size="lg"
+          className="text-navy"
+        />
+      </p>
+      <p className="mt-1 text-caption text-muted">Illustrative monthly payment</p>
+      <dl className="mt-4 space-y-1.5 border-t border-border pt-4 text-body-sm">
         <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
           {formatPounds(vehicle.cashPrice)}
         </Row>
@@ -80,14 +94,6 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
           </div>
         ) : null}
       </dl>
-      <div className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3">
-        <span className="text-label">Estimated monthly</span>
-        <FinancialNumber
-          value={formatPounds(calculation?.monthlyPayment ?? 0)}
-          suffix="/mo"
-          size="compact"
-        />
-      </div>
     </section>
   );
 }

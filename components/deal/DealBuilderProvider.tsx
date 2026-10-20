@@ -76,7 +76,10 @@ export interface DealBuilderContextValue {
   addRecommendedCover: () => void;
   productImpact: (id: string) => number;
   /** The same deal priced as HP or PCP, for side-by-side quote tabs. */
-  calculateFor: (type: FinanceProductType) => DealCalculation | undefined;
+  calculateFor: (
+    type: FinanceProductType,
+    term?: number,
+  ) => DealCalculation | undefined;
   /** Monthly added by the selected cover bundle versus no cover. */
   coverMonthly: number;
   /** APR used for figures: decision in principle, then eligibility profile. */
@@ -90,6 +93,8 @@ export interface DealBuilderContextValue {
   navigating: boolean;
   retryCalculation: () => void;
   markSaved: () => void;
+  /** Field changes are saved automatically. */
+  autosave: "idle" | "saving" | "saved";
 }
 
 const DealBuilderContext = createContext<DealBuilderContextValue | null>(null);
@@ -211,6 +216,8 @@ export function DealBuilderProvider({
   const [navTarget, setNavTarget] = useState<string | null>(null);
   const [pxError, setPxError] = useState<string>();
   const [saved, setSaved] = useState(false);
+  const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
+  const autosaveReady = useRef(false);
   const [retryTick, setRetryTick] = useState(0);
   const started = useRef(false);
 
@@ -252,9 +259,17 @@ export function DealBuilderProvider({
     if (!vehicle) {
       return;
     }
+    const showStatus = autosaveReady.current;
+    if (!autosaveReady.current) {
+      autosaveReady.current = true;
+    } else {
+      setAutosave("saving");
+    }
     const timer = window.setTimeout(() => {
       pendingSave.current = null;
-      void saveDealDraft(model.dealId, draft);
+      void saveDealDraft(model.dealId, draft).then(() => {
+        if (showStatus) setAutosave("saved");
+      });
       trackEvent(analyticsEvents.dealRecalculated);
       if (calculation && !calculation.valid) {
         trackEvent(analyticsEvents.dealInvalid);
@@ -298,8 +313,13 @@ export function DealBuilderProvider({
   const setFinanceType = useCallback(
     (type: FinanceProductType) => {
       setDraft((current) => {
-        // Spec defaults: PCP 60 months, HP 84 months.
-        const nextTerm = type === "pcp" ? 60 : 84;
+        if (current.financeType === type) {
+          return current;
+        }
+        // Keep the term the customer is already looking at. PCP cannot
+        // run past 60 months, so that is the only time the term changes.
+        const nextTerm =
+          type === "pcp" && current.term > 60 ? 60 : current.term;
         return {
           ...current,
           financeType: type,
@@ -561,12 +581,12 @@ export function DealBuilderProvider({
   );
 
   const calculateFor = useCallback(
-    (type: FinanceProductType) => {
+    (type: FinanceProductType, term = draft.term) => {
       if (!vehicle) {
         return undefined;
       }
       // Never invent a PCP quote for HP-only terms.
-      if (type === "pcp" && draft.term > 60) {
+      if (type === "pcp" && term > 60) {
         return undefined;
       }
       try {
@@ -574,7 +594,7 @@ export function DealBuilderProvider({
           {
             ...toInput(vehicle, draft),
             financeType: type,
-            term: draft.term,
+            term,
             annualMileage:
               draft.annualMileage ?? model.config.pcpMileageOptions[2] ?? 10000,
           },
@@ -707,6 +727,7 @@ export function DealBuilderProvider({
       navigating: navTarget !== null,
       retryCalculation,
       markSaved,
+      autosave,
     };
   }, [
     addRecommendedCover,
@@ -720,6 +741,7 @@ export function DealBuilderProvider({
     draft,
     navigateTo,
     navTarget,
+    autosave,
     markSaved,
     markStepComplete,
     setFinanceApplication,

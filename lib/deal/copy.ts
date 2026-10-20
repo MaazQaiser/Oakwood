@@ -62,7 +62,19 @@ export const DEAL_SAVE_CTA = "Save and get a resume link";
 export const DEAL_RESUME_EXPIRED_TITLE = "This resume link has expired";
 
 export const DEAL_RESUME_EXPIRED_BODY =
-  "Resume links stay active for seven days. Start again from the vehicle, or save a new link from the deal builder.";
+  "Resume links stay active for seven days. Confirm the email on this deal, then start again from the vehicle or save a new link.";
+
+export const DEAL_RESUME_USED_TITLE = "This resume link has already been used";
+
+export const DEAL_RESUME_USED_BODY =
+  "Each link opens once. Enter the same email to continue this deal.";
+
+export const DEAL_RESUME_VERIFY_EMAIL =
+  "Enter the email you used when you saved.";
+
+export const DEAL_AUTOSAVE_SAVING = "Saving your deal…";
+
+export const DEAL_AUTOSAVE_SAVED = "Progress saved";
 
 export const DEAL_RESUME_EXPIRED_RESTART = "Browse cars to start again";
 
@@ -92,7 +104,7 @@ export const DEAL_SAVE_PROGRESS_SAVE = "Save then continue";
 export const DEAL_SHARE_INTRO =
   "The shared summary includes the vehicle and your configuration. It does not include your rate, approval or finance profile.";
 
-export const DEAL_SKIP_PX = "Skip part exchange";
+export const DEAL_SKIP_PX = "Skip, no part exchange";
 
 export const DEAL_ADD_TO_DEAL = "Add to my deal";
 
@@ -109,14 +121,29 @@ export const DEAL_PX_EQUITY_LINE = (amount: string) =>
 
 export const DEAL_PX_NOT_YOUR_VEHICLE = "Not your vehicle?";
 
-export const DEAL_PX_VALUATION_LABEL = "Vehicle valuation";
+export const DEAL_PX_RESULT_TITLE = "Part-exchange valuation";
 
-export const DEAL_PX_FINANCE_LABEL = "Outstanding finance";
+export const DEAL_PX_RESULT_INTRO =
+  "What your current car is worth after any finance. The deposit summary below adds any cash deposit to this total.";
 
-export const DEAL_PX_TOTAL_LABEL = "Total towards your deposit";
+export const DEAL_PX_VALUATION_LABEL = "We valued your car at";
+
+export const DEAL_PX_FINANCE_LABEL = "Amount owed in finance";
+
+export const DEAL_PX_TOTAL_LABEL = "Toward your deposit";
+
+export const DEAL_PX_VALUE_SOURCE = (registration: string, mileage: string) =>
+  `Indicative lookup for ${registration} at ${mileage} miles`;
+
+export const DEAL_PX_FINANCE_SOURCE = "The outstanding amount you entered above";
+
+export const DEAL_PX_TOTAL_SOURCE = "Valuation minus the finance owed";
 
 export const DEAL_PX_INSPECTION =
   "This valuation is subject to inspection. It is not a guaranteed final purchase price.";
+
+export const DEAL_PX_SETTLEMENT_CHECK =
+  "We will verify the settlement figure with your lender before the part exchange is agreed.";
 
 export const DEAL_PX_HELP_TITLE = "How do I find my outstanding finance?";
 
@@ -126,7 +153,7 @@ export const DEAL_PX_HELP_BODY =
 export const DEAL_PX_NEGATIVE_TITLE = "Please contact us about your part exchange";
 
 export const DEAL_PX_NEGATIVE_BODY =
-  "Your outstanding finance is higher than the vehicle valuation. The shortfall is shown above. Speak to Oakwood before continuing — we can talk through options for your part exchange.";
+  "£0 goes toward your deposit. The outstanding difference may be included in the finance.";
 
 export const DEAL_PX_CALLBACK = "Request a callback";
 
@@ -143,6 +170,10 @@ export const DEAL_PX_DEPOSIT_TOTAL = "Total deposit";
 export const DEAL_BUDGET_ILLUSTRATIVE =
   "Illustrative mock quotes for this prototype. Not an approved offer. APR and monthly payments are confirmed when you apply.";
 
+export const DEAL_BUDGET_HP_ROLE = "Primary";
+
+export const DEAL_BUDGET_PCP_ROLE = "Alternative";
+
 export const DEAL_BUDGET_HP_LEAD = "Own it";
 
 export const DEAL_BUDGET_HP_BODY =
@@ -157,7 +188,7 @@ export const DEAL_BUDGET_PCP_TERM_BLOCK =
   "72 and 84 months are HP only. We've switched you to Hire Purchase for this term.";
 
 export const DEAL_BUDGET_PCP_UNAVAILABLE =
-  "PCP is not available at 72 or 84 months. Choose a term up to 60 months, or continue with HP.";
+  "Personal Contract Purchase stops at 60 months, so the term is now 60 months.";
 
 export const DEAL_BUDGET_SWITCH_HP = "Use Hire Purchase";
 
@@ -219,10 +250,10 @@ export const DEAL_ADD_RECOMMENDED_COVER = "Add recommended cover";
 export const DEAL_CLEAR_ALL_COVER = "Clear all cover";
 
 export const DEAL_YOUR_DEAL_APR_DISCLAIMER =
-  "Estimated APR for illustration only. Subject to finance approval and a full application. Not an approved offer.";
+  "Estimated with soft check. Confirmed when you apply.";
 
 export const DEAL_YOUR_DEAL_TIER_HINT =
-  "Estimated with a soft check illustration. Confirmed when you apply.";
+  "Choosing a tier updates the estimated APR on this illustration.";
 
 export const DEAL_YOUR_DEAL_MOCK_PRICE = "Mock price — final retail TBC";
 

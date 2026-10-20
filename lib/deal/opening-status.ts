@@ -71,11 +71,22 @@ function londonParts(date: Date): {
 }
 
 function hoursForDay(ymd: string, weekday: number) {
+  const override = SHOWROOM_HOUR_OVERRIDES[ymd];
+  if (override) return override;
   if (weekday === 0 || MOCK_BANK_HOLIDAYS.has(ymd)) {
     return { ...SUNDAY, label: "10:00 – 17:00" };
   }
   return { ...WEEKDAY, label: "09:00 – 18:00" };
 }
+
+/**
+ * Date-specific hour overrides (YYYY-MM-DD). Bank holidays use Sunday hours
+ * unless a date is listed here. Replace entries from site config when live.
+ */
+export const SHOWROOM_HOUR_OVERRIDES: Record<
+  string,
+  { open: number; close: number; label: string }
+> = {};
 
 function addDaysYmd(ymd: string, days: number): string {
   const [y, m, d] = ymd.split("-").map(Number);

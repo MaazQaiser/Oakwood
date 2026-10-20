@@ -20,7 +20,7 @@ import {
 } from "@/lib/valuation-entry/copy";
 
 export function ValuationEntryCard() {
-  const { vehicle, deposit, term, financeType, reservable } = useVehicleDeal();
+  const { vehicle, deposit, term, financeType } = useVehicleDeal();
   const regId = useId();
   const milesId = useId();
   const [registration, setRegistration] = useState("AB21 CDE");
@@ -28,10 +28,6 @@ export function ValuationEntryCard() {
   const [regError, setRegError] = useState<string>();
   const [mileError, setMileError] = useState<string>();
   const [open, setOpen] = useState(false);
-
-  if (!reservable) {
-    return null;
-  }
 
   function start() {
     const nextReg = registrationError(registration);
