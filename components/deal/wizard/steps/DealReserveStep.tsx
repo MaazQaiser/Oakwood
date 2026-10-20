@@ -13,13 +13,13 @@ import { DealCallbackPanel } from "@/components/deal/wizard/steps/DealCallbackPa
 import { markStep4CtaEngaged } from "@/components/deal/DealAbandonmentModal";
 import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import { getDealApplicationUrl } from "@/config/routes";
+import { DEAL_BACK } from "@/lib/deal/copy";
 import { formatPounds } from "@/lib/format/money";
 import {
   getMockShowroomOpenStatus,
   resolveShowroomSlug,
 } from "@/lib/deal/opening-status";
 import {
-  STEP4_BACK_HUB,
   STEP4_CLOSED_TITLE,
   STEP4_HUB_APPLY,
   STEP4_HUB_CALL_BACK,
@@ -113,6 +113,18 @@ export function DealReserveStep() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function emailQuote() {
+    markStep4CtaEngaged();
+    const monthly = formatPounds(calculation?.monthlyPayment ?? 0);
+    const subject = encodeURIComponent(
+      `My Oakwood quote for the ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+    );
+    const body = encodeURIComponent(
+      `Quote for stock ${vehicle.stockId}: ${monthly} a month. Cash price ${formatPounds(vehicle.cashPrice)}. Resume this deal from the page you are on.`,
+    );
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+
   if (panel === "reserve") {
     return <DealReservePaymentPanel onBack={backToHub} />;
   }
@@ -154,24 +166,6 @@ export function DealReserveStep() {
             }}
           >
             {STEP4_HUB_APPLY}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            className={hubActionClass}
-            onClick={() => {
-              const monthly = formatPounds(calculation?.monthlyPayment ?? 0);
-              const subject = encodeURIComponent(
-                `My Oakwood quote for the ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
-              );
-              const body = encodeURIComponent(
-                `Quote for stock ${vehicle.stockId}: ${monthly} a month. Cash price ${formatPounds(vehicle.cashPrice)}. Resume this deal from the page you are on.`,
-              );
-              window.location.href = `mailto:?subject=${subject}&body=${body}`;
-            }}
-          >
-            Email my quote
           </Button>
           <div className="grid grid-cols-3 gap-2">
             <Button
@@ -227,6 +221,14 @@ export function DealReserveStep() {
         <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
           <p className="text-label">Save your deal</p>
           <SaveDeal defaultOpen compact />
+          <Button
+            type="button"
+            variant="text"
+            className="mt-2 px-0"
+            onClick={emailQuote}
+          >
+            Email my quote
+          </Button>
         </div>
       </div>
 
@@ -256,7 +258,7 @@ export function DealReserveStep() {
           className="px-0"
           onClick={() => goBack("cover")}
         >
-          {STEP4_BACK_HUB}
+          {DEAL_BACK}
         </Button>
       </div>
     </div>
