@@ -30,7 +30,6 @@ import {
   COMPLAINTS_NEXT_BODY,
   COMPLAINTS_NEXT_TITLE,
   COMPLAINTS_PROCEDURE_PENDING,
-  CONTACT_HOURS_NOTICE,
   CONTACT_SECTION_TITLE,
   FAQ_H1,
   FAQ_INTRO,
@@ -130,7 +129,6 @@ export function SupportContactPage({
       <Section>
         <Container>
           <h2 className="text-h2">Locations</h2>
-          <p className="mt-3 max-w-2xl text-body-sm text-muted">{CONTACT_HOURS_NOTICE}</p>
           <Grid columns="two" className="mt-6">
             {showroomProfiles.map((profile) => (
               <LocationCard

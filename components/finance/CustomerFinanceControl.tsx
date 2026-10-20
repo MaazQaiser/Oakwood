@@ -51,7 +51,7 @@ export function CustomerFinanceControl() {
 
   return (
     <>
-      <div className="hidden shrink-0 lg:block">
+      <div className="hidden shrink-0 items-center gap-2 lg:flex">
         {personalised ? (
           <Button
             variant="secondary"
@@ -62,11 +62,10 @@ export function CustomerFinanceControl() {
             <span className="xl:hidden">{formatApr(apr)}</span>
             <span className="hidden xl:inline">Your finance: {formatApr(apr)}</span>
           </Button>
-        ) : (
-          <Button href={headerPrimaryAction.href} className="btn-compact">
-            {headerPrimaryAction.label}
-          </Button>
-        )}
+        ) : null}
+        <Button href={headerPrimaryAction.href} className="btn-compact">
+          {headerPrimaryAction.label}
+        </Button>
       </div>
       <Modal
         open={assumptionsOpen}

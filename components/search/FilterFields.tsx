@@ -32,6 +32,15 @@ import { getEligibilityUrl } from "@/config/routes";
 import type { CustomerFinanceMode } from "@/features/eligibility/CustomerFinanceProvider";
 import type { VehicleCategory } from "@/types/vehicle";
 
+/** Keep a budget that isn't in the preset list visible in the dropdown. */
+function optionsIncluding(options: readonly number[], current?: string): number[] {
+  const value = Number(current);
+  if (!current || !Number.isFinite(value) || value <= 0 || options.includes(value)) {
+    return [...options];
+  }
+  return [...options, value].sort((a, b) => a - b);
+}
+
 export function FilterFields({
   query,
   locked,
@@ -156,7 +165,7 @@ export function FilterFields({
               }
             >
               <option value="">Any</option>
-              {PRICE_OPTIONS.map((price) => (
+              {optionsIncluding(PRICE_OPTIONS, query.min_price).map((price) => (
                 <option key={price} value={price}>
                   {formatPounds(price)}
                 </option>
@@ -172,7 +181,7 @@ export function FilterFields({
               }
             >
               <option value="">Any</option>
-              {PRICE_OPTIONS.map((price) => (
+              {optionsIncluding(PRICE_OPTIONS, query.max_price).map((price) => (
                 <option key={price} value={price}>
                   {formatPounds(price)}
                 </option>
@@ -193,7 +202,7 @@ export function FilterFields({
               }
             >
               <option value="">Any</option>
-              {MONTHLY_OPTIONS.map((amount) => (
+              {optionsIncluding(MONTHLY_OPTIONS, query.monthly_min).map((amount) => (
                 <option key={amount} value={amount}>
                   {formatPounds(amount)}
                 </option>
@@ -212,7 +221,10 @@ export function FilterFields({
               }
             >
               <option value="">Any</option>
-              {MONTHLY_OPTIONS.map((amount) => (
+              {optionsIncluding(
+                MONTHLY_OPTIONS,
+                query.monthly_max ?? query.monthly,
+              ).map((amount) => (
                 <option key={amount} value={amount}>
                   {formatPounds(amount)}
                 </option>

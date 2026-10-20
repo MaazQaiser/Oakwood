@@ -24,9 +24,6 @@ export const CONTACT_OUT_OF_HOURS =
 export const CONTACT_CHAT_UNAVAILABLE =
   "Managed live chat is not connected yet. Use the form or request a callback instead.";
 
-export const CONTACT_HOURS_NOTICE =
-  "Opening hours will appear here when the location content source is connected.";
-
 export const CONTACT_FORM_TITLE = "Send a message";
 export const CONTACT_FORM_INTRO =
   "Tell us how we can help. We only ask for what we need to handle your enquiry.";

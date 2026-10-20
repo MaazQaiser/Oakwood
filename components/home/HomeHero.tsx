@@ -9,9 +9,7 @@ import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { HomeSearchCard } from "@/components/home/HomeSearchCard";
 import { useHomeHeroVariant } from "@/components/home/useHomeHeroVariant";
 import { IconArrow } from "@/components/ui/icons";
-import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { getSearchUrl, routes } from "@/config/routes";
-import { formatApr } from "@/lib/format/money";
+import { routes } from "@/config/routes";
 import {
   HOME_HERO_DESCRIPTION,
   HOME_HERO_HEADING,
@@ -38,21 +36,6 @@ export function HomeHero() {
 }
 
 function CurrentHero() {
-  const { mode, apr } = useCustomerFinance();
-  const eligible = mode === "personalised";
-  const ineligible = mode === "ineligible";
-
-  const heading = eligible
-    ? "Your finance profile is ready"
-    : HOME_HERO_HEADING;
-  const copy = eligible
-    ? `Browse cars using your personalised finance profile. Current APR from ${formatApr(apr)}.`
-    : ineligible
-      ? "Some cars may sit outside your current finance profile. You can still browse stock, change your deposit, or speak to Oakwood."
-      : HOME_HERO_DESCRIPTION;
-  const primaryLabel = eligible ? "Browse my budget" : HOME_HERO_PRIMARY;
-  const primaryHref = eligible ? getSearchUrl({ affordable: 1 }) : routes.search;
-
   return (
     <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] mx-[var(--oak-page-x)] flex min-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-[32px] bg-[#ECF3F8] px-6 pb-8 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:min-h-[calc(100dvh-9rem)] lg:pb-10">
       <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
@@ -69,18 +52,18 @@ function CurrentHero() {
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-1 flex-col justify-center">
         <div className="max-w-md">
           <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
-            {heading}
+            {HOME_HERO_HEADING}
           </h1>
           <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
-            {copy}
+            {HOME_HERO_DESCRIPTION}
           </p>
           <HomeSearchBar className="mt-6" />
           <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Link
-              href={primaryHref}
+              href={routes.search}
               className="group inline-flex min-h-14 items-center gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white no-underline hover:bg-[#001c3d]"
             >
-              <span className="text-button">{primaryLabel}</span>
+              <span className="text-button">{HOME_HERO_PRIMARY}</span>
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-white text-[#002852]">
                 <IconArrow width={20} height={20} />
               </span>
