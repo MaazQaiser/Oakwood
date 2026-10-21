@@ -5,9 +5,7 @@ import { cn } from "@/lib/cn";
 const COMPACT_MAX = 40;
 
 /**
- * Mobile header: padded square mark (object-contain — never cropped).
- * Desktop: full wordmark lockup (object-contain).
- * Compact: square mark only.
+ * Header: the full wordmark on every screen. Compact slots keep the square mark.
  */
 export function Logo({
   compact = false,
@@ -51,24 +49,13 @@ export function Logo({
           style={{ height }}
         />
       ) : (
-        <>
-          {/* Mobile: square mark, a step above the header icon size */}
-          <img
-            src="/brand/oakwood-mark.png"
-            alt="Oakwood Motor Company"
-            width={594}
-            height={594}
-            className="h-14 w-14 max-w-none shrink-0 -translate-x-[11px] object-contain md:hidden"
-          />
-          {/* Desktop: full lockup */}
-          <img
-            src="/brand/oakwood-logo.png"
-            alt="Oakwood Motor Company"
-            width={300}
-            height={55}
-            className="hidden h-9 w-auto object-contain md:block"
-          />
-        </>
+        <img
+          src="/brand/oakwood-logo.png"
+          alt="Oakwood Motor Company"
+          width={300}
+          height={55}
+          className="h-auto max-h-9 w-auto max-w-full object-contain object-left"
+        />
       )}
     </Link>
   );

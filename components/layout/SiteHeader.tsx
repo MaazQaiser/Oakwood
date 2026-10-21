@@ -82,8 +82,8 @@ export function SiteHeader() {
           width="wide"
           className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 px-0! xl:gap-10"
         >
-          <div className="shrink-0">
-            <Logo />
+          <div className="min-w-0">
+            <Logo className="max-w-full" />
           </div>
           <DesktopNav onDetailOpen={setDetailOpen} />
           <div className="ml-auto flex shrink-0 items-center gap-3 sm:gap-4 xl:gap-6">
