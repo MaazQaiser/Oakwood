@@ -19,7 +19,7 @@ const MAKE_LOGOS: Record<string, string> = {
   kia: "/images/brand-logos/kia.png",
 };
 
-const VISIBLE = 5;
+const VISIBLE = 3;
 
 function MakeLogo({ slug }: { slug: string }) {
   const src = MAKE_LOGOS[slug];
@@ -91,7 +91,7 @@ export function MakeCarousel({
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 px-[var(--oak-page-x)]">
+      <div className="flex items-center justify-between gap-4 px-6 sm:px-10 lg:px-14">
         <h2 className="text-h3 text-navy">Browse by make</h2>
         <div className="flex shrink-0 gap-2">
           <button
@@ -117,15 +117,16 @@ export function MakeCarousel({
         </div>
       </div>
 
+      <div className="mt-8 px-6 sm:px-10 lg:px-14">
       <ul
         id="browse-by-make-scroller"
         ref={scroller}
-        className="mt-8 flex gap-2 overflow-x-auto scroll-smooth px-[var(--oak-page-x)] pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex gap-2 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {makes.map((make) => (
           <li
             key={make.slug}
-            className="w-[calc((100%-2rem)/5)] shrink-0"
+            className="w-[calc((100%-1rem)/3)] shrink-0"
           >
             <Link
               href={getMakeUrl(make.name)}
@@ -139,9 +140,10 @@ export function MakeCarousel({
           </li>
         ))}
       </ul>
+      </div>
 
-      {/* Dragable scroller line under the logos */}
-      <div className="mt-4 px-[var(--oak-page-x)]">
+      {/* Drag the line to move through the makes. Arrows page three at a time. */}
+      <div className="mt-5 px-6 sm:px-10 lg:px-14">
         <div
           ref={track}
           role="scrollbar"
@@ -152,11 +154,15 @@ export function MakeCarousel({
           aria-valuenow={Math.round(progress.value)}
           aria-label="Scroll makes"
           tabIndex={0}
-          className="relative h-2 cursor-pointer rounded-full bg-border touch-none"
+          className="relative h-8 cursor-pointer touch-none"
           onPointerDown={(event) => {
             dragging.current = true;
-            event.currentTarget.setPointerCapture(event.pointerId);
             scrollToRatio(pointerToRatio(event.clientX));
+            try {
+              event.currentTarget.setPointerCapture(event.pointerId);
+            } catch {
+              dragging.current = false;
+            }
           }}
           onPointerMove={(event) => {
             if (!dragging.current) return;
@@ -179,13 +185,14 @@ export function MakeCarousel({
             }
           }}
         >
+          <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-[#D5E3EE]" />
           <div
             className={cn(
-              "absolute top-0 h-full rounded-full bg-primary transition-[left] duration-75",
+              "absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary transition-[left] duration-75",
               dragging.current && "transition-none",
             )}
             style={{
-              width: `${thumbRatio * 100}%`,
+              width: `${Math.max(thumbRatio * 100, 12)}%`,
               left: `${thumbLeft * 100}%`,
             }}
           />

@@ -41,8 +41,8 @@ export function VehicleSearchPage({
   return (
     <>
       <SearchHeader context={context} query={query.q} />
-      {/* Avoid Section/space-section — its padding-block left a large white gap under the blue banner. */}
-      <section className="pt-3 pb-10 md:pt-4 md:pb-12 lg:pb-14">
+      {/* A short gap under the blue banner. Avoid Section/space-section — that padding opened a large white band. */}
+      <section className="pt-4 pb-10 md:pb-12 lg:pt-6 lg:pb-14">
         <Container width="wide">
           <SearchExperience
             context={context}

@@ -118,7 +118,7 @@ export function FinancePersonalisationBanner({
       <div
         className={cn(
           "flex flex-col sm:flex-row sm:items-center sm:justify-between",
-          unboxed ? "gap-6 sm:gap-8" : "gap-4 sm:gap-5",
+          unboxed ? "gap-8 sm:gap-10" : "gap-4 sm:gap-5",
         )}
       >
         <div className="min-w-0">
@@ -134,7 +134,7 @@ export function FinancePersonalisationBanner({
           <p
             className={cn(
               "text-body-sm text-muted",
-              unboxed ? "mt-3" : "mt-1",
+              unboxed ? "mt-5" : "mt-1",
             )}
           >
             {copy.bannerBody}
@@ -142,7 +142,11 @@ export function FinancePersonalisationBanner({
         </div>
         <Button
           href={routes.eligibility}
-          className="btn-compact justify-start gap-2 self-start shrink-0"
+          className={
+            unboxed
+              ? "btn-compact w-fit! justify-start! gap-2! self-start shrink-0"
+              : "btn-compact justify-start gap-2 self-start shrink-0"
+          }
           onClick={onEligibilityClick}
         >
           {copy.bannerCta}
