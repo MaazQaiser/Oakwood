@@ -19,14 +19,14 @@ const MAKE_LOGOS: Record<string, string> = {
   kia: "/images/brand-logos/kia.png",
 };
 
-const VISIBLE = 3;
+const VISIBLE = 5;
 
 function MakeLogo({ slug }: { slug: string }) {
   const src = MAKE_LOGOS[slug];
   if (!src) return null;
 
   return (
-    <span className="relative mx-auto block h-8 w-[4.5rem]">
+    <span className="relative mx-auto block h-8 w-full max-w-[4.5rem]">
       <Image src={src} alt="" fill sizes="72px" className="object-contain" />
     </span>
   );
@@ -125,7 +125,7 @@ export function MakeCarousel({
         {makes.map((make) => (
           <li
             key={make.slug}
-            className="w-[calc((100%-1rem)/3)] shrink-0 sm:w-[calc((100%-1rem)/3)]"
+            className="w-[calc((100%-2rem)/5)] shrink-0"
           >
             <Link
               href={getMakeUrl(make.name)}

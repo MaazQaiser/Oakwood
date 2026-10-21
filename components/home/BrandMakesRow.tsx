@@ -29,7 +29,7 @@ export function BrandMakesRow() {
     <Section id="browse-by-make" aria-label="Browse by make" className="overflow-hidden">
       {/*
         Title/controls use oak-page-x inset so the heading never kisses the
-        viewport edge. The carousel list uses the same inset + 3-up item width.
+        viewport edge. The carousel list uses the same inset + 5-up item width.
       */}
       <MakeCarousel makes={featured} />
     </Section>
