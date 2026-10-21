@@ -74,13 +74,13 @@ export function SiteHeader() {
     >
       <header
         className={cn(
-          "relative mx-[var(--oak-page-x)]",
+          "relative px-6 lg:mx-[var(--oak-page-x)]",
           !elevated && detailOpen && "rounded-t-[32px] bg-page",
         )}
       >
         <Container
           width="wide"
-          className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 xl:gap-10"
+          className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 px-0! xl:gap-10"
         >
           <div className="shrink-0">
             <Logo />
@@ -107,7 +107,7 @@ export function SiteHeader() {
             <div ref={menuWrapRef} className="relative lg:hidden">
               <IconButton
                 label={menuOpen ? "Close menu" : "Open menu"}
-                className="h-12! min-h-12! w-12! min-w-12!"
+                className="-mr-4 h-12! min-h-12! w-12! min-w-12!"
                 aria-expanded={menuOpen}
                 aria-controls={menuId}
                 onClick={() => setMenuOpen((open) => !open)}

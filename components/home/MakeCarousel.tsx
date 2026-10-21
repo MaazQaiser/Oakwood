@@ -130,12 +130,10 @@ export function MakeCarousel({
           >
             <Link
               href={getMakeUrl(make.name)}
-              className="flex flex-col items-center px-1 py-3 text-center no-underline sm:px-2"
+              aria-label={make.name}
+              className="flex items-center justify-center px-1 py-3 no-underline sm:px-2"
             >
               <MakeLogo slug={make.slug} />
-              <span className="mt-2 flex min-h-10 w-full items-center justify-center px-0.5 text-center text-caption font-medium leading-snug text-ink">
-                {make.name}
-              </span>
             </Link>
           </li>
         ))}

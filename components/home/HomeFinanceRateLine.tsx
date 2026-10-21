@@ -18,16 +18,12 @@ export function HomeFinanceRateLine({
 
   const rates =
     example.ratesFromApr !== undefined ? (
-      <span key="rates">
-        Rates from{" "}
-        <span className="tabular-number">{formatApr(example.ratesFromApr)}</span>
-      </span>
+      <span key="rates">Rates from {formatApr(example.ratesFromApr)}</span>
     ) : null;
 
   const zero = example.zeroPercentOnSelectedCars ? (
     <span key="zero">
-      <span className="tabular-number">0%</span>
-      {variant === "short" ? " selected cars" : " available on selected cars"}
+      0%{variant === "short" ? " selected cars" : " available on selected cars"}
     </span>
   ) : null;
 
@@ -45,8 +41,8 @@ export function HomeFinanceRateLine({
     >
       {rates}
       {layout === "inline" && rates && zero ? (
-        <span className="text-[#d0d5dd]" aria-hidden="true">
-          {" · "}
+        <span className="px-1.5" aria-hidden="true">
+          ·
         </span>
       ) : null}
       {zero}

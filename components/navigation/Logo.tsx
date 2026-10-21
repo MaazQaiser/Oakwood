@@ -58,7 +58,7 @@ export function Logo({
             alt="Oakwood Motor Company"
             width={594}
             height={594}
-            className="h-14 w-14 object-contain md:hidden"
+            className="h-14 w-14 max-w-none shrink-0 -translate-x-[11px] object-contain md:hidden"
           />
           {/* Desktop: full lockup */}
           <img

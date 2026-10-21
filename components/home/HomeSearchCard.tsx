@@ -222,13 +222,13 @@ function KnowYourBudgetPanel() {
 
           <Button
             type="submit"
-            className="btn-compact w-full whitespace-nowrap tabular-nums lg:w-auto"
+            className="btn-compact btn-wrap w-full tabular-nums max-lg:pl-3! max-lg:text-[14px]! lg:w-auto"
           >
             {ctaLabel}
           </Button>
         </div>
       </form>
-      <HomeFinanceRateLine className="mt-5 text-[0.8rem] leading-relaxed text-muted" />
+      <HomeFinanceRateLine className="mt-4 text-[0.8rem] leading-normal text-muted" />
     </div>
   );
 }
