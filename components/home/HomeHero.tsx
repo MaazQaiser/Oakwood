@@ -62,7 +62,7 @@ function CurrentHero() {
             {HOME_HERO_DESCRIPTION}
           </p>
           <HomeSearchBar className="mt-6" />
-          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <div className="mt-8 flex flex-col items-start gap-4 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-5 lg:gap-y-3">
             <Link
               href={routes.search}
               className="group inline-flex min-h-14 items-center gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white no-underline hover:bg-[#001c3d]"
@@ -72,7 +72,7 @@ function CurrentHero() {
                 <IconArrow width={20} height={20} />
               </span>
             </Link>
-            <div className="hidden lg:block">
+            <div>
               <Link
                 href={routes.partExchange}
                 className="text-sm font-semibold text-primary-secondary underline-offset-2 no-underline hover:underline"
