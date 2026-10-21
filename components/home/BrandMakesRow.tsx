@@ -29,7 +29,7 @@ export function BrandMakesRow() {
     <Section id="browse-by-make" aria-label="Browse by make" className="overflow-hidden">
       {/*
         Title, logos, and the drag line share one inset so the heading
-        stays off the viewport edge. Three makes are visible at a time.
+        stays off the viewport edge. Five makes are visible at a time.
       */}
       <MakeCarousel makes={featured} />
     </Section>

@@ -29,7 +29,9 @@ export function HomeHero() {
         <HeroVariantToggle variant={variant} onChange={changeVariant} />
         <HomeProofStrip />
         {variant === "current" ? (
-          <HomeSearchCard className="mt-4 sm:mt-5 lg:mt-6" />
+          <div className="-mx-[var(--oak-page-x)] bg-[#ECF3F8] px-[var(--oak-page-x)] py-6 sm:py-8 lg:py-10">
+            <HomeSearchCard />
+          </div>
         ) : null}
         <HomeFinanceStrip />
       </div>
