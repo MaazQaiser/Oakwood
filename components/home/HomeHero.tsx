@@ -75,11 +75,11 @@ function CurrentHero() {
             <div>
               <Link
                 href={routes.partExchange}
-                className="text-sm font-semibold text-primary-secondary underline-offset-2 no-underline hover:underline"
+                className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
               >
                 {HOME_PART_EXCHANGE}
               </Link>
-              <p className="mt-1 text-sm leading-snug text-secondary">
+              <p className="mt-1.5 text-[0.95rem] font-medium leading-snug text-primary">
                 {HOME_PART_EXCHANGE_SUPPORT}
               </p>
             </div>
