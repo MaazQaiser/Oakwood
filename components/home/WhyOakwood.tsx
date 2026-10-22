@@ -4,6 +4,7 @@ import { HomeRepresentativeExample } from "@/components/home/HomeRepresentativeE
 import { SectionIntro } from "@/components/home/SectionIntro";
 import { Container, Section } from "@/components/layout/Container";
 import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
+import { Button } from "@/components/ui/Button";
 import { getFinanceIntentUrl, routes } from "@/config/routes";
 import { HOME_WARRANTY_AA_UPGRADE } from "@/lib/home/copy";
 import {
@@ -53,12 +54,9 @@ export function WhyOakwood() {
               <p className="mt-4 text-[0.98rem] text-[#002852]">
                 Preview eligibility is simulated — no live credit check yet.
               </p>
-              <Link
-                href={routes.eligibility}
-                className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#002852] px-5 text-sm font-semibold text-white no-underline hover:bg-[#001c3d]"
-              >
+              <Button href={routes.eligibility} className="mt-6">
                 Check eligibility
-              </Link>
+              </Button>
             </div>
             <div className="pt-8 lg:mt-auto">
               <div className="grid grid-cols-3 gap-x-3 gap-y-2 border-t border-ink/10 pt-5 text-center">
