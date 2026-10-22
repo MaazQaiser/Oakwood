@@ -60,16 +60,14 @@ export function SiteHeader() {
   return (
     // Sticky shell at top:0. Inset padding is permanent so the bar never jumps
     // when it sticks — same vertical/horizontal position at rest and scrolled.
-    // On scroll, the shell paints a full-bleed white bar (edge to edge, including
-    // the left/right gutters) so content cannot show through.
+    // Below lg the bar is always the thin white scrolled header, so the blue
+    // banner cannot wrap the logo in a curved frame. Desktop stays clear until scroll.
     <div
       data-oak-header-shell=""
       data-elevated={elevated ? "true" : "false"}
       className={cn(
-        "sticky top-0 z-[var(--oak-z-header)] w-full pt-3 -mb-3 transition-[background-color,box-shadow] duration-200 lg:pt-4 lg:-mb-4",
-        elevated
-          ? "bg-page shadow-[0_1px_0_var(--oak-border),0_10px_28px_rgba(66,69,78,0.06)]"
-          : "bg-transparent",
+        "sticky top-0 z-[var(--oak-z-header)] w-full bg-page pt-3 -mb-3 shadow-[0_1px_0_var(--oak-border),0_10px_28px_rgba(66,69,78,0.06)] transition-[background-color,box-shadow] duration-200 lg:pt-4 lg:-mb-4",
+        elevated ? "" : "lg:bg-transparent lg:shadow-none",
       )}
     >
       <header

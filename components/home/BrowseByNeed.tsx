@@ -42,8 +42,12 @@ export function CategoryCard({
 
 export function BrowseByNeed() {
   return (
-    <Section id="shop-by-need" aria-label="Shop by what you need">
-      <Container>
+    <Section
+      id="shop-by-need"
+      aria-label="Shop by what you need"
+      className="bg-[#ECF3F8] py-10! sm:py-12! lg:py-14!"
+    >
+      <Container className="px-10! sm:px-12! lg:px-16!">
         <SectionIntro align="center" heading="Shop by what you need">
           Start with the type of car that suits your everyday life.
         </SectionIntro>

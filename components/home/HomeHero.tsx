@@ -29,7 +29,7 @@ export function HomeHero() {
         <HeroVariantToggle variant={variant} onChange={changeVariant} />
         <HomeProofStrip />
         {variant === "current" ? (
-          <div className="-mx-[var(--oak-page-x)] bg-[#ECF3F8] px-[var(--oak-page-x)] py-6 sm:py-8 lg:py-10">
+          <div className="-mx-[var(--oak-page-x)] bg-[#ECF3F8] px-10 py-10 sm:px-12 sm:py-12 lg:px-16 lg:py-14">
             <HomeSearchCard />
           </div>
         ) : null}
@@ -86,7 +86,7 @@ function CurrentHero() {
           </div>
         </div>
       </div>
-      <HeroCompactPhoto bleedClassName="-mx-6" />
+      <HeroCompactPhoto bleedClassName="" />
     </section>
   );
 }
@@ -108,7 +108,7 @@ function FilterHero() {
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col py-4 lg:flex-1 lg:justify-center [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
         <HomeFilterSearchCard />
       </div>
-      <HeroCompactPhoto bleedClassName="-mx-5 sm:-mx-6" />
+      <HeroCompactPhoto bleedClassName="" />
     </section>
   );
 }

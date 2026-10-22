@@ -145,7 +145,7 @@ export function ScrollRow({
   return (
     <div
       className={cn(
-        "-mx-[var(--oak-page-x)] overflow-x-auto overscroll-x-contain px-[var(--oak-page-x)] pb-2 [scrollbar-width:thin] md:mx-0 md:overflow-visible md:px-0 md:pb-0",
+        "overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin] md:overflow-visible md:pb-0",
         className,
       )}
     >

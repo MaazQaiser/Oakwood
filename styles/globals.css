@@ -31,6 +31,7 @@
   --color-navy: var(--oak-navy);
   --color-navy-deep: var(--oak-navy-deep);
   --color-surface-soft: var(--oak-surface-soft);
+  --color-page-canvas: var(--oak-page-canvas);
   --font-sans: var(--oak-font-sans);
   --font-serif: var(--font-poppins), "Segoe UI", system-ui, sans-serif;
   --font-mono: var(--oak-font-numeric);

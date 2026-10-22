@@ -55,10 +55,24 @@ export function VehicleGrid({
             ? getDepositGap(vehicle.cashPrice, maxAdvance, deposit)
             : undefined;
 
+        const trackView = () => {
+          trackEvent(analyticsEvents.vehicleViewed, {
+            stockId: vehicle.stockId,
+            category,
+          });
+          const vanEvents = getVanSearchEvents(category);
+          if (vanEvents) {
+            trackEvent(vanEvents.resultClicked, {
+              stockId: vehicle.stockId,
+            });
+          }
+        };
+
         return (
           <VehicleCard
             key={vehicle.stockId}
             vehicle={vehicle}
+            onOpen={trackView}
             monthly={getIllustratedMonthly(vehicle, deposit, term)}
             priceView={priceView}
             state={state}
@@ -91,22 +105,12 @@ export function VehicleGrid({
                 </div>
               ) : null
             }
+            copyInset
             action={
               <Button
                 href={getVehicleUrl(vehicle)}
-                className="btn-compact w-full"
-                onClick={() => {
-                  trackEvent(analyticsEvents.vehicleViewed, {
-                    stockId: vehicle.stockId,
-                    category,
-                  });
-                  const vanEvents = getVanSearchEvents(category);
-                  if (vanEvents) {
-                    trackEvent(vanEvents.resultClicked, {
-                      stockId: vehicle.stockId,
-                    });
-                  }
-                }}
+                className="btn-compact w-full pl-6!"
+                onClick={trackView}
               >
                 {viewLabel}
               </Button>

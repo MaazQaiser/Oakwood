@@ -29,7 +29,7 @@ export function FeaturedVehicles() {
           action={
             featuredVehicles.length > 0 ? (
               <div className="hidden md:block">
-                <Button href={routes.usedCars} variant="text">
+                <Button href={routes.usedCars} variant="outline">
                   View all cars
                 </Button>
               </div>
@@ -68,7 +68,7 @@ export function FeaturedVehicles() {
             className="mt-8"
             title="No featured cars to show right now."
             actions={
-              <Button href={routes.usedCars} variant="secondary">
+              <Button href={routes.usedCars} variant="outline">
                 View all cars
               </Button>
             }
@@ -112,7 +112,7 @@ export function FeaturedVehicles() {
         )}
         {featuredVehicles.length > 0 ? (
         <div className="mt-8 md:hidden">
-          <Button href={routes.usedCars} variant="text">
+          <Button href={routes.usedCars} variant="outline">
             View all cars
           </Button>
         </div>

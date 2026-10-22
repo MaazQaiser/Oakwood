@@ -14,6 +14,7 @@ export type ButtonVariant =
   | "tertiary"
   | "destructive"
   | "text"
+  | "outline"
   | "icon";
 
 export type ButtonSize = "sm" | "md" | "lg";
@@ -26,6 +27,8 @@ const variantClass: Record<ButtonVariant, string> = {
   tertiary: "rounded-[14px]! bg-page-tint text-primary border border-transparent hover:bg-white",
   destructive: "bg-danger text-white hover:bg-danger/90 border border-transparent",
   text: "bg-transparent text-primary-secondary border border-transparent hover:underline underline-offset-4 px-2",
+  outline:
+    "rounded-[14px]! border border-primary bg-white px-5! text-primary hover:bg-primary-soft",
   icon: "bg-transparent text-ink border border-transparent hover:bg-page",
 };
 

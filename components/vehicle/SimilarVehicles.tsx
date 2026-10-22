@@ -93,6 +93,11 @@ export function SimilarVehicles({
                     />
                   </div>
                 }
+                onOpen={() =>
+                  trackEvent(analyticsEvents.similarVehicleClicked, {
+                    stockId: vehicle.stockId,
+                  })
+                }
                 action={
                   <Button
                     href={getVehicleUrl(vehicle)}

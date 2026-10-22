@@ -30,6 +30,8 @@
   --oak-navy: #002852;
   --oak-navy-deep: #001c3d;
   --oak-surface-soft: #ecf3f8;
+  /* Listing canvas. A light wash of #ECF3F8 toward white, so cards stay separate without a heavy blue. */
+  --oak-page-canvas: #f2f7fb;
 
   /* Typography — Regular 400 and SemiBold 600 only */
   --oak-font-sans: var(--font-poppins), "Segoe UI", system-ui, sans-serif;

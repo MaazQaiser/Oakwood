@@ -65,6 +65,12 @@ export function LocationStock({
                 finance.maxAdvance,
                 finance.deposit,
               )}
+              onOpen={() =>
+                trackEvent(analyticsEvents.locationStockClicked, {
+                  location: locationSlug,
+                  stockId: vehicle.stockId,
+                })
+              }
               action={
                 <Button
                   href={getVehicleUrl(vehicle)}

@@ -13,7 +13,9 @@ import {
 import {
   WHY_OAKWOOD_AA_POINTS,
   WHY_OAKWOOD_HEADING,
-  WHY_OAKWOOD_INTRO,
+  WHY_OAKWOOD_INTRO_BODY,
+  WHY_OAKWOOD_INTRO_CLOSE,
+  WHY_OAKWOOD_INTRO_LEAD,
   WHY_OAKWOOD_LINKS,
   WHY_OAKWOOD_PREPARATION,
   WHY_OAKWOOD_WARRANTY,
@@ -30,7 +32,10 @@ export function WhyOakwood() {
     <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING}>
       <Container width="wide">
         <SectionIntro heading={WHY_OAKWOOD_HEADING} headingClassName="text-navy">
-          {WHY_OAKWOOD_INTRO}
+          {WHY_OAKWOOD_INTRO_LEAD}
+          <br />
+          {WHY_OAKWOOD_INTRO_BODY}
+          <p className="mt-4 font-bold">{WHY_OAKWOOD_INTRO_CLOSE}</p>
         </SectionIntro>
         <div className="mt-10 grid gap-4 lg:grid-cols-2">
           <article
@@ -175,7 +180,14 @@ function PiggyIcon() {
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-[#002852]">
       <rect x="3.5" y="6" width="17" height="12" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
       <path
-        d="M12 9v6M10.3 10.3c.3-.5.9-.8 1.7-.8 1 0 1.7.5 1.7 1.3 0 .8-.7 1.1-1.7 1.4-.9.3-1.7.6-1.7 1.4 0 .8.7 1.3 1.7 1.3.8 0 1.4-.3 1.7-.8"
+        d="M13.7 9.15c0-1.1-.85-1.85-2-1.85-1.2 0-2 .75-2 1.9 0 1 .45 1.65 1.15 2L9.9 14.75h4.4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.7 11.5h3.55"
         stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"

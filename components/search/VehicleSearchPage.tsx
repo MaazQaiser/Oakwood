@@ -41,8 +41,8 @@ export function VehicleSearchPage({
   return (
     <>
       <SearchHeader context={context} query={query.q} />
-      {/* A short gap under the blue banner. Avoid Section/space-section — that padding opened a large white band. */}
-      <section className="pt-4 pb-10 md:pb-12 lg:pt-6 lg:pb-14">
+      {/* White gutter under the budget box, matching the side inset, so the canvas does not sit against it. */}
+      <section className="mt-[var(--oak-page-x)] bg-page-canvas pt-3 pb-10 sm:pt-4 md:pb-12 lg:pt-12 lg:pb-14">
         <Container width="wide">
           <SearchExperience
             context={context}

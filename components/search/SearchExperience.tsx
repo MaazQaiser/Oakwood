@@ -351,11 +351,11 @@ export function SearchExperience({
 
   return (
     <div>
-      <div className="sticky top-[calc(0.75rem+var(--oak-header-height))] z-30 border-b border-border bg-page pt-1 pb-3 lg:hidden">
+      <div className="sticky top-[calc(0.75rem+var(--oak-header-height))] z-30 bg-page-canvas pb-3 lg:hidden">
         <div className="flex gap-3">
           <Button
             variant="secondary"
-            className="flex-1"
+            className="flex-1 bg-transparent! shadow-none"
             onClick={() => {
               setFiltersOpen(true);
               trackEvent(analyticsEvents.filterOpened, {

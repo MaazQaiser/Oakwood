@@ -28,7 +28,7 @@ export function HomeProofStrip({ className }: { className?: string }) {
         return (
           <li
             key={point.id}
-            className="flex min-w-0 flex-col items-start gap-2.5 rounded-[20px] bg-white px-3.5 py-4 shadow-[0_10px_24px_rgba(16,40,72,0.06)] md:gap-3 md:px-4 md:py-5"
+            className="flex min-w-0 flex-col items-start gap-4 rounded-[20px] bg-white px-3.5 py-4 shadow-[0_10px_24px_rgba(16,40,72,0.06)] md:gap-5 md:px-4 md:py-5"
           >
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center md:h-11 md:w-11">
               <Icon />

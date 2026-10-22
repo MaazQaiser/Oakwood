@@ -96,6 +96,8 @@ export function VehicleCard({
   term = 48,
   financeType = "pcp",
   priceView = "monthly",
+  copyInset = false,
+  onOpen,
 }: {
   vehicle: Vehicle;
   monthly?: number;
@@ -109,7 +111,13 @@ export function VehicleCard({
   term?: number;
   financeType?: "hp" | "pcp";
   priceView?: ListingPriceView;
+  /** Line the listing copy up with the View car label. */
+  copyInset?: boolean;
+  onOpen?: () => void;
 }) {
+  const listingHref = getVehicleUrl(vehicle);
+  const listingLinkClass =
+    "vehicle-card-link text-ink no-underline hover:text-primary focus-visible:outline-none after:absolute after:inset-0 after:z-[1] after:rounded-2xl after:content-['']";
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
   const availabilityLabel =
@@ -126,7 +134,7 @@ export function VehicleCard({
       as="article"
       padded={false}
       className={cn(
-        "flex h-full flex-col overflow-hidden border-0 p-4 shadow-sm",
+        "relative flex h-full flex-col overflow-hidden border-0 p-4 shadow-sm has-[.vehicle-card-link:focus-visible]:ring-2 has-[.vehicle-card-link:focus-visible]:ring-inset has-[.vehicle-card-link:focus-visible]:ring-primary",
         featured &&
           "card-lift p-3",
       )}
@@ -159,7 +167,7 @@ export function VehicleCard({
           </div>
         ) : null}
         {toolbar && !featured ? (
-          <div className="absolute right-3 top-3">{toolbar}</div>
+          <div className="absolute right-3 top-3 z-[2]">{toolbar}</div>
         ) : null}
       </div>
       <div
@@ -168,11 +176,18 @@ export function VehicleCard({
           featured ? "gap-2 pt-3" : "gap-3 pt-4",
         )}
       >
+        <div
+          className={cn(
+            "flex flex-col",
+            featured ? "gap-2" : "gap-3",
+            copyInset && !featured && "pl-6",
+          )}
+        >
         {featured ? (
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="text-[1.25rem] font-medium leading-tight tracking-[-0.02em]">
-                <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
+                <Link href={listingHref} className={listingLinkClass} onClick={onOpen}>
                   {vehicle.make} {vehicle.model}
                 </Link>
               </h3>
@@ -189,7 +204,7 @@ export function VehicleCard({
         ) : (
           <div>
             <h3 className="text-[1.0625rem] font-medium leading-snug tracking-[-0.02em]">
-              <Link href={getVehicleUrl(vehicle)} className="text-ink no-underline hover:text-primary">
+              <Link href={listingHref} className={listingLinkClass} onClick={onOpen}>
                 {vehicle.make} {vehicle.model}
               </Link>
             </h3>
@@ -249,7 +264,7 @@ export function VehicleCard({
             /month*
           </p>
         )}
-        <div className="flex flex-wrap gap-1.5">
+        <div className={cn("flex flex-wrap gap-1.5", copyInset && !featured && "-ml-2.5")}>
           {(
             [
               {
@@ -271,8 +286,9 @@ export function VehicleCard({
               </span>
             ))}
         </div>
-        {financeActions ? <div>{financeActions}</div> : null}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+        {financeActions ? <div className="relative z-[2]">{financeActions}</div> : null}
+        </div>
+        <div className="relative z-[2] mt-auto flex items-center justify-between gap-3 pt-1">
           {action ??
             (featured ? (
               <Button

@@ -64,7 +64,7 @@ export function MobileSortButton({
     <>
       <Button
         variant="secondary"
-        className="h-11! min-h-11! flex-1 rounded-[14px]! px-4! lg:hidden"
+        className="h-11! min-h-11! flex-1 rounded-[14px]! bg-transparent! px-4! shadow-none lg:hidden"
         onClick={() => setOpen(true)}
       >
         Sort
