@@ -166,7 +166,7 @@ export const ELIGIBILITY_QUESTIONS: EligibilityQuestion[] = [
     type: "tel",
     question: "What's your mobile number?",
     why: "We may need this if the Oakwood team has to follow up.",
-    placeholder: "07...",
+    placeholder: "Phone number",
     inputMode: "tel",
   },
   {
