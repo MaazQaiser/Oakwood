@@ -13,10 +13,10 @@ export const DEAL_SUPPORTING =
 export const DEAL_PROFILE_SUPPORTING = "Based on your finance profile";
 
 export const DEAL_ILLUSTRATION_PERSONALISED =
-  "Estimated monthly payment. Indicative finance illustration. Subject to full application and vehicle approval.";
+  "Estimated monthly payment. Confirmed when you apply, and subject to vehicle approval.";
 
 export const DEAL_ILLUSTRATION_REPRESENTATIVE =
-  "Representative finance illustration. Your soft search does not affect your credit score.";
+  "Your rate is confirmed when you apply. A soft search does not affect your credit score.";
 
 export const DEAL_APPLICATION_BOUNDARY =
   "Your final finance terms are confirmed during the application.";
@@ -250,7 +250,7 @@ export const DEAL_YOUR_DEAL_APR_DISCLAIMER =
   "Estimated with soft check. Confirmed when you apply.";
 
 export const DEAL_YOUR_DEAL_TIER_HINT =
-  "Choosing a tier updates the estimated APR on this illustration.";
+  "Your rate is confirmed when you apply.";
 
 export const DEAL_YOUR_DEAL_MOCK_PRICE = "Mock price — final retail TBC";
 

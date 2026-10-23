@@ -102,7 +102,7 @@ export const COVER_INFO: Record<
     faq: [
       {
         q: "Can I add this to finance?",
-        a: "In this illustration it can be added to the amount financed. Your lender confirms this during application.",
+        a: "It can be added to the amount financed. Your lender confirms this when you apply.",
       },
       {
         q: "When does cover start?",

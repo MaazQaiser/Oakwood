@@ -1,6 +1,5 @@
 "use client";
 
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { listSelectedProducts } from "@/lib/deal/products";
 import { formatPounds, formatTerm } from "@/lib/format/money";
@@ -17,13 +16,9 @@ export function ApplicationDealSummary({
   compact?: boolean;
   className?: string;
 }) {
-  const { vehicle, draft, calculation, coverMonthly, apr } = useDealBuilder();
+  const { vehicle, draft } = useDealBuilder();
   const products = listSelectedProducts(draft.productIds);
-  const financeLine = [
-    draft.financeType.toUpperCase(),
-    formatTerm(draft.term),
-    apr !== undefined ? `${apr.toFixed(1)}% APR est.` : null,
-  ]
+  const financeLine = [draft.financeType.toUpperCase(), formatTerm(draft.term)]
     .filter(Boolean)
     .join(" · ");
 
@@ -40,12 +35,9 @@ export function ApplicationDealSummary({
           <p className="min-w-0 truncate text-body-sm font-semibold!">
             {vehicle.year} {vehicle.make} {vehicle.model}
           </p>
-          <FinancialNumber
-            value={formatPounds(calculation?.monthlyPayment ?? 0)}
-            suffix="/mo"
-            size="compact"
-            className="shrink-0 text-white"
-          />
+          <span className="shrink-0 text-body-sm font-semibold!">
+            {formatPounds(vehicle.cashPrice)}
+          </span>
         </div>
         <p className="mt-0.5 truncate text-caption text-white/65">
           {financeLine}
@@ -83,10 +75,10 @@ export function ApplicationDealSummary({
           <dt className="text-muted">Cash price</dt>
           <dd>{formatPounds(vehicle.cashPrice)}</dd>
         </div>
-        {draft.px ? (
+        {draft.px?.registration ? (
           <div className="flex justify-between gap-3">
             <dt className="text-muted">Part exchange</dt>
-            <dd>−{formatPounds(calculation?.pxEquity ?? 0)}</dd>
+            <dd>{draft.px.registration}</dd>
           </div>
         ) : null}
         <div className="flex justify-between gap-3">
@@ -101,7 +93,7 @@ export function ApplicationDealSummary({
           <dt className="text-muted">Optional products</dt>
           <dd className="text-right">
             {products.length
-              ? `+${formatPounds(coverMonthly)}/mo`
+              ? products.map((product) => product.name).join(", ")
               : "None"}
           </dd>
         </div>
@@ -114,17 +106,8 @@ export function ApplicationDealSummary({
         ) : null}
       </dl>
 
-      <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-border pt-3">
-        <span className="text-label">Estimated monthly</span>
-        <FinancialNumber
-          value={formatPounds(calculation?.monthlyPayment ?? 0)}
-          suffix="/mo"
-          size="compact"
-        />
-      </div>
-      <p className="mt-2 text-caption text-muted">
-        Illustrative until Oakwood confirms terms. Not a credit decision.
-        Credit-tier / APR labels need compliance approval before production.
+      <p className="mt-4 border-t border-border pt-3 text-caption text-muted">
+        Confirmed when you apply.
       </p>
     </aside>
   );

@@ -43,7 +43,7 @@ function ApplicationInner() {
           <DealPinnedVehicle layout="card" />
           <p className="text-caption text-muted">
             Your selected deal stays pinned while you apply. This is outside the
-            four-step builder progress.
+            six-step builder progress.
           </p>
           <Button
             href={getDealUrl(dealId, "reserve")}
@@ -51,7 +51,7 @@ function ApplicationInner() {
             className="min-h-9 self-start px-1 text-caption"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
-            Back to next step
+            Back to reserve
           </Button>
           <Button
             href={getVehicleUrl(vehicle.slug)}

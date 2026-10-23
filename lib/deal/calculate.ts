@@ -18,6 +18,32 @@ function roundPounds(value: number): number {
   return Math.max(0, Math.round(value));
 }
 
+/**
+ * Highest cash deposit that still leaves part of the car to finance.
+ * Cash plus part-exchange equity used to be allowed up to the full price,
+ * which made the amount financed £0 and stuck the estimate on £0/month.
+ */
+export function maximumCashDeposit(options: {
+  vehiclePrice: number;
+  maxDepositCap: number;
+  depositStep: number;
+  pxEquity: number;
+}): number {
+  const price = Math.max(0, options.vehiclePrice);
+  const equity = Math.max(0, options.pxEquity);
+  const step = Math.max(1, options.depositStep);
+  const roomAfterEquity = Math.max(0, price - equity);
+  const minimumToFinance = Math.min(
+    roomAfterEquity,
+    Math.max(step, Math.round(price * 0.1)),
+  );
+  const ceiling = Math.min(
+    options.maxDepositCap,
+    Math.max(0, roomAfterEquity - minimumToFinance),
+  );
+  return Math.floor(ceiling / step) * step;
+}
+
 function pxFigures(input: DealCalculationInput): {
   equity: number;
   negativeEquity: number;
@@ -208,12 +234,12 @@ export function calculateDeal(
   config: DealProviderConfig = DEAL_PROVIDER_CONFIG,
 ): DealCalculation {
   const { equity: pxEquity, negativeEquity: pxNegativeEquity } = pxFigures(input);
-  // Cash plus part-exchange equity cannot pass the price. Otherwise the
-  // amount left to finance is zero and the estimate sticks on £0.
-  const maxDeposit = Math.max(
-    0,
-    Math.min(input.vehiclePrice, config.maxDepositCap) - pxEquity,
-  );
+  const maxDeposit = maximumCashDeposit({
+    vehiclePrice: input.vehiclePrice,
+    maxDepositCap: config.maxDepositCap,
+    depositStep: config.depositStep,
+    pxEquity,
+  });
   const cashDeposit = roundPounds(
     Math.min(maxDeposit, Math.max(0, input.cashDeposit)),
   );

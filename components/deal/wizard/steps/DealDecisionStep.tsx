@@ -1,70 +1,70 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { Check, Lock, PhoneCall } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { useEffect, useId, useState } from "react";
 import { Field, Input } from "@/components/forms/FormControls";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
-import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
-import { getSearchUrl, supportRoutes } from "@/config/routes";
-import {
-  DEAL_DECISION_APPROVED_LESS_BODY,
-  DEAL_DECISION_APPROVED_LESS_TITLE,
-  DEAL_DECISION_LOADING,
-  DEAL_DECISION_REFER_BODY,
-  DEAL_DECISION_REFER_TITLE,
-  DEAL_RUN_SOFT_CHECK,
-  DEAL_SEE_MY_QUOTE,
-  DEAL_SOFT_SEARCH,
-} from "@/lib/deal/copy";
-import { formatPounds } from "@/lib/format/money";
-import type { DealDecisionOutcome } from "@/types/deal";
 
 const EMPLOYMENT_OPTIONS = [
   { value: "employed", label: "Employed" },
   { value: "self-employed", label: "Self-employed" },
   { value: "retired", label: "Retired" },
   { value: "other", label: "Other" },
-];
+] as const;
 
-const NEXT_UP = [
-  "Your real HP monthly for this car",
-  "Your real PCP monthly with final payment",
-  "Build cover to tailor the deal",
-  "Reserve when you're ready",
-];
+const NOT_AVAILABLE = "Not available";
 
-function mockOutcome(
-  income: number,
-  vehiclePrice: number,
-): {
-  outcome: DealDecisionOutcome;
-  apr: number;
-  extraDepositNeeded?: number;
-} {
-  // Prototype triggers: income under £12k → refer (supportive callback UI,
-  // never a blunt decline screen).
-  if (income < 12000) {
-    return { outcome: "refer", apr: 0 };
-  }
-  if (income * 4 < vehiclePrice) {
-    const maxAdvance = income * 3.5;
-    const extra = Math.max(500, Math.round(vehiclePrice - maxAdvance - 2000));
-    return { outcome: "approved_less", apr: 14.9, extraDepositNeeded: extra };
-  }
-  return { outcome: "approved", apr: 11.9 };
+type Employment = (typeof EMPLOYMENT_OPTIONS)[number]["value"];
+
+type FormErrors = Partial<
+  Record<"name" | "dob" | "postcode" | "address" | "employment" | "income", string>
+>;
+
+type SavedDecision = {
+  fullName: string;
+  dateOfBirth: string;
+  postcode: string;
+  addressLine: string;
+  employment?: Employment;
+  income: string;
+  showResult: boolean;
+  lookupDone: boolean;
+  callbackConfirmed: boolean;
+};
+
+function storageKey(dealId: string) {
+  return `oakwood-deal-decision:${dealId}`;
 }
 
-function splitDob(iso?: string): [string, string, string] {
-  const [y = "", m = "", d = ""] = iso?.split("-") ?? [];
-  return [d, m, y];
+function digits(value: string, maxLength: number): string {
+  return value.replace(/\D/g, "").slice(0, maxLength);
+}
+
+function withCommas(value: string): string {
+  return value === "" ? "" : Number(value).toLocaleString("en-GB");
+}
+
+function parseDob(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return date;
 }
 
 function ageOn(dob: Date, now = new Date()): number {
@@ -78,327 +78,176 @@ function ageOn(dob: Date, now = new Date()): number {
   return age;
 }
 
-type Errors = Partial<
-  Record<
-    "name" | "dob" | "postcode" | "address" | "employment" | "income",
-    string
-  >
->;
+function isEmployment(value: string): value is Employment {
+  return EMPLOYMENT_OPTIONS.some((option) => option.value === value);
+}
 
-function SecureBadge() {
-  return (
-    <div className="flex items-center gap-3 rounded-[18px] bg-surface-soft px-3.5 py-3">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface text-primary">
-        <Lock className="h-4 w-4" aria-hidden />
-      </span>
-      <div>
-        <p className="text-label">Secure soft check</p>
-        <p className="text-caption text-muted">
-          Will not affect your credit score
-        </p>
-      </div>
-    </div>
-  );
+function todayIso(): string {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
 }
 
 export function DealDecisionStep() {
-  const { draft, vehicle, setDecision, setCashDeposit } = useDealBuilder();
+  const { dealId } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("decision");
-  const existing = draft.decision;
   const nameId = useId();
   const dobId = useId();
   const postcodeId = useId();
   const addressId = useId();
   const incomeId = useId();
   const employmentId = useId();
-  const [fullName, setFullName] = useState(existing?.fullName ?? "");
-  const [[day, month, year], setDob] = useState(
-    splitDob(existing?.dateOfBirth),
-  );
-  const [postcode, setPostcode] = useState(existing?.postcode ?? "");
-  const [addressLine, setAddressLine] = useState(existing?.addressLine ?? "");
-  const [employmentStatus, setEmploymentStatus] = useState(
-    existing?.employmentStatus ?? "",
-  );
-  const [yearlyIncome, setYearlyIncome] = useState(
-    existing?.yearlyIncome ? String(existing.yearlyIncome) : "",
-  );
-  const [lookupHint, setLookupHint] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Errors>({});
-  const [phase, setPhase] = useState<"form" | "loading" | "result">(
-    existing?.outcome ? "result" : "form",
-  );
-  const [result, setResult] = useState(existing);
-  const firstRender = useRef(true);
 
-  // Each phase swap replaces the page content, so start the customer at the
-  // top instead of mid-page where the submit button was.
+  const [fullName, setFullName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [addressLine, setAddressLine] = useState("");
+  const [employment, setEmployment] = useState<Employment | undefined>();
+  const [income, setIncome] = useState("");
+  const [lookupDone, setLookupDone] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [callbackConfirmed, setCallbackConfirmed] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [hydrated, setHydrated] = useState(false);
+
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
+    const raw = window.sessionStorage.getItem(storageKey(dealId));
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw) as Partial<SavedDecision>;
+        setFullName(saved.fullName ?? "");
+        setDateOfBirth(saved.dateOfBirth ?? "");
+        setPostcode(saved.postcode ?? "");
+        const savedAddress = saved.addressLine ?? "";
+        setAddressLine(
+          /sampletown|mock street|mock road/i.test(savedAddress)
+            ? ""
+            : savedAddress,
+        );
+        setEmployment(
+          saved.employment && isEmployment(saved.employment)
+            ? saved.employment
+            : undefined,
+        );
+        setIncome(digits(String(saved.income ?? ""), 7));
+        setShowResult(Boolean(saved.showResult));
+        setLookupDone(Boolean(saved.lookupDone));
+        setCallbackConfirmed(Boolean(saved.callbackConfirmed));
+      } catch {
+        window.sessionStorage.removeItem(storageKey(dealId));
+      }
+    }
+    setHydrated(true);
+  }, [dealId]);
+
+  useEffect(() => {
+    if (!hydrated) {
       return;
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [phase]);
+    const saved: SavedDecision = {
+      fullName,
+      dateOfBirth,
+      postcode,
+      addressLine,
+      employment,
+      income,
+      showResult,
+      lookupDone,
+      callbackConfirmed,
+    };
+    window.sessionStorage.setItem(storageKey(dealId), JSON.stringify(saved));
+  }, [
+    addressLine,
+    callbackConfirmed,
+    dateOfBirth,
+    dealId,
+    employment,
+    fullName,
+    hydrated,
+    income,
+    lookupDone,
+    postcode,
+    showResult,
+  ]);
 
-  /** Drop a field's error as soon as the customer edits it. */
-  const clear = (key: keyof Errors) =>
+  function clear(key: keyof FormErrors) {
     setErrors((current) =>
       current[key] ? { ...current, [key]: undefined } : current,
     );
-  const income = Number(yearlyIncome.replace(/[,£\s]/g, ""));
-
-  function dobIso(): string | null {
-    const d = Number(day);
-    const m = Number(month);
-    const y = Number(year);
-    if (!d || !m || year.length !== 4) {
-      return null;
-    }
-    const date = new Date(y, m - 1, d);
-    if (date.getDate() !== d || date.getMonth() !== m - 1) {
-      return null;
-    }
-    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
   }
 
-  function validate(): Errors {
-    const next: Errors = {};
-    if (fullName.trim().split(/\s+/).length < 2) {
+  function validate(): FormErrors {
+    const next: FormErrors = {};
+    if (fullName.trim().split(/\s+/).filter(Boolean).length < 2) {
       next.name = "Enter your first and last name.";
     }
-    const iso = dobIso();
-    if (!iso) {
-      next.dob = "Enter a real date of birth, for example 27 03 1988.";
-    } else if (ageOn(new Date(iso)) < 18) {
-      next.dob = "You must be 18 or over to apply for finance.";
-    }
-    if (postcode.trim().replace(/\s/g, "").length < 5) {
-      next.postcode = "Enter your full UK postcode.";
+    const dob = parseDob(dateOfBirth);
+    if (!dateOfBirth) {
+      next.dob = "Enter your date of birth.";
+    } else if (!dob) {
+      next.dob = "Enter a valid date of birth.";
+    } else if (ageOn(dob) < 18) {
+      next.dob = "You must be 18 or over.";
     }
     if (addressLine.trim().length < 4) {
-      next.address = "Find or enter your address.";
+      next.address = "Enter your address.";
     }
-    if (!employmentStatus) {
+    if (!employment) {
       next.employment = "Choose your employment status.";
     }
-    if (!Number.isFinite(income) || income <= 0) {
-      next.income = "Enter your yearly income before tax.";
+    const yearly = Number(income);
+    if (!income || !Number.isFinite(yearly) || yearly <= 0) {
+      next.income = "Enter your gross annual income.";
     }
     return next;
   }
 
-  function lookupAddress() {
-    const code = postcode.trim().toUpperCase();
-    if (code.replace(/\s/g, "").length < 5) {
+  function focusFirst(next: FormErrors) {
+    const id = next.name
+      ? nameId
+      : next.dob
+        ? dobId
+        : next.postcode
+          ? postcodeId
+          : next.address
+            ? addressId
+            : next.income
+              ? incomeId
+              : next.employment
+                ? employmentId
+                : undefined;
+    if (id) {
+      document.getElementById(id)?.focus();
+    }
+  }
+
+  function findAddress() {
+    const compact = postcode.replace(/\s/g, "");
+    if (compact.length < 5) {
       setErrors((current) => ({
         ...current,
-        postcode: "Enter your full UK postcode.",
+        postcode: "Enter a postcode to look up an address.",
       }));
+      document.getElementById(postcodeId)?.focus();
       return;
     }
-    setErrors((current) => ({
-      ...current,
-      postcode: undefined,
-      address: undefined,
-    }));
-    setAddressLine(`1 Example Street, Sampletown, ${code}`);
-    setLookupHint("Prototype lookup. Check and edit the address if needed.");
+    setLookupDone(true);
+    clear("postcode");
   }
 
-  function runCheck() {
-    const found = validate();
-    setErrors(found);
-    const fieldIds: Record<keyof Errors, string> = {
-      name: nameId,
-      dob: dobId,
-      postcode: postcodeId,
-      address: addressId,
-      employment: employmentId,
-      income: incomeId,
-    };
-    const first = (Object.keys(fieldIds) as (keyof Errors)[]).find(
-      (key) => found[key],
-    );
-    if (first) {
-      document.getElementById(fieldIds[first])?.focus();
+  function viewStatus() {
+    const next = validate();
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      focusFirst(next);
       return;
     }
-    setPhase("loading");
-    window.setTimeout(() => {
-      const decision = mockOutcome(income, vehicle.cashPrice);
-      const next = {
-        fullName: fullName.trim(),
-        dateOfBirth: dobIso() ?? "",
-        postcode: postcode.trim().toUpperCase(),
-        addressLine: addressLine.trim() || undefined,
-        employmentStatus,
-        yearlyIncome: income,
-        ...decision,
-      };
-      setDecision(next);
-      setResult(next);
-      setPhase("result");
-    }, 1400);
+    setCallbackConfirmed(false);
+    setShowResult(true);
   }
 
-  if (phase === "loading") {
-    return (
-      <div className="flex min-h-72 flex-1 flex-col items-center justify-center gap-3 text-center">
-        <div
-          className="h-10 w-10 animate-spin rounded-full border-[3px] border-border border-t-primary"
-          aria-hidden
-        />
-        <p className="text-body font-semibold!" role="status">
-          {DEAL_DECISION_LOADING}
-        </p>
-        <p className="max-w-xs text-caption text-muted">{DEAL_SOFT_SEARCH}</p>
-      </div>
-    );
-  }
-
-  if (phase === "result" && result?.outcome) {
-    const editDetails = () => setPhase("form");
-
-    if (result.outcome === "approved") {
-      return (
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 space-y-4 pb-5">
-            <DealResultHero
-              eyebrow="Decision in principle"
-              title="You're approved"
-              body="Based on the information you've given us."
-            >
-              <div className="relative mt-5 rounded-[20px] bg-white/10 px-4 py-3.5">
-                <p className="text-caption text-white/75">Your personal APR</p>
-                <p className="financial-number financial-number--compact mt-1 text-white">
-                  {(result.apr ?? 11.9).toFixed(1)}%
-                </p>
-                <p className="mt-1 text-caption text-white/75">
-                  Final rate set at full application.
-                </p>
-              </div>
-              <p className="mt-4 text-caption text-white/80">
-                No credit footprint. No obligation.
-              </p>
-            </DealResultHero>
-
-            <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-              <p className="text-label">What we&apos;ll show you next</p>
-              <ul className="mt-2 space-y-1.5">
-                {NEXT_UP.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 text-body-sm"
-                  >
-                    <Check
-                      className="h-4 w-4 shrink-0 text-success"
-                      aria-hidden
-                    />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <DealStepFooter
-            onBack={editDetails}
-            backLabel="Edit details"
-            onContinue={() => goNext("cover")}
-            continueLabel={DEAL_SEE_MY_QUOTE}
-          />
-        </div>
-      );
-    }
-
-    if (result.outcome === "approved_less") {
-      const extra = result.extraDepositNeeded ?? 0;
-      return (
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 space-y-4 pb-5">
-            <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-              <p className="text-caption uppercase tracking-[0.08em] text-muted">
-                Decision in principle
-              </p>
-              <h2 className="mt-1 text-h5">
-                {DEAL_DECISION_APPROVED_LESS_TITLE}
-              </h2>
-              <p className="mt-1 text-body-sm text-muted">
-                {DEAL_DECISION_APPROVED_LESS_BODY}
-              </p>
-              {extra > 0 ? (
-                <div className="mt-4 flex items-baseline justify-between gap-3 rounded-[14px] bg-page-tint px-4 py-3">
-                  <span className="text-body-sm text-muted">
-                    Extra deposit for this car
-                  </span>
-                  <FinancialNumber value={formatPounds(extra)} size="sm" />
-                </div>
-              ) : null}
-            </div>
-            <Button
-              href={getSearchUrl({ affordable: 1 })}
-              variant="tertiary"
-              className="w-full"
-            >
-              View cars within my budget
-            </Button>
-          </div>
-          <DealStepFooter
-            onBack={editDetails}
-            backLabel="Edit details"
-            continueLabel={
-              extra > 0 ? `Add ${formatPounds(extra)} and continue` : "Continue"
-            }
-            onContinue={() => {
-              if (extra > 0) {
-                setCashDeposit(draft.cashDeposit + extra);
-              }
-              goNext("cover");
-            }}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-1 flex-col">
-        <div className="flex-1 space-y-4 pb-5">
-          <div className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-primary-soft text-primary">
-              <PhoneCall className="h-5 w-5" aria-hidden />
-            </span>
-            <h2 className="mt-3 text-h5">{DEAL_DECISION_REFER_TITLE}</h2>
-            <p className="mt-1 text-body-sm text-muted">
-              {DEAL_DECISION_REFER_BODY}
-            </p>
-            <p className="mt-3 text-caption text-muted">{DEAL_SOFT_SEARCH}</p>
-          </div>
-          <Button
-            variant="tertiary"
-            className="w-full"
-            onClick={() => goNext("cover")}
-          >
-            Keep building my deal
-          </Button>
-        </div>
-        <div className="sticky bottom-0 z-10 -mx-4 mt-auto flex gap-2 border-t border-border bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:-mx-6 sm:px-6">
-          <Button
-            variant="tertiary"
-            className="btn-compact shrink-0 px-4"
-            onClick={editDetails}
-          >
-            Edit details
-          </Button>
-          <Button
-            href={supportRoutes.bookingEnquiry}
-            className="btn-compact min-w-0 flex-1"
-          >
-            Request a callback
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const continueLabel = showResult ? "View my quote" : "View decision status";
 
   return (
     <form
@@ -406,179 +255,216 @@ export function DealDecisionStep() {
       className="flex flex-1 flex-col"
       onSubmit={(event) => {
         event.preventDefault();
-        runCheck();
+        if (!showResult) {
+          viewStatus();
+        }
       }}
     >
-      <div className="flex-1 pb-5">
-        <DealCard className="space-y-5">
-          <SecureBadge />
+      {showResult ? (
+        <DealCard>
+          <DecisionResult
+            callbackConfirmed={callbackConfirmed}
+            onEdit={() => setShowResult(false)}
+            onCallback={() => setCallbackConfirmed(true)}
+          />
+        </DealCard>
+      ) : (
+        <DealCard>
+          <div className="space-y-5">
+            <Field htmlFor={nameId} label="Full name" error={errors.name}>
+              <Input
+                id={nameId}
+                value={fullName}
+                autoComplete="name"
+                placeholder="Full name"
+                error={Boolean(errors.name)}
+                onChange={(event) => {
+                  setFullName(event.target.value);
+                  clear("name");
+                }}
+              />
+            </Field>
 
-          <Field htmlFor={nameId} label="Full name" error={errors.name}>
-            <Input
-              id={nameId}
-              value={fullName}
-              autoComplete="name"
-              error={Boolean(errors.name)}
-              onChange={(event) => {
-                setFullName(event.target.value);
-                clear("name");
-              }}
-            />
-          </Field>
+            <Field
+              htmlFor={dobId}
+              label="Date of birth"
+              hint="You need to be 18 or over."
+              error={errors.dob}
+            >
+              <Input
+                id={dobId}
+                type="date"
+                value={dateOfBirth}
+                autoComplete="bday"
+                max={todayIso()}
+                min="1900-01-01"
+                error={Boolean(errors.dob)}
+                onChange={(event) => {
+                  setDateOfBirth(event.target.value);
+                  clear("dob");
+                }}
+              />
+            </Field>
 
-          <fieldset
-            aria-describedby={errors.dob ? `${dobId}-error` : undefined}
-          >
-            <legend className="text-label">Date of birth</legend>
-            <div className="mt-1.5 grid grid-cols-[1fr_1fr_1.6fr] gap-2">
-              {(
-                [
-                  ["Day", "DD", day, 2, "bday-day"],
-                  ["Month", "MM", month, 2, "bday-month"],
-                  ["Year", "YYYY", year, 4, "bday-year"],
-                ] as const
-              ).map(([label, placeholder, value, max, auto], index) => (
-                <label key={label} className="block">
-                  <span className="sr-only">{label}</span>
+            <div className="space-y-3">
+              <Field
+                htmlFor={postcodeId}
+                label="Postcode"
+                error={errors.postcode}
+              >
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
-                    id={index === 0 ? dobId : undefined}
-                    inputMode="numeric"
-                    autoComplete={auto}
-                    maxLength={max}
-                    placeholder={placeholder}
-                    value={value}
-                    error={Boolean(errors.dob)}
-                    className="text-center tabular-number"
+                    id={postcodeId}
+                    value={postcode}
+                    autoComplete="postal-code"
+                    placeholder="Postcode"
+                    className="uppercase sm:flex-1"
+                    error={Boolean(errors.postcode)}
                     onChange={(event) => {
-                      const digits = event.target.value.replace(/\D/g, "");
-                      clear("dob");
-                      setDob((current) => {
-                        const next = [...current] as [string, string, string];
-                        next[index] = digits;
-                        return next;
-                      });
+                      setPostcode(event.target.value);
+                      setLookupDone(false);
+                      clear("postcode");
                     }}
                   />
-                </label>
-              ))}
-            </div>
-            {errors.dob ? (
-              <p
-                id={`${dobId}-error`}
-                className="mt-1.5 text-caption text-danger"
-                role="alert"
-              >
-                {errors.dob}
-              </p>
-            ) : null}
-          </fieldset>
+                  <Button
+                    type="button"
+                    variant="tertiary"
+                    className="w-full shrink-0 sm:w-auto"
+                    onClick={findAddress}
+                  >
+                    Find address
+                  </Button>
+                </div>
+              </Field>
 
-          <div className="space-y-3">
-            <Field
-              htmlFor={postcodeId}
-              label="Postcode"
-              error={errors.postcode}
-            >
-              <div className="flex gap-2">
+              {lookupDone ? (
+                <p className="text-caption text-muted" role="status">
+                  Address lookup is not available. Enter the address below.
+                </p>
+              ) : null}
+
+              <Field htmlFor={addressId} label="Address" error={errors.address}>
                 <Input
-                  id={postcodeId}
-                  className="flex-1 uppercase"
-                  value={postcode}
-                  autoComplete="postal-code"
-                  error={Boolean(errors.postcode)}
+                  id={addressId}
+                  value={addressLine}
+                  autoComplete="street-address"
+                  placeholder="Address"
+                  error={Boolean(errors.address)}
                   onChange={(event) => {
-                    setPostcode(event.target.value);
-                    setLookupHint(null);
-                    clear("postcode");
+                    setAddressLine(event.target.value);
+                    clear("address");
                   }}
                 />
-                <Button
-                  type="button"
-                  variant="tertiary"
-                  className="shrink-0"
-                  onClick={lookupAddress}
-                >
-                  Find address
-                </Button>
+              </Field>
+            </div>
+
+            <div id={employmentId} tabIndex={-1} className="outline-none">
+              <DealChipGroup
+                label="Employment status"
+                value={employment}
+                options={[...EMPLOYMENT_OPTIONS]}
+                columns={2}
+                onChange={(value) => {
+                  setEmployment(value);
+                  clear("employment");
+                }}
+              />
+              {errors.employment ? (
+                <p className="mt-1.5 text-caption text-danger" role="alert">
+                  {errors.employment}
+                </p>
+              ) : null}
+            </div>
+
+            <Field
+              htmlFor={incomeId}
+              label="Gross annual income"
+              hint="Before tax, per year."
+              error={errors.income}
+            >
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
+                  £
+                </span>
+                <Input
+                  id={incomeId}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className="pl-7 tabular-number"
+                  value={withCommas(income)}
+                  placeholder="Amount"
+                  error={Boolean(errors.income)}
+                  onChange={(event) => {
+                    setIncome(digits(event.target.value, 7));
+                    clear("income");
+                  }}
+                />
               </div>
             </Field>
-            <Field
-              htmlFor={addressId}
-              label="Address"
-              hint={lookupHint ?? undefined}
-              error={errors.address}
-            >
-              <Input
-                id={addressId}
-                value={addressLine}
-                autoComplete="street-address"
-                placeholder="Find from your postcode, or type it"
-                error={Boolean(errors.address)}
-                onChange={(event) => {
-                  setAddressLine(event.target.value);
-                  clear("address");
-                }}
-              />
-            </Field>
           </div>
-
-          <div id={employmentId} tabIndex={-1} className="outline-none">
-            <DealChipGroup
-              label="Employment status"
-              value={employmentStatus}
-              options={EMPLOYMENT_OPTIONS}
-              columns={2}
-              onChange={(value) => {
-                setEmploymentStatus(value);
-                clear("employment");
-              }}
-            />
-            {errors.employment ? (
-              <p className="mt-1.5 text-caption text-danger" role="alert">
-                {errors.employment}
-              </p>
-            ) : null}
-          </div>
-
-          <Field
-            htmlFor={incomeId}
-            label="Gross annual income"
-            hint="Before tax, per year"
-            error={errors.income}
-          >
-            <div className="relative">
-              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
-                £
-              </span>
-              <Input
-                id={incomeId}
-                inputMode="numeric"
-                className="pl-7 tabular-number"
-                value={yearlyIncome}
-                placeholder="32,000"
-                error={Boolean(errors.income)}
-                onChange={(event) => {
-                  setYearlyIncome(event.target.value);
-                  clear("income");
-                }}
-              />
-            </div>
-          </Field>
-
-          <p className="text-caption text-muted">
-            Powered by iVendi. The soft search uses Autoconvert underwriting
-            rules. We only run a hard search if you choose to go ahead with an
-            application.
-          </p>
         </DealCard>
-      </div>
+      )}
 
       <DealStepFooter
         onBack={() => goBack("budget")}
-        onContinue={runCheck}
-        continueLabel={DEAL_RUN_SOFT_CHECK}
-        submit
+        onContinue={showResult ? () => goNext("cover") : viewStatus}
+        continueLabel={continueLabel}
+        submit={!showResult}
+        showMonthly={false}
       />
     </form>
+  );
+}
+
+function DecisionResult({
+  callbackConfirmed,
+  onEdit,
+  onCallback,
+}: {
+  callbackConfirmed: boolean;
+  onEdit: () => void;
+  onCallback: () => void;
+}) {
+  return (
+    <div className="space-y-4" role="status" aria-live="polite">
+      <div className="rounded-2xl border border-border bg-page-tint px-4 py-4">
+        <p className="text-caption font-semibold! uppercase tracking-[0.08em] text-muted">
+          Decision status
+        </p>
+        <h2 className="mt-1 text-h5 text-navy">{NOT_AVAILABLE}</h2>
+        <p className="mt-2 text-caption text-muted">
+          Entering your details does not produce a lending decision.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-dashed border-border-strong px-4 py-4">
+        <p className="text-label text-navy">Personal APR</p>
+        <p className="mt-1 text-h4 text-navy">{NOT_AVAILABLE}</p>
+      </div>
+
+      {callbackConfirmed ? (
+        <Alert title="Not available" tone="info">
+          A callback is not available. No request has been sent.
+        </Alert>
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          onClick={onCallback}
+        >
+          Request a callback
+        </Button>
+      )}
+
+      <Button
+        type="button"
+        variant="text"
+        className="min-h-11 px-0 text-body font-semibold!"
+        onClick={onEdit}
+      >
+        Edit details
+      </Button>
+    </div>
   );
 }

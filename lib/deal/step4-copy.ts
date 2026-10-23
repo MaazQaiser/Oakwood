@@ -12,7 +12,7 @@ export const STEP4_HUB_RESERVE_HINT = () =>
   `Fully refundable. We hold the car for ${hold()}.`;
 export const STEP4_HUB_APPLY = "Apply for finance";
 export const STEP4_HUB_APPLY_HINT =
-  "Start a mock embedded finance application. Nothing is submitted to a live lender in this prototype.";
+  "Apply on this page. Your deal stays with you, and an advisor confirms your rate by phone.";
 export const STEP4_HUB_TEST_DRIVE = "Test drive";
 export const STEP4_HUB_TEST_DRIVE_HINT =
   "Book a showroom visit for this car.";
@@ -44,7 +44,7 @@ export const STEP4_TD_TITLE = "Book a test drive";
 export const STEP4_TD_SUBMIT =
   "Our sales team will be in touch soon to confirm who'll be looking after you.";
 export const STEP4_TD_CHANNELS =
-  "We'll prepare confirmation by SMS, WhatsApp and email (prototype — messages are not sent).";
+  "Confirmation is prepared by SMS, WhatsApp and email.";
 export const STEP4_TD_CHANNELS_CHECK =
   "Send me confirmation by SMS, WhatsApp and email";
 export const STEP4_TD_LOADING = "Checking availability…";
@@ -52,7 +52,7 @@ export const STEP4_TD_UNAVAILABLE =
   "That time isn't available. Please choose another slot.";
 export const STEP4_TD_CONFIRM_TITLE = "Test drive requested";
 export const STEP4_TD_CONFIRM_BODY =
-  "We've recorded your booking request. Confirmation channels below are a prototype summary — nothing has been sent yet.";
+  "Our sales team will be in touch soon to confirm who'll be looking after you.";
 export const STEP4_TD_WHAT_TO_BRING = [
   "Your driving licence (photocard)",
   "Proof of address if your licence address differs",
@@ -70,7 +70,7 @@ export const STEP4_CB_TITLE = "Call me back";
 export const STEP4_CB_SUBMITTING = "Booking your callback…";
 export const STEP4_CB_CONFIRM_TITLE = "Callback booked";
 export const STEP4_CB_CONFIRM_BODY =
-  "We've recorded your request (prototype). An Oakwood advisor will call at the time you chose — no SMS or email has been sent yet.";
+  "An Oakwood advisor will call at the time you chose.";
 
 export const STEP4_BACK_HUB = "Back to next steps";
 /** Leaves the deal after a completed Step 4 action (reserve / test drive / callback). */

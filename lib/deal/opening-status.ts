@@ -229,7 +229,7 @@ export type SalesTimeSlot = {
 
 /**
  * Half-hour sales slots for a given day from published hours.
- * Mock availability: every third slot marked unavailable for prototype UX.
+ * Slots already passed today are not offered.
  */
 export function getSalesTimeSlots(
   ymd: string,
@@ -239,18 +239,15 @@ export function getSalesTimeSlots(
   const hours = hoursForDay(ymd, weekday);
   const { ymd: today, minutes: nowMinutes } = londonParts(now);
   const slots: SalesTimeSlot[] = [];
-  let index = 0;
   for (let m = hours.open; m < hours.close; m += 30) {
     const hour = Math.floor(m / 60);
     const minute = m % 60;
     const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
     const pastToday = ymd === today && m <= nowMinutes;
-    const mockUnavailable = index % 3 === 2;
     slots.push({
       time,
-      available: !pastToday && !mockUnavailable,
+      available: !pastToday,
     });
-    index += 1;
   }
   return slots;
 }

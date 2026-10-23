@@ -11,7 +11,11 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { calculateDeal, productMonthlyImpact } from "@/lib/deal/calculate";
+import {
+  calculateDeal,
+  maximumCashDeposit,
+  productMonthlyImpact,
+} from "@/lib/deal/calculate";
 import { valuePartExchange } from "@/lib/deal/valuation";
 import {
   RECOMMENDED_COVER_IDS,
@@ -120,8 +124,9 @@ function toInput(
 }
 
 /**
- * Cash deposit ceiling: cash plus part-exchange equity can't exceed the
- * price, so the total deposit never passes the car's value.
+ * Cash deposit ceiling. Part-exchange equity counts towards the deposit,
+ * and enough of the price is left on finance that the monthly estimate
+ * does not collapse to £0.
  */
 export function maxCashDeposit(
   cashPrice: number | undefined,
@@ -130,8 +135,12 @@ export function maxCashDeposit(
   px?: DealDraft["px"],
 ): number {
   const equity = px ? Math.max(0, px.value - (px.settlement ?? 0)) : 0;
-  const ceiling = Math.min(cap, Math.max(0, (cashPrice ?? cap) - equity));
-  return Math.floor(ceiling / step) * step;
+  return maximumCashDeposit({
+    vehiclePrice: cashPrice ?? cap,
+    maxDepositCap: cap,
+    depositStep: step,
+    pxEquity: equity,
+  });
 }
 
 /**
@@ -218,6 +227,8 @@ export function DealBuilderProvider({
   const [saved, setSaved] = useState(false);
   const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
   const autosaveReady = useRef(false);
+  /** Condition, history and finance chosen before a valuation exists. */
+  const pendingPxAnswers = useRef<Partial<DealPartExchangeInput>>({});
   const [retryTick, setRetryTick] = useState(0);
   const started = useRef(false);
 
@@ -427,18 +438,24 @@ export function DealBuilderProvider({
         return;
       }
       setPxError(undefined);
+      const pending = pendingPxAnswers.current;
+      pendingPxAnswers.current = {};
       const next: DealPartExchangeInput = {
         registration: registration.replace(/\s+/g, "").toUpperCase(),
         mileage,
         value: result.value,
-        condition: draft.px?.condition,
-        serviceHistory: draft.px?.serviceHistory,
-        financeOutstanding: draft.px?.financeOutstanding,
-        outstandingFinanceAmount: draft.px?.outstandingFinanceAmount,
-        outstandingFinanceLender: draft.px?.outstandingFinanceLender,
-        settlement: draft.px?.settlement,
+        condition: pending.condition ?? draft.px?.condition,
+        serviceHistory: pending.serviceHistory ?? draft.px?.serviceHistory,
+        financeOutstanding:
+          pending.financeOutstanding ?? draft.px?.financeOutstanding,
+        outstandingFinanceAmount:
+          pending.outstandingFinanceAmount ??
+          draft.px?.outstandingFinanceAmount,
+        outstandingFinanceLender:
+          pending.outstandingFinanceLender ?? draft.px?.outstandingFinanceLender,
+        settlement: pending.settlement ?? draft.px?.settlement,
         vehicle: draft.px?.vehicle,
-        extras: draft.px?.extras,
+        extras: pending.extras ?? draft.px?.extras,
         deductions: draft.px?.deductions,
         valuationDate: draft.px?.valuationDate,
       };
@@ -476,6 +493,7 @@ export function DealBuilderProvider({
     (patch: Partial<DealPartExchangeInput>) => {
       setDraft((current) => {
         if (!current.px) {
+          pendingPxAnswers.current = { ...pendingPxAnswers.current, ...patch };
           return current;
         }
         const next = { ...current.px, ...patch };
@@ -508,6 +526,7 @@ export function DealBuilderProvider({
   }, []);
 
   const clearPartExchange = useCallback(() => {
+    pendingPxAnswers.current = {};
     setDraft((current) => ({ ...current, px: undefined }));
     setPxError(undefined);
     trackEvent(analyticsEvents.pxRemoved);

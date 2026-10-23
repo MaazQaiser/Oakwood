@@ -1,514 +1,377 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
-import { Input } from "@/components/forms/FormControls";
-import { Alert } from "@/components/ui/Alert";
-import { Button } from "@/components/ui/Button";
-import {
-  maxCashDeposit,
-  useDealBuilder,
-} from "@/components/deal/DealBuilderProvider";
-import { SaveDeal } from "@/components/deal/SaveDeal";
-import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
+import { useEffect, useId, useState } from "react";
+import { Field, Input } from "@/components/forms/FormControls";
+import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
-import { getContactUrl } from "@/config/routes";
 import {
   DEAL_BUDGET_DEFAULT_DEPOSIT,
   DEAL_BUDGET_HP_BODY,
   DEAL_BUDGET_HP_LEAD,
-  DEAL_BUDGET_HP_ROLE,
   DEAL_BUDGET_PCP_BODY,
   DEAL_BUDGET_PCP_LEAD,
-  DEAL_BUDGET_PCP_ROLE,
   DEAL_BUDGET_PCP_TERM_BLOCK,
-  DEAL_BUDGET_PCP_UNAVAILABLE,
-  DEAL_CONTINUE,
-  DEAL_PX_CALLBACK,
-  DEAL_PX_NEGATIVE_TITLE,
 } from "@/lib/deal/copy";
-import { cn } from "@/lib/cn";
-import { formatPounds, formatTerm } from "@/lib/format/money";
+import { formatNumber, formatPounds } from "@/lib/format/money";
 import type { FinanceProductType } from "@/types/finance";
 
+const TERMS = [24, 36, 48, 60, 72, 84] as const;
 const PCP_MAX_TERM = 60;
+const MILEAGE_PRESETS = [6000, 8000, 10000, 12000, 15000] as const;
 
-function mileageLabel(miles: number): string {
-  return miles >= 1000 ? `${Math.round(miles / 1000)}k` : String(miles);
-}
+type MileageChoice = `${(typeof MILEAGE_PRESETS)[number]}` | "other";
 
-function QuoteStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] bg-page-tint px-3 py-2.5">
-      <dt className="text-caption text-muted">{label}</dt>
-      <dd className="mt-0.5 tabular-number text-body-sm font-semibold! text-ink">
-        {value}
-      </dd>
-    </div>
-  );
-}
-
-function FinanceTypeCard({
-  type,
-  selected,
-  monthly,
-  term,
-  deposit,
-  finalPayment,
-  note,
-  onSelect,
-}: {
-  type: FinanceProductType;
-  selected: boolean;
-  monthly?: number;
-  term: number;
+type SavedFinance = {
   deposit: number;
-  finalPayment?: number;
-  note?: string;
-  onSelect: () => void;
-}) {
-  const copy =
-    type === "hp"
-      ? {
-          name: "Hire Purchase",
-          role: DEAL_BUDGET_HP_ROLE,
-          lead: DEAL_BUDGET_HP_LEAD,
-          body: DEAL_BUDGET_HP_BODY,
-        }
-      : {
-          name: "Personal Contract Purchase",
-          role: DEAL_BUDGET_PCP_ROLE,
-          lead: DEAL_BUDGET_PCP_LEAD,
-          body: DEAL_BUDGET_PCP_BODY,
-        };
+  financeType: FinanceProductType;
+  term: number;
+  mileageChoice: MileageChoice;
+  otherMileage: string;
+};
 
+function financeKey(dealId: string) {
+  return `oakwood-deal-finance:${dealId}`;
+}
+
+function clampDeposit(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+function isMileageChoice(value: string): value is MileageChoice {
   return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={selected}
-      onClick={onSelect}
-      className={cn(
-        "flex w-full flex-col rounded-[20px] border p-4 text-left transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-        selected
-          ? "border-navy bg-navy text-white shadow-[0_10px_24px_rgb(0_40_82/0.22)]"
-          : "border-border bg-surface text-ink hover:border-primary/40 hover:bg-page-tint",
-      )}
-    >
-      <span className="flex items-center justify-between gap-2">
-        <span
-          className={cn(
-            "text-[0.68rem] font-semibold! uppercase tracking-[0.12em]",
-            selected ? "text-white/75" : "text-muted",
-          )}
-        >
-          {type === "hp" ? "HP" : "PCP"} · {copy.lead}
-        </span>
-        <span
-          className={cn(
-            "rounded-full px-2 py-0.5 text-[0.65rem] font-semibold! uppercase tracking-[0.08em]",
-            selected
-              ? "bg-white/15 text-white"
-              : type === "hp"
-                ? "bg-navy text-white"
-                : "bg-page-tint text-navy",
-          )}
-        >
-          {copy.role}
-        </span>
-      </span>
-      <span className="mt-1 text-label">{copy.name}</span>
-      {monthly !== undefined ? (
-        <p className="mt-3">
-          <FinancialNumber
-            value={formatPounds(monthly)}
-            suffix="/mo"
-            size="compact"
-            className={selected ? "text-white" : "text-navy"}
-          />
-        </p>
-      ) : null}
-      <p className={cn("mt-2 text-caption", selected ? "text-white/80" : "text-muted")}>
-        {copy.body}
-      </p>
-      <dl className="mt-4 grid grid-cols-2 gap-2">
-        <QuoteStat label="Deposit" value={formatPounds(deposit)} />
-        <QuoteStat label="Term" value={formatTerm(term)} />
-        {type === "pcp" && finalPayment !== undefined ? (
-          <div className="col-span-2">
-            <QuoteStat
-              label="Optional final payment"
-              value={formatPounds(finalPayment)}
-            />
-          </div>
-        ) : null}
-      </dl>
-      {note ? (
-        <p className={cn("mt-3 text-caption", selected ? "text-white/80" : "text-navy")}>
-          {note}
-        </p>
-      ) : null}
-    </button>
+    value === "other" ||
+    MILEAGE_PRESETS.some((miles) => String(miles) === value)
   );
 }
 
-function DepositCard() {
-  const { draft, calculation, config, vehicle, setCashDeposit } =
-    useDealBuilder();
-  const sliderId = useId();
-  const inputId = useId();
-  const [typed, setTyped] = useState<string>();
-  const max = maxCashDeposit(
-    vehicle.cashPrice,
-    config.maxDepositCap,
-    config.depositStep,
-    draft.px,
-  );
-  const equity = calculation?.pxEquity ?? 0;
-  const owed = calculation?.pxNegativeEquity ?? 0;
-  const total = calculation?.totalDeposit ?? draft.cashDeposit;
-  const fill = max > 0 ? (Math.min(max, draft.cashDeposit) / max) * 100 : 0;
+function digits(value: string, maxLength: number): string {
+  return value.replace(/\D/g, "").slice(0, maxLength);
+}
 
-  function commit(text: string) {
-    const next = Number(text.replace(/[,£\s]/g, ""));
-    if (text.trim() !== "" && Number.isFinite(next)) {
-      setCashDeposit(next);
-    }
-  }
-
-  return (
-    <section aria-labelledby={`${sliderId}-label`} className="space-y-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 id={`${sliderId}-label`} className="text-label">
-          Cash deposit
-        </h2>
-        <FinancialNumber value={formatPounds(total)} size="compact" />
-      </div>
-      <p className="text-caption text-muted">{DEAL_BUDGET_DEFAULT_DEPOSIT}</p>
-      {equity > 0 ? (
-        <p className="text-caption text-muted">
-          {formatPounds(draft.cashDeposit)} cash + {formatPounds(equity)}{" "}
-          part-exchange equity = {formatPounds(total)} total deposit.
-        </p>
-      ) : (
-        <p className="text-caption text-muted">
-          Total deposit {formatPounds(total)} (cash only).
-        </p>
-      )}
-      {owed > 0 ? (
-        <p className="rounded-lg bg-warning-soft/70 px-3 py-2 text-caption text-ink">
-          Negative equity of {formatPounds(owed)} is not added to your deposit.
-          {config.maxNegativeEquityInAdvance === undefined
-            ? " A lender limit is not configured in this prototype."
-            : null}
-        </p>
-      ) : null}
-
-      <div>
-        <label htmlFor={sliderId} className="sr-only">
-          Cash deposit
-        </label>
-        <input
-          id={sliderId}
-          type="range"
-          min={config.minDeposit}
-          max={max}
-          step={config.depositStep}
-          value={Math.min(max, draft.cashDeposit)}
-          aria-valuetext={formatPounds(draft.cashDeposit)}
-          onChange={(event) => {
-            setTyped(undefined);
-            setCashDeposit(Number(event.target.value));
-          }}
-          className="h-11 w-full cursor-pointer accent-primary"
-          style={{
-            background: `linear-gradient(to right, var(--oak-primary) ${fill}%, var(--oak-border) ${fill}%) center / 100% 4px no-repeat`,
-          }}
-        />
-        <div className="flex justify-between text-caption text-muted">
-          <span>{formatPounds(config.minDeposit)}</span>
-          <span>{formatPounds(max)}</span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <label htmlFor={inputId} className="shrink-0 text-body-sm text-muted">
-          Cash amount
-        </label>
-        <div className="relative flex-1">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
-            £
-          </span>
-          <Input
-            id={inputId}
-            inputMode="numeric"
-            autoComplete="off"
-            className="pl-7 tabular-number"
-            value={typed ?? draft.cashDeposit.toLocaleString("en-GB")}
-            onChange={(event) => {
-              setTyped(event.target.value);
-              commit(event.target.value);
-            }}
-            onBlur={() => setTyped(undefined)}
-          />
-        </div>
-      </div>
-    </section>
-  );
+function withCommas(value: string): string {
+  return value === "" ? "" : Number(value).toLocaleString("en-GB");
 }
 
 export function DealBudgetStep() {
-  const {
-    vehicle,
-    draft,
-    config,
-    calculation,
-    calculateFor,
-    setFinanceType,
-    setTerm,
-    setAnnualMileage,
-  } = useDealBuilder();
+  const { dealId, config, vehicle } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("budget");
-  const customId = useId();
-  const presetMiles = config.pcpMileageOptions;
-  const isPreset = draft.annualMileage
-    ? presetMiles.includes(draft.annualMileage)
-    : true;
-  const [otherSelected, setOtherSelected] = useState(!isPreset);
-  const [otherValue, setOtherValue] = useState(
-    !isPreset && draft.annualMileage ? String(draft.annualMileage) : "",
-  );
-  const [pcpTermNotice, setPcpTermNotice] = useState(false);
-  const [savePromptOpen, setSavePromptOpen] = useState(false);
-  const savePromptSeen = useRef(false);
-  const prevType = useRef(draft.financeType);
+  const sliderId = useId();
+  const amountId = useId();
+  const otherId = useId();
+
+  const [deposit, setDeposit] = useState(0);
+  const [depositText, setDepositText] = useState("0");
+  const [financeType, setFinanceType] = useState<FinanceProductType>("hp");
+  const [term, setTerm] = useState<number>(84);
+  const [hpOnlyNote, setHpOnlyNote] = useState(false);
+  const [mileageChoice, setMileageChoice] = useState<MileageChoice>("10000");
+  const [otherMileage, setOtherMileage] = useState("");
+  const [mileageError, setMileageError] = useState<string>();
+  const [hydrated, setHydrated] = useState(false);
+
+  const minDeposit = config.minDeposit;
+  const maxDeposit = config.maxDepositCap;
 
   useEffect(() => {
-    if (
-      prevType.current === "pcp" &&
-      draft.financeType === "hp" &&
-      draft.term > PCP_MAX_TERM
-    ) {
-      setPcpTermNotice(true);
+    const raw = window.sessionStorage.getItem(financeKey(dealId));
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw) as Partial<SavedFinance>;
+        const savedDeposit = clampDeposit(
+          Number(saved.deposit),
+          minDeposit,
+          maxDeposit,
+        );
+        const savedType = saved.financeType === "pcp" ? "pcp" : "hp";
+        const savedTerm = TERMS.find((item) => item === Number(saved.term)) ?? 84;
+        const savedMileage = isMileageChoice(String(saved.mileageChoice))
+          ? saved.mileageChoice
+          : "10000";
+        setDeposit(savedDeposit);
+        setDepositText(String(savedDeposit));
+        setFinanceType(savedType);
+        setTerm(savedType === "pcp" && savedTerm > PCP_MAX_TERM ? 60 : savedTerm);
+        setMileageChoice(savedMileage ?? "10000");
+        setOtherMileage(digits(String(saved.otherMileage ?? ""), 6));
+        setHydrated(true);
+        return;
+      } catch {
+        window.sessionStorage.removeItem(financeKey(dealId));
+      }
     }
-    prevType.current = draft.financeType;
-  }, [draft.financeType, draft.term]);
 
-  const isPcp = draft.financeType === "pcp";
-  const pcpTerm = Math.min(draft.term, PCP_MAX_TERM);
-  const negativeEquity = calculation?.pxNegativeEquity ?? 0;
-  const neCap = config.maxNegativeEquityInAdvance;
-  const neExceedsCap =
-    neCap !== undefined && negativeEquity > neCap;
+    const tenPercent = Math.round(vehicle.cashPrice * 0.1);
+    const starting = clampDeposit(tenPercent, minDeposit, maxDeposit);
+    setDeposit(starting);
+    setDepositText(String(starting));
+    setTerm(84);
+    setHydrated(true);
+  }, [dealId, maxDeposit, minDeposit, vehicle.cashPrice]);
 
-  const hpQuote = calculateFor("hp", draft.term);
-  const pcpQuote = calculateFor("pcp", pcpTerm);
-  const totalDeposit = calculation?.totalDeposit ?? draft.cashDeposit;
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+    const saved: SavedFinance = {
+      deposit,
+      financeType,
+      term,
+      mileageChoice,
+      otherMileage,
+    };
+    window.sessionStorage.setItem(financeKey(dealId), JSON.stringify(saved));
+  }, [
+    dealId,
+    deposit,
+    financeType,
+    hydrated,
+    mileageChoice,
+    otherMileage,
+    term,
+  ]);
 
-  const termOptions = config.termOptions.map((term) => ({
-    value: term,
-    label: String(term),
-  }));
+  const fill =
+    maxDeposit > minDeposit
+      ? ((deposit - minDeposit) / (maxDeposit - minDeposit)) * 100
+      : 0;
 
-  const mileageOptions = [
-    ...presetMiles.map((miles) => ({
-      value: String(miles),
-      label: mileageLabel(miles),
-    })),
-    ...(config.pcpEnabled ? [{ value: "other", label: "Other" }] : []),
-  ];
+  const activeDeposit = formatPounds(deposit);
+
+  function applyDeposit(next: number) {
+    const clamped = clampDeposit(next, minDeposit, maxDeposit);
+    setDeposit(clamped);
+    setDepositText(String(clamped));
+  }
+
+  function selectFinanceType(next: FinanceProductType) {
+    setHpOnlyNote(false);
+    setMileageError(undefined);
+    if (next === "pcp" && term > PCP_MAX_TERM) {
+      setFinanceType("pcp");
+      setTerm(PCP_MAX_TERM);
+      return;
+    }
+    setFinanceType(next);
+  }
+
+  function selectTerm(months: number) {
+    if (financeType === "pcp" && months > PCP_MAX_TERM) {
+      setFinanceType("hp");
+      setTerm(months);
+      setHpOnlyNote(true);
+      return;
+    }
+    setHpOnlyNote(false);
+    setTerm(months);
+  }
+
+  function continueToDeal() {
+    if (financeType === "pcp" && mileageChoice === "other") {
+      const miles = Number(otherMileage);
+      if (!otherMileage || !Number.isFinite(miles) || miles <= 0) {
+        setMileageError("Enter the annual mileage.");
+        document.getElementById(otherId)?.focus();
+        return;
+      }
+    }
+    goNext("quote");
+  }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex-1 space-y-4 pb-5">
-        {neExceedsCap ? (
-          <div className="space-y-3 rounded-[20px] border border-warning/30 bg-warning-soft/50 px-4 py-4">
-            <p className="text-label text-ink">{DEAL_PX_NEGATIVE_TITLE}</p>
-            <p className="text-body-sm text-ink">
-              Part-exchange negative equity of {formatPounds(negativeEquity)}{" "}
-              is above the configured lender limit of {formatPounds(neCap)}.
-              Please contact Oakwood before continuing.
+    <div>
+      <DealCard>
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {(
+              [
+                {
+                  value: "hp" as const,
+                  title: "Hire Purchase",
+                  lead: DEAL_BUDGET_HP_LEAD,
+                  body: DEAL_BUDGET_HP_BODY,
+                  termNote: "84 months",
+                },
+                {
+                  value: "pcp" as const,
+                  title: "Personal Contract Purchase",
+                  lead: DEAL_BUDGET_PCP_LEAD,
+                  body: DEAL_BUDGET_PCP_BODY,
+                  termNote: "60 months",
+                },
+              ]
+            ).map((option) => {
+              const selected = financeType === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => selectFinanceType(option.value)}
+                  className={`rounded-2xl px-4 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                    selected
+                      ? "bg-navy text-white"
+                      : "bg-page-tint text-ink hover:bg-surface-soft"
+                  }`}
+                >
+                  <p className={`text-caption font-semibold! uppercase tracking-[0.08em] ${selected ? "text-white/70" : "text-muted"}`}>
+                    {option.lead}
+                  </p>
+                  <p className="mt-1 text-label">{option.title}</p>
+                  <p className={`mt-1 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
+                    {option.body}
+                  </p>
+                  <p className={`mt-2 text-caption font-semibold! ${selected ? "text-white" : "text-navy"}`}>
+                    {option.termNote}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          {hpOnlyNote ? (
+            <p className="text-body-sm text-navy" role="status">
+              {DEAL_BUDGET_PCP_TERM_BLOCK}
             </p>
-            <Button
-              href={getContactUrl({
-                stockId: vehicle.stockId,
-                topic: "part-exchange",
-              })}
-            >
-              {DEAL_PX_CALLBACK}
-            </Button>
-          </div>
-        ) : null}
-
-        <DealCard className="space-y-5">
-          <div>
-            <h2 className="text-label">Compare HP and PCP</h2>
-            <p className="mt-1 text-caption text-muted">
-              Both quotes use the deposit and term below. Choosing a card keeps
-              that term.
-            </p>
-          </div>
-
-          <div
-            role="tablist"
-            aria-label="Finance type"
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-          >
-            <FinanceTypeCard
-              type="hp"
-              selected={draft.financeType === "hp"}
-              monthly={hpQuote?.monthlyPayment}
-              term={draft.term}
-              deposit={totalDeposit}
-              onSelect={() => {
-                setPcpTermNotice(false);
-                setFinanceType("hp");
-              }}
-            />
-            {config.pcpEnabled ? (
-              <FinanceTypeCard
-                type="pcp"
-                selected={draft.financeType === "pcp"}
-                monthly={pcpQuote?.monthlyPayment}
-                term={pcpTerm}
-                deposit={totalDeposit}
-                finalPayment={pcpQuote?.finalPayment}
-                note={
-                  draft.term > PCP_MAX_TERM
-                    ? "72 and 84 months are HP only. This quote is at 60 months."
-                    : undefined
-                }
-                onSelect={() => {
-                  setPcpTermNotice(draft.term > PCP_MAX_TERM);
-                  setFinanceType("pcp");
-                }}
-              />
-            ) : null}
-          </div>
-
-          {pcpTermNotice ? (
-            <Alert
-              title={
-                draft.financeType === "hp"
-                  ? "72/84 is HP only"
-                  : "60 months for PCP"
-              }
-              tone="warning"
-            >
-              {draft.financeType === "hp"
-                ? DEAL_BUDGET_PCP_TERM_BLOCK
-                : DEAL_BUDGET_PCP_UNAVAILABLE}
-            </Alert>
           ) : null}
 
-          <DepositCard />
+          <section aria-labelledby={`${sliderId}-label`} className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 id={`${sliderId}-label`} className="text-label">
+                Deposit
+              </h2>
+              <p className="rounded-full bg-primary px-3 py-1 text-caption font-semibold! text-white">
+                <span className="sr-only">Selected deposit </span>
+                {hydrated ? activeDeposit : formatPounds(deposit)}
+              </p>
+            </div>
+            {hydrated ? (
+              <p className="text-caption text-muted">{DEAL_BUDGET_DEFAULT_DEPOSIT}</p>
+            ) : null}
+            <div>
+              <label htmlFor={sliderId} className="sr-only">
+                Deposit amount in pounds
+              </label>
+              <input
+                id={sliderId}
+                type="range"
+                min={minDeposit}
+                max={maxDeposit}
+                step={1}
+                value={deposit}
+                aria-valuetext={formatPounds(deposit)}
+                onChange={(event) => applyDeposit(Number(event.target.value))}
+                className="h-11 w-full cursor-pointer accent-primary"
+                style={{
+                  background: `linear-gradient(to right, var(--oak-primary) ${fill}%, var(--oak-border) ${fill}%) center / 100% 4px no-repeat`,
+                }}
+              />
+              <div className="flex justify-between text-caption text-muted">
+                <span>{formatPounds(minDeposit)}</span>
+                <span>{formatPounds(maxDeposit)}</span>
+              </div>
+            </div>
+            <Field
+              htmlFor={amountId}
+              label="Deposit amount"
+              hint="In pounds."
+            >
+              <div className="relative">
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
+                  £
+                </span>
+                <Input
+                  id={amountId}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className="pl-7 tabular-number"
+                  value={withCommas(depositText)}
+                  onChange={(event) => {
+                    const next = digits(event.target.value, 7);
+                    if (next === "") {
+                      setDepositText("");
+                      return;
+                    }
+                    const amount = Number(next);
+                    const clamped = clampDeposit(
+                      amount,
+                      minDeposit,
+                      maxDeposit,
+                    );
+                    setDeposit(clamped);
+                    setDepositText(String(clamped === amount ? amount : clamped));
+                  }}
+                  onBlur={() => setDepositText(String(deposit))}
+                />
+              </div>
+            </Field>
+          </section>
 
           <DealChipGroup
-            label="Term"
-            aside="HP 24–84 · PCP 24–60"
-            value={draft.term}
-            options={termOptions}
-            columns={6}
-            onChange={(value) => {
-              if (draft.financeType === "pcp" && value > PCP_MAX_TERM) {
-                setPcpTermNotice(true);
-              } else {
-                setPcpTermNotice(false);
-              }
-              setTerm(value);
-            }}
-            hint={
-              isPcp
-                ? "Months. Choosing 72 or 84 switches you to Hire Purchase."
-                : "Months. PCP is available up to 60 months."
-            }
+            label="Finance term"
+            value={term}
+            columns={3}
+            hint="Hire Purchase starts at 84 months. Personal Contract Purchase starts at 60 months. 72 and 84 months are Hire Purchase only."
+            options={TERMS.map((months) => ({
+              value: months,
+              label: `${months} months`,
+            }))}
+            onChange={selectTerm}
           />
 
-          {config.pcpEnabled ? (
+          {financeType === "pcp" ? (
             <div className="space-y-3">
               <DealChipGroup
                 label="Annual mileage"
-                value={
-                  otherSelected ? "other" : String(draft.annualMileage ?? "")
-                }
-                options={mileageOptions}
-                columns={3}
+                value={mileageChoice}
+                columns={2}
+                options={[
+                  ...MILEAGE_PRESETS.map((miles) => ({
+                    value: String(miles) as MileageChoice,
+                    label: `${formatNumber(miles)} miles`,
+                  })),
+                  { value: "other" as const, label: "Other" },
+                ]}
                 onChange={(value) => {
-                  if (value === "other") {
-                    setOtherSelected(true);
-                    return;
-                  }
-                  setOtherSelected(false);
-                  setAnnualMileage(Number(value));
+                  setMileageChoice(value);
+                  setMileageError(undefined);
                 }}
-                hint="Used for PCP quotes. HP does not use annual mileage."
               />
-              {otherSelected ? (
-                <div className="flex items-center gap-3">
-                  <label
-                    htmlFor={customId}
-                    className="shrink-0 text-body-sm text-muted"
-                  >
-                    Miles a year
-                  </label>
+              {mileageChoice === "other" ? (
+                <Field
+                  htmlFor={otherId}
+                  label="Annual mileage"
+                  error={mileageError}
+                >
                   <Input
-                    id={customId}
+                    id={otherId}
                     inputMode="numeric"
-                    placeholder="e.g. 20,000"
-                    value={otherValue}
+                    autoComplete="off"
+                    value={withCommas(otherMileage)}
+                    placeholder="Miles a year"
+                    error={Boolean(mileageError)}
                     onChange={(event) => {
-                      setOtherValue(event.target.value);
-                      const next = Number(
-                        event.target.value.replace(/[,\s]/g, ""),
-                      );
-                      if (Number.isFinite(next) && next > 0) {
-                        setAnnualMileage(next);
-                      }
+                      setOtherMileage(digits(event.target.value, 6));
+                      setMileageError(undefined);
                     }}
                   />
-                </div>
+                </Field>
               ) : null}
             </div>
           ) : null}
-        </DealCard>
-      </div>
-
-      <div className="mb-3">
-        <SaveDeal />
-      </div>
-
-      <SaveProgressPrompt
-        open={savePromptOpen}
-        onContinue={() => {
-          setSavePromptOpen(false);
-          goNext("cover");
-        }}
-      />
+        </div>
+      </DealCard>
 
       <DealStepFooter
         onBack={() => goBack("part-exchange")}
-        onContinue={() => {
-          // Spec §13: soft “Save your progress?” on Step 2 → Step 3 (once).
-          if (!savePromptSeen.current) {
-            savePromptSeen.current = true;
-            setSavePromptOpen(true);
-            return;
-          }
-          goNext("cover");
-        }}
-        continueLabel={DEAL_CONTINUE}
-        continueDisabled={neExceedsCap}
-        note={
-          neExceedsCap
-            ? DEAL_PX_NEGATIVE_TITLE
-            : undefined
-        }
+        onContinue={continueToDeal}
+        showMonthly={false}
       />
     </div>
   );

@@ -11,5 +11,5 @@ export default async function Page({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-  await redirectLegacyDealStep(dealId, "cover");
+  await redirectLegacyDealStep(dealId, "quote");
 }

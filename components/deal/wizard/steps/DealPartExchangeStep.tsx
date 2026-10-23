@@ -2,60 +2,29 @@
 
 import { useEffect, useId, useState } from "react";
 import { Field, Input } from "@/components/forms/FormControls";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
-import { Accordion } from "@/components/ui/Accordion";
-import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { LoadingState } from "@/components/ui/Loading";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { SaveDeal } from "@/components/deal/SaveDeal";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
-import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
+import { requestDealAbandonment } from "@/components/deal/DealAbandonmentModal";
 import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
+import { getVehicleUrl } from "@/config/routes";
 import {
-  DEAL_ADD_TO_DEAL,
-  DEAL_PX_DEPOSIT_CASH,
-  DEAL_PX_DEPOSIT_EQUITY,
-  DEAL_PX_DEPOSIT_TOTAL,
+  DEAL_BACK,
+  DEAL_CONTINUE,
   DEAL_PX_FINANCE_LABEL,
-  DEAL_PX_FINANCE_SOURCE,
-  DEAL_PX_GET_OFFER,
   DEAL_PX_HELP_BODY,
   DEAL_PX_HELP_TITLE,
   DEAL_PX_INSPECTION,
-  DEAL_PX_NEGATIVE_BODY,
   DEAL_PX_NOT_YOUR_VEHICLE,
-  DEAL_PX_RESULT_INTRO,
-  DEAL_PX_RESULT_TITLE,
   DEAL_PX_SETTLEMENT_CHECK,
   DEAL_PX_TOTAL_LABEL,
-  DEAL_PX_TOTAL_SOURCE,
   DEAL_PX_VALUATION_LABEL,
-  DEAL_PX_VALUE_SOURCE,
-  DEAL_PX_VALUING,
-  DEAL_SKIP_PX,
 } from "@/lib/deal/copy";
 import { formatPounds } from "@/lib/format/money";
-import { cn } from "@/lib/cn";
-import { VE_EXTRA_OPTIONS } from "@/lib/valuation-entry/extras";
-import {
-  VE_EXTRAS_HEADING,
-  VE_EXTRAS_SUPPORT,
-  VE_OTHER_DETAILS,
-  VE_PRIVATE_PLATE_LABEL,
-  VE_PRIVATE_RETAIN,
-  VE_PRIVATE_SELL,
-} from "@/lib/valuation-entry/copy";
-import type {
-  DealPartExchangeInput,
-  DealPxCondition,
-  DealPxExtraId,
-  DealPxPrivatePlateDisposition,
-  DealPxServiceHistory,
-} from "@/types/deal";
+import type { DealPxCondition, DealPxServiceHistory } from "@/types/deal";
 
 const CONDITION_OPTIONS: { value: DealPxCondition; label: string }[] = [
   { value: "needs-work", label: "Rough" },
@@ -70,13 +39,29 @@ const SERVICE_OPTIONS: { value: DealPxServiceHistory; label: string }[] = [
   { value: "none", label: "None" },
 ];
 
-function parseNumber(value: string): number {
-  return Number(value.replace(/[,£\s]/g, ""));
-}
+type FormErrors = {
+  registration?: string;
+  mileage?: string;
+  condition?: string;
+  serviceHistory?: string;
+  finance?: string;
+  settlement?: string;
+  lender?: string;
+};
 
-const MAX_MILES = 500_000;
-const MAX_SETTLEMENT = 150_000;
-const MOCK_LOOKUP_MS = 850;
+type SavedForm = {
+  registration: string;
+  mileage: string;
+  condition?: DealPxCondition;
+  serviceHistory?: DealPxServiceHistory;
+  financeOutstanding?: boolean;
+  settlementText: string;
+  lender: string;
+};
+
+function storageKey(dealId: string) {
+  return `oakwood-deal-px:${dealId}`;
+}
 
 function digits(value: string, max: number): string {
   const raw = value.replace(/\D/g, "").slice(0, String(max).length);
@@ -87,291 +72,240 @@ function withCommas(value: string): string {
   return value === "" ? "" : Number(value).toLocaleString("en-GB");
 }
 
-function normaliseReg(value: string): string {
-  return value.replace(/\s+/g, "").toUpperCase();
+function parseAmount(value: string): number {
+  return Number(value.replace(/[,£\s]/g, ""));
 }
 
 export function DealPartExchangeStep() {
-  const {
-    draft,
-    pxError,
-    calculation,
-    startPartExchange,
-    updatePartExchange,
-    clearPartExchange,
-  } = useDealBuilder();
+  const { dealId, draft, vehicle } = useDealBuilder();
   const { goNext } = useDealStepNavigation("part-exchange");
+  const px = draft.px;
   const regId = useId();
   const milesId = useId();
   const settleId = useId();
   const lenderId = useId();
-  const px = draft.px;
 
   const [registration, setRegistration] = useState(px?.registration ?? "");
   const [mileage, setMileage] = useState(px?.mileage ? String(px.mileage) : "");
-  const [condition, setCondition] = useState(px?.condition);
-  const [serviceHistory, setServiceHistory] = useState(px?.serviceHistory);
-  const [financeOutstanding, setFinanceOutstanding] = useState(
-    px?.financeOutstanding,
+  const [condition, setCondition] = useState<DealPxCondition | undefined>(
+    px?.condition,
   );
+  const [serviceHistory, setServiceHistory] = useState<
+    DealPxServiceHistory | undefined
+  >(px?.serviceHistory);
+  const [financeOutstanding, setFinanceOutstanding] = useState<
+    boolean | undefined
+  >(px?.financeOutstanding);
   const [settlementText, setSettlementText] = useState(
     px?.outstandingFinanceAmount !== undefined
       ? String(px.outstandingFinanceAmount)
-      : px?.settlement !== undefined
-        ? String(px.settlement)
-        : "",
+      : "",
   );
   const [lender, setLender] = useState(px?.outstandingFinanceLender ?? "");
-  const [extras, setExtras] = useState<DealPxExtraId[]>(
-    px?.extras?.selected ?? [],
-  );
-  const [privatePlateDisposition, setPrivatePlateDisposition] = useState<
-    DealPxPrivatePlateDisposition | undefined
-  >(px?.extras?.privatePlateDisposition);
-  const [otherNotes, setOtherNotes] = useState(px?.extras?.otherNotes ?? "");
-  const [valuing, setValuing] = useState(false);
-  const [localError, setLocalError] = useState<string>();
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [hydrated, setHydrated] = useState(false);
 
-  // Keep local fields aligned when returning from a later step.
   useEffect(() => {
-    if (!px) {
+    const raw = window.sessionStorage.getItem(storageKey(dealId));
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw) as SavedForm;
+        setRegistration(saved.registration ?? "");
+        setMileage(saved.mileage ?? "");
+        setCondition(saved.condition);
+        setServiceHistory(saved.serviceHistory);
+        setFinanceOutstanding(saved.financeOutstanding);
+        setSettlementText(saved.settlementText ?? "");
+        setLender(saved.lender ?? "");
+      } catch {
+        window.sessionStorage.removeItem(storageKey(dealId));
+      }
+    }
+    setHydrated(true);
+  }, [dealId]);
+
+  useEffect(() => {
+    if (!hydrated) {
       return;
     }
-    setRegistration(px.registration);
-    setMileage(String(px.mileage));
-    setCondition(px.condition);
-    setServiceHistory(px.serviceHistory);
-    setFinanceOutstanding(px.financeOutstanding);
-    setSettlementText(
-      px.outstandingFinanceAmount !== undefined
-        ? String(px.outstandingFinanceAmount)
-        : px.settlement !== undefined
-          ? String(px.settlement)
-          : "",
-    );
-    setLender(px.outstandingFinanceLender ?? "");
-    setExtras(px.extras?.selected ?? []);
-    setPrivatePlateDisposition(px.extras?.privatePlateDisposition);
-    setOtherNotes(px.extras?.otherNotes ?? "");
-  }, [px?.registration, px?.mileage, px?.value]);
-
-  const miles = parseNumber(mileage);
-  const hasVehicle =
-    normaliseReg(registration).length >= 2 &&
-    Number.isFinite(miles) &&
-    miles > 0;
-  const settlementAmount = parseNumber(settlementText);
-  const settlementMissing =
-    financeOutstanding === true &&
-    !(Number.isFinite(settlementAmount) && settlementAmount >= 0 && settlementText !== "");
-  const answered =
-    Boolean(condition) &&
-    Boolean(serviceHistory) &&
-    financeOutstanding !== undefined &&
-    !settlementMissing;
-  const valued =
-    px?.value !== undefined &&
-    px.registration === normaliseReg(registration) &&
-    px.mileage === miles;
-  const settlement =
-    financeOutstanding === true
-      ? Number.isFinite(settlementAmount)
-        ? settlementAmount
-        : (px?.settlement ?? 0)
-      : 0;
-  const equity = calculation?.pxEquity ?? 0;
-  const negativeEquity = calculation?.pxNegativeEquity ?? 0;
-  const owes = valued && negativeEquity > 0;
-  const cashDeposit = calculation?.cashDeposit ?? draft.cashDeposit;
-  const totalDeposit = calculation?.totalDeposit ?? cashDeposit;
-
-  function toggleExtra(id: DealPxExtraId) {
-    setExtras((current) => {
-      const next = current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id];
-      syncExtras(next);
-      return next;
-    });
-  }
-
-  function syncExtras(
-    selected: DealPxExtraId[],
-    plate: DealPxPrivatePlateDisposition | undefined = privatePlateDisposition,
-    notes: string = otherNotes,
-  ) {
-    sync({
-      extras: {
-        selected,
-        privatePlateDisposition: selected.includes("private-plate")
-          ? plate
-          : undefined,
-        otherNotes: selected.includes("other") ? notes || undefined : undefined,
-      },
-    });
-  }
-
-  function details(): Partial<DealPartExchangeInput> {
-    const amount = parseNumber(settlementText);
-    return {
+    const saved: SavedForm = {
+      registration,
+      mileage,
       condition,
       serviceHistory,
       financeOutstanding,
-      outstandingFinanceAmount:
-        financeOutstanding && Number.isFinite(amount) ? amount : undefined,
-      outstandingFinanceLender: financeOutstanding
-        ? lender || undefined
-        : undefined,
-      settlement: financeOutstanding && Number.isFinite(amount) ? amount : 0,
-      extras: {
-        selected: extras,
-        privatePlateDisposition: extras.includes("private-plate")
-          ? privatePlateDisposition
-          : undefined,
-        otherNotes: extras.includes("other") ? otherNotes || undefined : undefined,
-      },
+      settlementText,
+      lender,
     };
-  }
+    window.sessionStorage.setItem(storageKey(dealId), JSON.stringify(saved));
+  }, [
+    condition,
+    dealId,
+    financeOutstanding,
+    hydrated,
+    lender,
+    mileage,
+    registration,
+    serviceHistory,
+    settlementText,
+  ]);
 
-  function valueNow() {
-    if (!hasVehicle || valued || valuing) {
-      return;
-    }
-    const cleaned = normaliseReg(registration);
-    if (cleaned.length < 2) {
-      setLocalError("Enter a valid registration.");
-      return;
+  const settlementAmount = parseAmount(settlementText);
+  const miles = parseAmount(mileage);
+  const financeAnswered = financeOutstanding !== undefined;
+  const settlementReady =
+    financeOutstanding !== true ||
+    (settlementText !== "" &&
+      Number.isFinite(settlementAmount) &&
+      settlementAmount >= 0 &&
+      lender.trim().length > 0);
+  const formReady =
+    registration.trim().length >= 2 &&
+    Number.isFinite(miles) &&
+    miles > 0 &&
+    Boolean(condition) &&
+    Boolean(serviceHistory) &&
+    financeAnswered &&
+    settlementReady;
+
+  function validate(): FormErrors {
+    const next: FormErrors = {};
+    if (registration.trim().length < 2) {
+      next.registration = "Enter the vehicle registration.";
     }
     if (!Number.isFinite(miles) || miles <= 0) {
-      setLocalError("Enter the current mileage.");
+      next.mileage = "Enter the current mileage.";
+    }
+    if (!condition) {
+      next.condition = "Choose a vehicle condition.";
+    }
+    if (!serviceHistory) {
+      next.serviceHistory = "Choose the service history.";
+    }
+    if (!financeAnswered) {
+      next.finance = "Say whether there is outstanding finance.";
+    }
+    if (financeOutstanding === true) {
+      if (
+        settlementText === "" ||
+        !Number.isFinite(settlementAmount) ||
+        settlementAmount < 0
+      ) {
+        next.settlement = "Enter the settlement amount.";
+      }
+      if (lender.trim().length === 0) {
+        next.lender = "Enter the lender.";
+      }
+    }
+    return next;
+  }
+
+  function focusFirst(next: FormErrors) {
+    const id = next.registration
+      ? regId
+      : next.mileage
+        ? milesId
+        : next.settlement
+          ? settleId
+          : next.lender
+            ? lenderId
+            : undefined;
+    if (id) {
+      document.getElementById(id)?.focus();
+    }
+  }
+
+  function continueToFinance() {
+    const next = validate();
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      focusFirst(next);
       return;
     }
-    setLocalError(undefined);
-    setValuing(true);
-    window.setTimeout(() => {
-      startPartExchange(cleaned, miles);
-      updatePartExchange(details());
-      setValuing(false);
-    }, MOCK_LOOKUP_MS);
+    goNext("budget");
   }
 
-  function sync(patch: Partial<DealPartExchangeInput>) {
-    if (px) {
-      updatePartExchange(patch);
-    }
+  function skipToFinance() {
+    goNext("budget");
   }
-
-  function resetVehicle() {
-    clearPartExchange();
-    setLocalError(undefined);
-    setValuing(false);
-    window.setTimeout(() => {
-      document.getElementById(regId)?.focus();
-    }, 0);
-  }
-
-  const note = valuing
-    ? DEAL_PX_VALUING
-    : !hasVehicle
-      ? "Enter your registration and mileage to get a valuation."
-      : valued && settlementMissing
-        ? "Enter the outstanding finance amount from your lender."
-        : valued && !answered
-        ? "Answer condition, service history and finance to continue."
-        : owes
-          ? DEAL_PX_NEGATIVE_BODY
-          : undefined;
-
-  const continueDisabled =
-    valuing ||
-    !hasVehicle ||
-    (valued && !answered) ||
-    Boolean(pxError && !valued);
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex-1 space-y-4 pb-5">
-        <DealCard className="space-y-5">
-          <div className="flex items-start justify-between gap-3">
-            <p className="text-label text-navy">Your part exchange</p>
-            {valued || registration ? (
-              <Button
-                type="button"
-                variant="text"
-                className="min-h-8 shrink-0 px-0 text-caption"
-                onClick={resetVehicle}
-              >
-                {DEAL_PX_NOT_YOUR_VEHICLE}
-              </Button>
-            ) : null}
-          </div>
+      <DealCard className="space-y-5">
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="min-h-11 text-caption font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            onClick={() => {
+              setRegistration("");
+              setMileage("");
+              setCondition(undefined);
+              setServiceHistory(undefined);
+              setFinanceOutstanding(undefined);
+              setSettlementText("");
+              setLender("");
+              setErrors({});
+              document.getElementById(regId)?.focus();
+            }}
+          >
+            {DEAL_PX_NOT_YOUR_VEHICLE}
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Field
+            htmlFor={regId}
+            label="Vehicle registration"
+            error={errors.registration}
+          >
+            <Input
+              id={regId}
+              className="font-semibold! tracking-wider uppercase"
+              value={registration}
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              placeholder="Registration"
+              error={Boolean(errors.registration)}
+              onChange={(event) => {
+                setRegistration(event.target.value);
+                setErrors((current) => ({ ...current, registration: undefined }));
+              }}
+            />
+          </Field>
+          <Field htmlFor={milesId} label="Current mileage" error={errors.mileage}>
+            <Input
+              id={milesId}
+              inputMode="numeric"
+              value={withCommas(mileage)}
+              placeholder="Mileage"
+              error={Boolean(errors.mileage)}
+              onChange={(event) => {
+                setMileage(digits(event.target.value, 500_000));
+                setErrors((current) => ({ ...current, mileage: undefined }));
+              }}
+            />
+          </Field>
+        </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            <Field htmlFor={regId} label="Registration" error={localError && !mileage ? localError : undefined}>
-              <Input
-                id={regId}
-                className="font-semibold! tracking-wider uppercase"
-                value={registration}
-                autoComplete="off"
-                autoCapitalize="characters"
-                spellCheck={false}
-                placeholder="AB21 CDE"
-                disabled={valuing}
-                onChange={(event) => {
-                  setRegistration(event.target.value);
-                  setLocalError(undefined);
-                }}
-                onBlur={() => {
-                  if (hasVehicle && !valued) {
-                    valueNow();
-                  }
-                }}
-              />
-            </Field>
-            <Field htmlFor={milesId} label="Mileage">
-              <Input
-                id={milesId}
-                inputMode="numeric"
-                value={withCommas(mileage)}
-                placeholder="42,000"
-                disabled={valuing}
-                onChange={(event) => {
-                  setMileage(digits(event.target.value, MAX_MILES));
-                  setLocalError(undefined);
-                }}
-                onBlur={() => {
-                  if (hasVehicle && !valued) {
-                    valueNow();
-                  }
-                }}
-              />
-            </Field>
-          </div>
-
-          {pxError ? (
-            <Alert title="Valuation unavailable" tone="warning">
-              {pxError} You can skip part exchange and continue with £0 equity,
-              or try another registration.
-            </Alert>
-          ) : null}
-
-          {localError && hasVehicle ? (
-            <p className="text-caption text-danger" role="alert">
-              {localError}
-            </p>
-          ) : null}
-
+        <div>
           <DealChipGroup
-            label="Condition"
+            label="Vehicle condition"
             value={condition}
             options={CONDITION_OPTIONS}
             columns={2}
             onChange={(value) => {
               setCondition(value);
-              sync({ condition: value });
+              setErrors((current) => ({ ...current, condition: undefined }));
             }}
           />
+          {errors.condition ? (
+            <p className="mt-1.5 text-caption text-danger" role="alert">
+              {errors.condition}
+            </p>
+          ) : null}
+        </div>
 
+        <div>
           <DealChipGroup
             label="Service history"
             value={serviceHistory}
@@ -379,280 +313,166 @@ export function DealPartExchangeStep() {
             columns={3}
             onChange={(value) => {
               setServiceHistory(value);
-              sync({ serviceHistory: value });
+              setErrors((current) => ({
+                ...current,
+                serviceHistory: undefined,
+              }));
             }}
           />
+          {errors.serviceHistory ? (
+            <p className="mt-1.5 text-caption text-danger" role="alert">
+              {errors.serviceHistory}
+            </p>
+          ) : null}
+        </div>
 
-          <div className="space-y-3">
-            <DealChipGroup
-              label="Outstanding finance"
-              value={
-                financeOutstanding === undefined
-                  ? undefined
-                  : financeOutstanding
-                    ? "yes"
-                    : "no"
+        <div className="space-y-3">
+          <DealChipGroup
+            label="Outstanding finance"
+            value={
+              financeOutstanding === undefined
+                ? undefined
+                : financeOutstanding
+                  ? "yes"
+                  : "no"
+            }
+            options={[
+              { value: "yes", label: "Yes" },
+              { value: "no", label: "No" },
+            ]}
+            columns={2}
+            onChange={(value) => {
+              const next = value === "yes";
+              setFinanceOutstanding(next);
+              if (!next) {
+                setSettlementText("");
+                setLender("");
               }
-              options={[
-                { value: "yes", label: "Yes" },
-                { value: "no", label: "No" },
-              ]}
-              columns={2}
-              onChange={(value) => {
-                const next = value === "yes";
-                setFinanceOutstanding(next);
-                if (!next) {
-                  setSettlementText("");
-                  setLender("");
-                }
-                sync({ financeOutstanding: next });
-              }}
-            />
+              setErrors((current) => ({
+                ...current,
+                finance: undefined,
+                settlement: undefined,
+                lender: undefined,
+              }));
+            }}
+          />
+          {errors.finance ? (
+            <p className="text-caption text-danger" role="alert">
+              {errors.finance}
+            </p>
+          ) : null}
 
-            {financeOutstanding ? (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Field htmlFor={settleId} label="Outstanding finance amount">
-                  <div className="relative">
-                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
-                      £
-                    </span>
-                    <Input
-                      id={settleId}
-                      inputMode="numeric"
-                      className="pl-7"
-                      value={withCommas(settlementText)}
-                      placeholder="0"
-                      onChange={(event) => {
-                        const text = digits(event.target.value, MAX_SETTLEMENT);
-                        setSettlementText(text);
-                        const amount = parseNumber(text);
-                        if (Number.isFinite(amount)) {
-                          sync({
-                            outstandingFinanceAmount: amount,
-                            settlement: amount,
-                          });
-                        }
-                      }}
-                    />
-                  </div>
-                </Field>
-                <Field htmlFor={lenderId} label="Lender (optional)">
+          {financeOutstanding ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Field
+                htmlFor={settleId}
+                label="Settlement amount"
+                error={errors.settlement}
+              >
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
+                    £
+                  </span>
                   <Input
-                    id={lenderId}
-                    value={lender}
-                    placeholder="e.g. Black Horse"
+                    id={settleId}
+                    inputMode="numeric"
+                    className="pl-7"
+                    value={withCommas(settlementText)}
+                    placeholder="Amount"
+                    error={Boolean(errors.settlement)}
                     onChange={(event) => {
-                      setLender(event.target.value);
-                      sync({ outstandingFinanceLender: event.target.value });
+                      setSettlementText(digits(event.target.value, 150_000));
+                      setErrors((current) => ({
+                        ...current,
+                        settlement: undefined,
+                      }));
                     }}
                   />
-                </Field>
-              </div>
-            ) : null}
-
-            <Accordion
-              title={DEAL_PX_HELP_TITLE}
-              className="rounded-xl border border-border bg-page-tint px-3 [&_summary]:text-primary"
-            >
-              <p>{DEAL_PX_HELP_BODY}</p>
-            </Accordion>
-          </div>
-
-          <div className="space-y-3 border-t border-border pt-4">
-            <div>
-              <p className="text-label">{VE_EXTRAS_HEADING}</p>
-              <p className="mt-1 text-caption text-muted">{VE_EXTRAS_SUPPORT}</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {VE_EXTRA_OPTIONS.map((option) => {
-                const selected = extras.includes(option.id);
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => toggleExtra(option.id)}
-                    className={cn(
-                      "min-h-10 rounded-xl border px-3 text-caption font-semibold!",
-                      selected
-                        ? "border-primary bg-primary text-white"
-                        : "border-border bg-surface text-ink hover:bg-page-tint",
-                    )}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-            {extras.includes("private-plate") ? (
-              <DealChipGroup
-                label={VE_PRIVATE_PLATE_LABEL}
-                value={privatePlateDisposition}
-                options={[
-                  { value: "retain", label: VE_PRIVATE_RETAIN },
-                  { value: "sell", label: VE_PRIVATE_SELL },
-                ]}
-                columns={2}
-                onChange={(value) => {
-                  setPrivatePlateDisposition(value);
-                  syncExtras(extras, value, otherNotes);
-                }}
-              />
-            ) : null}
-            {extras.includes("other") ? (
-              <Field htmlFor="px-other-notes" label={VE_OTHER_DETAILS}>
+                </div>
+              </Field>
+              <Field htmlFor={lenderId} label="Lender" error={errors.lender}>
                 <Input
-                  id="px-other-notes"
-                  value={otherNotes}
+                  id={lenderId}
+                  value={lender}
+                  placeholder="Lender name"
+                  error={Boolean(errors.lender)}
                   onChange={(event) => {
-                    setOtherNotes(event.target.value);
-                    syncExtras(extras, privatePlateDisposition, event.target.value);
+                    setLender(event.target.value);
+                    setErrors((current) => ({ ...current, lender: undefined }));
                   }}
                 />
               </Field>
+            </div>
+          ) : null}
+
+          <details className="rounded-2xl bg-page-tint px-4 py-3">
+            <summary className="cursor-pointer text-body-sm font-semibold! text-primary">
+              {DEAL_PX_HELP_TITLE}
+            </summary>
+            <p className="mt-2 text-body-sm text-muted">{DEAL_PX_HELP_BODY}</p>
+          </details>
+        </div>
+
+        {formReady ? (
+          <div
+            className="rounded-2xl bg-page-tint px-4 py-4"
+            role="status"
+            aria-label="Part-exchange breakdown"
+          >
+            <p className="text-label text-navy">Part exchange</p>
+            <dl className="mt-3 space-y-2 text-body-sm">
+              <div className="flex items-baseline justify-between gap-3">
+                <dt>{DEAL_PX_VALUATION_LABEL}</dt>
+                <dd className="shrink-0 text-right font-semibold! text-ink">
+                  Subject to inspection
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt>{DEAL_PX_FINANCE_LABEL}</dt>
+                <dd className="shrink-0 font-semibold! text-ink">
+                  {financeOutstanding ? `−${formatPounds(settlementAmount)}` : formatPounds(0)}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-t border-border pt-2">
+                <dt className="font-semibold text-navy">{DEAL_PX_TOTAL_LABEL}</dt>
+                <dd className="shrink-0 text-right font-semibold! text-primary">
+                  Subject to inspection
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-3 text-caption text-muted">{DEAL_PX_INSPECTION}</p>
+            {financeOutstanding ? (
+              <p className="mt-1 text-caption text-muted">{DEAL_PX_SETTLEMENT_CHECK}</p>
             ) : null}
           </div>
+        ) : null}
+      </DealCard>
 
-          {valuing ? (
-            <div className="rounded-[16px] bg-page-tint px-4 py-5">
-              <LoadingState label={DEAL_PX_VALUING} />
-            </div>
-          ) : null}
-
-          {valued && px ? (
-            <div
-              className="overflow-hidden rounded-2xl border border-navy/15"
-              role="status"
-              aria-live="polite"
-            >
-              <div className="bg-navy px-3 py-2.5 text-white">
-                <p className="text-label">{DEAL_PX_RESULT_TITLE}</p>
-                <p className="mt-0.5 text-caption text-white/75">
-                  {DEAL_PX_RESULT_INTRO}
-                </p>
-              </div>
-              <dl className="divide-y divide-border text-body-sm">
-                <div className="flex items-center justify-between gap-4 px-3 py-2">
-                  <div className="min-w-0">
-                    <dt>{DEAL_PX_VALUATION_LABEL}</dt>
-                    <p className="text-caption text-muted">
-                      {DEAL_PX_VALUE_SOURCE(
-                        normaliseReg(registration),
-                        withCommas(String(miles)),
-                      )}
-                    </p>
-                  </div>
-                  <dd className="shrink-0">
-                    <FinancialNumber value={formatPounds(px.value)} size="sm" />
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-4 px-3 py-2">
-                  <div className="min-w-0">
-                    <dt>{DEAL_PX_FINANCE_LABEL}</dt>
-                    <p className="text-caption text-muted">{DEAL_PX_FINANCE_SOURCE}</p>
-                  </div>
-                  <dd className="shrink-0">
-                    <FinancialNumber
-                      value={`−${formatPounds(settlement)}`}
-                      size="sm"
-                    />
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-4 bg-success-soft px-3 py-2">
-                  <div className="min-w-0">
-                    <dt className="font-semibold text-success">{DEAL_PX_TOTAL_LABEL}</dt>
-                    <p className="text-caption text-success/80">{DEAL_PX_TOTAL_SOURCE}</p>
-                  </div>
-                  <dd className="shrink-0">
-                    <FinancialNumber
-                      value={formatPounds(owes ? 0 : equity)}
-                      size="sm"
-                      className="text-success"
-                    />
-                  </dd>
-                </div>
-              </dl>
-              {owes ? (
-                <p className="border-t border-border px-3 py-2 text-caption text-ink">
-                  {DEAL_PX_NEGATIVE_BODY} The difference is{" "}
-                  {formatPounds(negativeEquity)}.
-                </p>
-              ) : null}
-              <p className="border-t border-border px-3 py-2 text-caption text-muted">
-                {DEAL_PX_INSPECTION} {DEAL_PX_SETTLEMENT_CHECK}
-              </p>
-            </div>
-          ) : null}
-        </DealCard>
-
-        <DealCard className="space-y-2.5">
-          <p className="text-label text-navy">Deposit summary</p>
-          <dl className="space-y-2 text-body-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{DEAL_PX_DEPOSIT_CASH}</dt>
-              <dd>
-                <FinancialNumber value={formatPounds(cashDeposit)} size="sm" />
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">{DEAL_PX_DEPOSIT_EQUITY}</dt>
-              <dd>
-                <FinancialNumber
-                  value={
-                    owes
-                      ? formatPounds(0)
-                      : formatPounds(valued ? equity : 0)
-                  }
-                  size="sm"
-                  className={valued && equity > 0 && !owes ? "text-success" : undefined}
-                />
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4 border-t border-border pt-2">
-              <dt className="text-label">{DEAL_PX_DEPOSIT_TOTAL}</dt>
-              <dd>
-                <FinancialNumber
-                  value={formatPounds(
-                    valued && !owes ? totalDeposit : cashDeposit,
-                  )}
-                  size="sm"
-                />
-              </dd>
-            </div>
-          </dl>
-          {owes ? (
-            <p className="text-caption text-muted">
-              The outstanding difference of {formatPounds(negativeEquity)} may
-              be included in the finance. It is not added to your deposit.
-            </p>
-          ) : null}
-        </DealCard>
+      <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_rgb(16_40_72/0.06)] backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:z-auto lg:mx-0 lg:mt-6 lg:mb-5 lg:rounded-[22px] lg:px-4 lg:pb-3 lg:shadow-card">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)]">
+          <Button
+            type="button"
+            variant="tertiary"
+            className="btn-compact w-full px-4 sm:w-auto"
+            onClick={() =>
+              requestDealAbandonment(getVehicleUrl(vehicle.slug))
+            }
+          >
+            {DEAL_BACK}
+          </Button>
+          <Button
+            type="button"
+            variant="text"
+            className="min-h-11 w-full text-body font-semibold! text-primary"
+            onClick={skipToFinance}
+          >
+            Skip part exchange
+          </Button>
+          <Button type="button" className="btn-compact w-full" onClick={continueToFinance}>
+            <span className="truncate">{DEAL_CONTINUE}</span>
+          </Button>
+        </div>
       </div>
-
-      <div className="mb-3">
-        <SaveDeal />
-      </div>
-
-      <DealStepFooter
-        showMonthly={false}
-        onSkip={() => {
-          clearPartExchange();
-          goNext("budget");
-        }}
-        skipLabel={DEAL_SKIP_PX}
-        continueLabel={valued ? DEAL_ADD_TO_DEAL : DEAL_PX_GET_OFFER}
-        continueDisabled={continueDisabled}
-        note={note}
-        busy={valuing}
-        onContinue={() => {
-          if (!valued) {
-            valueNow();
-            return;
-          }
-          updatePartExchange(details());
-          goNext("budget");
-        }}
-      />
     </div>
   );
 }

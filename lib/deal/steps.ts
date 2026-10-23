@@ -1,13 +1,13 @@
 import type { DealStep } from "@/config/routes";
 
 /**
- * Customer Deal Builder primary journey (four steps).
- * Decision and quote routes redirect into Your deal.
+ * Customer Deal Builder. Four steps, matching the deal-builder flow:
+ * part exchange, finance preferences, your deal, then the next-step choices.
  */
 export const DEAL_STEPS = [
   "part-exchange",
   "budget",
-  "cover",
+  "quote",
   "reserve",
 ] as const satisfies readonly DealStep[];
 
@@ -19,43 +19,40 @@ export const DEAL_STEP_META: Record<
 > = {
   "part-exchange": {
     index: 1,
-    title: "Value your part exchange",
+    title: "Part exchange",
     shortTitle: "Part exchange",
-    supporting:
-      "Optional. See valuation, outstanding finance and what goes towards your deposit.",
+    supporting: "Your current car, and how it counts toward the deposit.",
   },
   budget: {
     index: 2,
     title: "Finance preferences",
     shortTitle: "Finance",
-    supporting:
-      "Compare HP and PCP, set your deposit and term. Figures are illustrative.",
-  },
-  cover: {
-    index: 3,
-    title: "Your deal",
-    shortTitle: "Your deal",
-    supporting:
-      "Review your finance, add optional cover, and continue when you're ready.",
-  },
-  reserve: {
-    index: 4,
-    title: "Choose your next step",
-    shortTitle: "Next step",
-    supporting:
-      "Reserve, apply for finance, book a test drive, or speak to Oakwood.",
+    supporting: "Hire Purchase and Personal Contract Purchase, side by side.",
   },
   decision: {
     index: 3,
     title: "Your deal",
     shortTitle: "Your deal",
-    supporting: "Continue on the combined Your deal screen.",
+    supporting: "Your finance choice and the cover on this deal.",
+  },
+  cover: {
+    index: 3,
+    title: "Your deal",
+    shortTitle: "Your deal",
+    supporting: "Your finance choice and the cover on this deal.",
   },
   quote: {
     index: 3,
     title: "Your deal",
     shortTitle: "Your deal",
-    supporting: "Continue on the combined Your deal screen.",
+    supporting: "Your finance choice and the cover on this deal.",
+  },
+  reserve: {
+    index: 4,
+    title: "Next step",
+    shortTitle: "Next step",
+    supporting:
+      "Reserve, apply for finance, book a test drive, or speak to us.",
   },
 };
 

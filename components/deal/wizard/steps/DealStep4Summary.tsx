@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { listSelectedProducts } from "@/lib/deal/products";
 import { formatNumber, formatPounds, formatTerm } from "@/lib/format/money";
@@ -23,7 +22,7 @@ function Row({
 
 /** Deal summary shared across Step 4 hub and action panels. */
 export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
-  const { vehicle, draft, calculation, coverMonthly, apr } = useDealBuilder();
+  const { vehicle, draft } = useDealBuilder();
   const headingId = useId();
   const products = listSelectedProducts(draft.productIds);
   const vehicleDetail = [
@@ -33,15 +32,9 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
   ]
     .filter(Boolean)
     .join(" · ");
-  const financeLine = [
-    draft.financeType.toUpperCase(),
-    formatTerm(draft.term),
-    apr !== undefined ? `${apr.toFixed(1)}% APR est.` : null,
-  ]
+  const financeLine = [draft.financeType.toUpperCase(), formatTerm(draft.term)]
     .filter(Boolean)
     .join(" · ");
-
-  const monthly = calculation?.monthlyPayment ?? 0;
 
   return (
     <section
@@ -54,15 +47,12 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
       >
         {title}
       </h2>
-      <p className="mt-2">
-        <FinancialNumber
-          value={formatPounds(monthly)}
-          suffix="/mo"
-          size="lg"
-          className="text-navy"
-        />
+      <p className="mt-2 text-body font-semibold! text-navy">
+        {vehicle.year} {vehicle.make} {vehicle.model}
       </p>
-      <p className="mt-1 text-caption text-muted">Illustrative monthly payment</p>
+      <p className="mt-1 text-caption text-muted">
+        Confirmed when you apply.
+      </p>
       <dl className="mt-4 space-y-1.5 border-t border-border pt-4 text-body-sm">
         <Row label={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}>
           {formatPounds(vehicle.cashPrice)}
@@ -71,15 +61,15 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
           <dt className="sr-only">Vehicle details</dt>
           <dd className="text-caption text-muted">{vehicleDetail}</dd>
         </div>
-        {draft.px ? (
-          <Row label="Part exchange">
-            −{formatPounds(calculation?.pxEquity ?? 0)}
-          </Row>
+        {draft.px?.registration ? (
+          <Row label="Part exchange">{draft.px.registration}</Row>
         ) : null}
         <Row label="Cash deposit">{formatPounds(draft.cashDeposit)}</Row>
         <Row label="Finance">{financeLine}</Row>
-        <Row label="Optional products">
-          {products.length ? `+${formatPounds(coverMonthly)}/mo` : "None"}
+        <Row label="Cover">
+          {products.length
+            ? products.map((product) => product.name).join(", ")
+            : "None"}
         </Row>
         {products.length ? (
           <div>

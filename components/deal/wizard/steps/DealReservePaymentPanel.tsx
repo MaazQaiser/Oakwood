@@ -224,7 +224,7 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-page-tint px-2.5 py-1 text-caption text-muted">
               <Lock className="h-3 w-3" aria-hidden />
-              Mock pay
+              Not available
             </span>
           </div>
           <p className="mt-3 rounded-[14px] bg-page-tint px-4 py-3 text-body-sm">

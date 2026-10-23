@@ -1,22 +1,8 @@
-import {
-  dealStepMetadata,
-  dealStepStaticParams,
-  renderDealStepPage,
-} from "@/lib/deal/deal-page";
-
-const step = "cover" as const;
+import { redirectLegacyDealStep } from "@/lib/deal/deal-page";
+import { mockDealId } from "@/lib/mock/data";
 
 export function generateStaticParams() {
-  return dealStepStaticParams();
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ dealId: string }>;
-}) {
-  const { dealId } = await params;
-  return dealStepMetadata(dealId, step);
+  return [{ dealId: mockDealId }];
 }
 
 export default async function Page({
@@ -25,5 +11,5 @@ export default async function Page({
   params: Promise<{ dealId: string }>;
 }) {
   const { dealId } = await params;
-  return renderDealStepPage(dealId, step);
+  await redirectLegacyDealStep(dealId, "quote");
 }

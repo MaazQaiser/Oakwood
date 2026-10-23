@@ -269,7 +269,7 @@ export function DealApplicationFlow() {
       <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
         <LoadingState label={APP_SUBMITTING} />
         <p className="max-w-sm text-center text-caption text-muted">
-          Mock submission only — nothing is sent to a live lender.
+          A lending decision is not available. Nothing is sent to a lender.
         </p>
       </div>
     );
@@ -315,10 +315,7 @@ export function DealApplicationFlow() {
             ) : null}
 
             {appDraft.submitError ? (
-              <Alert title={appDraft.submitError} tone="danger">
-                Tip for this prototype: remove the word &quot;error&quot; from
-                your name and try again.
-              </Alert>
+              <Alert title={appDraft.submitError} tone="danger" />
             ) : null}
 
             <Alert title={APP_NOT_CREDIT_DECISION} tone="info" />

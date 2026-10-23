@@ -9,10 +9,10 @@ export const APP_COMPLIANCE_FLAG =
 export const APP_TITLE = "Apply for finance";
 
 export const APP_SUPPORTING =
-  "Complete this mock application for your selected deal. Nothing is sent to a live lender in this prototype.";
+  "Your deal stays on this page while you apply.";
 
 export const APP_NOT_CREDIT_DECISION =
-  "This is not a real credit decision or final lending approval. Figures on your deal remain illustrative until Oakwood confirms terms with you.";
+  "An advisor confirms your rate by phone within 20 minutes.";
 
 export const APP_PROGRESS_LABEL = (current: number, total: number) =>
   `Section ${current} of ${total}`;
@@ -84,7 +84,7 @@ export const APP_DECLINED_BODY =
   "We couldn't complete an automatic path for this application. An Oakwood advisor will review your details and call you — we're here to help find a workable option where we can. This is not a final credit decision shown online.";
 
 export const APP_OUTCOME_DISCLAIMER =
-  "Mock prototype only. Not a real credit decision, guaranteed rate, or final lending approval.";
+  "An advisor calls within 20 minutes to confirm your rate. This is not a final lending decision.";
 
 export const APP_NEXT_RESERVE = "Reserve this car";
 
