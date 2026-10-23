@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   FinancialNumber,
   MonthlyPayment,
@@ -18,6 +19,7 @@ import { reservationConfig } from "@/config/reservation";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import {
   DEAL_VDP_CARD_BODY,
+  DEAL_VDP_CARD_CTA,
   DEAL_VDP_CARD_TITLE,
 } from "@/lib/deal/copy";
 import { formatPounds, formatTerm } from "@/lib/format/money";
@@ -51,6 +53,7 @@ export function VehiclePrice() {
     setPriceView,
   } = useVehicleDeal();
   const { title } = getVehicleIdentity(vehicle);
+  const image = vehicle.images[0];
   const amount = reservationAmountLabel(reservationConfig.amount);
   const hold = formatHoldPeriod(reservationConfig.holdDurationDays);
   const showMonthly = priceView === "monthly";
@@ -144,15 +147,35 @@ export function VehiclePrice() {
       <ValuationEntryCard />
 
       {reservable ? (
-        <div className="mt-5 rounded-lg border border-border bg-page p-4">
-          <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
-          <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
-          <DealEntrySteps />
-          <StartVehicleDealButton className="mt-3 w-full" label="Start building" />
+        <div className="mt-5 overflow-hidden rounded-lg border border-border bg-page">
+          {image ? (
+            <div className="relative aspect-[16/10] bg-page-tint">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 22rem, 100vw"
+              />
+            </div>
+          ) : null}
+          <div className="p-4">
+            <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
+            <p className="mt-1 text-body font-semibold! text-navy">{title}</p>
+            <p className="mt-1">
+              <FinancialNumber value={formatPounds(cashPrice)} size="sm" />
+            </p>
+            <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
+            <DealEntrySteps />
+            <StartVehicleDealButton
+              className="mt-3 w-full"
+              label={DEAL_VDP_CARD_CTA}
+            />
+          </div>
         </div>
       ) : null}
 
-      <div className="mt-4 hidden flex-col gap-2 bg-[#ECF3F8] lg:sticky lg:bottom-0 lg:z-10 lg:flex lg:pt-2">
+      <div className="mt-4 hidden flex-col gap-2 lg:flex">
         {reservable ? (
           <StartReservationButton
             stockId={vehicle.stockId}

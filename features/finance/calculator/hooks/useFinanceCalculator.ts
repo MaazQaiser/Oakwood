@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { calculateFinanceIllustration } from "@/features/finance/calculator/services";
+import { maximumCashDeposit } from "@/lib/deal/calculate";
 import type {
   CalculatorDraft,
   CalculatorPageModel,
@@ -97,6 +98,29 @@ export function useFinanceCalculator(model: CalculatorPageModel) {
   ]);
 
   useEffect(() => {
+    const equity = draft.px
+      ? Math.max(0, draft.px.value - (draft.px.settlement ?? 0))
+      : 0;
+    const max = maximumCashDeposit({
+      vehiclePrice: draft.vehiclePrice,
+      maxDepositCap: provider.maxDepositCap,
+      depositStep: provider.depositStep,
+      pxEquity: equity,
+    });
+    if (draft.cashDeposit > max) {
+      setDraft((current) =>
+        current.cashDeposit > max ? { ...current, cashDeposit: max } : current,
+      );
+    }
+  }, [
+    draft.cashDeposit,
+    draft.px,
+    draft.vehiclePrice,
+    provider.depositStep,
+    provider.maxDepositCap,
+  ]);
+
+  useEffect(() => {
     trackEvent(analyticsEvents.financeCalculatorViewed, {
       hasVehicle: Boolean(model.vehicle),
       representative: !model.finance.hasProfile,
@@ -178,13 +202,24 @@ export function useFinanceCalculator(model: CalculatorPageModel) {
   const setCashDeposit = useCallback(
     (value: number) => {
       markStarted();
-      setDraft((current) => ({
-        ...current,
-        cashDeposit: Math.round(value),
-      }));
+      setDraft((current) => {
+        const equity = current.px
+          ? Math.max(0, current.px.value - (current.px.settlement ?? 0))
+          : 0;
+        const max = maximumCashDeposit({
+          vehiclePrice: current.vehiclePrice,
+          maxDepositCap: provider.maxDepositCap,
+          depositStep: provider.depositStep,
+          pxEquity: equity,
+        });
+        return {
+          ...current,
+          cashDeposit: Math.min(max, Math.max(provider.minDeposit, Math.round(value))),
+        };
+      });
       trackEvent(analyticsEvents.financeDepositChanged);
     },
-    [markStarted],
+    [markStarted, provider.depositStep, provider.maxDepositCap, provider.minDeposit],
   );
 
   const setFinanceType = useCallback(

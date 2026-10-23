@@ -190,19 +190,16 @@ export function ComparePage({ initialIds = [] }: { initialIds?: string[] }) {
                 </div>
               ) : null}
 
-              <div className="-mx-[var(--oak-page-x)] mt-6 min-w-0 max-w-[100vw] overflow-x-auto px-[var(--oak-page-x)] overscroll-x-contain [scrollbar-width:thin] md:mx-0 md:max-w-none md:overflow-visible md:px-0">
+              <div className="mt-6 min-w-0">
                 <div
                   className={cn(
-                    "grid gap-4",
-                    "w-max grid-flow-col auto-cols-[minmax(16rem,18rem)] md:w-full md:auto-cols-fr md:grid-flow-row",
+                    "grid grid-cols-1 gap-4 sm:grid-cols-2",
                     vehicles.length + (showEmptySlot ? 1 : 0) === 1 &&
-                      "md:grid-cols-1",
-                    vehicles.length + (showEmptySlot ? 1 : 0) === 2 &&
-                      "md:grid-cols-2",
+                      "sm:grid-cols-1",
                     vehicles.length + (showEmptySlot ? 1 : 0) === 3 &&
-                      "md:grid-cols-3",
+                      "lg:grid-cols-3",
                     vehicles.length + (showEmptySlot ? 1 : 0) >= 4 &&
-                      "md:grid-cols-2 xl:grid-cols-4",
+                      "xl:grid-cols-4",
                   )}
                 >
                   {vehicles.map((vehicle) => (

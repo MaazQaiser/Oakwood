@@ -17,6 +17,7 @@ import { CalculatorVehicleCard } from "@/features/finance/calculator/components/
 import { DealBuilderCTA } from "@/features/finance/calculator/components/DealBuilderCTA";
 import { EligibilityCTA } from "@/features/finance/calculator/components/EligibilityCTA";
 import { useFinanceCalculator } from "@/features/finance/calculator/hooks/useFinanceCalculator";
+import { maximumCashDeposit } from "@/lib/deal/calculate";
 import type { CalculatorPageModel } from "@/features/finance/calculator/types";
 import {
   CALCULATOR_EXAMPLE_PRICE_HINT,
@@ -101,12 +102,15 @@ export function FinanceCalculator({ model }: { model: CalculatorPageModel }) {
   } = calculator;
 
   const showPcpMileage = draft.financeType === "pcp" && provider.pcpEnabled;
-  const maxDeposit = Math.max(
-    provider.minDeposit,
-    Number.isFinite(draft.vehiclePrice)
-      ? Math.min(draft.vehiclePrice, provider.maxDepositCap)
-      : provider.maxDepositCap,
-  );
+  const pxEquity = draft.px
+    ? Math.max(0, draft.px.value - (draft.px.settlement ?? 0))
+    : 0;
+  const maxDeposit = maximumCashDeposit({
+    vehiclePrice: Number.isFinite(draft.vehiclePrice) ? draft.vehiclePrice : 0,
+    maxDepositCap: provider.maxDepositCap,
+    depositStep: provider.depositStep,
+    pxEquity,
+  });
   const showPayment = result.status === "ok" && result.calculation;
 
   return (

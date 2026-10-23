@@ -56,7 +56,7 @@ export function CompareVehicleCard({
   ].filter(Boolean);
 
   return (
-    <article className="flex h-full min-w-[14rem] flex-col rounded-[22px] border border-border bg-surface p-4">
+    <article className="flex h-full min-w-0 flex-col rounded-[22px] border border-border bg-surface p-4">
       <div className="relative">
         <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-page-tint">
           <Image
@@ -131,7 +131,7 @@ export function CompareVehicleCard({
         </div>
 
         <div className="mt-auto pt-6">
-          <Button href={getVehicleUrl(vehicle)} className="btn-compact w-full">
+          <Button href={getVehicleUrl(vehicle)} className="btn-compact btn-wrap w-full min-w-0!">
             {compareCopy.viewCar}
           </Button>
         </div>
@@ -144,7 +144,7 @@ export function CompareEmptySlot() {
   return (
     <Link
       href={routes.usedCars}
-      className="flex min-h-[22rem] min-w-[14rem] flex-col items-center justify-center rounded-[22px] border border-dashed border-[#002852]/30 bg-[#ECF3F8] p-6 text-center no-underline"
+      className="flex min-h-[16rem] min-w-0 flex-col items-center justify-center rounded-[22px] border border-dashed border-[#002852]/30 bg-[#ECF3F8] p-6 text-center no-underline sm:min-h-[22rem]"
     >
       <p className="text-[1.05rem] font-semibold text-[#002852]">
         {compareCopy.addAnother}

@@ -80,27 +80,35 @@ export function VehicleDetailPage({
           ) : null}
 
           <div className="vdp-hero">
-            <VehicleGallery vehicle={vehicle} />
-            <VehicleHeader vehicle={vehicle} />
-            <div className="vdp-hero__aside">
-              {listingClosed ? (
-                <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
-                  <p className="text-body text-muted">
-                    This listing is kept available so you can still see the car and
-                    compare similar stock.
-                  </p>
-                  <ValuationEntryCard />
-                </div>
-              ) : (
-                <VehiclePrice />
-              )}
-              {listingClosed ? (
-                <div className="vdp-hero__deal" />
-              ) : (
-                <VehicleDealColumn />
-              )}
+            <div className="vdp-hero__main">
+              <VehicleGallery vehicle={vehicle} />
+              <VehicleHeader vehicle={vehicle} />
+              <VehicleSpecifications vehicle={vehicle} />
             </div>
-            <VehicleSpecifications vehicle={vehicle} />
+            <div className="vdp-hero__aside">
+              <div
+                className="vdp-hero__aside-scroll"
+                tabIndex={0}
+                aria-label="Vehicle price and deal details"
+              >
+                {listingClosed ? (
+                  <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
+                    <p className="text-body text-muted">
+                      This listing is kept available so you can still see the car and
+                      compare similar stock.
+                    </p>
+                    <ValuationEntryCard />
+                  </div>
+                ) : (
+                  <VehiclePrice />
+                )}
+                {listingClosed ? (
+                  <div className="vdp-hero__deal" />
+                ) : (
+                  <VehicleDealColumn />
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="mt-14 space-y-14">
