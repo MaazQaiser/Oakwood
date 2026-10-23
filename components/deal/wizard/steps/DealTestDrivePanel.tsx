@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useMemo, useState } from "react";
 import { MapPin, Phone } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { Checkbox, Field, Input } from "@/components/forms/FormControls";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
@@ -196,6 +195,24 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
               src={`https://maps.google.com/maps?q=${mapsQuery}&z=14&output=embed`}
             />
           </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <a
+              href={`https://maps.google.com/maps?q=${mapsQuery}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-page-tint px-4 text-body-sm font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Google Maps
+            </a>
+            <a
+              href={`https://maps.apple.com/?q=${mapsQuery}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-page-tint px-4 text-body-sm font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Apple Maps
+            </a>
+          </div>
         </section>
 
         {dealSettings.walkaroundVideo === "on" ? (
@@ -218,14 +235,16 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
           </ul>
         </section>
 
-        <Alert title="Confirmation messages" tone="info">
+        <Alert title="Your confirmation" tone="info">
           <ul className="mt-1 list-disc space-y-1 pl-4 text-body-sm">
-            <li>Email — not sent</li>
-            <li>SMS — not sent</li>
-            <li>WhatsApp — not sent</li>
-            <li>Reminder two hours before — not scheduled</li>
+            <li>Email with the walkaround, map links, and what to bring</li>
+            <li>SMS with a short confirmation and a map link</li>
+            <li>WhatsApp with the car, location, and video</li>
+            <li>A reminder two hours before you arrive</li>
           </ul>
-          <p className="mt-2 text-caption">{STEP4_TD_CHANNELS}</p>
+          {channels ? (
+            <p className="mt-2 text-caption">{STEP4_TD_CHANNELS}</p>
+          ) : null}
         </Alert>
 
         <DealStepFooter
@@ -245,9 +264,11 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
         <DealStep4Summary />
         <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
           <h2 className="text-label">{STEP4_TD_TITLE}</h2>
+          <p className="mt-1 text-body-sm text-ink">
+            This car is at {vehicle.locationName}.
+          </p>
           <p className="mt-1 text-caption text-muted">
-            This car is at {vehicle.locationName}. You can change showroom if
-            needed.
+            Choose another Oakwood showroom if you would rather visit there.
           </p>
 
           <div className="mt-4">
