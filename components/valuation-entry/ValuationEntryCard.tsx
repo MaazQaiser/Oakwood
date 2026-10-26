@@ -85,7 +85,7 @@ export function ValuationEntryCard() {
           <Field htmlFor={regId} label="Registration" error={regError}>
             <Input
               id={regId}
-              className="border-transparent bg-white/95 font-semibold! tracking-wider text-navy uppercase"
+              className="h-9! min-h-9! border-transparent bg-white/95 py-0 font-semibold! tracking-wider text-navy uppercase"
               value={registration}
               autoComplete="off"
               autoCapitalize="characters"
@@ -101,7 +101,7 @@ export function ValuationEntryCard() {
           <Field htmlFor={milesId} label="Current mileage" error={mileError}>
             <Input
               id={milesId}
-              className="border-transparent bg-white/95 text-navy"
+              className="h-9! min-h-9! border-transparent bg-white/95 py-0 text-navy"
               inputMode="numeric"
               value={mileage}
               placeholder="42,000"
@@ -115,7 +115,7 @@ export function ValuationEntryCard() {
         </div>
 
         <Button
-          className="mt-4 w-full border-transparent! bg-[#FFD100]! text-navy! hover:bg-[#ffe14d]!"
+          className="btn-compact mt-3 h-10! min-h-10! w-full border-transparent! bg-[#FFD100]! text-navy! hover:bg-[#ffe14d]!"
           busy={lookingUp}
           onClick={() => void start()}
         >
