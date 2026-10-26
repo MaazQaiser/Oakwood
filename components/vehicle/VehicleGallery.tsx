@@ -17,6 +17,9 @@ function isSvg(src: string) {
   return src.endsWith(".svg");
 }
 
+const galleryControlClass =
+  "h-8! w-8! min-h-8! min-w-8! bg-surface/95 p-0 shadow-sm [&_svg]:h-3.5! [&_svg]:w-3.5!";
+
 export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
   const items = useMemo(() => getVehicleGallery(vehicle), [vehicle]);
   const [index, setIndex] = useState(0);
@@ -93,16 +96,18 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           <p className="text-body-sm text-muted">
             Images are not available for this vehicle.
           </p>
-          <div className="absolute right-3 top-3 flex items-center gap-2">
+          <div className="absolute right-2 top-2 flex items-center gap-1.5">
             <CompareVehicleButton
               vehicleName={vehicleName}
               stockId={vehicle.stockId}
               category={vehicle.category}
+              className={galleryControlClass}
             />
             <SaveVehicleButton
               vehicleName={vehicleName}
               stockId={vehicle.stockId}
               category={vehicle.category}
+              className={galleryControlClass}
             />
           </div>
         </div>
@@ -192,22 +197,22 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
         ) : null}
 
         {items.length > 1 ? (
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-3">
+          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-2">
             <IconButton
               label="Previous image"
-              className="bg-surface/95 shadow-sm"
+              className={galleryControlClass}
               onClick={() => goTo(index - 1)}
             >
               <IconArrow className="rotate-180" />
             </IconButton>
-            <p className="rounded-full bg-surface/95 px-3 py-1 text-caption text-ink shadow-sm">
-              <span className="financial-number financial-number--sm text-body-sm">
+            <p className="rounded-full bg-surface/95 px-2 py-0.5 text-ink shadow-sm">
+              <span className="tabular-number text-caption font-semibold">
                 {index + 1} / {items.length}
               </span>
             </p>
             <IconButton
               label="Next image"
-              className="bg-surface/95 shadow-sm"
+              className={galleryControlClass}
               onClick={() => goTo(index + 1)}
             >
               <IconArrow />
@@ -215,21 +220,23 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           </div>
         ) : null}
 
-        <div className="absolute right-3 top-3 flex items-center gap-2">
+        <div className="absolute right-2 top-2 flex items-center gap-1.5">
           <CompareVehicleButton
             vehicleName={vehicleName}
             stockId={vehicle.stockId}
             category={vehicle.category}
+            className={galleryControlClass}
           />
           <SaveVehicleButton
             vehicleName={vehicleName}
             stockId={vehicle.stockId}
             category={vehicle.category}
+            className={galleryControlClass}
           />
           {current.kind === "image" && !imageBroken ? (
             <IconButton
               label="View larger image"
-              className="bg-surface/95 shadow-sm"
+              className={galleryControlClass}
               onClick={() => setLightbox(true)}
             >
               <IconSearch />
@@ -246,7 +253,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
               aria-label={item.kind === "video" ? item.title ?? "Video" : item.alt}
               aria-current={itemIndex === index ? "true" : undefined}
               className={cn(
-                "relative h-12 w-[4.5rem] overflow-hidden rounded-xl border md:h-[4.25rem] md:w-24",
+                "relative h-12 w-[4.5rem] overflow-hidden rounded-sm border md:h-[4.25rem] md:w-24",
                 itemIndex === index ? "border-primary" : "border-border",
               )}
               onClick={() => goTo(itemIndex)}

@@ -55,22 +55,30 @@ export function DealProgressBar({ step }: { step: DealStep }) {
   );
 }
 
-/** Labelled vertical stepper for the desktop sidebar. */
-export function DealProgress({ step }: { step: DealStep }) {
+/** Labelled stepper. `row` sits above a step heading; `stack` is the sidebar. */
+export function DealProgress({
+  step,
+  layout = "stack",
+}: {
+  step: DealStep;
+  layout?: "stack" | "row";
+}) {
   const steps = useStepState(step);
+  const row = layout === "row";
 
   return (
     <nav aria-label="Deal steps">
-      <ol className="space-y-0.5">
+      <ol className={row ? "flex gap-1 overflow-x-auto sm:overflow-visible" : "space-y-0.5"}>
         {steps.map(({ item, meta, isCurrent, isDone, canJump, go }) => (
-          <li key={item}>
+          <li key={item} className={row ? "min-w-[10.25rem] flex-1 sm:min-w-0" : undefined}>
             <button
               type="button"
               disabled={!canJump}
               aria-current={isCurrent ? "step" : undefined}
               onClick={go}
               className={cn(
-                "flex w-full items-center gap-3 rounded-[14px] px-2.5 py-2 text-left text-body-sm transition-colors",
+                "flex items-center gap-2 rounded-[14px] px-2 py-2 text-left text-body-sm transition-colors",
+                row ? "w-full min-w-0" : "w-full gap-3 px-2.5",
                 isCurrent && "bg-surface-soft font-semibold! text-navy",
                 !isCurrent && isDone && "text-ink hover:bg-page-tint",
                 !isCurrent && !isDone && "text-muted",
@@ -92,10 +100,12 @@ export function DealProgress({ step }: { step: DealStep }) {
                   meta.index
                 )}
               </span>
-              <span className="min-w-0 flex-1 truncate">{meta.shortTitle}</span>
-              {canJump ? (
-                <span className="text-caption text-primary">Edit</span>
-              ) : null}
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="block truncate">{meta.shortTitle}</span>
+                {canJump ? (
+                  <span className="block text-caption text-primary">Edit</span>
+                ) : null}
+              </span>
             </button>
           </li>
         ))}

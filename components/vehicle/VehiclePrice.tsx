@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  FinancialNumber,
-  MonthlyPayment,
-} from "@/components/finance/FinancePrimitives";
+import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { Skeleton } from "@/components/ui/Loading";
 import { Button } from "@/components/ui/Button";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { DealEntrySteps } from "@/components/deal/DealEntrySteps";
 import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
-import { VehiclePriceToggle } from "@/components/vehicle/VehiclePriceToggle";
+import { PartExchange } from "@/components/vehicle/PartExchange";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
 import { getEligibilityUrl, getSearchUrl } from "@/config/routes";
@@ -41,78 +38,49 @@ export function VehiclePrice() {
     term,
     vehicle,
     reservable,
-    priceView,
-    setPriceView,
   } = useVehicleDeal();
   const { title } = getVehicleIdentity(vehicle);
-  const showMonthly = priceView === "monthly";
   const financeUnavailable = displayState === "missing";
 
   return (
     <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
-      <p className="text-caption font-semibold tracking-[0.02em] text-muted uppercase">
-        {title}
-      </p>
+      <h2 className="text-xl font-semibold tracking-[-0.02em] text-navy">{title}</h2>
 
-      <div className="mt-4">
-        <VehiclePriceToggle value={priceView} onChange={setPriceView} />
-      </div>
-
-      <div className="mt-5">
-        {showMonthly ? (
-          financeUnavailable ? (
-            <div>
-              <p className="text-caption text-muted">Monthly payment</p>
-              <p className="mt-1 text-h3 text-muted">Not available yet</p>
-              <p className="mt-2 text-caption text-muted">
-                A monthly figure is not available for this car. Check eligibility
-                or continue with the cash price.
-              </p>
-            </div>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="sr-only">Cash price</p>
+          {displayState === "loading" ? (
+            <Skeleton className="h-8 w-32" />
           ) : (
-            <MonthlyPayment
-              amount={monthlyPayment}
-              state={displayState}
-              gapAmount={gapAmount}
-              term={term}
-              financeType={financeType}
-              showDisclaimer={false}
-            />
-          )
-        ) : displayState === "loading" ? (
-          <div>
-            <p className="text-caption text-muted">Cash price</p>
-            <Skeleton className="mt-2 h-8 w-32" />
-          </div>
-        ) : (
-          <div>
-            <p className="text-caption text-muted">Cash price</p>
-            <p className="mt-1 text-primary">
+            <p className="text-primary">
               <FinancialNumber value={formatPounds(cashPrice)} size="lg" />
             </p>
+          )}
+          <div className="mt-1">
+            {financeUnavailable ? (
+              <p className="text-body-sm text-muted">Not available yet</p>
+            ) : displayState === "loading" ? (
+              <Skeleton className="h-6 w-24" />
+            ) : (
+              <p className="text-ink">
+                <FinancialNumber value={formatPounds(monthlyPayment)} size="sm" />
+                <span className="text-body-sm text-muted">
+                  {displayState === "representative" ? "/month*" : "/month"}
+                </span>
+              </p>
+            )}
           </div>
-        )}
+        </div>
+        <a
+          href={financeUnavailable ? getEligibilityUrl() : "#finance-this-car"}
+          className="shrink-0 border-b border-current pb-0.5 text-sm font-semibold text-primary"
+          onClick={() =>
+            trackEvent(analyticsEvents.financeCtaClicked, { action: "apply" })
+          }
+        >
+          Apply for finance
+        </a>
       </div>
-
-      {showMonthly && !financeUnavailable ? (
-        <p className="mt-2 text-body-sm text-muted">
-          <FinancialNumber
-            value={formatPounds(cashPrice)}
-            size="sm"
-            className="text-muted"
-          />
-        </p>
-      ) : !showMonthly && !financeUnavailable ? (
-        <p className="mt-2 text-body-sm text-muted">
-          From{" "}
-          <FinancialNumber
-            value={formatPounds(monthlyPayment)}
-            size="sm"
-            className="text-muted"
-          />
-          {displayState === "representative" ? "/month*" : "/month"}
-        </p>
-      ) : null}
 
       {displayState === "personalised" ? (
         <p className="mt-2 text-caption text-muted">
@@ -132,6 +100,10 @@ export function VehiclePrice() {
           within your current profile.
         </p>
       ) : null}
+
+      <div className="mt-4">
+        <PartExchange />
+      </div>
 
       <ValuationEntryCard />
 

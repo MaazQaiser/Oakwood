@@ -40,7 +40,10 @@ export function IconGoogleReview(props: IconProps) {
  * AA brand mark — yellow disc + black AA letters, matching the AA Cars /
  * inspected-dealer badge treatment.
  */
-export function IconAaBadge(props: IconProps) {
+export function IconAaBadge({
+  tile = true,
+  ...props
+}: IconProps & { tile?: boolean }) {
   return (
     <svg
       viewBox="0 0 40 40"
@@ -50,15 +53,21 @@ export function IconAaBadge(props: IconProps) {
       height="40"
       {...props}
     >
-      <rect width="40" height="40" rx="12" fill="#E6F4FB" />
-      <circle cx="20" cy="20" r="13.5" fill="#FFD100" />
-      <circle cx="20" cy="20" r="13.5" stroke="#1A1A1A" strokeWidth="1.1" />
+      {tile ? <rect width="40" height="40" rx="12" fill="#E6F4FB" /> : null}
+      <circle cx="20" cy="20" r={tile ? 13.5 : 18} fill="#FFD100" />
+      <circle
+        cx="20"
+        cy="20"
+        r={tile ? 13.5 : 18}
+        stroke="#1A1A1A"
+        strokeWidth="1.25"
+      />
       <text
         x="20"
-        y="24.5"
+        y={tile ? 24.5 : 26}
         textAnchor="middle"
         fill="#1A1A1A"
-        fontSize="12"
+        fontSize={tile ? 12 : 16}
         fontWeight="800"
         fontFamily="Arial Black, Arial, Helvetica, sans-serif"
         letterSpacing="-0.05em"

@@ -19,6 +19,9 @@ export const HOME_BUDGET_DESCRIPTION =
   "See cars that fit your monthly or total budget.";
 export const HOME_BUDGET_FIELD = "Budget";
 export const HOME_SEARCH_PLACEHOLDER = 'Try "white Audi A3 petrol auto"';
+export const HOME_HERO_OR_TYPE = "Or type here";
+export const HOME_HERO_OR_TYPE_HINT =
+  "Describe a car in your own words, such as colour, fuel or gearbox.";
 export const HOME_HERO_FILTERS = "Filters";
 export const HOME_HERO_FILTER_HEADING = "Buy used cars online";
 export const HOME_HERO_FILTER_SEARCH = "Search e.g. white Audi A3 auto";

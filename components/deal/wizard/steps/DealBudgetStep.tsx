@@ -4,7 +4,6 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Field, Input } from "@/components/forms/FormControls";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
@@ -14,11 +13,8 @@ import {
 } from "@/components/deal/wizard/DealWizardShell";
 import {
   DEAL_BUDGET_DEFAULT_DEPOSIT,
-  DEAL_BUDGET_HP_BODY,
-  DEAL_BUDGET_HP_LEAD,
-  DEAL_BUDGET_PCP_BODY,
-  DEAL_BUDGET_PCP_LEAD,
   DEAL_BUDGET_PCP_TERM_BLOCK,
+  DEAL_PX_DEPOSIT_EQUITY,
   DEAL_CALCULATION_ERROR,
   DEAL_ILLUSTRATION_REPRESENTATIVE,
   DEAL_QUOTE_UNAVAILABLE,
@@ -199,7 +195,6 @@ export function DealBudgetStep() {
       ? ((deposit - minDeposit) / (maxDeposit - minDeposit)) * 100
       : 0;
 
-  const activeDeposit = formatPounds(deposit);
   const hpTerm = financeType === "hp" ? term : 84;
   const pcpTerm = financeType === "pcp" ? Math.min(term, PCP_MAX_TERM) : PCP_MAX_TERM;
   const hpQuote = calculateFor("hp", hpTerm);
@@ -275,21 +270,70 @@ export function DealBudgetStep() {
               [
                 {
                   value: "hp" as const,
-                  title: "Hire Purchase",
-                  lead: DEAL_BUDGET_HP_LEAD,
-                  body: DEAL_BUDGET_HP_BODY,
-                  termNote: `${hpTerm} months`,
+                  title: "HP",
+                  name: "Hire Purchase",
+                  months: hpTerm,
                 },
                 {
                   value: "pcp" as const,
-                  title: "Personal Contract Purchase",
-                  lead: DEAL_BUDGET_PCP_LEAD,
-                  body: DEAL_BUDGET_PCP_BODY,
-                  termNote: `${pcpTerm} months`,
+                  title: "PCP",
+                  name: "Personal Contract Purchase",
+                  months: pcpTerm,
                 },
               ]
             ).map((option) => {
               const selected = financeType === option.value;
+              const quote = quotes[option.value];
+              const miles =
+                option.value === "pcp"
+                  ? mileageChoice === "other"
+                    ? Number(otherMileage)
+                    : Number(mileageChoice)
+                  : undefined;
+              const rows = quote
+                ? [
+                    { label: "Cash price", value: formatPounds(vehicle.cashPrice) },
+                    ...(miles && Number.isFinite(miles) && miles > 0
+                      ? [
+                          {
+                            label: "Annual mileage",
+                            value: formatNumber(miles),
+                          },
+                        ]
+                      : []),
+                    {
+                      label: "Deposit",
+                      value: formatPounds(quote.cashDeposit),
+                    },
+                    ...(quote.pxEquity > 0
+                      ? [
+                          {
+                            label: DEAL_PX_DEPOSIT_EQUITY,
+                            value: formatPounds(quote.pxEquity),
+                          },
+                        ]
+                      : []),
+                    {
+                      label: "Amount financed",
+                      value: formatPounds(quote.amountFinanced),
+                    },
+                    { label: "Term", value: `${option.months} months` },
+                    ...(quote.finalPayment !== undefined
+                      ? [
+                          {
+                            label: "Final payment",
+                            value: formatPounds(quote.finalPayment),
+                          },
+                        ]
+                      : []),
+                    {
+                      label: DEAL_TOTAL_PAYABLE_LABEL,
+                      value: formatPounds(quote.totalPayable),
+                    },
+                  ]
+                : [];
+              const quiet = selected ? "text-white/70" : "text-muted";
+              const figure = selected ? "text-white" : "text-navy";
               return (
                 <button
                   key={option.value}
@@ -302,35 +346,42 @@ export function DealBudgetStep() {
                       : "bg-page-tint text-ink hover:bg-surface-soft"
                   }`}
                 >
-                  <p className={`text-caption font-semibold! uppercase tracking-[0.08em] ${selected ? "text-white/70" : "text-muted"}`}>
-                    {option.lead}
-                  </p>
-                  <p className="mt-1 text-label">{option.title}</p>
-                  <p className={`mt-1 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
-                    {option.body}
-                  </p>
-                  <p className={`mt-2 text-caption font-semibold! ${selected ? "text-white" : "text-navy"}`}>
-                    {option.termNote}
+                  <p className="text-[1.75rem] font-semibold! leading-none tracking-[-0.03em]">
+                    {option.title}
+                    <span className="sr-only"> {option.name}</span>
                   </p>
                   {phase === "CALCULATION_ERROR" ? (
-                    <p className={`mt-2 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
+                    <p className={`mt-3 text-caption ${quiet}`}>
                       {DEAL_CALCULATION_ERROR}
                     </p>
-                  ) : quotes[option.value] ? (
-                    <p className="mt-2">
-                      <FinancialNumber
-                        value={formatPounds(quotes[option.value]?.monthlyPayment ?? 0)}
-                        suffix="/mo"
-                        size="sm"
-                        className={selected ? "text-white" : "text-primary"}
-                      />
-                      <span className={`mt-1 block text-caption ${selected ? "text-white/75" : "text-muted"}`}>
-                        {DEAL_TOTAL_PAYABLE_LABEL}{" "}
-                        {formatPounds(quotes[option.value]?.totalPayable ?? 0)}
-                      </span>
-                    </p>
+                  ) : quote ? (
+                    <>
+                      <p className="mt-3">
+                        <span
+                          className={`financial-number financial-number--lg ${
+                            selected ? "text-white" : "text-primary"
+                          }`}
+                        >
+                          {formatPounds(quote.monthlyPayment)}
+                        </span>
+                        <span className={`text-body-sm ${quiet}`}>/mo</span>
+                      </p>
+                      <div className="mt-4 space-y-1.5">
+                        {rows.map((row) => (
+                          <div
+                            key={row.label}
+                            className="flex items-baseline justify-between gap-3 text-caption"
+                          >
+                            <span className={quiet}>{row.label}</span>
+                            <span className={`shrink-0 tabular-number font-semibold! ${figure}`}>
+                              {row.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   ) : (
-                    <p className={`mt-2 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
+                    <p className={`mt-3 text-caption ${quiet}`}>
                       {DEAL_QUOTE_UNAVAILABLE}
                     </p>
                   )}
@@ -360,15 +411,9 @@ export function DealBudgetStep() {
           </div>
 
           <section aria-labelledby={`${sliderId}-label`} className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 id={`${sliderId}-label`} className="text-label">
-                Deposit
-              </h2>
-              <p className="rounded-full bg-primary px-3 py-1 text-caption font-semibold! text-white">
-                <span className="sr-only">Selected deposit </span>
-                {hydrated ? activeDeposit : formatPounds(deposit)}
-              </p>
-            </div>
+            <h2 id={`${sliderId}-label`} className="text-label">
+              Deposit
+            </h2>
             {hydrated ? (
               <p className="text-caption text-muted">
                 {DEAL_BUDGET_DEFAULT_DEPOSIT}

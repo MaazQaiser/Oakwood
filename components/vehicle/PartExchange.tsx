@@ -57,9 +57,9 @@ export function PartExchange() {
         </div>
       ) : (
         <p className="mt-3">
-          <Button
-            variant="text"
-            className="px-0"
+          <button
+            type="button"
+            className="border-b border-current pb-0.5 text-sm font-semibold text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             onClick={() => {
               trackEvent(analyticsEvents.pxStarted, {
                 source: "vdp",
@@ -69,7 +69,7 @@ export function PartExchange() {
             }}
           >
             Get my valuation
-          </Button>
+          </button>
         </p>
       )}
       </Accordion>

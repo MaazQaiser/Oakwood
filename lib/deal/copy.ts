@@ -307,6 +307,9 @@ export const DEAL_YOUR_DEAL_APR_DISCLAIMER =
 export const DEAL_YOUR_DEAL_TIER_HINT =
   "Your rate is confirmed when you apply.";
 
+export const DEAL_YOUR_DEAL_PAYMENT_NOTE =
+  "Estimate only. Confirmed when you apply. Soft search, no impact on your credit score.";
+
 export const DEAL_YOUR_DEAL_MOCK_PRICE = "Mock price — final retail TBC";
 
 export const DEAL_AA_BADGE = "Backed by the AA";

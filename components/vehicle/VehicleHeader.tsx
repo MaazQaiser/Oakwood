@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Chip } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { IconShare } from "@/components/ui/icons";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber } from "@/lib/format/money";
 import { getVehicleIdentity } from "@/lib/vehicles/labels";
@@ -22,8 +22,18 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
     vehicle.bodyStyle,
   ].filter((label) => Boolean(label));
 
+  function shareCar() {
+    const url = window.location.href;
+    const text = `${title} at Oakwood`;
+    if (navigator.share) {
+      void navigator.share({ title: text, url }).catch(() => undefined);
+      return;
+    }
+    void navigator.clipboard.writeText(url).then(() => setShared("copied"));
+  }
+
   return (
-    <header className="vdp-hero__header min-w-0">
+    <header className="vdp-hero__header -mt-3 min-w-0">
       <div className="flex flex-wrap items-center gap-2">
         <VehicleAvailabilityBadge availability={vehicle.availability} />
         {vehicle.registration ? (
@@ -32,9 +42,19 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
           </p>
         ) : null}
       </div>
-      <h1 className="mt-2 text-[1.75rem] font-medium leading-tight tracking-[-0.03em] text-ink sm:text-[2rem]">
-        {title}
-      </h1>
+      <div className="mt-1 flex items-center gap-2">
+        <h1 className="min-w-0 text-[1.75rem] font-medium leading-tight tracking-[-0.03em] text-ink sm:text-[2rem]">
+          {title}
+        </h1>
+        <button
+          type="button"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-primary hover:bg-primary-soft"
+          aria-label={shared === "copied" ? "Link copied" : "Share this car"}
+          onClick={shareCar}
+        >
+          <IconShare />
+        </button>
+      </div>
       {subtitle ? (
         <p className="mt-1 text-body-sm text-muted">{subtitle}</p>
       ) : null}
@@ -44,24 +64,6 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
             {label}
           </Chip>
         ))}
-      </div>
-      <div className="mt-3">
-        <Button
-          type="button"
-          variant="text"
-          className="px-0"
-          onClick={() => {
-            const url = window.location.href;
-            const text = `${title} at Oakwood`;
-            if (navigator.share) {
-              void navigator.share({ title: text, url }).catch(() => undefined);
-              return;
-            }
-            void navigator.clipboard.writeText(url).then(() => setShared("copied"));
-          }}
-        >
-          {shared === "copied" ? "Link copied" : "Share this car"}
-        </Button>
       </div>
     </header>
   );

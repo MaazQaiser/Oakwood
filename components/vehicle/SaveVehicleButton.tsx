@@ -14,10 +14,12 @@ export function SaveVehicleButton({
   vehicleName,
   stockId,
   category = "car",
+  className,
 }: {
   vehicleName: string;
   stockId?: string;
   category?: VehicleCategory;
+  className?: string;
 }) {
   const { has, toggle, ready } = useSavedVehicles();
   const { pushToast } = useToast();
@@ -36,6 +38,7 @@ export function SaveVehicleButton({
       className={cn(
         "bg-surface shadow-sm",
         saved ? "text-primary" : "text-ink hover:bg-page-tint",
+        className,
       )}
       onClick={() => {
         if (!stockId) {

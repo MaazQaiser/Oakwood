@@ -48,7 +48,7 @@ export function DealStepFooter({
   return (
     // Mobile: full-width bar lifted by a soft shadow. Desktop: a floating
     // rounded bar, like the home page's white panels.
-    <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_rgb(16_40_72/0.06)] backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:z-auto lg:mx-0 lg:mt-6 lg:mb-5 lg:rounded-[22px] lg:px-4 lg:pb-3 lg:shadow-card">
+    <div className="sticky bottom-0 z-10 -mx-4 mt-6 bg-surface/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_rgb(16_40_72/0.06)] backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-[22px] lg:px-4">
       {showMonthly ? (
         <div className="mb-2 flex items-baseline justify-between gap-3 lg:hidden">
           <span className="text-caption text-muted">
@@ -66,7 +66,7 @@ export function DealStepFooter({
         className={cn(
           "grid gap-2",
           onBack && onSkip && "grid-cols-[auto_1fr_1fr]",
-          onBack && !onSkip && "grid-cols-[auto_1fr]",
+          onBack && !onSkip && "grid-cols-2",
           // Skip and the primary stay equal weight (spec): stacked on phones.
           !onBack && onSkip && "grid-cols-1 sm:grid-cols-2",
         )}

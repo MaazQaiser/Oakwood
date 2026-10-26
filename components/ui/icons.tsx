@@ -109,6 +109,28 @@ export function IconStar(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconShare(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18" {...props}>
+      <path d="M12 3.5v10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      <path
+        d="M8.25 7.25 12 3.5l3.75 3.75"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 11.5H6.5A1.5 1.5 0 0 0 5 13v6.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V13a1.5 1.5 0 0 0-1.5-1.5H17"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function IconPhone(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18" {...props}>

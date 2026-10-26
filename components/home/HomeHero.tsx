@@ -9,12 +9,10 @@ import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { HomeSearchCard } from "@/components/home/HomeSearchCard";
 import { HeroVariantToggle } from "@/components/home/HeroVariantToggle";
 import { useHomeHeroVariant } from "@/components/home/useHomeHeroVariant";
-import { IconArrow } from "@/components/ui/icons";
 import { routes } from "@/config/routes";
 import {
   HOME_HERO_DESCRIPTION,
   HOME_HERO_HEADING,
-  HOME_HERO_PRIMARY,
   HOME_PART_EXCHANGE,
   HOME_PART_EXCHANGE_SUPPORT,
 } from "@/lib/home/copy";
@@ -62,27 +60,16 @@ function CurrentHero() {
             {HOME_HERO_DESCRIPTION}
           </p>
           <HomeSearchBar className="mt-6" />
-          <div className="mt-8 flex flex-col items-start gap-4 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-5 lg:gap-y-3">
+          <div className="mt-8">
             <Link
-              href={routes.search}
-              className="group inline-flex min-h-14 items-center gap-3 rounded-[14px] bg-[#002852] py-1.5 pl-5 pr-1.5 text-white no-underline hover:bg-[#001c3d]"
+              href={routes.partExchange}
+              className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
             >
-              <span className="text-button">{HOME_HERO_PRIMARY}</span>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-white text-[#002852]">
-                <IconArrow width={20} height={20} />
-              </span>
+              {HOME_PART_EXCHANGE}
             </Link>
-            <div>
-              <Link
-                href={routes.partExchange}
-                className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
-              >
-                {HOME_PART_EXCHANGE}
-              </Link>
-              <p className="mt-1.5 text-[0.95rem] font-medium leading-snug text-primary">
-                {HOME_PART_EXCHANGE_SUPPORT}
-              </p>
-            </div>
+            <p className="mt-1.5 text-[0.95rem] font-medium leading-snug text-primary">
+              {HOME_PART_EXCHANGE_SUPPORT}
+            </p>
           </div>
         </div>
       </div>

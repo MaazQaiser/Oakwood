@@ -81,7 +81,7 @@ export function ValuationEntryCard() {
         </h2>
         <p className="mt-1 text-body-sm text-white/85">{VE_CARD_SUPPORT}</p>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] [&_label]:text-white [&_.text-danger]:text-danger-soft">
+        <div className="mt-4 grid grid-cols-2 items-start gap-3 [&_label]:text-white [&_.text-danger]:text-danger-soft">
           <Field htmlFor={regId} label="Registration" error={regError}>
             <Input
               id={regId}

@@ -17,15 +17,14 @@ import {
   DEAL_CALCULATION_UNAVAILABLE,
   DEAL_CLEAR_ALL_COVER,
   DEAL_CONTINUE,
-  DEAL_ILLUSTRATION_PERSONALISED,
   DEAL_PRICE_UNAVAILABLE,
-  DEAL_SOFT_SEARCH,
   DEAL_TOTAL_PAYABLE_LABEL,
   DEAL_VIDEO_UNAVAILABLE,
   DEAL_YOUR_DEAL_APR_DISCLAIMER,
   DEAL_YOUR_DEAL_MOCK_PRICE,
-  DEAL_YOUR_DEAL_TIER_HINT,
+  DEAL_YOUR_DEAL_PAYMENT_NOTE,
 } from "@/lib/deal/copy";
+import { IconAaBadge } from "@/components/home/HomeProofIcons";
 import { COVER_INFO, defaultCoverYears, productPriceForYears } from "@/lib/deal/products";
 import { FINANCE_CALCULATOR_CONFIG } from "@/lib/finance/calculator-config";
 import { getRatesFromLabel } from "@/lib/finance/representative-example";
@@ -385,7 +384,7 @@ export function DealCoverStep() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex-1 space-y-3 pb-5">
-        <div className="rounded-card bg-navy p-5 text-white shadow-card sm:p-7">
+        <div className="overflow-hidden rounded-card bg-[linear-gradient(145deg,var(--oak-navy-deep)_0%,var(--oak-navy)_46%,#0a4d86_100%)] p-5 text-white shadow-card sm:p-7">
           <p className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-white/70">
             Monthly payment
           </p>
@@ -399,21 +398,25 @@ export function DealCoverStep() {
                 value={formatPounds(calculation.monthlyPayment)}
                 suffix="/mo"
                 size="lg"
-                className="text-white"
+                className="text-white [&_.text-muted]:text-white/70"
               />
             </p>
           )}
-          <p className="mt-2 text-body font-semibold!">
-            {financeType === "hp" ? "Hire Purchase" : "Personal Contract Purchase"}
-          </p>
-          {calculation ? (
-            <p className="mt-1 text-caption text-white/80">
-              {DEAL_TOTAL_PAYABLE_LABEL} {formatPounds(calculation.totalPayable)}
+          <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <p className="text-body font-semibold!">
+              {financeType === "hp" ? "Hire Purchase" : "Personal Contract Purchase"}
             </p>
-          ) : null}
-          <p className="mt-2 text-caption text-white/75">
-            {DEAL_ILLUSTRATION_PERSONALISED} {DEAL_SOFT_SEARCH}{" "}
-            {DEAL_YOUR_DEAL_TIER_HINT} {DEAL_YOUR_DEAL_APR_DISCLAIMER}
+            {calculation ? (
+              <p className="text-caption text-white/80">
+                {DEAL_TOTAL_PAYABLE_LABEL}{" "}
+                <span className="tabular-number font-semibold! text-white">
+                  {formatPounds(calculation.totalPayable)}
+                </span>
+              </p>
+            ) : null}
+          </div>
+          <p className="mt-3 max-w-xl text-caption text-white/75">
+            {DEAL_YOUR_DEAL_PAYMENT_NOTE}
             {getRatesFromLabel(FINANCE_CALCULATOR_CONFIG.ratesFromApr)
               ? ` ${getRatesFromLabel(FINANCE_CALCULATOR_CONFIG.ratesFromApr)}.`
               : ""}
@@ -451,44 +454,69 @@ export function DealCoverStep() {
               : undefined;
           const impact = on && configuredPrice ? productImpact(product.id) : undefined;
           const detailsOpen = infoId === product.id;
+          const isAa = product.id === "aa-warranty";
+          const switchControl = (
+            <Switch
+              checked={on}
+              label={`${product.name} ${on ? "on" : "off"}`}
+              onChange={() => toggle(product.id)}
+            />
+          );
           return (
-            <DealCard key={product.id} className={cn(!on && "opacity-80")}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  {product.id === "aa-warranty" ? (
-                    <p className="text-caption font-semibold! text-primary">
-                      {DEAL_AA_BADGE}
-                    </p>
-                  ) : null}
-                  <h2 className="text-label text-navy">{product.name}</h2>
-                  {product.id === "aa-warranty" ? (
-                    <p className="mt-1 text-body-sm text-ink">{DEAL_AA_BREAKDOWN}</p>
-                  ) : null}
-                  <p className={cn("mt-1 text-caption font-semibold!", on ? "text-primary" : "text-muted")}>
-                    {on ? "Selected" : "Not selected"}
-                  </p>
+            <DealCard
+              key={product.id}
+              className={cn(isAa && "overflow-hidden", !on && "opacity-80")}
+            >
+              {isAa ? (
+                <div className="-mx-5 -mt-5 mb-4 flex items-center justify-between gap-3 bg-[#FFD100] px-5 py-4 text-[#1A1A1A] sm:-mx-7 sm:-mt-7 sm:px-7">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white">
+                      <IconAaBadge tile={false} className="h-11 w-11" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-caption font-semibold! uppercase tracking-[0.08em]">
+                        {DEAL_AA_BADGE}
+                      </p>
+                      <h2 className="text-label">{product.name}</h2>
+                      <p className="text-caption">{DEAL_AA_BREAKDOWN}</p>
+                    </div>
+                  </div>
+                  {switchControl}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-caption font-semibold! text-ink">
-                    {on ? "On" : "Off"}
-                  </span>
-                  <Switch
-                    checked={on}
-                    label={`${product.name} ${on ? "on" : "off"}`}
-                    onChange={() => toggle(product.id)}
-                  />
+              ) : (
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="text-label text-navy">{product.name}</h2>
+                  </div>
+                  {switchControl}
                 </div>
-              </div>
+              )}
+              <p className={cn("text-caption font-semibold!", on ? (isAa ? "text-[#1A1A1A]" : "text-primary") : "text-muted")}>
+                {on ? "Selected" : "Not selected"}
+              </p>
 
               {product.included.length > 0 ? (
-                <ul className="mt-3 space-y-1.5 text-body-sm text-ink">
-                  {product.included.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                isAa ? (
+                  <ul className="mt-3 flex flex-nowrap gap-2 overflow-x-auto">
+                    {product.included.map((item) => (
+                      <li
+                        key={item}
+                        className="shrink-0 rounded-full bg-page-tint px-3 py-1.5 text-caption font-semibold! whitespace-nowrap text-ink"
+                      >
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <ul className="mt-3 space-y-1.5 text-body-sm text-ink">
+                    {product.included.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )
               ) : null}
 
               {product.years ? (
