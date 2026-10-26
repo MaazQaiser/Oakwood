@@ -371,6 +371,87 @@ export const clearPxSessionAction = withSessionPersistence(async function clearP
   return { ok: true };
 });
 
+/** Valuation result “Email me this valuation”. Stores a lead without starting a deal. */
+export const saveValuationEmailLead = withSessionPersistence(async function saveValuationEmailLead(input: {
+  email: string;
+  stockId: string;
+  px: DealPartExchangeInput;
+}): Promise<{ ok: true } | { ok: false; reason: "invalid" }> {
+  const email = input.email.trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return { ok: false, reason: "invalid" };
+  }
+  if (!input.px.registration || !Number.isFinite(input.px.value)) {
+    return { ok: false, reason: "invalid" };
+  }
+
+  recordPxLead({
+    id: createPxOpaqueId(),
+    source: "vdp",
+    vehicleStockId: input.stockId,
+    requestedAction: "valuation-email",
+    identity: { email },
+    context: {
+      registration: input.px.registration,
+      mileage: input.px.mileage,
+      estimatedValue: input.px.value,
+      settlementFigure: input.px.settlement,
+      vehicle: input.px.vehicle,
+      condition: input.px.condition,
+      serviceHistory: input.px.serviceHistory,
+      valuationOnly: true,
+    },
+  });
+  return { ok: true };
+});
+
+/** Before You Go. Callback stores a sales lead. Close stores anonymous session feedback. */
+export const saveValuationDecline = withSessionPersistence(async function saveValuationDecline(input: {
+  mode: "callback" | "anonymous";
+  sessionId: string;
+  stockId: string;
+  email?: string;
+  phone?: string;
+  expected?: string;
+  elsewhere?: string;
+  changeMind?: string;
+  registration?: string;
+  mileage?: number;
+  estimatedValue?: number;
+}): Promise<{ ok: true } | { ok: false; reason: "invalid" }> {
+  const email = input.email?.trim().toLowerCase() ?? "";
+  const phoneDigits = input.phone?.replace(/\D/g, "") ?? "";
+  if (input.mode === "callback") {
+    if (!/^\S+@\S+\.\S+$/.test(email) || phoneDigits.length < 10) {
+      return { ok: false, reason: "invalid" };
+    }
+  }
+
+  recordPxLead({
+    id: createPxOpaqueId(),
+    source: "vdp",
+    vehicleStockId: input.stockId,
+    requestedAction:
+      input.mode === "callback" ? "valuation-rejected" : "valuation-feedback",
+    identity:
+      input.mode === "callback"
+        ? { email, telephone: phoneDigits }
+        : {},
+    context: {
+      sessionId: input.sessionId,
+      anonymous: input.mode === "anonymous",
+      expected: input.expected?.trim() || undefined,
+      elsewhere: input.elsewhere?.trim() || undefined,
+      changeMind: input.changeMind?.trim() || undefined,
+      registration: input.registration,
+      mileage: input.mileage,
+      estimatedValue: input.estimatedValue,
+      customerIntent: "valuation-rejected",
+    },
+  });
+  return { ok: true };
+});
+
 export const recordPxCompletionLead = withSessionPersistence(async function recordPxCompletionLead(input: {
   source: PxSource;
   consideredStockId?: string;

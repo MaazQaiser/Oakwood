@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { ReservationProcessing } from "@/components/reservation/ReservationProcessing";
@@ -14,10 +15,11 @@ import {
   getDealUrl,
   getEligibilityUrl,
   getReserveUrl,
+  routes,
   supportRoutes,
 } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
-import { reservationCopy } from "@/lib/reservation/copy";
+import { heldForCopy, reservationCopy } from "@/lib/reservation/copy";
 import {
   formatReservationDate,
   reservationAmountLabel,
@@ -134,6 +136,16 @@ export function ReservationConfirmation({
       <header>
         <h1 className="text-h2">{reservationCopy.successHeading}</h1>
         <p className="mt-2 text-body">{reservationCopy.successSupporting}</p>
+        <p className="mt-2 text-body-sm text-muted">
+          {heldForCopy(current.holdDurationDays)} This follows the{" "}
+          <Link
+            href={routes.reservationTerms}
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            reservation terms
+          </Link>
+          .
+        </p>
       </header>
       <ReservationVehicleSummary
         vehicle={vehicle}

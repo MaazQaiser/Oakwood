@@ -47,30 +47,56 @@ export const DEAL_NEGATIVE_EQUITY =
   "This amount may need to be included in your new deal.";
 
 export const DEAL_SAVE_INTRO =
-  "We'll keep a mock resume link ready for seven days. Nothing is emailed or texted in this prototype.";
+  "Enter your email. We keep this car, valuation and deal for seven days and give you a link to return.";
 
 export const DEAL_SAVE_MOBILE_HINT =
-  "Mobile is stored with the mock resume only — no SMS is sent.";
+  "Optional. Stored with this deal so we can reach you about it.";
 
 export const DEAL_SAVE_CONFIRM =
-  "Saved. Your deal is ready to resume for seven days. Use the mock link below — no email or SMS was sent.";
+  "Saved. Your car, valuation and deal are ready for seven days.";
 
-export const DEAL_SAVE_RESUME_LABEL = "Mock resume link";
+export const DEAL_SAVE_RETURN =
+  "Open this link to come back to the same deal. It works once. After that, confirm the same email.";
+
+export const DEAL_SAVE_RESUME_LABEL = "Your resume link";
 
 export const DEAL_SAVE_CTA = "Save and get a resume link";
+
+export const DEAL_SAVE_FAILED =
+  "We couldn't save your deal. Your details are still here.";
+
+export const DEAL_AUTOSAVE_ERROR =
+  "We couldn't save your latest changes. They're still on this page.";
 
 export const DEAL_RESUME_EXPIRED_TITLE = "This resume link has expired";
 
 export const DEAL_RESUME_EXPIRED_BODY =
-  "Resume links stay active for seven days. Confirm the email on this deal, then start again from the vehicle or save a new link.";
+  "This link is no longer valid. Resume links expire after seven days. Enter the original email so we can confirm it.";
 
 export const DEAL_RESUME_USED_TITLE = "This resume link has already been used";
 
 export const DEAL_RESUME_USED_BODY =
-  "Each link opens once. Enter the same email to continue this deal.";
+  "This link is no longer valid. Each link opens once. Enter the original email to continue this deal.";
+
+export const DEAL_RESUME_TITLE = "Continue your deal";
+
+export const DEAL_RESUME_BODY =
+  "Confirm the email you used when you saved. We'll reopen the same car, valuation and deal.";
 
 export const DEAL_RESUME_VERIFY_EMAIL =
   "Enter the email you used when you saved.";
+
+export const DEAL_RESUME_VERIFY_SUBMIT = "Confirm email";
+
+export const DEAL_RESUME_CHECKING = "Checking your resume link…";
+
+export const DEAL_RESUME_MISMATCH =
+  "We couldn't match that email. Check it and try again.";
+
+export const DEAL_RESUME_INVALID_TITLE = "This resume link is no longer valid";
+
+export const DEAL_RESUME_INVALID_BODY =
+  "Request a new link from your deal, or start again from the car. Links expire after seven days and each one opens once.";
 
 export const DEAL_AUTOSAVE_SAVING = "Saving your deal…";
 
@@ -95,7 +121,7 @@ export const DEAL_ABANDON_LEAVE = "Leave without saving";
 export const DEAL_SAVE_PROGRESS_TITLE = "Save your progress?";
 
 export const DEAL_SAVE_PROGRESS_BODY =
-  "Keep a mock resume link for seven days so you can pick up this deal later. Nothing is emailed or texted in this prototype.";
+  "Save your email and we'll keep this car, valuation and deal for seven days, with a link back to where you left off.";
 
 export const DEAL_SAVE_PROGRESS_CONTINUE = "Continue without saving";
 

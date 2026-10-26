@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { calculatePxEquity } from "@/lib/part-exchange/equity";
 import type { DealPartExchangeInput } from "@/types/deal";
-import type { Lead } from "@/types/lead";
+import type { Lead, LeadIdentity } from "@/types/lead";
 import type {
   PartExchange,
   PxIdentifiedVehicle,
@@ -176,11 +176,12 @@ export function recordPxLead(input: {
   dealId?: string;
   vehicleStockId?: string;
   requestedAction?: string;
+  identity?: LeadIdentity;
   context?: Record<string, unknown>;
 }): void {
   leads.set(input.id, {
     id: input.id,
-    identity: {},
+    identity: input.identity ?? {},
     source: {
       source: input.source,
       sessionIdentifier: input.id,

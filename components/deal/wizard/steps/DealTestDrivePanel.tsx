@@ -1,47 +1,31 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
-import { MapPin, Phone } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
 import { Checkbox, Field, Input } from "@/components/forms/FormControls";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summary";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
-import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
+import { TestDriveConfirmation } from "@/components/deal/wizard/steps/TestDriveConfirmation";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
-import { dealSettings } from "@/config/deal-settings";
+import { submitSupportEnquiry } from "@/features/support/actions";
+import { emailError, telephoneError } from "@/lib/aftersales/validation";
+import { getShowroomProfile, showrooms } from "@/config/locations";
 import {
-  formatShowroomAddress,
-  getShowroomProfile,
-  showrooms,
-} from "@/config/locations";
-import { getVehicleUrl } from "@/config/routes";
-import {
-  getNextOpenDays,
-  getSalesTimeSlots,
+  getShowroomOpenDays,
+  getShowroomTimeSlots,
   resolveShowroomSlug,
 } from "@/lib/deal/opening-status";
 import {
   STEP4_BACK_HUB,
-  STEP4_DONE,
   STEP4_TD_CHANNELS,
   STEP4_TD_CHANNELS_CHECK,
-  STEP4_TD_CONFIRM_BODY,
-  STEP4_TD_CONFIRM_TITLE,
   STEP4_TD_LOADING,
+  STEP4_TD_NO_SLOTS,
   STEP4_TD_SUBMIT,
   STEP4_TD_TITLE,
   STEP4_TD_UNAVAILABLE,
-  STEP4_TD_WALKAROUND_PLACEHOLDER,
-  STEP4_TD_WHAT_TO_BRING,
 } from "@/lib/deal/step4-copy";
-import { reservationConfig } from "@/config/reservation";
-import {
-  formatHoldPeriod,
-  reservationAmountLabel,
-} from "@/lib/reservation/format";
-import { reservationCopy } from "@/lib/reservation/copy";
 import { cn } from "@/lib/cn";
 
 type TdPhase = "form" | "loading" | "confirm";
@@ -51,17 +35,18 @@ type Errors = Partial<
 >;
 
 export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
-  const { dealId, vehicle, draft, navigateTo } = useDealBuilder();
+  const { vehicle, draft } = useDealBuilder();
   const nameId = useId();
   const phoneId = useId();
   const emailId = useId();
 
   const defaultSlug = resolveShowroomSlug(vehicle.locationSlug);
-  const openDays = useMemo(() => getNextOpenDays(4), []);
 
   const [phase, setPhase] = useState<TdPhase>("form");
   const [showroomSlug, setShowroomSlug] = useState(defaultSlug);
-  const [day, setDay] = useState(openDays[0]?.ymd ?? "");
+  const [day, setDay] = useState(
+    () => getShowroomOpenDays(defaultSlug, 4)[0]?.ymd ?? "",
+  );
   const [time, setTime] = useState("");
   const [name, setName] = useState(draft.decision?.fullName ?? "");
   const [phone, setPhone] = useState("");
@@ -69,10 +54,24 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
   const [channels, setChannels] = useState(true);
   const [errors, setErrors] = useState<Errors>({});
   const [slotError, setSlotError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [reference, setReference] = useState<string | null>(null);
 
+  const openDays = useMemo(
+    () => getShowroomOpenDays(showroomSlug, 4),
+    [showroomSlug],
+  );
   const profile = getShowroomProfile(showroomSlug);
-  const slots = useMemo(() => (day ? getSalesTimeSlots(day) : []), [day]);
+  const slots = useMemo(
+    () => (day ? getShowroomTimeSlots(showroomSlug, day) : []),
+    [day, showroomSlug],
+  );
   const selectedDay = openDays.find((d) => d.ymd === day);
+
+  useEffect(() => {
+    if (openDays.some((item) => item.ymd === day)) return;
+    setDay(openDays[0]?.ymd ?? "");
+  }, [day, openDays]);
 
   useEffect(() => {
     setTime("");
@@ -86,16 +85,17 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
     if (!time) next.time = "Choose a time.";
     if (name.trim().split(/\s+/).length < 2)
       next.name = "Enter your first and last name.";
-    if (phone.replace(/\D/g, "").length < 10)
-      next.phone = "Enter a UK phone number.";
-    if (!/^\S+@\S+\.\S+$/.test(email.trim()))
-      next.email = "Enter a valid email address.";
+    const phoneMessage = telephoneError(phone);
+    const emailMessage = emailError(email);
+    if (phoneMessage) next.phone = phoneMessage;
+    if (emailMessage) next.email = emailMessage;
     return next;
   }
 
   function submit() {
     const found = validate();
     setErrors(found);
+    setSubmitError(null);
     if (Object.keys(found).length) {
       const focus =
         (found.name && nameId) ||
@@ -105,18 +105,40 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
       return;
     }
 
-    const slot = slots.find((s) => s.time === time);
+    const slot = getShowroomTimeSlots(showroomSlug, day).find(
+      (item) => item.time === time,
+    );
+    if (!slot?.available || !profile || !selectedDay) {
+      setSlotError(STEP4_TD_UNAVAILABLE);
+      setTime("");
+      return;
+    }
+
+    const confirmation = channels
+      ? "SMS, WhatsApp and email"
+      : "the details already given";
     setPhase("loading");
-    window.setTimeout(() => {
-      if (!slot?.available) {
-        setSlotError(STEP4_TD_UNAVAILABLE);
+    void submitSupportEnquiry({
+      enquiryType: "buying",
+      name: name.trim(),
+      email: email.trim(),
+      telephone: phone.trim(),
+      locationSlug: showroomSlug,
+      stockId: vehicle.stockId,
+      source: "deal",
+      marketingConsent: false,
+      message: `Test drive for stock ${vehicle.stockId} (${vehicle.year} ${vehicle.make} ${vehicle.model}) at Oakwood ${profile.name} on ${selectedDay.label} at ${slot.time}. Confirmation preference: ${confirmation}.`,
+    }).then((result) => {
+      if (!result.ok) {
+        setSubmitError(result.error);
         setPhase("form");
         return;
       }
+      setReference(result.reference);
       setSlotError(null);
       setPhase("confirm");
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 900);
+    });
   }
 
   if (phase === "loading") {
@@ -133,154 +155,33 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
     );
   }
 
-  if (phase === "confirm" && profile && selectedDay) {
-    const mapsQuery = encodeURIComponent(
-      `Oakwood Motor Company ${profile.name} ${profile.postcode ?? ""}`,
-    );
+  if (phase === "confirm" && profile && selectedDay && reference) {
     return (
-      <div className="flex flex-1 flex-col gap-4 pb-5">
-        <DealResultHero
-          eyebrow="Test drive"
-          title={STEP4_TD_CONFIRM_TITLE}
-          body={STEP4_TD_CONFIRM_BODY}
-        />
-        <DealStep4Summary />
-
-        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-          <p className="text-label">Your appointment</p>
-          <dl className="mt-3 space-y-2 text-body-sm">
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted">Showroom</dt>
-              <dd>Oakwood {profile.name}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted">When</dt>
-              <dd>
-                {selectedDay.label} · {time}
-              </dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted">Contact</dt>
-              <dd className="text-right">
-                {name}
-                <br />
-                {phone}
-                <br />
-                {email}
-              </dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-          <p className="text-label">Showroom</p>
-          <p className="mt-2 flex items-start gap-2 text-body-sm">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-            <span>
-              Oakwood {profile.name}
-              <br />
-              {formatShowroomAddress(profile)}
-            </span>
-          </p>
-          {profile.telephone ? (
-            <p className="mt-2 flex items-center gap-2 text-body-sm">
-              <Phone className="h-4 w-4 text-primary" aria-hidden />
-              <a
-                href={`tel:${profile.telephone.replace(/\s/g, "")}`}
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {profile.telephone}
-              </a>
-            </p>
-          ) : null}
-          <div className="mt-4 aspect-[16/10] overflow-hidden rounded-xl bg-page-tint">
-            <iframe
-              title={`Map of Oakwood ${profile.name}`}
-              className="h-full w-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              src={`https://maps.google.com/maps?q=${mapsQuery}&z=14&output=embed`}
-            />
-          </div>
-          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <a
-              href={`https://maps.google.com/maps?q=${mapsQuery}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-page-tint px-4 text-body-sm font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
-              Google Maps
-            </a>
-            <a
-              href={`https://maps.apple.com/?q=${mapsQuery}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-page-tint px-4 text-body-sm font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
-              Apple Maps
-            </a>
-          </div>
-        </section>
-
-        {dealSettings.walkaroundVideo === "on" ? (
-          <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-            <p className="text-label">Walkaround video</p>
-            <div className="mt-3 flex aspect-[9/16] max-h-72 items-center justify-center rounded-xl bg-ink px-6 text-center">
-              <p className="text-caption text-white/80">
-                {STEP4_TD_WALKAROUND_PLACEHOLDER}
-              </p>
-            </div>
-          </section>
-        ) : null}
-
-        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-          <p className="text-label">What to bring</p>
-          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-body-sm">
-            {STEP4_TD_WHAT_TO_BRING.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <Alert title="Your confirmation" tone="info">
-          <ul className="mt-1 list-disc space-y-1 pl-4 text-body-sm">
-            <li>Email with the walkaround, map links, and what to bring</li>
-            <li>SMS with a short confirmation and a map link</li>
-            <li>WhatsApp with the car, location, and video</li>
-            <li>A reminder two hours before you arrive</li>
-          </ul>
-          {channels ? (
-            <p className="mt-2 text-caption">{STEP4_TD_CHANNELS}</p>
-          ) : null}
-        </Alert>
-
-        {vehicle.availability === "available" ? (
-          <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
-            <p className="text-label">Reserve this car</p>
-            <p className="mt-1 text-body-sm text-muted">
-              {reservationCopy.fullyRefundable}. Holds the car for{" "}
-              {formatHoldPeriod(reservationConfig.holdDurationDays)}. The{" "}
-              {reservationAmountLabel(reservationConfig.amount)} is applied to
-              the purchase.
-            </p>
-            <StartReservationButton
-              className="mt-3 w-full sm:w-auto"
-              stockId={vehicle.stockId}
-              dealId={dealId}
-            />
-          </section>
-        ) : null}
-
-        <DealStepFooter
-          showMonthly={false}
-          onBack={onBack}
-          backLabel={STEP4_BACK_HUB}
-          onContinue={() => navigateTo(getVehicleUrl(vehicle.slug))}
-          continueLabel={STEP4_DONE}
-        />
-      </div>
+      <TestDriveConfirmation
+        onBack={onBack}
+        request={{
+          reference,
+          stockId: vehicle.stockId,
+          showroomSlug,
+          dateYmd: selectedDay.ymd,
+          time,
+          whenLabel: `${selectedDay.label} · ${time}`,
+          channels,
+          vehicleTitle: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+          derivative: vehicle.derivative,
+          mileage: vehicle.mileage,
+          cashPrice: vehicle.cashPrice,
+          imageSrc: vehicle.imageSrc,
+          imageAlt: vehicle.imageAlt,
+        }}
+      />
     );
   }
+
+  if (phase === "confirm") {
+    return null;
+  }
+
 
   return (
     <div className="flex flex-1 flex-col">
@@ -338,6 +239,11 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
               Slots from published hours
               {selectedDay ? ` (${selectedDay.hoursLabel})` : ""}.
             </p>
+            {slots.length === 0 ? (
+              <p className="mt-2 text-body-sm text-muted" role="status">
+                {STEP4_TD_NO_SLOTS}
+              </p>
+            ) : null}
             <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
               {slots.map((slot) => {
                 const selected = time === slot.time;
@@ -432,6 +338,11 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
             />
             <p className="text-caption text-muted">{STEP4_TD_CHANNELS}</p>
             <p className="text-caption text-muted">{STEP4_TD_SUBMIT}</p>
+            {submitError ? (
+              <Alert title="We couldn't book your test drive" tone="warning">
+                {submitError}
+              </Alert>
+            ) : null}
           </div>
         </section>
       </div>

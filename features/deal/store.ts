@@ -4,7 +4,12 @@ import {
   RECOMMENDED_COVER_IDS,
   defaultCoverYears,
 } from "@/lib/deal/products";
-import type { DealCreditTier, DealDraft, DealShareSnapshot } from "@/types/deal";
+import type {
+  DealCreditTier,
+  DealDraft,
+  DealShareSnapshot,
+  DealStepName,
+} from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 export const DEAL_SESSION_COOKIE = "oakwood_deal_session";
@@ -30,6 +35,7 @@ export interface DealSessionRecord {
   decision?: DealDraft["decision"];
   financeApplication?: DealDraft["financeApplication"];
   stepsCompleted?: DealDraft["stepsCompleted"];
+  resumeStep?: DealStepName;
   email?: string;
   resume?: {
     token: string;
@@ -145,11 +151,50 @@ export function touchDeal(
   return next;
 }
 
+const RESUME_STEPS: readonly DealStepName[] = [
+  "part-exchange",
+  "budget",
+  "decision",
+  "cover",
+  "quote",
+  "reserve",
+];
+
+export function isDealResumeStep(value: unknown): value is DealStepName {
+  return (
+    typeof value === "string" &&
+    (RESUME_STEPS as readonly string[]).includes(value)
+  );
+}
+
+/** Step a resume link should reopen. Falls back from steps the customer has left. */
+export function dealResumeStep(record: DealSessionRecord): DealStepName {
+  if (isDealResumeStep(record.resumeStep)) {
+    return record.resumeStep;
+  }
+  const done = record.stepsCompleted ?? [];
+  if (
+    done.includes("quote") ||
+    done.includes("cover") ||
+    done.includes("decision")
+  ) {
+    return "reserve";
+  }
+  if (done.includes("budget")) {
+    return "quote";
+  }
+  if (done.includes("part-exchange")) {
+    return "budget";
+  }
+  return "part-exchange";
+}
+
 export function saveDealResumeToken(
   dealId: string,
   token: string,
   email: string,
   phone?: string,
+  step?: DealStepName,
   now = Date.now(),
 ): DealSessionRecord | null {
   const current = deals.get(dealId);
@@ -164,6 +209,7 @@ export function saveDealResumeToken(
     dealId,
     {
       email,
+      ...(isDealResumeStep(step) ? { resumeStep: step } : {}),
       resume: {
         token,
         email: email.trim().toLowerCase(),
@@ -342,5 +388,6 @@ export function toDealDraft(record: DealSessionRecord): DealDraft {
     decision: record.decision,
     financeApplication: record.financeApplication,
     stepsCompleted: record.stepsCompleted,
+    resumeStep: record.resumeStep,
   };
 }

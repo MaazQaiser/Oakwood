@@ -22,12 +22,20 @@ import {
 } from "@/lib/valuation-entry/copy";
 import type { PxIdentifiedVehicle } from "@/types/part-exchange";
 
+function formatMileageInput(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 6);
+  if (!digits) {
+    return "";
+  }
+  return Number(digits).toLocaleString("en-GB");
+}
+
 export function ValuationEntryCard() {
   const { vehicle, deposit, term, financeType } = useVehicleDeal();
   const regId = useId();
   const milesId = useId();
-  const [registration, setRegistration] = useState("AB21 CDE");
-  const [mileage, setMileage] = useState("42,000");
+  const [registration, setRegistration] = useState("");
+  const [mileage, setMileage] = useState("");
   const [regError, setRegError] = useState<string>();
   const [mileError, setMileError] = useState<string>();
   const [lookupError, setLookupError] = useState<string>();
@@ -73,7 +81,7 @@ export function ValuationEntryCard() {
         </h2>
         <p className="mt-1 text-body-sm text-white/85">{VE_CARD_SUPPORT}</p>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] [&_label]:text-white">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] [&_label]:text-white [&_.text-danger]:text-danger-soft">
           <Field htmlFor={regId} label="Registration" error={regError}>
             <Input
               id={regId}
@@ -90,7 +98,7 @@ export function ValuationEntryCard() {
               }}
             />
           </Field>
-          <Field htmlFor={milesId} label="Mileage" error={mileError}>
+          <Field htmlFor={milesId} label="Current mileage" error={mileError}>
             <Input
               id={milesId}
               className="border-transparent bg-white/95 text-navy"
@@ -99,7 +107,7 @@ export function ValuationEntryCard() {
               placeholder="42,000"
               error={Boolean(mileError)}
               onChange={(event) => {
-                setMileage(event.target.value);
+                setMileage(formatMileageInput(event.target.value));
                 setMileError(undefined);
               }}
             />

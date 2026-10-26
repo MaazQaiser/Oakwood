@@ -14,11 +14,13 @@ export function StartReservationButton({
   dealId,
   className,
   variant = "primary",
+  label,
 }: {
   stockId: string;
   dealId?: string;
   className?: string;
   variant?: "primary" | "secondary" | "tertiary";
+  label?: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -43,7 +45,7 @@ export function StartReservationButton({
         });
       }}
     >
-      {reserveCtaLabel(reservationConfig.amount)}
+      {label ?? reserveCtaLabel(reservationConfig.amount)}
     </Button>
   );
 }

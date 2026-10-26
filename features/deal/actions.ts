@@ -7,9 +7,11 @@ import { isPxExpired, snapshotToDealPx } from "@/features/part-exchange/store";
 import {
   consumeDealResumeToken,
   createDealOpaqueId,
+  dealResumeStep,
   findDealByResumeToken,
   getDealRecord,
   isDealExpired,
+  isDealResumeStep,
   peekDealResumeToken,
   saveDealResumeToken,
   saveDealShareToken,
@@ -26,7 +28,8 @@ import { listSelectedProducts } from "@/lib/deal/products";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { isReservable } from "@/lib/vehicles/sold";
 import { getDealResumeUrl } from "@/config/routes";
-import type { DealDraft, DealShareSnapshot } from "@/types/deal";
+import { emailError, telephoneError } from "@/lib/aftersales/validation";
+import type { DealDraft, DealShareSnapshot, DealStepName } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 /**
@@ -112,31 +115,39 @@ export async function createDealResumeLink(input: {
   dealId: string;
   email: string;
   phone?: string;
+  step?: DealStepName;
   /** QA helper — creates an already-expired token for the expired-link screen. */
   forceExpired?: boolean;
 }): Promise<
   | { ok: true; token: string; resumePath: string }
-  | { ok: false; expired: true }
+  | { ok: false; reason: "expired" | "invalid" }
 > {
   await hydrateDealsFromCookie();
   const record = getDealRecord(input.dealId);
   if (!record || isDealExpired(record)) {
-    return { ok: false, expired: true };
+    return { ok: false, reason: "expired" };
   }
   const email = input.email.trim().toLowerCase();
-  if (!email || !email.includes("@")) {
-    return { ok: false, expired: true };
+  if (emailError(email)) {
+    return { ok: false, reason: "invalid" };
+  }
+  if (input.phone?.trim() && telephoneError(input.phone)) {
+    return { ok: false, reason: "invalid" };
   }
   const phoneDigits = input.phone?.replace(/\D/g, "") ?? "";
-  if (phoneDigits && phoneDigits.length < 10) {
-    return { ok: false, expired: true };
-  }
+  const step = isDealResumeStep(input.step) ? input.step : undefined;
   const token = createDealOpaqueId();
   const saved = input.forceExpired
     ? saveExpiredDealResumeToken(record.id, token, email)
-    : saveDealResumeToken(record.id, token, email, phoneDigits || undefined);
+    : saveDealResumeToken(
+        record.id,
+        token,
+        email,
+        phoneDigits || undefined,
+        step,
+      );
   if (!saved) {
-    return { ok: false, expired: true };
+    return { ok: false, reason: "expired" };
   }
   await persistDeal(saved);
   return {
@@ -149,6 +160,7 @@ export async function createDealResumeLink(input: {
 export async function inspectDealResumeToken(input: {
   token: string;
 }): Promise<{ status: "ok" | "expired" | "invalid" | "used" }> {
+  await hydrateDealsFromCookie();
   return { status: peekDealResumeToken(input.token).status };
 }
 
@@ -156,12 +168,13 @@ export async function resumeDealSession(input: {
   token: string;
   email: string;
 }): Promise<
-  | { ok: true; dealId: string }
+  | { ok: true; dealId: string; step: DealStepName }
   | { ok: false; reason: "invalid" | "expired" | "used" }
 > {
   if (input.token === "mock-expired") {
     return { ok: false, reason: "expired" };
   }
+  await hydrateDealsFromCookie();
   const pending = findDealByResumeToken(input.token);
   if (!pending?.resume) {
     return { ok: false, reason: "invalid" };
@@ -178,7 +191,7 @@ export async function resumeDealSession(input: {
   }
   await writeDealCookie(record.id);
   await persistDeal(record);
-  return { ok: true, dealId: record.id };
+  return { ok: true, dealId: record.id, step: dealResumeStep(record) };
 }
 
 /**
@@ -189,10 +202,11 @@ export async function reopenUsedDealSession(input: {
   token: string;
   email: string;
 }): Promise<
-  | { ok: true; dealId: string; status: "used" }
+  | { ok: true; dealId: string; step: DealStepName; status: "used" }
   | { ok: true; status: "expired" }
   | { ok: false; reason: "invalid" | "mismatch" }
 > {
+  await hydrateDealsFromCookie();
   const pending = peekDealResumeToken(input.token);
   if (pending.status === "invalid" || !pending.dealId || !pending.email) {
     return { ok: false, reason: "invalid" };
@@ -213,7 +227,12 @@ export async function reopenUsedDealSession(input: {
   }
   await writeDealCookie(record.id);
   await persistDeal(record);
-  return { ok: true, dealId: record.id, status: "used" };
+  return {
+    ok: true,
+    dealId: record.id,
+    step: dealResumeStep(record),
+    status: "used",
+  };
 }
 
 export async function createDealShareLink(input: {

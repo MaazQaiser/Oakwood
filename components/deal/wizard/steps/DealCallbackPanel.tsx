@@ -1,12 +1,17 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summary";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { submitPriorityCallbackRequest } from "@/features/support/actions";
+import { telephoneError } from "@/lib/aftersales/validation";
+import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import {
   formatShowroomAddress,
   getShowroomProfile,
@@ -21,10 +26,12 @@ import {
 } from "@/lib/deal/opening-status";
 import {
   STEP4_BACK_HUB,
-  STEP4_CB_CONFIRM_BODY,
-  STEP4_CB_CONFIRM_TITLE,
+  STEP4_CB_INTRO,
   STEP4_CB_SUBMITTING,
   STEP4_CB_TITLE,
+  STEP4_CMB_CONFIRM_BODY,
+  STEP4_CMB_CONFIRM_TITLE,
+  STEP4_CMB_ERROR,
   STEP4_CLOSED_BODY,
   STEP4_CLOSED_HOURS_REF,
   STEP4_CLOSED_TITLE,
@@ -48,7 +55,7 @@ export function DealCallbackPanel({
   mode: "closed" | "callback";
   closedStatus?: ShowroomOpenStatus;
 }) {
-  const { vehicle, draft, navigateTo } = useDealBuilder();
+  const { dealId, vehicle, draft, navigateTo } = useDealBuilder();
   const nameId = useId();
   const phoneId = useId();
 
@@ -81,12 +88,14 @@ export function DealCallbackPanel({
   const [name, setName] = useState(draft.decision?.fullName ?? "");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [reference, setReference] = useState<string | null>(null);
 
   const profile = getShowroomProfile(showroomSlug);
-  const slots = useMemo(
-    () => (day ? getSalesTimeSlots(day).filter((s) => s.available) : []),
-    [day],
-  );
+  const slots = useMemo(() => {
+    if (!day || profile?.hoursStatus !== "published") return [];
+    return getSalesTimeSlots(day).filter((slot) => slot.available);
+  }, [day, profile?.hoursStatus]);
   const selectedDay = openDays.find((d) => d.ymd === day);
 
   function validate(): Errors {
@@ -96,24 +105,57 @@ export function DealCallbackPanel({
     if (!time) next.time = "Choose a time.";
     if (name.trim().split(/\s+/).length < 2)
       next.name = "Enter your first and last name.";
-    if (phone.replace(/\D/g, "").length < 10)
-      next.phone = "Enter a UK phone number.";
+    const phoneMessage = telephoneError(phone);
+    if (phoneMessage) next.phone = phoneMessage;
     return next;
   }
 
   function submit() {
     const found = validate();
     setErrors(found);
-    if (Object.keys(found).length) {
+    setSubmitError(null);
+    if (Object.keys(found).length || !selectedDay) {
       if (found.name) document.getElementById(nameId)?.focus();
       else if (found.phone) document.getElementById(phoneId)?.focus();
       return;
     }
+    const chosen = slots.find((slot) => slot.time === time);
+    if (!chosen) {
+      setErrors((current) => ({
+        ...current,
+        time: "That time isn't available. Please choose another slot.",
+      }));
+      setTime("");
+      return;
+    }
+    const whenLabel = `${selectedDay.label} at ${time}`;
     setPhase("loading");
-    window.setTimeout(() => {
+    void submitPriorityCallbackRequest({
+      name: name.trim(),
+      telephone: phone.trim(),
+      locationSlug: showroomSlug,
+      dateYmd: day,
+      time,
+      whenLabel,
+      vehicleLabel: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      stockId: vehicle.stockId,
+      dealId,
+    }).then((result) => {
+      if (!result.ok) {
+        setSubmitError(result.error);
+        setPhase("form");
+        return;
+      }
+      setReference(result.reference);
       setPhase("confirm");
+      trackEvent(analyticsEvents.callbackRequested, {
+        source: "deal-call-me-back",
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 900);
+    }).catch(() => {
+      setSubmitError("We couldn't book your callback.");
+      setPhase("form");
+    });
   }
 
   if (phase === "loading") {
@@ -134,9 +176,9 @@ export function DealCallbackPanel({
     return (
       <div className="flex flex-1 flex-col gap-4 pb-5">
         <DealResultHero
-          eyebrow={mode === "closed" ? "Priority callback" : "Callback"}
-          title={STEP4_CB_CONFIRM_TITLE}
-          body={STEP4_CB_CONFIRM_BODY}
+          eyebrow="Call me back"
+          title={mode === "callback" ? STEP4_CMB_CONFIRM_TITLE : STEP4_CB_TITLE}
+          body={STEP4_CMB_CONFIRM_BODY}
         />
         <DealStep4Summary />
         <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
@@ -152,6 +194,12 @@ export function DealCallbackPanel({
                 {selectedDay.label} · {time}
               </dd>
             </div>
+            {reference ? (
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted">Reference</dt>
+                <dd>{reference}</dd>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-3">
               <dt className="text-muted">Contact</dt>
               <dd className="text-right">
@@ -197,10 +245,7 @@ export function DealCallbackPanel({
           ) : (
             <>
               <h2 className="text-label">{STEP4_CB_TITLE}</h2>
-              <p className="mt-1 text-caption text-muted">
-                Choose a preferred day and time. We&apos;ll call you back about
-                this deal.
-              </p>
+              <p className="mt-1 text-body-sm text-secondary">{STEP4_CB_INTRO}</p>
             </>
           )}
 
@@ -240,6 +285,11 @@ export function DealCallbackPanel({
 
           <fieldset className="mt-4">
             <legend className="text-label">Time</legend>
+            {slots.length === 0 ? (
+              <p className="mt-2 text-body-sm text-muted" role="status">
+                No callback times are published for this day.
+              </p>
+            ) : null}
             <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
               {slots.map((slot) => {
                 const selected = time === slot.time;
@@ -297,6 +347,14 @@ export function DealCallbackPanel({
                 }}
               />
             </Field>
+            {submitError ? (
+              <Alert title={STEP4_CMB_ERROR} tone="warning">
+                <p>{submitError}</p>
+                <Button className="mt-3" size="sm" onClick={submit}>
+                  Try again
+                </Button>
+              </Alert>
+            ) : null}
           </div>
         </section>
       </div>

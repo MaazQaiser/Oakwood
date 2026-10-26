@@ -7,6 +7,7 @@ import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
+import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import {
   DealCard,
   useDealStepNavigation,
@@ -77,6 +78,7 @@ export function DealBudgetStep() {
     draft,
     calculation,
     phase,
+    saved,
     calculateFor,
     setCashDeposit,
     setFinanceType: persistFinanceType,
@@ -85,6 +87,7 @@ export function DealBudgetStep() {
     retryCalculation,
   } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("budget");
+  const [savePrompt, setSavePrompt] = useState(false);
   const sliderId = useId();
   const amountId = useId();
   const otherId = useId();
@@ -243,6 +246,22 @@ export function DealBudgetStep() {
         document.getElementById(otherId)?.focus();
         return;
       }
+    }
+    const promptKey = `oakwood-save-prompt:budget:${dealId}`;
+    let alreadyPrompted = false;
+    try {
+      alreadyPrompted = sessionStorage.getItem(promptKey) === "1";
+    } catch {
+      alreadyPrompted = false;
+    }
+    if (!saved && !alreadyPrompted) {
+      try {
+        sessionStorage.setItem(promptKey, "1");
+      } catch {
+        // The prompt still shows once for this visit.
+      }
+      setSavePrompt(true);
+      return;
     }
     goNext("quote");
   }
@@ -479,6 +498,14 @@ export function DealBudgetStep() {
         onBack={() => goBack("part-exchange")}
         onContinue={continueToDeal}
         showMonthly={false}
+      />
+      <SaveProgressPrompt
+        open={savePrompt}
+        onDismiss={() => setSavePrompt(false)}
+        onContinue={() => {
+          setSavePrompt(false);
+          goNext("quote");
+        }}
       />
     </div>
   );

@@ -42,8 +42,7 @@ function ApplicationInner() {
         <aside className="hidden lg:sticky lg:top-[calc(var(--oak-header-height)+1.5rem)] lg:flex lg:max-h-[calc(100dvh-var(--oak-header-height)-3rem)] lg:flex-col lg:gap-5 lg:overflow-y-auto lg:rounded-card lg:bg-surface lg:p-4 lg:shadow-card">
           <DealPinnedVehicle layout="card" />
           <p className="text-caption text-muted">
-            Your selected deal stays pinned while you apply. This is outside the
-            six-step builder progress.
+            Your selected car and deal stay pinned while you apply.
           </p>
           <Button
             href={getDealUrl(dealId, "reserve")}

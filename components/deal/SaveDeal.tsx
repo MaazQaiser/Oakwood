@@ -1,20 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
 import { createDealResumeLink } from "@/features/deal/actions";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { emailError, telephoneError } from "@/lib/aftersales/validation";
 import {
   DEAL_EMAIL_DEAL,
   DEAL_SAVE_CONFIRM,
   DEAL_SAVE_CTA,
+  DEAL_SAVE_FAILED,
   DEAL_SAVE_INTRO,
   DEAL_SAVE_MOBILE_HINT,
   DEAL_SAVE_RESUME_LABEL,
+  DEAL_SAVE_RETURN,
+  DEAL_SESSION_EXPIRED,
 } from "@/lib/deal/copy";
 import { cn } from "@/lib/cn";
-import { getDealResumeUrl } from "@/config/routes";
 
 export function SaveDeal({
   defaultOpen = false,
@@ -28,37 +32,39 @@ export function SaveDeal({
   /** Popup layout: stacked fields and a text link instead of a save button. */
   prompt?: boolean;
 } = {}) {
-  const { dealId, markSaved } = useDealBuilder();
+  const { dealId, draft, markSaved } = useDealBuilder();
+  const emailId = useId();
+  const phoneId = useId();
   const [open, setOpen] = useState(defaultOpen);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string>();
   const [phoneError, setPhoneError] = useState<string>();
+  const [formError, setFormError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [resumePath, setResumePath] = useState("");
 
   async function save() {
-    if (!email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
-    if (phone.replace(/\D/g, "").length < 10) {
-      setPhoneError("Enter a UK mobile number.");
+    const nextEmail = emailError(email);
+    const nextPhone = phone.trim() ? telephoneError(phone) : undefined;
+    setError(nextEmail);
+    setPhoneError(nextPhone);
+    setFormError(undefined);
+    if (nextEmail || nextPhone) {
       return;
     }
     setSaving(true);
-    setError(undefined);
-    setPhoneError(undefined);
     const result = await createDealResumeLink({
       dealId,
       email,
-      phone,
+      phone: phone.trim() || undefined,
+      step: draft.resumeStep,
     });
     setSaving(false);
     if (!result.ok) {
-      setError(
-        "This deal session has expired. Please start again from the vehicle.",
+      setFormError(
+        result.reason === "expired" ? DEAL_SESSION_EXPIRED : DEAL_SAVE_FAILED,
       );
       return;
     }
@@ -67,21 +73,18 @@ export function SaveDeal({
     markSaved();
   }
 
-  if (saved) {
+  if (saved && resumePath) {
     const absolute =
       typeof window !== "undefined"
-        ? `${window.location.origin}${resumePath || getDealResumeUrl()}`
+        ? `${window.location.origin}${resumePath}`
         : resumePath;
     return (
       <div className="space-y-2" role="status">
         <p className="text-body-sm font-semibold! text-ink">{DEAL_SAVE_CONFIRM}</p>
+        <p className="text-caption text-muted">{DEAL_SAVE_RETURN}</p>
         <p className="text-caption text-muted">{DEAL_SAVE_RESUME_LABEL}</p>
         <p className="break-all rounded-[14px] bg-page-tint px-3 py-2 text-caption text-ink">
-          {absolute || resumePath}
-        </p>
-        <p className="text-caption text-muted">
-          Prototype only — no email or SMS was sent. The link expires after
-          seven days.
+          {absolute}
         </p>
       </div>
     );
@@ -112,34 +115,50 @@ export function SaveDeal({
         <p className="text-caption text-muted">{DEAL_SAVE_INTRO}</p>
       ) : null}
       <div className={cn("grid gap-3", prompt ? "grid-cols-1" : "mt-3 sm:grid-cols-2")}>
-        <Field htmlFor="deal-save-email" label="Email" error={error}>
+        <Field htmlFor={emailId} label="Email" error={error}>
           <Input
-            id="deal-save-email"
+            id={emailId}
             type="email"
             inputMode="email"
             autoComplete="email"
             value={email}
             error={Boolean(error)}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setError(undefined);
+              setFormError(undefined);
+            }}
           />
         </Field>
         <Field
-          htmlFor="deal-save-phone"
+          htmlFor={phoneId}
           label="Mobile"
           hint={DEAL_SAVE_MOBILE_HINT}
           error={phoneError}
         >
           <Input
-            id="deal-save-phone"
+            id={phoneId}
             type="tel"
             inputMode="tel"
             autoComplete="tel"
             value={phone}
             error={Boolean(phoneError)}
-            onChange={(event) => setPhone(event.target.value)}
+            onChange={(event) => {
+              setPhone(event.target.value);
+              setPhoneError(undefined);
+            }}
           />
         </Field>
       </div>
+      {formError ? (
+        <div className="mt-3">
+          <Alert title={formError} tone="warning">
+            <Button className="mt-3" size="sm" onClick={() => void save()}>
+              Try again
+            </Button>
+          </Alert>
+        </div>
+      ) : null}
       <div className={cn("mt-3 flex flex-wrap gap-3", prompt && "mt-4")}>
         {prompt ? (
           <button
@@ -151,8 +170,8 @@ export function SaveDeal({
             {saving ? "Saving…" : DEAL_SAVE_CTA}
           </button>
         ) : (
-          <Button onClick={() => void save()} disabled={saving} size="sm">
-            {DEAL_SAVE_CTA}
+          <Button onClick={() => void save()} busy={saving} size="sm">
+            {saving ? "Saving…" : DEAL_SAVE_CTA}
           </Button>
         )}
         {!defaultOpen && !prompt ? (

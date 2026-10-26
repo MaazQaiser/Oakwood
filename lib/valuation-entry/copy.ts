@@ -1,7 +1,6 @@
-export const VE_CARD_HEADING = "Value your part exchange";
+export const VE_CARD_HEADING = "Not sure what your car is worth?";
 
-export const VE_CARD_SUPPORT =
-  "Check what your current car could be worth towards this one.";
+export const VE_CARD_SUPPORT = "Get a free valuation for your part exchange.";
 
 export const VE_CARD_REASSURANCE =
   "You do not need to give your name or email to see an indicative valuation.";
@@ -21,6 +20,13 @@ export const VE_CONFIRM_CTA = "Yes, continue";
 
 export const VE_NOT_MY_CAR = "That's not my car";
 
+export const VE_DETAILS_HEADING = "Tell us about your car";
+
+export const VE_DETAILS_SUPPORT =
+  "Registration and mileage are the ones you entered. Condition, history and finance are used with that request.";
+
+export const VE_CARRIED_LABEL = "Your car";
+
 export const VE_CONDITION_HEADING = "What condition is your car in?";
 
 export const VE_SERVICE_HEADING = "What service history does it have?";
@@ -28,7 +34,7 @@ export const VE_SERVICE_HEADING = "What service history does it have?";
 export const VE_EXTRAS_HEADING = "Any extras or equipment?";
 
 export const VE_EXTRAS_SUPPORT =
-  "Select anything that applies. We use this to refine your indicative valuation.";
+  "Optional. Select anything that applies to this car.";
 
 export const VE_FINANCE_HEADING = "Do you still have finance on this car?";
 
@@ -62,22 +68,41 @@ export const VE_EMAIL_SUPPORT =
   "We'll send a copy of this indicative valuation. Nothing is submitted to a live system in this prototype.";
 
 export const VE_EMAIL_CONFIRM =
-  "Sent (mock). Check your inbox for the valuation summary.";
+  "Saved. This valuation is queued to your email. No live email is sent in this prototype.";
+
+export const VE_EMAIL_SEND = "Send valuation";
+
+export const VE_EMAIL_FAILED =
+  "We couldn't send this valuation. Please try again.";
 
 export const VE_SAVE_HEADING = "Save and come back later";
 
 export const VE_SAVE_SUPPORT =
-  "We'll keep this valuation and deal ready for seven days. Email and mobile are required — nothing is emailed or texted in this prototype.";
+  "Enter your email. We keep this valuation and deal for seven days and give you a link to return.";
 
 export const VE_SAVE_CONFIRM =
-  "Saved (mock). Your valuation and deal are ready for seven days. Use the resume link below — no email or SMS was sent.";
+  "Saved. This valuation and deal are ready for seven days.";
 
-export const VE_SAVE_RESUME_LABEL = "Mock resume link (expires in 7 days)";
+export const VE_SAVE_RETURN =
+  "Open this link to come back to the same car and valuation. It works once.";
+
+export const VE_SAVE_RESUME_LABEL = "Your resume link";
+
+export const VE_SAVE_CTA = "Save";
+
+export const VE_SAVE_FAILED =
+  "We couldn't save your valuation. Please try again.";
 
 export const VE_DECLINE_TITLE = "Before you go";
 
 export const VE_DECLINE_INTRO =
   "Optional questions help our buyers follow up. You can skip any field.";
+
+export const VE_DECLINE_BETTER =
+  "How could Oakwood make this experience better next time? The questions are optional.";
+
+export const VE_DECLINE_FAILED =
+  "We couldn't save that. Please try again.";
 
 export const VE_DECLINE_EXPECTED = "What were you expecting?";
 
@@ -99,6 +124,9 @@ export const VE_DECLINE_PHONE = "Mobile number";
 export const VE_DECLINE_THANKS =
   "Thanks — we've noted your feedback (mock). You can keep this valuation open.";
 
+export const VE_DECLINE_CALLBACK_THANKS =
+  "Thanks. A buyer can call you about this valuation.";
+
 export const VE_PRIVATE_PLATE_LABEL = "Private plate";
 
 export const VE_PRIVATE_RETAIN = "Keep the plate";
@@ -106,6 +134,8 @@ export const VE_PRIVATE_RETAIN = "Keep the plate";
 export const VE_PRIVATE_SELL = "Sell with the car";
 
 export const VE_OTHER_DETAILS = "Other details";
+
+export const VE_OTHER_REQUIRED = "Tell us about the other extra.";
 
 export const VE_BACK = "Back";
 

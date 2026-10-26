@@ -101,8 +101,10 @@ export interface DealBuilderContextValue {
   navigating: boolean;
   retryCalculation: () => void;
   markSaved: () => void;
+  /** True after the backend has confirmed a resume link for this visit. */
+  saved: boolean;
   /** Field changes are saved automatically. */
-  autosave: "idle" | "saving" | "saved";
+  autosave: "idle" | "saving" | "saved" | "error";
 }
 
 const DealBuilderContext = createContext<DealBuilderContextValue | null>(null);
@@ -182,20 +184,33 @@ function resolveProfile(
 }
 
 /** Autosave via the Route Handler, which persists the draft without re-rendering the page. */
-function saveDealDraft(dealId: string, draft: DealDraft): Promise<unknown> {
+function saveDealDraft(dealId: string, draft: DealDraft): Promise<boolean> {
   return fetch("/api/deal/draft", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ dealId, draft }),
     keepalive: true,
-  }).catch(() => undefined);
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        return false;
+      }
+      const body = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+      } | null;
+      return Boolean(body?.ok);
+    })
+    .catch(() => false);
 }
 
 export function DealBuilderProvider({
   model,
+  step,
   children,
 }: {
   model: Extract<DealPageModel, { status: "ready" }> | DealPageModel;
+  /** Current wizard step, stored so a resume link reopens it. */
+  step?: DealStepName;
   children: ReactNode;
 }) {
   const vehicle = model.vehicle;
@@ -207,6 +222,7 @@ export function DealBuilderProvider({
           // HP deals arrive without mileage; preselect the PCP default so the
           // Step 2 chips and the PCP quote tab always have a value.
           annualMileage: model.draft.annualMileage ?? defaultMileage,
+          resumeStep: step ?? model.draft.resumeStep,
         }
       : {
           financeType: "hp",
@@ -222,6 +238,7 @@ export function DealBuilderProvider({
           productIds: [],
           productYears: {},
           stepsCompleted: [],
+          resumeStep: step,
         },
   );
   const pendingSave = useRef<number | null>(null);
@@ -229,7 +246,9 @@ export function DealBuilderProvider({
   const [navTarget, setNavTarget] = useState<string | null>(null);
   const [pxError, setPxError] = useState<string>();
   const [saved, setSaved] = useState(false);
-  const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
+  const [autosave, setAutosave] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
   const autosaveReady = useRef(false);
   /** Condition, history and finance chosen before a valuation exists. */
   const pendingPxAnswers = useRef<Partial<DealPartExchangeInput>>({});
@@ -285,8 +304,8 @@ export function DealBuilderProvider({
     }
     const timer = window.setTimeout(() => {
       pendingSave.current = null;
-      void saveDealDraft(model.dealId, draft).then(() => {
-        if (showStatus) setAutosave("saved");
+      void saveDealDraft(model.dealId, draft).then((ok) => {
+        if (showStatus) setAutosave(ok ? "saved" : "error");
       });
       trackEvent(analyticsEvents.dealRecalculated);
       if (calculation && !calculation.valid) {
@@ -795,6 +814,7 @@ export function DealBuilderProvider({
       navigating: navTarget !== null,
       retryCalculation,
       markSaved,
+      saved,
       autosave,
     };
   }, [
@@ -811,6 +831,7 @@ export function DealBuilderProvider({
     navigateTo,
     navTarget,
     autosave,
+    saved,
     markSaved,
     markStepComplete,
     setFinanceApplication,

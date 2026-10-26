@@ -1,11 +1,11 @@
 "use server";
 
 import { withSessionPersistence } from "@/lib/session/persist";
-import { randomBytes } from "crypto";
 import { reservationConfig } from "@/config/reservation";
 import { calculateDeal } from "@/lib/deal/calculate";
 import { DEAL_PROVIDER_CONFIG } from "@/lib/deal/provider-config";
-import { mockPaymentIntent } from "@/lib/payments/stripe";
+import { stripeIntegration } from "@/lib/api/integrations";
+import { createStripeAdapter } from "@/lib/payments/stripe";
 import { findVehicleByStockId } from "@/lib/vehicles/query";
 import { isReservable } from "@/lib/vehicles/sold";
 import { getDealRecord } from "@/features/deal/store";
@@ -13,13 +13,10 @@ import { readDealCookieId } from "@/features/deal/session";
 import {
   applyDueTransitions,
   applyMockWebhook,
-  getIdempotentReservation,
   findReservationByReference,
-  getReservationRecord,
   isActiveReservation,
   isStockLockedByOther,
   patchReservation,
-  rememberIdempotency,
   releaseStock,
   type ReservationRecord,
 } from "@/features/reservation/store";
@@ -29,7 +26,7 @@ import {
   writeReservationCookie,
 } from "@/features/reservation/session";
 import type { ReservationDealSnapshot } from "@/types/reservation";
-import type { MockPaymentOutcome, RefundReasonCode } from "@/types/reservation";
+import type { RefundReasonCode } from "@/types/reservation";
 import type { Vehicle } from "@/types/vehicle";
 import {
   toStatusSnapshot,
@@ -72,36 +69,6 @@ function snapshotFromDeal(
     annualMileage: deal.annualMileage,
     monthlyPayment: calculation.monthlyPayment,
   };
-}
-
-function mockOutcomeFromEmail(email: string): MockPaymentOutcome {
-  const local = email.trim().toLowerCase().split("@")[0] ?? "";
-  if (local.startsWith("fail")) {
-    return "fail";
-  }
-  if (local.startsWith("conflict")) {
-    return "conflict";
-  }
-  if (local.startsWith("reconcile")) {
-    return "reconcile";
-  }
-  if (local.startsWith("pending")) {
-    return "pending";
-  }
-  if (local.startsWith("expire")) {
-    return "expire";
-  }
-  if (local.startsWith("sold")) {
-    return "sold";
-  }
-  if (local.startsWith("finance")) {
-    return "finance_unavailable";
-  }
-  return "succeed";
-}
-
-function createIdempotencyKey(): string {
-  return randomBytes(16).toString("hex");
 }
 
 export const startReservationAction = withSessionPersistence(async function startReservationAction(input: {
@@ -176,7 +143,8 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
         | "conflict"
         | "invalid_email"
         | "invalid_contact"
-        | "already_requested";
+        | "already_requested"
+        | "stripe_unavailable";
       status?: ReservationStatusSnapshot;
     }
 > {
@@ -202,21 +170,6 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
     return { ok: true, status: toStatusSnapshot(record) };
   }
 
-  const idempotencyKey =
-    input.idempotencyKey || record.idempotencyKey || createIdempotencyKey();
-  const existingId = getIdempotentReservation(idempotencyKey);
-  if (existingId && existingId !== record.id) {
-    const existing = getReservationRecord(existingId);
-    if (existing) {
-      return { ok: true, status: toStatusSnapshot(applyDueTransitions(existing)) };
-    }
-  }
-  rememberIdempotency(idempotencyKey, record.id);
-
-  if (record.idempotencyKey === idempotencyKey && record.paymentIntentId) {
-    return { ok: true, status: toStatusSnapshot(record) };
-  }
-
   if (!vehicle || !isReservable(vehicle)) {
     return { ok: false, reason: "unavailable", status: toStatusSnapshot(record) };
   }
@@ -225,59 +178,15 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
     return { ok: false, reason: "conflict", status: toStatusSnapshot(record) };
   }
 
-  const outcome = mockOutcomeFromEmail(email);
-
-  if (outcome === "conflict") {
-    const next =
-      patchReservation(record.id, {
-        email,
-        customerName: name,
-        telephone,
-        mockOutcome: outcome,
-        paymentState: "pending",
-        stockState: "available",
-        webhookApplied: true,
-      }) ?? record;
-    return { ok: false, reason: "conflict", status: toStatusSnapshot(next) };
+  const paymentsLive =
+    createStripeAdapter().connected && Boolean(stripeIntegration.implemented);
+  if (!paymentsLive) {
+    return { ok: false, reason: "stripe_unavailable" };
   }
 
-  const intent = mockPaymentIntent({
-    reservationId: record.id,
-    amount: record.amount,
-    currency: record.currency,
-    idempotencyKey,
-    metadata: {
-      stockId: record.vehicleStockId,
-      location: record.locationSlug,
-      registration: record.registration,
-    },
-    outcome,
-  });
-
-  const delay =
-    outcome === "pending"
-      ? Math.max(reservationConfig.mockWebhookDelayMs, 8000)
-      : reservationConfig.mockWebhookDelayMs;
-
-  const next =
-    patchReservation(record.id, {
-      email,
-      customerName: name,
-      telephone,
-      mockOutcome: outcome,
-      idempotencyKey,
-      paymentIntentId: intent.paymentIntentId,
-      paymentState: outcome === "fail" ? "failed" : "pending",
-      webhookApplied: outcome === "fail",
-      webhookDueAt:
-        outcome === "fail" ? undefined : Date.now() + delay,
-    }) ?? record;
-
-  if (outcome === "fail") {
-    return { ok: true, status: toStatusSnapshot(next) };
-  }
-
-  return { ok: true, status: toStatusSnapshot(next) };
+  // PaymentIntent creation belongs here. Do not mark the car reserved in
+  // this action — only a confirmed Stripe webhook may do that.
+  return { ok: false, reason: "stripe_unavailable" };
 });
 
 export const pollReservationAction = withSessionPersistence(async function pollReservationAction(): Promise<

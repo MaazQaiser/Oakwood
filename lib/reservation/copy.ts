@@ -44,6 +44,12 @@ export const reservationCopy = {
   successSupporting: "We're holding this vehicle for you.",
   notReserved: "Your vehicle has not been reserved.",
   paymentFailedHeading: "We couldn't process your payment.",
+  stripeUnavailable:
+    "We couldn't take payment just now. Your car has not been reserved. You can try again.",
+  paymentReassurance:
+    "Fully refundable. After payment is confirmed, the car is held for the reservation period under the reservation terms.",
+  cardFallback:
+    "Card details are entered in Stripe. Oakwood does not store your card number.",
   concurrent:
     "Sorry, this vehicle has just been reserved by another customer.",
   reconciliation:

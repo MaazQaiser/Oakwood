@@ -19,7 +19,11 @@ import { Container } from "@/components/layout/Container";
 import { JourneyChrome } from "@/components/layout/JourneyChrome";
 import type { DealStep } from "@/config/routes";
 import { getDealUrl, getVehicleUrl } from "@/config/routes";
-import { DEAL_AUTOSAVE_SAVED, DEAL_AUTOSAVE_SAVING } from "@/lib/deal/copy";
+import {
+  DEAL_AUTOSAVE_ERROR,
+  DEAL_AUTOSAVE_SAVED,
+  DEAL_AUTOSAVE_SAVING,
+} from "@/lib/deal/copy";
 import { DEAL_STEP_META, DEAL_STEPS } from "@/lib/deal/steps";
 import type { DealPageModel } from "@/types/deal";
 import { Button } from "@/components/ui/Button";
@@ -98,10 +102,19 @@ function WizardInner({
                 {meta.supporting}
               </p>
               {autosave !== "idle" ? (
-                <p className="mt-2 text-caption text-muted" role="status">
+                <p
+                  className={
+                    autosave === "error"
+                      ? "mt-2 text-caption text-danger"
+                      : "mt-2 text-caption text-muted"
+                  }
+                  role="status"
+                >
                   {autosave === "saving"
                     ? DEAL_AUTOSAVE_SAVING
-                    : DEAL_AUTOSAVE_SAVED}
+                    : autosave === "error"
+                      ? DEAL_AUTOSAVE_ERROR
+                      : DEAL_AUTOSAVE_SAVED}
                 </p>
               ) : null}
             </header>
@@ -219,7 +232,7 @@ export function DealWizardShell({
   }
 
   return (
-    <DealBuilderProvider model={model}>
+    <DealBuilderProvider model={model} step={step}>
       <WizardInner step={step}>{children}</WizardInner>
     </DealBuilderProvider>
   );

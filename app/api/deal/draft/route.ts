@@ -3,6 +3,7 @@ import {
   ensureDemoDeal,
   getDealRecord,
   isDealExpired,
+  isDealResumeStep,
   touchDeal,
 } from "@/features/deal/store";
 import { listSelectedProducts } from "@/lib/deal/products";
@@ -65,6 +66,9 @@ export async function POST(request: Request) {
     decision: draft.decision,
     financeApplication: draft.financeApplication,
     stepsCompleted: draft.stepsCompleted,
+    ...(isDealResumeStep(draft.resumeStep)
+      ? { resumeStep: draft.resumeStep }
+      : {}),
   });
   await persistDeal(updated);
   return Response.json({ ok: true });

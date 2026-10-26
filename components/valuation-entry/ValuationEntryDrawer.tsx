@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Drawer } from "@/components/ui/Dialogs";
-import { BeforeYouGoModal } from "@/components/valuation-entry/BeforeYouGoModal";
+import {
+  BeforeYouGoModal,
+  type ValuationDeclineContext,
+} from "@/components/valuation-entry/BeforeYouGoModal";
 import { ValuationEntryFlow } from "@/components/valuation-entry/ValuationEntryFlow";
 import { VE_FLOW_TITLE } from "@/lib/valuation-entry/copy";
 import type { FinanceProductType } from "@/types/finance";
@@ -30,20 +33,41 @@ export function ValuationEntryDrawer({
   onClose: () => void;
 }) {
   const [declineOpen, setDeclineOpen] = useState(false);
+  const [declineContext, setDeclineContext] = useState<
+    Omit<ValuationDeclineContext, "sessionId">
+  >({
+    stockId,
+    registration,
+  });
   const resultReadyAt = useRef<number | null>(null);
+  const autoOffered = useRef(false);
+  const abandonRef = useRef<() => boolean>(() => false);
+  const registerAbandon = useCallback((handler: () => boolean) => {
+    abandonRef.current = handler;
+  }, []);
+  const sessionId = useRef(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `ve-${stockId}`,
+  );
 
   useEffect(() => {
     if (!open) {
       resultReadyAt.current = null;
+      autoOffered.current = false;
       setDeclineOpen(false);
     }
   }, [open]);
 
-  const markResultReady = useCallback(() => {
-    if (resultReadyAt.current === null) {
-      resultReadyAt.current = Date.now();
-    }
-  }, []);
+  const markResultReady = useCallback(
+    (context: Omit<ValuationDeclineContext, "sessionId">) => {
+      if (resultReadyAt.current === null) {
+        resultReadyAt.current = Date.now();
+      }
+      setDeclineContext(context);
+    },
+    [],
+  );
 
   const coolDownElapsed = useCallback(() => {
     if (resultReadyAt.current === null) {
@@ -52,46 +76,42 @@ export function ValuationEntryDrawer({
     return Date.now() - resultReadyAt.current >= 2000;
   }, []);
 
+  const openDecline = useCallback((kind: "explicit" | "auto") => {
+    setDeclineOpen((current) => {
+      if (current) {
+        return current;
+      }
+      if (kind === "auto" && (autoOffered.current || !coolDownElapsed())) {
+        return current;
+      }
+      autoOffered.current = true;
+      return true;
+    });
+  }, [coolDownElapsed]);
+
   const handleDrawerClose = useCallback(() => {
-    if (coolDownElapsed()) {
-      setDeclineOpen(true);
+    if (abandonRef.current()) {
       return;
     }
     onClose();
-  }, [coolDownElapsed, onClose]);
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    const onPageHide = () => {
-      if (coolDownElapsed()) {
-        setDeclineOpen(true);
-      }
-    };
-
-    const onMouseLeave = (event: MouseEvent) => {
-      if (event.clientY > 0) {
+    const onAbandon = () => {
+      if (abandonRef.current()) {
         return;
       }
-      if (coolDownElapsed()) {
-        setDeclineOpen(true);
-      }
+      openDecline("auto");
     };
-
-    const onBackground = () => {
-      if (document.visibilityState === "hidden") onPageHide();
-    };
-    window.addEventListener("pagehide", onPageHide);
-    document.addEventListener("visibilitychange", onBackground);
-    document.documentElement.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("pagehide", onAbandon);
     return () => {
-      window.removeEventListener("pagehide", onPageHide);
-      document.removeEventListener("visibilitychange", onBackground);
-      document.documentElement.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("pagehide", onAbandon);
     };
-  }, [open, coolDownElapsed]);
+  }, [open, openDecline]);
 
   return (
     <>
@@ -112,14 +132,12 @@ export function ValuationEntryDrawer({
             financeType={financeType}
             initialVehicle={initialVehicle}
             onReachedResult={markResultReady}
-            onRequestDecline={() => setDeclineOpen(true)}
+            onRequestDecline={() => openDecline("explicit")}
+            onRegisterAbandon={registerAbandon}
             onCloseRequest={({ fromResult }) => {
-              if (fromResult && coolDownElapsed()) {
-                setDeclineOpen(true);
+              if (fromResult && abandonRef.current()) {
+                window.history.pushState({ veFlow: true }, "");
                 return;
-              }
-              if (fromResult) {
-                markResultReady();
               }
               onClose();
             }}
@@ -128,11 +146,8 @@ export function ValuationEntryDrawer({
       </Drawer>
       <BeforeYouGoModal
         open={declineOpen}
-        onClose={() => {
-          setDeclineOpen(false);
-          // Decline point reached — close the valuation drawer after feedback.
-          onClose();
-        }}
+        context={{ ...declineContext, sessionId: sessionId.current }}
+        onClose={() => setDeclineOpen(false)}
       />
     </>
   );

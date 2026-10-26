@@ -1,29 +1,28 @@
 "use client";
 
-import { useId, useMemo, useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
+import { Field, Input } from "@/components/forms/FormControls";
 import { StripePaymentElement } from "@/components/reservation/StripePaymentElement";
 import { ReservationProcessing } from "@/components/reservation/ReservationProcessing";
 import { submitReservationPaymentAction } from "@/features/reservation/actions";
-import {
-  getDealUrl,
-  getReserveUrl,
-  supportRoutes,
-} from "@/config/routes";
+import { routes, getDealUrl, getReserveUrl, supportRoutes } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
-import { reservationCopy, payBelowCopy, payHeadingCopy } from "@/lib/reservation/copy";
-import { payAndReserveLabel, reservationAmountLabel } from "@/lib/reservation/format";
+import { emailError, telephoneError } from "@/lib/aftersales/validation";
+import {
+  payBelowCopy,
+  payHeadingCopy,
+  reservationCopy,
+} from "@/lib/reservation/copy";
+import {
+  payAndReserveLabel,
+  reservationAmountLabel,
+} from "@/lib/reservation/format";
 import { formatPounds } from "@/lib/format/money";
 import type { ReservationPageModel } from "@/features/reservation/load";
-
-function createIdempotencyKey(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID().replace(/-/g, "");
-  }
-  return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
-}
 
 export function ReservationPayment({ model }: { model: ReservationPageModel }) {
   const router = useRouter();
@@ -33,10 +32,12 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [nameMessage, setNameMessage] = useState<string>();
+  const [emailMessage, setEmailMessage] = useState<string>();
+  const [phoneMessage, setPhoneMessage] = useState<string>();
   const [error, setError] = useState<string | null>(null);
   const [submitting, startTransition] = useTransition();
   const [processing, setProcessing] = useState(false);
-  const idempotencyKey = useMemo(() => createIdempotencyKey(), []);
   const vehicle = model.vehicle;
   const amountLabel = reservationAmountLabel(model.amount);
 
@@ -45,25 +46,33 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
   }
 
   const stockId = vehicle.stockId;
+  const busy = submitting || processing;
 
-  if (processing) {
-    return <ReservationProcessing label={reservationCopy.processing} />;
+  function contactReady() {
+    const nextName = name.trim().length < 2 ? "Enter your name." : undefined;
+    const nextEmail = emailError(email);
+    const nextPhone = telephoneError(telephone);
+    setNameMessage(nextName);
+    setEmailMessage(nextEmail);
+    setPhoneMessage(nextPhone);
+    return !nextName && !nextEmail && !nextPhone;
   }
 
-  function submit() {
-    if (submitting || processing) {
+  function pay() {
+    if (busy) {
       return;
     }
     setError(null);
-    trackEvent(analyticsEvents.reservationPaymentSubmitted, {
-      stockId,
-    });
+    if (!contactReady()) {
+      return;
+    }
+    trackEvent(analyticsEvents.reservationPaymentSubmitted, { stockId });
     setProcessing(true);
     startTransition(() => {
-      void submitReservationPaymentAction({ email, name, telephone, idempotencyKey }).then(
+      void submitReservationPaymentAction({ email, name, telephone }).then(
         (result) => {
+          setProcessing(false);
           if (!result.ok) {
-            setProcessing(false);
             if (result.reason === "conflict") {
               trackEvent(analyticsEvents.reservationConcurrentConflict, {
                 stockId,
@@ -76,38 +85,52 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
               return;
             }
             if (result.reason === "invalid_email") {
-              setError("Enter a valid email address so we can send your confirmation.");
+              setEmailMessage("Enter a valid email address.");
               return;
             }
             if (result.reason === "invalid_contact") {
               setError("Enter your name and a phone number.");
               return;
             }
-            setError("We could not start payment. Try again.");
+            if (result.reason === "stripe_unavailable") {
+              trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
+              setError(reservationCopy.stripeUnavailable);
+              return;
+            }
+            setError(reservationCopy.stripeUnavailable);
+            return;
+          }
+          if (
+            result.status.phase === "RESERVED" &&
+            result.status.paymentState === "paid"
+          ) {
+            trackEvent(analyticsEvents.reservationPaymentSucceeded, { stockId });
+            router.push(getReserveUrl(stockId, "success"));
             return;
           }
           if (result.status.paymentFailed) {
-            trackEvent(analyticsEvents.reservationPaymentFailed, {
-              stockId,
-            });
+            trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
             router.push(getReserveUrl(stockId, "failed"));
             return;
           }
-          trackEvent(analyticsEvents.reservationPaymentSucceeded, {
-            stockId,
-          });
-          router.push(getReserveUrl(stockId, "success"));
+          setError(reservationCopy.notReserved);
         },
       );
     });
   }
 
+  if (processing) {
+    return <ReservationProcessing label={reservationCopy.processing} />;
+  }
+
   return (
     <section aria-labelledby="reservation-payment-heading">
-      <h1 id="reservation-payment-heading" className="text-h2">
+      <p className="oak-eyebrow">Reserve this car</p>
+      <h1 id="reservation-payment-heading" className="mt-2 text-h2 text-navy">
         {payHeadingCopy(model.amount)}
       </h1>
-      <p className="mt-2 text-body">{reservationCopy.payAbove}</p>
+      <p className="mt-2 text-body-sm text-secondary">{reservationCopy.payAbove}</p>
+
       <dl className="mt-5 space-y-2 text-body-sm">
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Vehicle</dt>
@@ -115,7 +138,7 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
         </div>
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Reservation</dt>
-          <dd>{amountLabel}</dd>
+          <dd>{amountLabel} · refundable</dd>
         </div>
         <div className="flex justify-between gap-4 border-t border-border pt-2">
           <dt className="text-label">{reservationCopy.amountPayableToday}</dt>
@@ -123,82 +146,95 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
         </div>
       </dl>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor={nameId} className="text-label">
-            Name
-          </label>
-          <input
+      <div className="mt-6 space-y-4">
+        <Field htmlFor={nameId} label="Name" error={nameMessage}>
+          <Input
             id={nameId}
             name="name"
             autoComplete="name"
-            required
             value={name}
-            onChange={(event) => setName(event.target.value)}
-            className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
+            error={Boolean(nameMessage)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setNameMessage(undefined);
+            }}
           />
-        </div>
-        <div>
-          <label htmlFor={phoneId} className="text-label">
-            Phone
-          </label>
-          <input
+        </Field>
+        <Field htmlFor={phoneId} label="Mobile number" error={phoneMessage}>
+          <Input
             id={phoneId}
             name="tel"
             type="tel"
             autoComplete="tel"
-            required
+            inputMode="tel"
             value={telephone}
-            onChange={(event) => setTelephone(event.target.value)}
-            className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
+            error={Boolean(phoneMessage)}
+            onChange={(event) => {
+              setTelephone(event.target.value);
+              setPhoneMessage(undefined);
+            }}
           />
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <label htmlFor={emailId} className="text-label">
-          Email for confirmation
-        </label>
-        <input
-          id={emailId}
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
-        />
+        </Field>
+        <Field htmlFor={emailId} label="Email for confirmation" error={emailMessage}>
+          <Input
+            id={emailId}
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            value={email}
+            error={Boolean(emailMessage)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setEmailMessage(undefined);
+            }}
+          />
+        </Field>
       </div>
 
       <div className="mt-6">
         <StripePaymentElement
           wallets={model.stripe.wallets}
           connected={model.stripe.connected}
+          busy={busy || model.dealChanged}
+          onWallet={() => pay()}
         />
       </div>
 
       {error ? (
         <div className="mt-4">
           <Alert title={error} tone="warning">
+            <p>{reservationCopy.notReserved}</p>
             {error === reservationCopy.concurrent ? (
               <Button href={`${getReserveUrl(vehicle.stockId)}#similar`} size="sm">
                 View similar cars
               </Button>
-            ) : null}
+            ) : (
+              <Button size="sm" onClick={() => pay()}>
+                Try again
+              </Button>
+            )}
           </Alert>
         </div>
       ) : null}
 
       <p className="mt-4 text-body-sm text-muted">
-        {payBelowCopy(model.holdDurationDays)}
+        {reservationCopy.paymentReassurance} {payBelowCopy(model.holdDurationDays)}
+      </p>
+      <p className="mt-2 text-body-sm">
+        <Link
+          href={routes.reservationTerms}
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          Reservation terms
+        </Link>
       </p>
 
       <div className="mt-6 flex flex-col gap-3">
         <Button
           className="w-full"
-          onClick={submit}
-          busy={submitting || processing}
+          onClick={() => pay()}
+          busy={busy}
           disabled={model.dealChanged}
         >
           {payAndReserveLabel(model.amount)}

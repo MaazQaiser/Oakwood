@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { Check, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { LoadingState } from "@/components/ui/Loading";
@@ -25,6 +25,9 @@ import {
   APP_CONTINUE,
   APP_NOT_CREDIT_DECISION,
   APP_PROGRESS_LABEL,
+  APP_SAVED,
+  APP_SAVING,
+  APP_SECTION_SHORT,
   APP_SECTION_TITLES,
   APP_SUBMIT,
   APP_SUBMIT_ERROR,
@@ -32,11 +35,7 @@ import {
   APP_SUPPORTING,
   APP_TITLE,
 } from "@/lib/deal/application/copy";
-import {
-  buildMockApplicationResult,
-  mockSubmitDelayMs,
-  shouldMockSubmitFail,
-} from "@/lib/deal/application/mock";
+import { submitEmbeddedApplication } from "@/lib/deal/application/submit";
 import {
   getApplicationSections,
   initialApplicationDraft,
@@ -54,9 +53,11 @@ import type {
 function ApplicationProgress({
   sectionId,
   sections,
+  onSelect,
 }: {
   sectionId: DealApplicationSectionId;
   sections: ReturnType<typeof getApplicationSections>;
+  onSelect: (id: DealApplicationSectionId) => void;
 }) {
   const index = Math.max(
     0,
@@ -64,49 +65,67 @@ function ApplicationProgress({
   );
   const current = index + 1;
   const total = sections.length;
+  const label = APP_PROGRESS_LABEL(current, total);
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="text-caption font-semibold! text-muted">
-          {APP_PROGRESS_LABEL(current, total)}
-        </p>
-        <p className="text-caption text-muted">
-          {Math.round((current / total) * 100)}%
-        </p>
-      </div>
-      <div
-        className="h-1.5 overflow-hidden rounded-full bg-border"
-        role="progressbar"
-        aria-valuemin={1}
-        aria-valuemax={total}
-        aria-valuenow={current}
-        aria-label={APP_PROGRESS_LABEL(current, total)}
+    <nav aria-label="Application progress" className="space-y-3">
+      <p className="text-caption font-semibold! text-muted">{label}</p>
+      <ol
+        className={cn(
+          "grid grid-cols-3 gap-x-2 gap-y-3",
+          total > 5 ? "sm:grid-cols-6" : "sm:grid-cols-5",
+        )}
       >
-        <div
-          className="h-full rounded-full bg-primary transition-[width] duration-300"
-          style={{ width: `${(current / total) * 100}%` }}
-        />
-      </div>
-      <ol className="hidden gap-1 sm:flex sm:flex-wrap">
-        {sections.map((section, i) => (
-          <li
-            key={section.id}
-            className={cn(
-              "rounded-full px-2.5 py-1 text-caption",
-              i === index
-                ? "bg-primary text-white"
-                : i < index
-                  ? "bg-primary-soft text-primary"
-                  : "bg-page-tint text-muted",
-            )}
-          >
-            {section.title}
-            {section.optional ? " · optional" : ""}
-          </li>
-        ))}
+        {sections.map((section, i) => {
+          const done = i < index;
+          const active = i === index;
+          const body = (
+            <>
+              <span
+                aria-hidden
+                className={cn(
+                  "grid h-8 w-8 place-items-center rounded-full text-caption font-semibold!",
+                  active && "bg-primary text-white",
+                  done && "bg-primary-soft text-primary",
+                  !active && !done && "bg-page-tint text-muted",
+                )}
+              >
+                {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
+              </span>
+              <span className="max-w-full text-center text-caption leading-tight">
+                {APP_SECTION_SHORT[section.id]}
+              </span>
+              {section.optional ? (
+                <span className="text-[0.7rem] font-normal text-muted">Optional</span>
+              ) : null}
+            </>
+          );
+          return (
+            <li key={section.id} className="min-w-0">
+              {done ? (
+                <button
+                  type="button"
+                  onClick={() => onSelect(section.id)}
+                  className="flex w-full flex-col items-center gap-1 text-center text-ink"
+                >
+                  {body}
+                </button>
+              ) : (
+                <div
+                  className={cn(
+                    "flex w-full flex-col items-center gap-1 text-center",
+                    active ? "font-semibold! text-navy" : "text-muted",
+                  )}
+                  aria-current={active ? "step" : undefined}
+                >
+                  {body}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ol>
-    </div>
+    </nav>
   );
 }
 
@@ -148,7 +167,8 @@ function SectionBody({
 }
 
 export function DealApplicationFlow() {
-  const { dealId, draft, setFinanceApplication, navigateTo } = useDealBuilder();
+  const { dealId, draft, autosave, setFinanceApplication, navigateTo } =
+    useDealBuilder();
   const headingId = useId();
   const sections = useMemo(() => getApplicationSections(), []);
   const [appDraft, setAppDraft] = useState<DealFinanceApplicationDraft>(() =>
@@ -169,7 +189,9 @@ export function DealApplicationFlow() {
     trackEvent(analyticsEvents.applicationStarted, { dealId });
   }, [dealId]);
 
-  const [savedNote, setSavedNote] = useState(false);
+  const [savedNote, setSavedNote] = useState(
+    () => Boolean(draft.financeApplication),
+  );
 
   function persist(next: DealFinanceApplicationDraft) {
     setAppDraft(next);
@@ -225,57 +247,54 @@ export function DealApplicationFlow() {
 
   async function submitApplication() {
     if (submitting) return;
+    const pending: DealFinanceApplicationDraft = {
+      ...appDraft,
+      submitError: undefined,
+    };
     setSubmitting(true);
     setPhase("submitting");
-    persist({ ...appDraft, submitError: undefined });
+    persist(pending);
 
-    await new Promise((resolve) =>
-      window.setTimeout(resolve, mockSubmitDelayMs()),
-    );
+    const submitted = await submitEmbeddedApplication({
+      dealId,
+      draft,
+      application: pending,
+      form: pending.form,
+    });
 
-    if (shouldMockSubmitFail(appDraft.form)) {
-      const failed: DealFinanceApplicationDraft = {
-        ...appDraft,
+    if (!submitted.ok) {
+      persist({
+        ...pending,
         submitError: APP_SUBMIT_ERROR,
         result: undefined,
-      };
-      persist(failed);
+      });
       setSubmitting(false);
       setPhase("form");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    const result = buildMockApplicationResult(dealId, appDraft.form);
-    // Form values stay saved for resume. Confirmation UI never echoes bank digits.
-    const confirmed: DealFinanceApplicationDraft = {
+    persist({
       section: "licence",
-      form: appDraft.form,
-      result,
+      form: pending.form,
+      result: submitted.result,
       submitError: undefined,
-    };
-    persist(confirmed);
+    });
     setSubmitting(false);
     setPhase("outcome");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (phase === "outcome" && appDraft.result) {
-    return <ApplicationOutcome result={appDraft.result} />;
-  }
-
-  if (phase === "submitting") {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16">
-        <LoadingState label={APP_SUBMITTING} />
-        <p className="max-w-sm text-center text-caption text-muted">
-          A lending decision is not available. Nothing is sent to a lender.
-        </p>
-      </div>
-    );
-  }
-
   const isLast = sectionIndex >= sections.length - 1;
+  const showOutcome = phase === "outcome" && appDraft.result;
+  const progressStatus =
+    autosave === "saving"
+      ? APP_SAVING
+      : autosave === "error"
+        ? null
+        : savedNote
+          ? APP_SAVED
+          : null;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -296,52 +315,76 @@ export function DealApplicationFlow() {
               Back to your next step
             </Button>
 
-            <header>
-              <p className="oak-eyebrow">{APP_TITLE}</p>
-              <h1
-                id={headingId}
-                className="mt-2 text-[1.75rem] font-semibold! leading-tight tracking-[-0.03em] text-navy sm:text-[2.15rem]"
-              >
-                {sectionMeta.title}
-              </h1>
-              <p className="mt-2 text-body-sm text-secondary">{APP_SUPPORTING}</p>
-            </header>
+            {showOutcome && appDraft.result ? (
+              <ApplicationOutcome result={appDraft.result} />
+            ) : (
+              <>
+                <header>
+                  <p className="oak-eyebrow">{APP_TITLE}</p>
+                  <h1
+                    id={headingId}
+                    className="mt-2 text-[1.75rem] font-semibold! leading-tight tracking-[-0.03em] text-navy sm:text-[2.15rem]"
+                  >
+                    {sectionMeta.title}
+                  </h1>
+                  <p className="mt-2 text-body-sm text-secondary">{APP_SUPPORTING}</p>
+                </header>
 
-            <ApplicationProgress sectionId={sectionId} sections={sections} />
-            {savedNote ? (
-              <p className="text-caption text-muted" role="status">
-                Progress saved on this deal.
-              </p>
-            ) : null}
+                <ApplicationProgress
+                  sectionId={sectionId}
+                  sections={sections}
+                  onSelect={goToSection}
+                />
+                {progressStatus ? (
+                  <p className="text-caption text-muted" role="status">
+                    {progressStatus}
+                  </p>
+                ) : null}
 
-            {appDraft.submitError ? (
-              <Alert title={appDraft.submitError} tone="danger" />
-            ) : null}
+                {appDraft.submitError ? (
+                  <Alert title={appDraft.submitError} tone="danger" />
+                ) : null}
 
-            <Alert title={APP_NOT_CREDIT_DECISION} tone="info" />
+                <Alert title={APP_NOT_CREDIT_DECISION} tone="info" />
 
-            <section
-              className="rounded-card bg-surface p-5 shadow-card sm:p-7"
-              aria-labelledby={headingId}
-            >
-              <h2 className="sr-only">{APP_SECTION_TITLES[sectionId]}</h2>
-              <SectionBody
-                sectionId={sectionId}
-                form={appDraft.form}
-                errors={errors}
-                onChange={updateForm}
-              />
-            </section>
+                <section
+                  className="rounded-card bg-surface p-5 shadow-card sm:p-7"
+                  aria-labelledby={headingId}
+                >
+                  {phase === "submitting" ? (
+                    <div className="flex flex-col items-center gap-3 py-10 text-center">
+                      <LoadingState label={APP_SUBMITTING} />
+                      <p className="max-w-sm text-caption text-muted">
+                        Your answers stay on this deal. An advisor confirms the rate
+                        with you by phone.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <h2 className="sr-only">{APP_SECTION_TITLES[sectionId]}</h2>
+                      <SectionBody
+                        sectionId={sectionId}
+                        form={appDraft.form}
+                        errors={errors}
+                        onChange={updateForm}
+                      />
+                    </>
+                  )}
+                </section>
+              </>
+            )}
           </div>
 
-          <DealStepFooter
-            showMonthly={false}
-            onBack={handleBack}
-            backLabel={sectionIndex <= 0 ? "Back to deal" : APP_BACK}
-            onContinue={handleContinue}
-            continueLabel={isLast ? APP_SUBMIT : APP_CONTINUE}
-            busy={submitting}
-          />
+          {showOutcome || phase === "submitting" ? null : (
+            <DealStepFooter
+              showMonthly={false}
+              onBack={handleBack}
+              backLabel={sectionIndex <= 0 ? "Back to deal" : APP_BACK}
+              onContinue={handleContinue}
+              continueLabel={isLast ? APP_SUBMIT : APP_CONTINUE}
+              busy={submitting}
+            />
+          )}
         </div>
 
         <aside className="hidden lg:sticky lg:top-[calc(var(--oak-header-height)+1.5rem)] lg:block">

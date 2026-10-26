@@ -133,6 +133,8 @@ export function VehiclePrice() {
         </p>
       ) : null}
 
+      <ValuationEntryCard />
+
       {reservable ? (
         <div className="mt-5 rounded-lg border border-border bg-page p-4">
           <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
@@ -144,8 +146,6 @@ export function VehiclePrice() {
           />
         </div>
       ) : null}
-
-      <ValuationEntryCard />
 
       <div className="mt-4 hidden flex-col gap-2 lg:flex">
         {displayState === "representative" ? (

@@ -15,7 +15,11 @@ export const APP_NOT_CREDIT_DECISION =
   "An advisor confirms your rate by phone within 20 minutes.";
 
 export const APP_PROGRESS_LABEL = (current: number, total: number) =>
-  `Section ${current} of ${total}`;
+  `Step ${current} of ${total}`;
+
+export const APP_SAVING = "Saving your progress…";
+
+export const APP_SAVED = "Progress saved on this deal.";
 
 export const APP_BACK = "Back";
 
@@ -23,7 +27,7 @@ export const APP_CONTINUE = "Continue";
 
 export const APP_SUBMIT = "Submit application";
 
-export const APP_SUBMITTING = "Submitting your application…";
+export const APP_SUBMITTING = "Saving your application…";
 
 export const APP_SUBMIT_ERROR =
   "We couldn't submit your application just now. Please try again, or call Oakwood for help.";
@@ -57,31 +61,14 @@ export const APP_OUTGOINGS_HINT =
 
 export const APP_INCOME_HINT = "Gross annual income before tax.";
 
-/** Pre-approved (auto_decision_display OFF) — process update, not an invented APR. */
-export const APP_PREAPPROVED_EYEBROW = "Application received";
+export const APP_RECEIVED_EYEBROW = "Application received";
 
-export const APP_PREAPPROVED_TITLE = "You're pre-approved to continue";
+export const APP_RECEIVED_TITLE = "We've received your application";
 
-export const APP_PREAPPROVED_BODY =
-  "We've received your application. An Oakwood advisor will call within 20 minutes to confirm next steps. This is a process update — not a final lending decision.";
+export const APP_RECEIVED_BODY =
+  "Your details are saved with this deal. An Oakwood advisor will call within 20 minutes. This is not a lending decision, and no rate has been confirmed.";
 
-/** Compliance: "pre-approved" label needs FCA / compliance approval. */
-export const APP_PREAPPROVED_COMPLIANCE =
-  '"Pre-approved" customer wording requires compliance approval before launch.';
-
-export const APP_REFERRED_EYEBROW = "Application under review";
-
-export const APP_REFERRED_TITLE = "We need a little more time";
-
-export const APP_REFERRED_BODY =
-  "Your application needs a further look. Our team will find the right lender option where we can and call you shortly. This is not a final decision.";
-
-export const APP_DECLINED_EYEBROW = "We're reviewing your options";
-
-export const APP_DECLINED_TITLE = "Let's talk through the next step together";
-
-export const APP_DECLINED_BODY =
-  "We couldn't complete an automatic path for this application. An Oakwood advisor will review your details and call you — we're here to help find a workable option where we can. This is not a final credit decision shown online.";
+export const APP_REFERENCE = (reference: string) => `Reference ${reference}`;
 
 export const APP_OUTCOME_DISCLAIMER =
   "An advisor calls within 20 minutes to confirm your rate. This is not a final lending decision.";
@@ -104,6 +91,15 @@ export const APP_SECTION_TITLES = {
   income: "Income and outgoings",
   bank: "Bank details",
   licence: "Driving licence and consent",
+} as const;
+
+export const APP_SECTION_SHORT = {
+  personal: "Personal",
+  address: "Address",
+  employment: "Employment",
+  income: "Income",
+  bank: "Bank",
+  licence: "Licence",
 } as const;
 
 /** Marital options — confirm exact lender list with compliance. */

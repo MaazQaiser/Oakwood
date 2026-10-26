@@ -237,6 +237,77 @@ export function getSalesTimeSlots(
 ): SalesTimeSlot[] {
   const weekday = weekdayFromYmd(ymd);
   const hours = hoursForDay(ymd, weekday);
+  return slotsInWindow(ymd, hours, now);
+}
+
+const WEEKDAY_NAMES = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+] as const;
+
+function parseHoursRange(
+  hours: string,
+): { open: number; close: number } | null {
+  const match = hours.match(/(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})/);
+  if (!match) return null;
+  const open = Number(match[1]) * 60 + Number(match[2]);
+  const close = Number(match[3]) * 60 + Number(match[4]);
+  if (!Number.isFinite(open) || !Number.isFinite(close) || close <= open) {
+    return null;
+  }
+  return { open, close };
+}
+
+function weekdayCovered(daysLabel: string, weekday: number): boolean {
+  const label = daysLabel.toLowerCase().replace(/\s+/g, " ").trim();
+  if (label.includes(" to ")) {
+    const [start, end] = label.split(" to ");
+    const startIdx = WEEKDAY_NAMES.findIndex((name) => start.trim().startsWith(name));
+    const endIdx = WEEKDAY_NAMES.findIndex((name) => end.trim().startsWith(name));
+    if (startIdx >= 0 && endIdx >= 0 && startIdx <= endIdx) {
+      return weekday >= startIdx && weekday <= endIdx;
+    }
+  }
+  return label.includes(WEEKDAY_NAMES[weekday] ?? "");
+}
+
+/**
+ * Sales window from the selected showroom's published hours.
+ * Bank holidays stay closed for online booking unless a date override exists,
+ * because the published exception says those hours vary.
+ */
+function publishedSalesWindow(
+  locationSlug: string,
+  ymd: string,
+): { open: number; close: number; label: string } | null {
+  const override = SHOWROOM_HOUR_OVERRIDES[ymd];
+  if (override) return override;
+
+  const profile = getShowroomProfile(locationSlug);
+  if (!profile || profile.hoursStatus !== "published") return null;
+  if (MOCK_BANK_HOLIDAYS.has(ymd)) return null;
+
+  const row = profile.openingHours.find(
+    (item) =>
+      item.department === "sales" &&
+      weekdayCovered(item.days, weekdayFromYmd(ymd)),
+  );
+  if (!row) return null;
+  const range = parseHoursRange(row.hours);
+  if (!range) return null;
+  return { ...range, label: row.hours };
+}
+
+function slotsInWindow(
+  ymd: string,
+  hours: { open: number; close: number },
+  now: Date,
+): SalesTimeSlot[] {
   const { ymd: today, minutes: nowMinutes } = londonParts(now);
   const slots: SalesTimeSlot[] = [];
   for (let m = hours.open; m < hours.close; m += 30) {
@@ -244,10 +315,54 @@ export function getSalesTimeSlots(
     const minute = m % 60;
     const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
     const pastToday = ymd === today && m <= nowMinutes;
-    slots.push({
-      time,
-      available: !pastToday,
-    });
+    slots.push({ time, available: !pastToday });
   }
   return slots;
+}
+
+/** Next open sales days for one showroom, from its published hours. */
+export function getShowroomOpenDays(
+  locationSlug: string,
+  count = 4,
+  now = new Date(),
+): OpenDayOption[] {
+  const { ymd, minutes } = londonParts(now);
+  const days: OpenDayOption[] = [];
+  let cursor = ymd;
+
+  for (let guard = 0; days.length < count && guard < 21; guard += 1) {
+    const hours = publishedSalesWindow(locationSlug, cursor);
+    const isToday = cursor === ymd;
+    const stillOpenToday = Boolean(hours && isToday && minutes < hours.close);
+    if (hours && (stillOpenToday || !isToday)) {
+      const [y, m, d] = cursor.split("-").map(Number);
+      const date = new Date(Date.UTC(y, m - 1, d, 12));
+      days.push({
+        ymd: cursor,
+        shortLabel: new Intl.DateTimeFormat("en-GB", {
+          weekday: "short",
+          day: "numeric",
+        }).format(date),
+        label: new Intl.DateTimeFormat("en-GB", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        }).format(date),
+        hoursLabel: hours.label,
+      });
+    }
+    cursor = addDaysYmd(cursor, 1);
+  }
+  return days;
+}
+
+/** Half-hour request times inside the selected showroom's published sales hours. */
+export function getShowroomTimeSlots(
+  locationSlug: string,
+  ymd: string,
+  now = new Date(),
+): SalesTimeSlot[] {
+  const hours = publishedSalesWindow(locationSlug, ymd);
+  if (!hours) return [];
+  return slotsInWindow(ymd, hours, now);
 }

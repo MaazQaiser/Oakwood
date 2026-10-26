@@ -8,14 +8,19 @@ import {
 } from "@/features/deal/actions";
 import { getDealUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
-import { negativeEquityBlocksDeal, partExchangePosition } from "@/lib/deal/valuation";
+import { emailError, telephoneError } from "@/lib/aftersales/validation";
+import { saveValuationEmailLead } from "@/features/part-exchange/actions";
+import {
+  VE_EMAIL_FAILED,
+  VE_OTHER_REQUIRED,
+  VE_SAVE_FAILED,
+} from "@/lib/valuation-entry/copy";
 import { mockPrefillExtras } from "@/lib/valuation-entry/extras";
 import {
-  mockCalculateValuation,
   mockLookupRegistration,
   vehicleToDealVehicle,
-  type VeMockValuation,
 } from "@/lib/valuation-entry/mock";
+import { valuePartExchangeVehicle } from "@/lib/part-exchange/valuation";
 import {
   mileageError,
   normaliseRegistration,
@@ -31,19 +36,27 @@ import type {
   DealPxPrivatePlateDisposition,
   DealPxServiceHistory,
 } from "@/types/deal";
-import type { PxIdentifiedVehicle } from "@/types/part-exchange";
+import type { PxIdentifiedVehicle, PxValuation } from "@/types/part-exchange";
 
 export type VeStep =
   | "lookup"
   | "vehicle"
   | "manual"
-  | "condition"
-  | "service"
-  | "extras"
-  | "finance"
+  | "details"
   | "valuing"
+  | "valuation-error"
   | "result"
   | "error";
+
+export type VeDetailsErrors = {
+  condition?: string;
+  service?: string;
+  plate?: string;
+  other?: string;
+  finance?: string;
+  settlement?: string;
+  lender?: string;
+};
 
 export type VeExitPanel = "none" | "email" | "save";
 
@@ -88,11 +101,14 @@ export function useValuationEntry({
   const [settlement, setSettlement] = useState("");
   const [lender, setLender] = useState("");
   const [fieldError, setFieldError] = useState<string>();
-  const [valuation, setValuation] = useState<VeMockValuation>();
+  const [valuation, setValuation] = useState<PxValuation>();
+  const [valuationError, setValuationError] = useState<string>();
+  const [detailsErrors, setDetailsErrors] = useState<VeDetailsErrors>({});
   const [exitPanel, setExitPanel] = useState<VeExitPanel>("none");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const [phoneError, setPhoneError] = useState<string>();
   const [saved, setSaved] = useState(false);
   const [resumeLink, setResumeLink] = useState("");
   const [busy, setBusy] = useState(false);
@@ -106,6 +122,10 @@ export function useValuationEntry({
   });
   const resultReadyAt = useRef<number | null>(null);
   const historyPushed = useRef(false);
+  const stepRef = useRef(step);
+  const onCloseRequestRef = useRef(onCloseRequest);
+  stepRef.current = step;
+  onCloseRequestRef.current = onCloseRequest;
 
   const miles = parseMileage(mileage);
 
@@ -136,7 +156,6 @@ export function useValuationEntry({
         otherNotes: extras.includes("other") ? otherNotes || undefined : undefined,
       },
       valuationDate: valuation.valuationDate,
-      deductions: valuation.deductions,
     };
   }, [
     condition,
@@ -195,19 +214,23 @@ export function useValuationEntry({
   }, [step]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || historyPushed.current) {
+    if (typeof window === "undefined") {
       return;
     }
-    historyPushed.current = true;
-    window.history.pushState({ veFlow: true }, "");
+    if (!historyPushed.current) {
+      historyPushed.current = true;
+      window.history.pushState({ veFlow: true }, "");
+    }
     const onPop = () => {
-      onCloseRequest({ fromResult: step === "result" });
+      onCloseRequestRef.current({
+        fromResult: stepRef.current === "result",
+      });
     };
     window.addEventListener("popstate", onPop);
     return () => {
       window.removeEventListener("popstate", onPop);
     };
-  }, [onCloseRequest, step]);
+  }, []);
 
   function canTriggerAbandon(): boolean {
     if (step !== "result" || resultReadyAt.current === null) {
@@ -218,8 +241,8 @@ export function useValuationEntry({
 
   function goBack() {
     setFieldError(undefined);
-    if (step === "result") {
-      setStep("finance");
+    if (step === "result" || step === "valuation-error" || step === "valuing") {
+      setStep("details");
       return;
     }
     if (step === "error" || step === "vehicle" || step === "lookup") {
@@ -230,20 +253,8 @@ export function useValuationEntry({
       setStep(vehicle ? "vehicle" : "error");
       return;
     }
-    if (step === "condition") {
-      setStep("vehicle");
-      return;
-    }
-    if (step === "service") {
-      setStep("condition");
-      return;
-    }
-    if (step === "extras") {
-      setStep("service");
-      return;
-    }
-    if (step === "finance" || step === "valuing") {
-      setStep("extras");
+    if (step === "details") {
+      setStep(vehicle?.source === "manual" ? "manual" : "vehicle");
     }
   }
 
@@ -251,7 +262,7 @@ export function useValuationEntry({
     if (!vehicle) {
       return;
     }
-    setStep("condition");
+    setStep("details");
   }
 
   function saveManual() {
@@ -276,71 +287,78 @@ export function useValuationEntry({
       transmission: manual.transmission,
       source: "manual",
     });
-    setStep("condition");
+    setStep("details");
   }
 
-  function continueCondition() {
+  function validateDetails(): boolean {
+    const next: VeDetailsErrors = {};
     if (!condition) {
-      setFieldError("Choose a condition.");
-      return;
+      next.condition = "Choose a condition.";
     }
-    setFieldError(undefined);
-    setStep("service");
-  }
-
-  function continueService() {
     if (!serviceHistory) {
-      setFieldError("Choose a service history option.");
-      return;
+      next.service = "Choose a service history option.";
     }
-    setFieldError(undefined);
-    setStep("extras");
-  }
-
-  function continueExtras() {
     if (extras.includes("private-plate") && !privatePlateDisposition) {
-      setFieldError("Tell us whether you want to keep or sell the private plate.");
-      return;
+      next.plate = "Tell us whether you want to keep or sell the private plate.";
     }
-    setFieldError(undefined);
-    setStep("finance");
-  }
-
-  async function continueFinance() {
+    if (extras.includes("other") && otherNotes.trim().length === 0) {
+      next.other = VE_OTHER_REQUIRED;
+    }
     if (financeOutstanding === undefined) {
-      setFieldError("Tell us if you still have finance on this car.");
-      return;
-    }
-    if (financeOutstanding) {
-      const err = settlementError(settlement);
-      if (err) {
-        setFieldError(err);
-        return;
+      next.finance = "Tell us if you still have finance on this car.";
+    } else if (financeOutstanding) {
+      const settlementMessage = settlementError(settlement);
+      if (settlementMessage) {
+        next.settlement = settlementMessage;
       }
       if (lender.trim().length === 0) {
-        setFieldError("Enter the finance lender.");
-        return;
+        next.lender = "Enter the finance lender.";
       }
     }
+    setDetailsErrors(next);
+    return Object.keys(next).length === 0;
+  }
+
+  async function submitDetails() {
+    if (miles === undefined) {
+      setFieldError("Enter the current mileage.");
+      return;
+    }
+    if (!validateDetails()) {
+      return;
+    }
     setFieldError(undefined);
+    setValuationError(undefined);
     setStep("valuing");
     trackEvent(analyticsEvents.pxValuationRequested, {
       source: "entry_hook",
       stockId,
     });
-    const result = await mockCalculateValuation({
-      registration,
-      mileage: miles ?? 0,
-      condition,
-      serviceHistory,
-      extras,
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 400);
     });
-    setValuation(result);
+    const result = valuePartExchangeVehicle({
+      registration,
+      mileage: miles,
+      valuationDate: new Date().toISOString().slice(0, 10),
+    });
+    if (!result.ok) {
+      setValuation(undefined);
+      setValuationError(result.message);
+      setStep("valuation-error");
+      trackEvent(analyticsEvents.pxValuationFailed, {
+        source: "entry_hook",
+        stockId,
+        reason: result.reason,
+      });
+      return;
+    }
+    setValuation(result.valuation);
     setStep("result");
     trackEvent(analyticsEvents.pxValuationReceived, {
       source: "entry_hook",
       stockId,
-      value: result.estimatedValue,
+      value: result.valuation.estimatedValue,
     });
   }
 
@@ -374,12 +392,7 @@ export function useValuationEntry({
       setFieldError("We couldn't start your deal. Please try again.");
       return;
     }
-    const position = partExchangePosition(px.value, px.settlement ?? 0);
-    router.push(
-      negativeEquityBlocksDeal(position.negativeEquity)
-        ? `${getDealUrl(result.dealId, "reserve")}?panel=callback`
-        : getDealUrl(result.dealId, "budget"),
-    );
+    router.push(getDealUrl(result.dealId, "budget"));
   }
 
   async function requestCallback() {
@@ -403,12 +416,29 @@ export function useValuationEntry({
     router.push(`${getDealUrl(result.dealId, "reserve")}?panel=callback`);
   }
 
-  function submitEmail() {
-    if (!email.includes("@")) {
-      setFieldError("Enter a valid email address.");
+  async function submitEmail() {
+    const message = emailError(email);
+    if (message) {
+      setFieldError(message);
+      return;
+    }
+    const px = toDealPx();
+    if (!px) {
+      setFieldError("Complete the valuation before sending it.");
       return;
     }
     setFieldError(undefined);
+    setBusy(true);
+    const result = await saveValuationEmailLead({
+      email,
+      stockId,
+      px,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setFieldError(VE_EMAIL_FAILED);
+      return;
+    }
     setEmailSent(true);
     trackEvent(analyticsEvents.dealSaved, {
       source: "entry_hook",
@@ -417,12 +447,11 @@ export function useValuationEntry({
   }
 
   async function submitSave() {
-    if (!email.includes("@")) {
-      setFieldError("Enter a valid email address.");
-      return;
-    }
-    if (phone.replace(/\D/g, "").length < 10) {
-      setFieldError("Enter a valid UK mobile number.");
+    const message = emailError(email);
+    const mobileMessage = phone.trim() ? telephoneError(phone) : undefined;
+    setFieldError(message);
+    setPhoneError(mobileMessage);
+    if (message || mobileMessage) {
       return;
     }
     const px = toDealPx();
@@ -430,7 +459,6 @@ export function useValuationEntry({
       setFieldError("Complete the valuation before saving.");
       return;
     }
-    setFieldError(undefined);
     setBusy(true);
     const deal = await createDealAction({
       stockId,
@@ -441,7 +469,7 @@ export function useValuationEntry({
     });
     if (!deal.ok) {
       setBusy(false);
-      setFieldError("We couldn't save your progress. Please try again.");
+      setFieldError(VE_SAVE_FAILED);
       return;
     }
     const resume = await createDealResumeLink({
@@ -451,7 +479,7 @@ export function useValuationEntry({
     });
     setBusy(false);
     if (!resume.ok) {
-      setFieldError("We couldn't create a resume link. Please try again.");
+      setFieldError(VE_SAVE_FAILED);
       return;
     }
     setResumeLink(resume.resumePath);
@@ -490,6 +518,9 @@ export function useValuationEntry({
     fieldError,
     setFieldError,
     valuation,
+    valuationError,
+    detailsErrors,
+    setDetailsErrors,
     exitPanel,
     setExitPanel,
     email,
@@ -497,6 +528,8 @@ export function useValuationEntry({
     phone,
     setPhone,
     emailSent,
+    phoneError,
+    setPhoneError,
     saved,
     resumeLink,
     busy,
@@ -507,10 +540,7 @@ export function useValuationEntry({
     runLookup,
     confirmVehicle,
     saveManual,
-    continueCondition,
-    continueService,
-    continueExtras,
-    continueFinance,
+    submitDetails,
     continueToDeal,
     requestCallback,
     submitEmail,

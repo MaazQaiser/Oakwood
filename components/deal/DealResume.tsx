@@ -11,15 +11,23 @@ import {
   reopenUsedDealSession,
   resumeDealSession,
 } from "@/features/deal/actions";
+import { emailError } from "@/lib/aftersales/validation";
 import { getDealUrl, getUsedCarsUrl, routes } from "@/config/routes";
 import {
+  DEAL_RESUME_BODY,
+  DEAL_RESUME_CHECKING,
   DEAL_RESUME_EXPIRED_BODY,
   DEAL_RESUME_EXPIRED_REQUEST,
   DEAL_RESUME_EXPIRED_RESTART,
   DEAL_RESUME_EXPIRED_TITLE,
+  DEAL_RESUME_INVALID_BODY,
+  DEAL_RESUME_INVALID_TITLE,
+  DEAL_RESUME_MISMATCH,
+  DEAL_RESUME_TITLE,
   DEAL_RESUME_USED_BODY,
   DEAL_RESUME_USED_TITLE,
   DEAL_RESUME_VERIFY_EMAIL,
+  DEAL_RESUME_VERIFY_SUBMIT,
 } from "@/lib/deal/copy";
 
 export function DealResume({ token }: { token?: string }) {
@@ -28,7 +36,13 @@ export function DealResume({ token }: { token?: string }) {
   const [error, setError] = useState<string>();
   const [submitting, setSubmitting] = useState(false);
   const [linkStatus, setLinkStatus] = useState<
-    "loading" | "ok" | "expired" | "invalid" | "used" | "missing" | "expired-confirmed"
+    | "loading"
+    | "ok"
+    | "expired"
+    | "invalid"
+    | "used"
+    | "missing"
+    | "expired-confirmed"
   >(token ? "loading" : "missing");
 
   useEffect(() => {
@@ -52,25 +66,25 @@ export function DealResume({ token }: { token?: string }) {
       setError("This resume link is missing. Please request a new one.");
       return;
     }
-    if (!email.trim()) {
-      setError(DEAL_RESUME_VERIFY_EMAIL);
+    const emailMessage = emailError(email);
+    if (emailMessage) {
+      setError(emailMessage);
       return;
     }
     setSubmitting(true);
+    setError(undefined);
     if (linkStatus === "used" || linkStatus === "expired") {
       const checked = await reopenUsedDealSession({ token, email });
       setSubmitting(false);
       if (!checked.ok) {
-        setError(
-          "We couldn't match those details. Please check your email and try again.",
-        );
+        setError(DEAL_RESUME_MISMATCH);
         return;
       }
       if (checked.status === "expired") {
         setLinkStatus("expired-confirmed");
         return;
       }
-      router.push(getDealUrl(checked.dealId, "part-exchange"));
+      router.push(getDealUrl(checked.dealId, checked.step));
       return;
     }
     const result = await resumeDealSession({ token, email });
@@ -78,20 +92,16 @@ export function DealResume({ token }: { token?: string }) {
     if (!result.ok) {
       if (result.reason === "expired") {
         setLinkStatus("expired");
-        setError(undefined);
         return;
       }
       if (result.reason === "used") {
         setLinkStatus("used");
-        setError(undefined);
         return;
       }
-      setError(
-        "We couldn't match those details. Please check your email and try again.",
-      );
+      setError(DEAL_RESUME_MISMATCH);
       return;
     }
-    router.push(getDealUrl(result.dealId, "part-exchange"));
+    router.push(getDealUrl(result.dealId, result.step));
   }
 
   if (linkStatus === "loading") {
@@ -99,22 +109,24 @@ export function DealResume({ token }: { token?: string }) {
       <Section>
         <Container width="narrow">
           <p className="text-body text-muted" role="status">
-            Checking your resume link…
+            {DEAL_RESUME_CHECKING}
           </p>
         </Container>
       </Section>
     );
   }
 
-  if (linkStatus === "expired-confirmed" || (linkStatus === "expired" && token === "mock-expired")) {
+  if (linkStatus === "expired-confirmed") {
     return (
       <Section>
         <Container width="narrow">
           <h1 className="text-h2">{DEAL_RESUME_EXPIRED_TITLE}</h1>
           <p className="mt-3 text-body text-muted">{DEAL_RESUME_EXPIRED_BODY}</p>
-          <Alert title="Expired after seven days" tone="warning">
-            {DEAL_RESUME_EXPIRED_REQUEST}
-          </Alert>
+          <div className="mt-4">
+            <Alert title="Expired after seven days" tone="warning">
+              {DEAL_RESUME_EXPIRED_REQUEST}
+            </Alert>
+          </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href={getUsedCarsUrl()}>
               {DEAL_RESUME_EXPIRED_RESTART}
@@ -128,20 +140,32 @@ export function DealResume({ token }: { token?: string }) {
     );
   }
 
-  if (linkStatus === "expired" || linkStatus === "used") {
-    return (
-      <Section>
-        <Container width="narrow">
-          <h1 className="text-h2">
-            {linkStatus === "used"
-              ? DEAL_RESUME_USED_TITLE
-              : DEAL_RESUME_EXPIRED_TITLE}
-          </h1>
-          <p className="mt-3 text-body text-muted">
-            {linkStatus === "used"
-              ? DEAL_RESUME_USED_BODY
-              : DEAL_RESUME_EXPIRED_BODY}
-          </p>
+  const needsReverification = linkStatus === "expired" || linkStatus === "used";
+  const title = needsReverification
+    ? linkStatus === "used"
+      ? DEAL_RESUME_USED_TITLE
+      : DEAL_RESUME_EXPIRED_TITLE
+    : DEAL_RESUME_TITLE;
+  const body = needsReverification
+    ? linkStatus === "used"
+      ? DEAL_RESUME_USED_BODY
+      : DEAL_RESUME_EXPIRED_BODY
+    : DEAL_RESUME_BODY;
+  const canVerify = Boolean(token) && linkStatus === "ok";
+
+  return (
+    <Section>
+      <Container width="narrow">
+        <h1 className="text-h2">{title}</h1>
+        <p className="mt-3 text-body text-muted">{body}</p>
+        {!token || linkStatus === "invalid" || linkStatus === "missing" ? (
+          <div className="mt-6">
+            <Alert title={DEAL_RESUME_INVALID_TITLE} tone="warning">
+              {DEAL_RESUME_INVALID_BODY}
+            </Alert>
+          </div>
+        ) : null}
+        {canVerify || needsReverification ? (
           <div className="mt-6">
             <Field htmlFor="deal-resume-email" label="Email" error={error}>
               <Input
@@ -151,62 +175,24 @@ export function DealResume({ token }: { token?: string }) {
                 autoComplete="email"
                 value={email}
                 error={Boolean(error)}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setError(undefined);
+                }}
               />
             </Field>
-          </div>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              onClick={() => void resume()}
-              disabled={submitting}
-            >
-              {linkStatus === "used" ? "Continue this deal" : "Confirm email"}
-            </Button>
-            <Button href={getUsedCarsUrl()} variant="text">
-              Browse cars
-            </Button>
-          </div>
-        </Container>
-      </Section>
-    );
-  }
-
-  return (
-    <Section>
-      <Container width="narrow">
-        <h1 className="text-h2">Continue your deal</h1>
-        <p className="mt-3 text-body text-muted">
-          Confirm the email you used when you saved. Your vehicle, valuation,
-          part exchange, finance preferences and products are restored. The
-          link does not include your rate or a live finance decision.
-        </p>
-        {!token || linkStatus === "invalid" || linkStatus === "missing" ? (
-          <div className="mt-6">
-            <Alert title="This resume link is not valid." tone="warning">
-              Request a new link from the deal builder, or start again from a
-              vehicle. Resume links expire after seven days.
-            </Alert>
+            <p className="mt-2 text-caption text-muted">
+              {DEAL_RESUME_VERIFY_EMAIL}
+            </p>
           </div>
         ) : null}
-        <div className="mt-6">
-          <Field htmlFor="deal-resume-email" label="Email" error={error}>
-            <Input
-              id="deal-resume-email"
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              value={email}
-              error={Boolean(error)}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </Field>
-        </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Button
             onClick={() => void resume()}
-            disabled={submitting || !token || linkStatus !== "ok"}
+            busy={submitting}
+            disabled={submitting || (!canVerify && !needsReverification)}
           >
-            Continue
+            {needsReverification ? DEAL_RESUME_VERIFY_SUBMIT : "Continue"}
           </Button>
           <Button href={getUsedCarsUrl()} variant="text">
             Browse cars

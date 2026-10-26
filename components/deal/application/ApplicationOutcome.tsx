@@ -2,6 +2,7 @@
 
 import { PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { Alert } from "@/components/ui/Alert";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { ApplicationDealSummary } from "@/components/deal/application/ApplicationDealSummary";
@@ -15,9 +16,10 @@ import {
   APP_NEXT_CALL,
   APP_NEXT_TEST_DRIVE,
   APP_OUTCOME_DISCLAIMER,
-  APP_PREAPPROVED_BODY,
-  APP_PREAPPROVED_EYEBROW,
-  APP_PREAPPROVED_TITLE,
+  APP_RECEIVED_BODY,
+  APP_RECEIVED_EYEBROW,
+  APP_RECEIVED_TITLE,
+  APP_REFERENCE,
 } from "@/lib/deal/application/copy";
 import { reservationAmountLabel } from "@/lib/reservation/format";
 import type { DealApplicationResult } from "@/types/deal-application";
@@ -43,37 +45,37 @@ function OliviaCard() {
 }
 
 export function ApplicationOutcome({
-  result: _result,
+  result,
 }: {
   result: DealApplicationResult;
 }) {
-  const { dealId, contact, navigateTo } = useDealBuilder();
+  const { dealId, vehicle, contact, navigateTo } = useDealBuilder();
   const telephone = contact.telephone;
 
   return (
     <div className="flex flex-1 flex-col gap-4 pb-8">
       <DealResultHero
-        eyebrow={APP_PREAPPROVED_EYEBROW}
-        title={APP_PREAPPROVED_TITLE}
-        body={APP_PREAPPROVED_BODY}
+        eyebrow={APP_RECEIVED_EYEBROW}
+        title={APP_RECEIVED_TITLE}
+        body={APP_RECEIVED_BODY}
       />
+      <p className="text-caption text-muted">{APP_REFERENCE(result.reference)}</p>
 
       <Alert title={APP_OUTCOME_DISCLAIMER} tone="info" />
 
       <OliviaCard />
-      <ApplicationDealSummary />
+      <div className="lg:hidden">
+        <ApplicationDealSummary />
+      </div>
 
       <div className="space-y-3 rounded-card bg-surface p-5 shadow-card sm:p-6">
           <p className="text-label">While you wait</p>
-          <Button
-            type="button"
+          <StartReservationButton
+            stockId={vehicle.stockId}
+            dealId={dealId}
             className="w-full"
-            onClick={() =>
-              navigateTo(`${getDealUrl(dealId, "reserve")}?panel=reserve`)
-            }
-          >
-            Reserve this car for {reservationAmountLabel(reservationConfig.amount)}
-          </Button>
+            label={`Reserve this car for ${reservationAmountLabel(reservationConfig.amount)}`}
+          />
           <Button
             type="button"
             variant="secondary"

@@ -51,20 +51,8 @@ export interface DealApplicationBankDetails {
   monthsAtBank: number | "";
 }
 
-/**
- * Lender-side mock outcome. Not shown as a hard credit decision while
- * auto_decision_display is OFF — customer sees process messaging instead.
- */
-export type DealApplicationLenderOutcome =
-  | "approved"
-  | "referred"
-  | "declined";
-
-/** Customer-facing screens with auto_decision_display OFF at launch. */
-export type DealApplicationCustomerOutcome =
-  | "pre_approved"
-  | "referred"
-  | "declined";
+/** Where the saved application is held. Never a lending decision. */
+export type DealApplicationProvider = "queued" | "hero-admiral";
 
 export interface DealApplicationPersonal {
   fullName: string;
@@ -97,25 +85,22 @@ export interface DealApplicationFormState {
 }
 
 export interface DealApplicationResult {
-  /** Internal mock lender outcome (stored silently; not a live credit decision). */
-  lenderOutcome: DealApplicationLenderOutcome;
-  /** What the customer sees under the launch toggle. */
-  customerOutcome: DealApplicationCustomerOutcome;
   submittedAt: string;
   reference: string;
   /** True when bank details were supplied — never echo the values in UI summaries. */
   bankDetailsProvided: boolean;
   /**
-   * Mock APR for Eskimo/admin only. Must not surface while auto_decision_display is OFF.
-   * Compliance: credit-tier / APR labels need sign-off before customer display.
+   * queued: saved on the Oakwood deal for an advisor.
+   * hero-admiral: accepted by the live finance provider.
+   * Neither value is an approval, referral, or decline.
    */
-  mockApr?: number;
+  provider: DealApplicationProvider;
 }
 
 export interface DealFinanceApplicationDraft {
   section: DealApplicationSectionId;
   form: DealApplicationFormState;
   result?: DealApplicationResult;
-  /** Last client-side error message after a failed mock submit. */
+  /** Last message after a failed save, so the customer can try again. */
   submitError?: string;
 }

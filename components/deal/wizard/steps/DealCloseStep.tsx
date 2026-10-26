@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import { PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
@@ -9,6 +10,7 @@ import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
+import { CallClosedModal } from "@/components/deal/wizard/steps/CallClosedModal";
 import { DealCallbackPanel } from "@/components/deal/wizard/steps/DealCallbackPanel";
 import { DealReservePanel } from "@/components/deal/wizard/steps/DealReservePanel";
 import { DealTestDrivePanel } from "@/components/deal/wizard/steps/DealTestDrivePanel";
@@ -29,7 +31,14 @@ import {
   getMockShowroomOpenStatus,
   resolveShowroomSlug,
 } from "@/lib/deal/opening-status";
-type View = "hub" | "reserve" | "drive" | "callback" | "closed";
+type View = "hub" | "reserve" | "drive" | "callback";
+
+/** Leave the next-step screen alone long enough that a save prompt is useful. */
+const STEP4_IDLE_MS = 45_000;
+
+function savePromptKey(dealId: string) {
+  return `oakwood-save-prompt:step4:${dealId}`;
+}
 
 function telHref(phone: string) {
   const digits = phone.replace(/\D/g, "");
@@ -38,9 +47,11 @@ function telHref(phone: string) {
 }
 
 export function DealCloseStep() {
-  const { dealId, vehicle, navigateTo } = useDealBuilder();
+  const { dealId, vehicle, navigateTo, saved } = useDealBuilder();
   const { goBack } = useDealStepNavigation("reserve");
   const [view, setView] = useState<View>("hub");
+  const [closedOpen, setClosedOpen] = useState(false);
+  const [idlePrompt, setIdlePrompt] = useState(false);
   const status = getMockShowroomOpenStatus(
     resolveShowroomSlug(vehicle.locationSlug),
   );
@@ -55,17 +66,54 @@ export function DealCloseStep() {
     }
   }, []);
 
+  useEffect(() => {
+    if (view !== "hub" || saved || closedOpen) {
+      return;
+    }
+    let alreadyPrompted = false;
+    try {
+      alreadyPrompted = sessionStorage.getItem(savePromptKey(dealId)) === "1";
+    } catch {
+      alreadyPrompted = false;
+    }
+    if (alreadyPrompted) {
+      return;
+    }
+    let opened = false;
+    let timer = 0;
+    const arm = () => {
+      window.clearTimeout(timer);
+      if (opened) {
+        return;
+      }
+      timer = window.setTimeout(() => {
+        opened = true;
+        try {
+          sessionStorage.setItem(savePromptKey(dealId), "1");
+        } catch {
+          // Still show it once while this screen is open.
+        }
+        setIdlePrompt(true);
+      }, STEP4_IDLE_MS);
+    };
+    arm();
+    const events = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+    for (const event of events) {
+      window.addEventListener(event, arm, { passive: true });
+    }
+    return () => {
+      window.clearTimeout(timer);
+      for (const event of events) {
+        window.removeEventListener(event, arm);
+      }
+    };
+  }, [closedOpen, dealId, saved, view]);
+
   if (view === "drive") {
     return <DealTestDrivePanel onBack={() => setView("hub")} />;
   }
-  if (view === "callback" || view === "closed") {
-    return (
-      <DealCallbackPanel
-        mode={view === "closed" ? "closed" : "callback"}
-        closedStatus={view === "closed" ? status : undefined}
-        onBack={() => setView("hub")}
-      />
-    );
+  if (view === "callback") {
+    return <DealCallbackPanel mode="callback" onBack={() => setView("hub")} />;
   }
 
   if (view === "reserve") {
@@ -112,7 +160,7 @@ export function DealCloseStep() {
               {STEP4_HUB_CALL_NOW_OPEN}
             </Button>
           ) : (
-            <Button type="button" variant="tertiary" onClick={() => setView("closed")}>
+            <Button type="button" variant="tertiary" onClick={() => setClosedOpen(true)}>
               {STEP4_HUB_CALL_NOW}
             </Button>
           )}
@@ -125,6 +173,13 @@ export function DealCloseStep() {
         </p>
       </div>
       <DealStepFooter onBack={() => goBack("quote")} showMonthly={false} />
+      <CallClosedModal open={closedOpen} onClose={() => setClosedOpen(false)} />
+      <SaveProgressPrompt
+        open={idlePrompt}
+        continueLabel="Stay on this step"
+        onDismiss={() => setIdlePrompt(false)}
+        onContinue={() => setIdlePrompt(false)}
+      />
     </div>
   );
 }

@@ -78,6 +78,72 @@ export function createSupportEnquiry(
   return record;
 }
 
+export function createCallbackLead(input: {
+  name: string;
+  telephone: string;
+  locationSlug: string;
+  stockId?: string;
+  dealId?: string;
+  whenLabel: string;
+  vehicleLabel?: string;
+  priority?: boolean;
+  source?: string;
+}): { reference: string } {
+  const id = opaqueId();
+  const callbackReference = `OAK-CBK-${id.slice(0, 8).toUpperCase()}`;
+  const source = input.source ?? "deal-callback";
+  const requestedAction = input.priority ? "priority-callback" : "callback";
+  const lead: Lead = {
+    id,
+    identity: {
+      name: input.name,
+      telephone: input.telephone,
+    },
+    source: {
+      source,
+      landingPage: "deal",
+    },
+    vehicleStockId: input.stockId,
+    dealId: input.dealId,
+    requestedAction,
+  };
+  const about = [input.vehicleLabel, input.dealId ? `deal ${input.dealId}` : ""]
+    .filter(Boolean)
+    .join(", ");
+  enquiries.set(id, {
+    id,
+    createdAt: Date.now(),
+    reference: callbackReference,
+    name: input.name,
+    email: "",
+    telephone: input.telephone,
+    enquiryType: "buying",
+    message: `${input.priority ? "Priority callback" : "Callback"} requested for ${input.whenLabel}${about ? ` (${about})` : ""}.`,
+    locationSlug: input.locationSlug,
+    stockId: input.stockId,
+    marketingConsent: false,
+    marketingConsentRecord: {
+      granted: false,
+      timestamp: new Date().toISOString(),
+      method: "contact_form",
+      wording: MARKETING_CONSENT_WORDING,
+    },
+    source,
+    crmPayload: lead,
+  });
+  void eskimoIntegration.implemented;
+  return { reference: callbackReference };
+}
+
+export function findSupportEnquiryByReference(
+  reference: string,
+): SupportEnquiryRecord | undefined {
+  for (const record of enquiries.values()) {
+    if (record.reference === reference) return record;
+  }
+  return undefined;
+}
+
 export function createSupportComplaint(
   input: SupportComplaintInput,
 ): SupportComplaintRecord {

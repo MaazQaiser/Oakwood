@@ -6,12 +6,13 @@ import { Modal } from "@/components/ui/Dialogs";
 import { Button } from "@/components/ui/Button";
 import { SaveDeal } from "@/components/deal/SaveDeal";
 import { ExitIntelModal } from "@/components/deal/ExitIntelModal";
+import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import {
-  DEAL_ABANDON_BODY,
   DEAL_ABANDON_LEAVE,
   DEAL_ABANDON_SAVE,
   DEAL_ABANDON_STAY,
-  DEAL_ABANDON_TITLE,
+  DEAL_SAVE_PROGRESS_BODY,
+  DEAL_SAVE_PROGRESS_TITLE,
 } from "@/lib/deal/copy";
 
 const SESSION_KEY = "oakwood-deal-abandon-shown";
@@ -55,6 +56,7 @@ export function DealAbandonmentModal({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { saved } = useDealBuilder();
   const [saveOpen, setSaveOpen] = useState(false);
   const [intelOpen, setIntelOpen] = useState(false);
   const [showSave, setShowSave] = useState(false);
@@ -77,12 +79,12 @@ export function DealAbandonmentModal({
   const step4Engaged = ctaEngaged || isStep4CtaEngaged();
 
   const canPromptSave = useCallback(() => {
-    if (saveShownRef.current) return false;
+    if (saved || saveShownRef.current) return false;
     if (Date.now() - engagedAt.current < ENGAGE_MS && !step4Engaged) {
       return false;
     }
     return true;
-  }, [step4Engaged]);
+  }, [saved, step4Engaged]);
 
   const canPromptIntel = useCallback(() => {
     if (intelShownRef.current) return false;
@@ -226,9 +228,9 @@ export function DealAbandonmentModal({
       />
       <DealAbandonmentBridge requestLeave={requestLeave} />
 
-      <Modal open={saveOpen} title={DEAL_ABANDON_TITLE} onClose={stay}>
+      <Modal open={saveOpen} title={DEAL_SAVE_PROGRESS_TITLE} onClose={stay}>
         <div className="space-y-4">
-          <p className="text-body-sm text-muted">{DEAL_ABANDON_BODY}</p>
+          <p className="text-body-sm text-muted">{DEAL_SAVE_PROGRESS_BODY}</p>
           {showSave ? (
             <SaveDeal defaultOpen compact />
           ) : (

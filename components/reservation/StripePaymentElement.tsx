@@ -1,48 +1,51 @@
 "use client";
 
-import { cn } from "@/lib/cn";
+import { reservationCopy } from "@/lib/reservation/copy";
 
 export function StripePaymentElement({
   wallets,
   connected,
+  busy,
+  onWallet,
 }: {
   wallets: readonly string[];
   connected: boolean;
+  busy?: boolean;
+  onWallet: (wallet: "apple_pay" | "google_pay") => void;
 }) {
   const apple = wallets.includes("apple_pay");
   const google = wallets.includes("google_pay");
 
   return (
-    <div
-      className="rounded-lg border border-border bg-page p-4"
-      role="group"
-      aria-label="Payment method"
-    >
-      <p className="text-label">Pay by card</p>
-      <p className="mt-1 text-body-sm text-muted">
-        Card details are entered in Stripe&apos;s secure payment field. Oakwood
-        never collects or stores card numbers.
-      </p>
-      <div
-        className={cn(
-          "mt-4 rounded-md border border-dashed border-border-strong bg-surface px-3 py-6 text-center text-body-sm text-muted",
-        )}
-      >
-        {connected
-          ? "Stripe Payment Element"
-          : "Stripe Payment Element (mock). Live card fields appear when Stripe is connected."}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {apple ? (
-          <span className="rounded-full border border-border px-3 py-2 text-caption text-muted">
-            Apple Pay{connected ? "" : " — available when Stripe is connected"}
-          </span>
-        ) : null}
-        {google ? (
-          <span className="rounded-full border border-border px-3 py-2 text-caption text-muted">
-            Google Pay{connected ? "" : " — available when Stripe is connected"}
-          </span>
-        ) : null}
+    <div role="group" aria-label="Payment method" className="space-y-3">
+      {apple ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onWallet("apple_pay")}
+          className="flex min-h-14 w-full items-center justify-center rounded-[14px] bg-black px-4 text-body-sm font-semibold! text-white disabled:opacity-60"
+        >
+          Apple Pay
+        </button>
+      ) : null}
+      {google ? (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => onWallet("google_pay")}
+          className="flex min-h-14 w-full items-center justify-center rounded-[14px] border border-border bg-white px-4 text-body-sm font-semibold! text-ink disabled:opacity-60"
+        >
+          Google Pay
+        </button>
+      ) : null}
+      <p className="text-center text-caption text-muted">Or pay by card</p>
+      <div className="rounded-xl border border-dashed border-border-strong bg-page px-4 py-6 text-center">
+        <p className="text-label text-navy">Card payment</p>
+        <p className="mt-2 text-body-sm text-muted">
+          {connected
+            ? "Stripe Payment Element"
+            : reservationCopy.cardFallback}
+        </p>
       </div>
     </div>
   );

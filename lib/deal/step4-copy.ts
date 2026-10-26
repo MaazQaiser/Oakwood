@@ -50,6 +50,8 @@ export const STEP4_TD_CHANNELS_CHECK =
 export const STEP4_TD_LOADING = "Checking availability…";
 export const STEP4_TD_UNAVAILABLE =
   "That time isn't available. Please choose another slot.";
+export const STEP4_TD_NO_SLOTS =
+  "No times are published for this showroom on that day.";
 export const STEP4_TD_CONFIRM_TITLE = "Test drive requested";
 export const STEP4_TD_CONFIRM_BODY =
   "Our sales team will be in touch soon to confirm who'll be looking after you.";
@@ -60,6 +62,17 @@ export const STEP4_TD_WHAT_TO_BRING = [
 ];
 export const STEP4_TD_WALKAROUND_PLACEHOLDER =
   "Walkaround video for this car will appear here when the showroom has uploaded it.";
+export const STEP4_TD_VIDEO_UNAVAILABLE =
+  "A walkaround video isn't available for this car yet.";
+export const STEP4_TD_CONFIRM_LOADING = "Loading your confirmation…";
+export const STEP4_TD_CONFIRM_ERROR =
+  "We couldn't load this confirmation. Your request is unchanged.";
+export const STEP4_TD_MAP_UNAVAILABLE =
+  "A Google Maps link isn't available until a showroom postcode is published.";
+export const STEP4_TD_PHONE_UNAVAILABLE =
+  "A showroom phone number isn't published for this location.";
+export const STEP4_TD_MESSAGES_PENDING =
+  "Email, SMS, WhatsApp, the calendar file and the two-hour reminder use the same details as this screen. They have not been sent.";
 
 export const STEP4_CLOSED_TITLE = "Sorry, we are now closed";
 export const STEP4_CLOSED_BODY = (nextOpenLabel: string) =>
@@ -67,10 +80,17 @@ export const STEP4_CLOSED_BODY = (nextOpenLabel: string) =>
 export const STEP4_CLOSED_HOURS_REF = "Today's published hours";
 
 export const STEP4_CB_TITLE = "Call me back";
+export const STEP4_CB_INTRO =
+  "Choose a day and time. Our sales team will call you about this car and your deal.";
 export const STEP4_CB_SUBMITTING = "Booking your callback…";
 export const STEP4_CB_CONFIRM_TITLE = "Callback booked";
 export const STEP4_CB_CONFIRM_BODY =
   "An Oakwood advisor will call at the time you chose.";
+export const STEP4_CMB_CONFIRM_TITLE = "Priority callback booked";
+export const STEP4_CMB_CONFIRM_BODY =
+  "Our sales team will call you at the time you chose.";
+export const STEP4_CMB_ERROR =
+  "We couldn't book your callback. Your details are still here.";
 
 export const STEP4_BACK_HUB = "Back to next steps";
 /** Leaves the deal after a completed Step 4 action (reserve / test drive / callback). */

@@ -1,4 +1,5 @@
 import { reservationConfig } from "@/config/reservation";
+import { createStripeAdapter } from "@/lib/payments/stripe";
 import { supportRoutes } from "@/config/routes";
 import { showrooms } from "@/config/locations";
 import { calculateDeal } from "@/lib/deal/calculate";
@@ -178,10 +179,15 @@ function emptyModel(_stockId: string, vehicle?: Vehicle): ReservationPageModel {
       telephone: showrooms[0]?.telephone,
       enquiryHref: supportRoutes.bookingEnquiry,
     },
-    stripe: {
-      connected: false,
-      wallets: ["apple_pay", "google_pay", "card"],
-    },
+    stripe: stripeClient(),
+  };
+}
+
+function stripeClient() {
+  const stripe = createStripeAdapter();
+  return {
+    connected: stripe.connected,
+    wallets: stripe.wallets,
   };
 }
 
@@ -221,10 +227,7 @@ function toPageModel(
       telephone: showrooms[0]?.telephone,
       enquiryHref: supportRoutes.bookingEnquiry,
     },
-    stripe: {
-      connected: false,
-      wallets: ["apple_pay", "google_pay", "card"],
-    },
+    stripe: stripeClient(),
     ...extras,
   };
 }

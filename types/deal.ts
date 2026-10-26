@@ -192,6 +192,8 @@ export interface DealDraft {
   /** Embedded finance application progress (v4 §8). Persisted with the deal. */
   financeApplication?: DealFinanceApplicationDraft;
   stepsCompleted?: DealStepName[];
+  /** Wizard step to reopen from a resume link. */
+  resumeStep?: DealStepName;
 }
 
 export type DealStepName =
