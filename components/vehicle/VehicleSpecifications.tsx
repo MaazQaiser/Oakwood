@@ -1,7 +1,14 @@
+import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format/money";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
-export function VehicleSpecifications({ vehicle }: { vehicle: VehicleDetail }) {
+export function VehicleSpecifications({
+  vehicle,
+  embedded = false,
+}: {
+  vehicle: VehicleDetail;
+  embedded?: boolean;
+}) {
   const extra = vehicle.fullSpecification;
   const items = [
     { label: "Year", value: String(vehicle.year) },
@@ -23,11 +30,20 @@ export function VehicleSpecifications({ vehicle }: { vehicle: VehicleDetail }) {
   return (
     <section
       aria-labelledby="key-spec-heading"
-      className="vdp-hero__specs min-w-0 border-t border-border pt-8"
+      className={cn(
+        "vdp-hero__specs min-w-0",
+        embedded ? "pt-2" : "border-t border-border pt-8",
+      )}
     >
-      <h2 id="key-spec-heading" className="text-h3">
-        Key specification
-      </h2>
+      {embedded ? (
+        <h3 id="key-spec-heading" className="sr-only">
+          Key specification
+        </h3>
+      ) : (
+        <h2 id="key-spec-heading" className="text-h3">
+          Key specification
+        </h2>
+      )}
       <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
         {items.map((item) => (
           <div key={item.label} className="min-w-0">

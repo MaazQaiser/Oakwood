@@ -9,7 +9,12 @@ import { getFinanceCalculatorUrl, getFinanceIntentUrl, routes } from "@/config/r
 import { formatPounds, formatTerm } from "@/lib/format/money";
 import { cn } from "@/lib/cn";
 
-export function FinanceControls() {
+export function FinanceControls({
+  hideInlineSummary = false,
+}: {
+  /** V2 CDP shows finance summary in the preview card; hide the duplicate line in accordions. */
+  hideInlineSummary?: boolean;
+}) {
   const {
     financeType,
     setFinanceType,
@@ -39,16 +44,18 @@ export function FinanceControls() {
       aria-labelledby="finance-this-car-heading"
       className="scroll-mt-24"
     >
-      <p className="text-caption text-muted">
-        <FinancialNumber
-          value={formatPounds(monthlyPayment)}
-          suffix={displayState === "representative" ? "/month*" : "/month"}
-          size="sm"
-          className="text-muted"
-        />
-        {" · "}
-        {formatPounds(deposit + extraDeposit)} deposit · {formatTerm(term)}
-      </p>
+      {hideInlineSummary ? null : (
+        <p className="text-caption text-muted">
+          <FinancialNumber
+            value={formatPounds(monthlyPayment)}
+            suffix={displayState === "representative" ? "/month*" : "/month"}
+            size="sm"
+            className="text-muted"
+          />
+          {" · "}
+          {formatPounds(deposit + extraDeposit)} deposit · {formatTerm(term)}
+        </p>
+      )}
       <Accordion title="Finance this car" id="finance-this-car-heading">
           <p>
             Change the deposit, term and finance type here. Figures update as you go.

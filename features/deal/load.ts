@@ -1,9 +1,11 @@
-import { hydrateDealsFromCookie } from "@/features/deal/session";
+import {
+  findPersistedVehicleStockId,
+  resolveDealRecord,
+} from "@/features/deal/session";
 import { getEligibilitySession } from "@/features/eligibility/session";
 import { isSessionExpired } from "@/features/eligibility/store";
 import {
   ensureDemoDeal,
-  getDealRecord,
   isDealExpired,
   toDealDraft,
 } from "@/features/deal/store";
@@ -51,12 +53,23 @@ function isProfileExpired(iso?: string, now = Date.now()): boolean {
   return Number.isFinite(stamp) && stamp <= now;
 }
 
+function recoveryFromRecord(
+  record: { vehicleStockId: string } | null | undefined,
+) {
+  if (!record) {
+    return {};
+  }
+  const vehicle = findVehicleByStockId(record.vehicleStockId);
+  return vehicle
+    ? { recoveryStockId: vehicle.stockId, recoveryVehicleSlug: vehicle.slug }
+    : { recoveryStockId: record.vehicleStockId };
+}
+
 export async function loadDealPage(dealId: string): Promise<DealPageModel> {
-  await hydrateDealsFromCookie();
   const record =
     dealId === mockDealId
       ? ensureDemoDeal()
-      : getDealRecord(dealId);
+      : await resolveDealRecord(dealId);
 
   const eligibility = await getEligibilitySession();
   const eligibilityExpired = !eligibility || isSessionExpired(eligibility);
@@ -89,10 +102,14 @@ export async function loadDealPage(dealId: string): Promise<DealPageModel> {
   };
 
   if (!record) {
+    const stockId = await findPersistedVehicleStockId(dealId);
     return {
       status: "not_found",
       dealId,
       similar: [],
+      ...(stockId
+        ? recoveryFromRecord({ vehicleStockId: stockId })
+        : {}),
       finance,
       products: MOCK_OPTIONAL_PRODUCTS,
       config: DEAL_PROVIDER_CONFIG,
@@ -107,6 +124,7 @@ export async function loadDealPage(dealId: string): Promise<DealPageModel> {
       dealId,
       vehicle: expiredVehicle ? toVehicleSummary(expiredVehicle) : undefined,
       similar: expiredVehicle ? getSimilarVehicles(expiredVehicle) : [],
+      ...recoveryFromRecord(record),
       finance,
       products: MOCK_OPTIONAL_PRODUCTS,
       config: DEAL_PROVIDER_CONFIG,
@@ -120,6 +138,7 @@ export async function loadDealPage(dealId: string): Promise<DealPageModel> {
       status: "not_found",
       dealId,
       similar: [],
+      ...recoveryFromRecord(record),
       finance,
       products: MOCK_OPTIONAL_PRODUCTS,
       config: DEAL_PROVIDER_CONFIG,

@@ -15,28 +15,53 @@ import { toTelHref } from "@/lib/format/phone";
 
 export function DealFailureState({
   kind,
+  recoveryStockId,
+  recoveryVehicleSlug,
 }: {
   kind: "session" | "vehicle" | "calculation" | "provider" | "not_found";
+  recoveryStockId?: string;
+  recoveryVehicleSlug?: string;
 }) {
   const deal = useDealBuilderOptional();
 
   if (kind === "not_found") {
+    const stockId = deal?.vehicle?.stockId ?? recoveryStockId;
+    const vehicleSlug = deal?.vehicle?.slug ?? recoveryVehicleSlug;
     return (
-      <Alert title="We couldn't find this deal" tone="info">
-        The link may be wrong or the deal may have been removed. Start a new
-        deal from any car page.
-        <div className="mt-3">
-          <Button href={getUsedCarsUrl()} size="sm">
-            Browse cars
-          </Button>
-        </div>
-      </Alert>
+      <div className="mx-auto max-w-xl rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
+        <Alert title="We couldn't find this deal" tone="info">
+          The link may be wrong or the deal may have expired. You can start
+          again from a car page or browse stock.
+          <div className="mt-4 flex flex-wrap gap-2">
+            {stockId ? (
+              <StartDealButton stockId={stockId} label="Start a new deal" />
+            ) : null}
+            {vehicleSlug ? (
+              <Button
+                href={getVehicleUrl(vehicleSlug)}
+                variant="secondary"
+                size="sm"
+              >
+                Back to this car
+              </Button>
+            ) : null}
+            <Button href={getUsedCarsUrl()} variant="secondary" size="sm">
+              Browse cars
+            </Button>
+            <Button href={getEligibilityUrl()} variant="text" size="sm">
+              Check my eligibility
+            </Button>
+          </div>
+        </Alert>
+      </div>
     );
   }
 
   if (kind === "session") {
-    const stockId = deal?.vehicle.stockId;
+    const stockId = deal?.vehicle?.stockId ?? recoveryStockId;
+    const vehicleSlug = deal?.vehicle?.slug ?? recoveryVehicleSlug;
     return (
+      <div className="mx-auto max-w-xl rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
       <Alert title={DEAL_SESSION_EXPIRED} tone="warning">
         Start a new deal for this car, or check eligibility again.
         <div className="mt-3 flex flex-wrap gap-2">
@@ -47,9 +72,9 @@ export function DealFailureState({
               Browse cars
             </Button>
           )}
-          {deal?.vehicle ? (
+          {vehicleSlug ? (
             <Button
-              href={getVehicleUrl(deal.vehicle.slug)}
+              href={getVehicleUrl(vehicleSlug)}
               variant="secondary"
               size="sm"
             >
@@ -61,6 +86,7 @@ export function DealFailureState({
           </Button>
         </div>
       </Alert>
+      </div>
     );
   }
 

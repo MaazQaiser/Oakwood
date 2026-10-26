@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { VehicleDetailPage } from "@/components/vehicle/VehicleDetailPage";
+import { resolveVdpVariantFromSearchParams } from "@/lib/vdp/variant";
 import { getVehicleUrl } from "@/config/routes";
 import { mockVehicles } from "@/lib/mock/data";
 import { getVehicleDetail } from "@/lib/mock/vehicle-detail";
@@ -55,10 +56,14 @@ export async function generateMetadata({
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ vehicleSlug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { vehicleSlug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const initialVdpVariant = resolveVdpVariantFromSearchParams(resolvedSearchParams);
 
   if (!isVehicleSlug(vehicleSlug)) {
     notFound();
@@ -81,6 +86,7 @@ export default async function Page({
       vehicle={detail}
       similar={getSimilarVehicles(vehicle)}
       breadcrumbs={getVehicleBreadcrumbs(vehicle)}
+      initialVdpVariant={initialVdpVariant}
     />
   );
 }

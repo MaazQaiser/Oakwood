@@ -240,6 +240,9 @@ export interface DealFinanceContext {
 export interface DealPageModel {
   status: "ready" | "not_found" | "expired";
   dealId: string;
+  /** When the session is missing but we still know the stock id from cookies. */
+  recoveryStockId?: string;
+  recoveryVehicleSlug?: string;
   vehicle?: DealVehicleSummary;
   similar: Vehicle[];
   draft?: DealDraft;

@@ -4,13 +4,12 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@/components/forms/FormControls";
 import { MONTHLY_OPTIONS, PRICE_OPTIONS } from "@/components/search/constants";
-import { IconArrow, IconFilters, IconSearch } from "@/components/ui/icons";
+import { IconArrow, IconSearch } from "@/components/ui/icons";
 import { getSearchUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import { formatPounds } from "@/lib/format/money";
 import {
-  HOME_HERO_FILTERS,
   HOME_HERO_FILTER_MAX_MONTHLY,
   HOME_HERO_FILTER_MAX_PRICE,
   HOME_HERO_FILTER_MONTHLY,
@@ -18,23 +17,19 @@ import {
   HOME_HERO_FILTER_SEARCH,
   HOME_HERO_FILTER_SELECT_MAKE,
   HOME_HERO_FILTER_SELECT_MODEL,
-  HOME_HERO_OR_TYPE,
-  HOME_HERO_OR_TYPE_HINT,
   HOME_HERO_PRIMARY,
 } from "@/lib/home/copy";
 import type { SearchQuery } from "@/lib/validation/search";
 import { getMakes, getModels } from "@/lib/vehicles/labels";
 
 const fieldClass =
-  "min-h-12! w-full rounded-2xl! border-[#D7E0E8]! bg-white! pl-3.5! pr-9! text-[0.8125rem]! font-medium text-ink!";
+  "min-h-12! w-full min-w-0 rounded-2xl! border-[#D7E0E8]! bg-white! px-3! py-2.5! pr-9! text-sm! leading-normal! font-medium text-ink!";
 
 type PriceMode = "monthly" | "total";
 
 export function HomeSearchBar({ className }: { className?: string }) {
   const router = useRouter();
   const [value, setValue] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(true);
-  const [hintOpen, setHintOpen] = useState(false);
   const [mode, setMode] = useState<PriceMode>("monthly");
   const [monthlyMax, setMonthlyMax] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -75,7 +70,6 @@ export function HomeSearchBar({ className }: { className?: string }) {
       }}
     >
       <div className="rounded-[22px] bg-white p-4 shadow-[0_16px_36px_rgba(16,40,72,0.1)] sm:p-5">
-        {filtersOpen ? (
         <div id="home-search-filters">
         <fieldset className="m-0 border-0 p-0">
           <legend className="sr-only">Price type</legend>
@@ -87,19 +81,19 @@ export function HomeSearchBar({ className }: { className?: string }) {
             <PriceTab
               selected={mode === "monthly"}
               onClick={() => setMode("monthly")}
-            >
-              {HOME_HERO_FILTER_MONTHLY}
-            </PriceTab>
+              shortLabel="Monthly"
+              longLabel={HOME_HERO_FILTER_MONTHLY}
+            />
             <PriceTab
               selected={mode === "total"}
               onClick={() => setMode("total")}
-            >
-              {HOME_HERO_FILTER_PRICE}
-            </PriceTab>
+              shortLabel="Total"
+              longLabel={HOME_HERO_FILTER_PRICE}
+            />
           </div>
         </fieldset>
 
-        <div className="mt-3 grid grid-cols-2 gap-2.5">
+        <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="min-w-0">
             <label htmlFor="home-search-budget" className="sr-only">
               {mode === "monthly"
@@ -119,13 +113,13 @@ export function HomeSearchBar({ className }: { className?: string }) {
               }}
             >
               <option value="">
-                {mode === "monthly" ? "Max monthly" : "Max price"}
+                {mode === "monthly" ? "Budget" : "Max price"}
               </option>
               {(mode === "monthly" ? MONTHLY_OPTIONS : PRICE_OPTIONS).map(
                 (amount) => (
                   <option key={amount} value={amount}>
                     {mode === "monthly"
-                      ? `${formatPounds(amount)} a month`
+                      ? `${formatPounds(amount)}/mo`
                       : formatPounds(amount)}
                   </option>
                 ),
@@ -145,7 +139,7 @@ export function HomeSearchBar({ className }: { className?: string }) {
                 setModel("");
               }}
             >
-              <option value="">{HOME_HERO_FILTER_SELECT_MAKE}</option>
+              <option value="">Make</option>
               {makes.map((item) => (
                 <option key={item.slug} value={item.slug}>
                   {item.name}
@@ -153,78 +147,42 @@ export function HomeSearchBar({ className }: { className?: string }) {
               ))}
             </Select>
           </div>
-        </div>
-
-        <div className="mt-2.5">
-          <label htmlFor="home-search-model" className="sr-only">
-            {HOME_HERO_FILTER_SELECT_MODEL}
-          </label>
-          <Select
-            id="home-search-model"
-            className={fieldClass}
-            value={model}
-            onChange={(event) => setModel(event.target.value)}
-          >
-            <option value="">{HOME_HERO_FILTER_SELECT_MODEL}</option>
-            {models.map((item) => (
-              <option key={item.slug} value={item.slug}>
-                {item.name}
-              </option>
-            ))}
-          </Select>
-        </div>
-        </div>
-        ) : null}
-
-        <div className={cn("flex items-center gap-2", filtersOpen && "mt-3")}>
-          <div className="flex shrink-0 items-center gap-1 text-[0.8125rem] font-medium leading-tight text-[#5d6b7a]">
-            <label htmlFor="home-search">{HOME_HERO_OR_TYPE}</label>
-            <button
-              type="button"
-              className="grid h-4 w-4 place-items-center rounded-full border border-[#8ea0b0] text-[0.625rem] font-semibold leading-none text-[#5d6b7a]"
-              aria-expanded={hintOpen}
-              aria-controls="home-search-hint"
-              aria-label="About keyword search"
-              onClick={() => setHintOpen((open) => !open)}
+          <div className="min-w-0">
+            <label htmlFor="home-search-model" className="sr-only">
+              {HOME_HERO_FILTER_SELECT_MODEL}
+            </label>
+            <Select
+              id="home-search-model"
+              className={fieldClass}
+              value={model}
+              onChange={(event) => setModel(event.target.value)}
             >
-              i
-            </button>
+              <option value="">Model</option>
+              {models.map((item) => (
+                <option key={item.slug} value={item.slug}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
           </div>
-          <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#D7E0E8] bg-white px-3">
-            <IconSearch className="shrink-0 text-[#8b95a3]" width={16} height={16} />
-            <input
-              id="home-search"
-              name="q"
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder={HOME_HERO_FILTER_SEARCH}
-              autoComplete="off"
-              aria-describedby={hintOpen ? "home-search-hint" : undefined}
-              className="h-full w-full border-0 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b95a3]"
-            />
-          </div>
-          <button
-            type="button"
-            aria-expanded={filtersOpen}
-            aria-controls="home-search-filters"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#002852] text-white hover:bg-[#001c3d]"
-            onClick={() => {
-              const next = !filtersOpen;
-              setFiltersOpen(next);
-              if (next) {
-                trackEvent(analyticsEvents.filterOpened, { category: "car" });
-              }
-            }}
-          >
-            <IconFilters className="text-white" width={20} height={20} />
-            <span className="sr-only">{HOME_HERO_FILTERS}</span>
-          </button>
         </div>
-        {hintOpen ? (
-          <p id="home-search-hint" className="mt-2 text-xs leading-snug text-muted">
-            {HOME_HERO_OR_TYPE_HINT}
-          </p>
-        ) : null}
+        </div>
+
+        <div className="mt-3 flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-[#D7E0E8] bg-white px-3">
+          <IconSearch className="shrink-0 text-[#8b95a3]" width={16} height={16} />
+          <label htmlFor="home-search" className="sr-only">
+            {HOME_HERO_FILTER_SEARCH}
+          </label>
+          <input
+            id="home-search"
+            name="q"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder={HOME_HERO_FILTER_SEARCH}
+            autoComplete="off"
+            className="h-full w-full border-0 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b95a3]"
+          />
+        </div>
 
         <button
           type="submit"
@@ -243,24 +201,28 @@ export function HomeSearchBar({ className }: { className?: string }) {
 function PriceTab({
   selected,
   onClick,
-  children,
+  shortLabel,
+  longLabel,
 }: {
   selected: boolean;
   onClick: () => void;
-  children: string;
+  shortLabel: string;
+  longLabel: string;
 }) {
   return (
     <button
       type="button"
       role="tab"
       aria-selected={selected}
+      aria-label={longLabel}
       className={cn(
-        "h-10 rounded-full px-3 text-sm font-semibold",
+        "flex min-h-11 items-center justify-center rounded-full px-2 text-center text-xs leading-snug font-semibold sm:min-h-10 sm:px-3 sm:text-sm",
         selected ? "bg-[#002852] text-white" : "bg-transparent text-[#5d6b7a]",
       )}
       onClick={onClick}
     >
-      {children}
+      <span className="sm:hidden">{shortLabel}</span>
+      <span className="hidden sm:inline">{longLabel}</span>
     </button>
   );
 }

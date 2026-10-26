@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { DealFailureState } from "@/components/deal/DealFailureState";
 import { FinanceConstraintMessage } from "@/components/deal/FinanceConstraintMessage";
@@ -129,38 +129,64 @@ function failureKind(
   return "vehicle";
 }
 
+const DEAL_OPEN_MAX_REFRESH = 3;
+
+function DealFailureShell({
+  model,
+  kind,
+}: {
+  model: DealPageModel;
+  kind: "session" | "vehicle" | "not_found";
+}) {
+  return (
+    <>
+      <JourneyChrome />
+      <div className="px-[var(--oak-page-x)] py-10 sm:py-12">
+        <Container width="content">
+          <DealFailureState
+            kind={kind}
+            recoveryStockId={model.recoveryStockId}
+            recoveryVehicleSlug={model.recoveryVehicleSlug}
+          />
+        </Container>
+      </div>
+    </>
+  );
+}
+
 /**
  * A new deal is often painted once before its cookie is visible to this
- * request. That first paint used to stick on "this vehicle is no longer
- * available" until a hard refresh. Retry the server render once, then show
- * the real failure if the deal is still missing.
+ * request. Retry the server render a few times — a single refresh plus
+ * sessionStorage used to fail immediately under React Strict Mode.
  */
 function DealStartupRecovery({ model }: { model: DealPageModel }) {
   const router = useRouter();
   const [gaveUp, setGaveUp] = useState(false);
+  const refreshAttempts = useRef(0);
 
   useEffect(() => {
-    const key = `oakwood-deal-open:${model.dealId}`;
-    if (window.sessionStorage.getItem(key) === "1") {
+    if (refreshAttempts.current >= DEAL_OPEN_MAX_REFRESH) {
       setGaveUp(true);
       return;
     }
-    window.sessionStorage.setItem(key, "1");
-    router.refresh();
+    refreshAttempts.current += 1;
+    const delayMs = refreshAttempts.current === 1 ? 80 : 350;
+    const timer = window.setTimeout(() => router.refresh(), delayMs);
+    return () => window.clearTimeout(timer);
   }, [model.dealId, router]);
+
+  if (gaveUp) {
+    return <DealFailureShell model={model} kind={failureKind(model)} />;
+  }
 
   return (
     <>
       <JourneyChrome />
-      <div className="px-[var(--oak-page-x)] py-6">
-        <Container width="narrow" className="px-0">
-          {gaveUp ? (
-            <DealFailureState kind={failureKind(model)} />
-          ) : (
-            <p className="text-body text-muted" role="status">
-              Opening your deal…
-            </p>
-          )}
+      <div className="px-[var(--oak-page-x)] py-10 sm:py-12">
+        <Container width="content">
+          <p className="text-body text-muted" role="status">
+            Opening your deal…
+          </p>
         </Container>
       </div>
     </>

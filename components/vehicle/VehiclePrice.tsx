@@ -17,7 +17,6 @@ import {
   DEAL_VDP_CARD_TITLE,
 } from "@/lib/deal/copy";
 import { formatPounds, formatTerm } from "@/lib/format/money";
-import { getVehicleIdentity } from "@/lib/vehicles/labels";
 
 function scrollToFinance() {
   document.getElementById("finance-this-car")?.scrollIntoView({
@@ -39,14 +38,11 @@ export function VehiclePrice() {
     vehicle,
     reservable,
   } = useVehicleDeal();
-  const { title } = getVehicleIdentity(vehicle);
   const financeUnavailable = displayState === "missing";
 
   return (
     <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
-      <h2 className="text-xl font-semibold tracking-[-0.02em] text-navy">{title}</h2>
-
-      <div className="mt-4 flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <p className="sr-only">Cash price</p>
           {displayState === "loading" ? (

@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { IconButton } from "@/components/ui/Button";
-import { IconArrow, IconClose, IconPlay, IconSearch } from "@/components/ui/icons";
+import { IconArrow, IconPlay } from "@/components/ui/icons";
 import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -20,12 +19,17 @@ function isSvg(src: string) {
 const galleryControlClass =
   "h-8! w-8! min-h-8! min-w-8! bg-surface/95 p-0 shadow-sm [&_svg]:h-3.5! [&_svg]:w-3.5!";
 
-export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
+export function VehicleGallery({
+  vehicle,
+  presentation = "default",
+}: {
+  vehicle: VehicleDetail;
+  presentation?: "default" | "vdp-v2";
+}) {
+  const isV2 = presentation === "vdp-v2";
   const items = useMemo(() => getVehicleGallery(vehicle), [vehicle]);
   const [index, setIndex] = useState(0);
-  const [lightbox, setLightbox] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
   const [broken, setBroken] = useState<Record<number, boolean>>({});
   const touchStart = useRef<number | null>(null);
   const current = items[index];
@@ -50,30 +54,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
   );
 
   useEffect(() => {
-    setPortalReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!lightbox) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.body.dataset.vehicleLightbox = "true";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      delete document.body.dataset.vehicleLightbox;
-    };
-  }, [lightbox]);
-
-  useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (lightbox && event.key === "Escape") {
-        setLightbox(false);
-        return;
-      }
       if (event.key === "ArrowRight") {
         goTo(index + 1);
       }
@@ -84,7 +65,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo, index, lightbox]);
+  }, [goTo, index]);
 
   const vehicleName = getVehicleTitle(vehicle);
   const imageBroken = Boolean(current && broken[index]);
@@ -124,7 +105,11 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
     <div className="vdp-hero__gallery min-w-0">
       <div className="vdp-hero__gallery-sticky">
       <div
-        className="relative overflow-hidden rounded-2xl bg-page-tint"
+        className={cn(
+          "relative overflow-hidden bg-page-tint",
+          isV2 ? "rounded-xl" : "rounded-2xl",
+        )}
+        data-vdp-v2-main-image={isV2 ? "" : undefined}
         onTouchStart={(event) => {
           touchStart.current = event.changedTouches[0]?.clientX ?? null;
         }}
@@ -142,7 +127,7 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           }
         }}
       >
-        <div className="relative aspect-[16/10]">
+        <div className={cn("relative", isV2 ? "aspect-[4/3]" : "aspect-[16/10]")}>
         {imageBroken ? (
           <div className="absolute inset-0 flex items-center justify-center bg-page-tint px-6 text-center">
             <p className="max-w-md text-body-sm text-muted">
@@ -233,19 +218,15 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
             category={vehicle.category}
             className={galleryControlClass}
           />
-          {current.kind === "image" && !imageBroken ? (
-            <IconButton
-              label="View larger image"
-              className={galleryControlClass}
-              onClick={() => setLightbox(true)}
-            >
-              <IconSearch />
-            </IconButton>
-          ) : null}
         </div>
       </div>
 
-      <ul className="mt-3 flex w-full max-w-full gap-2 overflow-x-auto pb-1">
+      <ul
+        className={cn(
+          "flex w-full max-w-full overflow-x-auto pb-1",
+          isV2 ? "vdp-v2-thumb-row mt-2 gap-2" : "mt-3 gap-2",
+        )}
+      >
         {items.map((item, itemIndex) => (
           <li key={`${item.kind}-${item.src}-${itemIndex}`}>
             <button
@@ -253,8 +234,17 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
               aria-label={item.kind === "video" ? item.title ?? "Video" : item.alt}
               aria-current={itemIndex === index ? "true" : undefined}
               className={cn(
-                "relative h-12 w-[4.5rem] overflow-hidden rounded-sm border md:h-[4.25rem] md:w-24",
-                itemIndex === index ? "border-primary" : "border-border",
+                "relative overflow-hidden border",
+                isV2
+                  ? "h-12 w-16 rounded-[6px]"
+                  : "h-12 w-[4.5rem] rounded-sm md:h-[4.25rem] md:w-24",
+                itemIndex === index
+                  ? isV2
+                    ? "border-[#0875D1] border-2"
+                    : "border-primary"
+                  : isV2
+                    ? "border-[#DCE4ED]"
+                    : "border-border",
               )}
               onClick={() => goTo(itemIndex)}
             >
@@ -276,74 +266,6 @@ export function VehicleGallery({ vehicle }: { vehicle: VehicleDetail }) {
           </li>
         ))}
       </ul>
-
-      {lightbox && current.kind === "image" && portalReady
-        ? createPortal(
-            <div
-              className="fixed inset-0 z-[200] h-dvh w-screen bg-[#101828]"
-              style={{ zIndex: 200 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label={current.alt}
-            >
-              <button
-                type="button"
-                className="absolute inset-0 cursor-zoom-out"
-                aria-label="Close zoomed image"
-                onClick={() => setLightbox(false)}
-              />
-              <div className="pointer-events-none absolute inset-3 sm:inset-8">
-                <Image
-                  src={current.src}
-                  alt={current.alt}
-                  fill
-                  sizes="100vw"
-                  unoptimized={isSvg(current.src)}
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <IconButton
-                label="Close"
-                className="absolute top-4 right-4 z-20 bg-white text-ink shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:bg-[#E7F1F8] sm:top-5 sm:right-5"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setLightbox(false);
-                }}
-              >
-                <IconClose />
-              </IconButton>
-              {items.length > 1 ? (
-                <>
-                  <IconButton
-                    label="Previous image"
-                    className="absolute top-1/2 left-3 z-20 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:left-5"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      goTo(index - 1);
-                    }}
-                  >
-                    <IconArrow className="rotate-180" />
-                  </IconButton>
-                  <IconButton
-                    label="Next image"
-                    className="absolute top-1/2 right-3 z-20 -translate-y-1/2 bg-white/95 text-ink shadow-sm hover:bg-white sm:right-5"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      goTo(index + 1);
-                    }}
-                  >
-                    <IconArrow />
-                  </IconButton>
-                  <p className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full bg-[rgb(16_24_40/0.72)] px-3 py-1 text-caption text-white">
-                    {index + 1} / {items.length}
-                  </p>
-                </>
-              ) : null}
-            </div>,
-            document.body,
-          )
-        : null}
       </div>
     </div>
   );

@@ -84,8 +84,8 @@ export function DealApplicationPage({ model }: { model: DealPageModel }) {
     return (
       <>
         <JourneyChrome />
-        <div className="px-[var(--oak-page-x)] py-6">
-          <Container width="narrow" className="px-0">
+        <div className="px-[var(--oak-page-x)] py-10 sm:py-12">
+          <Container width="content">
             <DealFailureState
               kind={
                 model.status === "expired"
@@ -94,6 +94,8 @@ export function DealApplicationPage({ model }: { model: DealPageModel }) {
                     ? "not_found"
                     : "vehicle"
               }
+              recoveryStockId={model.recoveryStockId}
+              recoveryVehicleSlug={model.recoveryVehicleSlug}
             />
             <p className="mt-4 text-caption text-muted">
               Return to a vehicle to build a deal before applying for finance.

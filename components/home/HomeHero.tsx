@@ -10,6 +10,7 @@ import { HomeSearchCard } from "@/components/home/HomeSearchCard";
 import { HeroVariantToggle } from "@/components/home/HeroVariantToggle";
 import { useHomeHeroVariant } from "@/components/home/useHomeHeroVariant";
 import { routes } from "@/config/routes";
+import { cn } from "@/lib/cn";
 import {
   HOME_HERO_DESCRIPTION,
   HOME_HERO_HEADING,
@@ -52,15 +53,18 @@ function CurrentHero() {
         />
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col pb-8 lg:flex-1 lg:justify-center lg:pb-0 [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
-        <div className="max-w-md">
-          <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
-            {HOME_HERO_HEADING}
-          </h1>
-          <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
-            {HOME_HERO_DESCRIPTION}
-          </p>
-          <HomeSearchBar className="mt-6" />
-          <div className="mt-8">
+        <div className="flex w-full max-w-xl flex-col">
+          <div className="max-w-md">
+            <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
+              {HOME_HERO_HEADING}
+            </h1>
+            <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
+              {HOME_HERO_DESCRIPTION}
+            </p>
+          </div>
+          <HeroCompactPhoto className="-mx-6 mt-3 lg:hidden" />
+          <HomeSearchBar className="relative z-20 w-full max-lg:-mt-14 lg:mt-5" />
+          <div className="relative z-10 mt-8">
             <Link
               href={routes.partExchange}
               className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
@@ -73,7 +77,6 @@ function CurrentHero() {
           </div>
         </div>
       </div>
-      <HeroCompactPhoto bleedClassName="" />
     </section>
   );
 }
@@ -93,17 +96,20 @@ function FilterHero() {
         />
       </div>
       <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col py-4 lg:flex-1 lg:justify-center [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
-        <HomeFilterSearchCard />
+        <HeroCompactPhoto className="-mx-5 mt-2 lg:hidden" />
+        <HomeFilterSearchCard className="mt-4 lg:mt-0" />
       </div>
-      <HeroCompactPhoto bleedClassName="" />
     </section>
   );
 }
 
-function HeroCompactPhoto({ bleedClassName }: { bleedClassName: string }) {
+function HeroCompactPhoto({ className }: { className?: string }) {
   return (
     <div
-      className={`relative mt-2 h-60 shrink-0 overflow-hidden lg:hidden [@media(max-height:560px)]:pointer-events-none [@media(max-height:560px)]:absolute [@media(max-height:560px)]:top-0 [@media(max-height:560px)]:right-0 [@media(max-height:560px)]:bottom-auto [@media(max-height:560px)]:left-auto [@media(max-height:560px)]:mx-0 [@media(max-height:560px)]:mt-0 [@media(max-height:560px)]:h-[min(100%,100dvh)] [@media(max-height:560px)]:w-[42%] ${bleedClassName}`}
+      className={cn(
+        "relative h-48 shrink-0 overflow-hidden sm:h-56",
+        className,
+      )}
     >
       <Image
         src="/images/hero/open-sky-mobile.png"
@@ -111,8 +117,12 @@ function HeroCompactPhoto({ bleedClassName }: { bleedClassName: string }) {
         fill
         priority
         quality={92}
-        sizes="(max-width: 1024px) 100vw, 46vw"
-        className="object-cover object-[center_28%] [@media(max-height:560px)]:object-[center_45%] [mask-image:linear-gradient(to_bottom,transparent,#000_12%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,#000_12%)] [@media(max-height:560px)]:[mask-image:linear-gradient(to_right,transparent,#000_18%)] [@media(max-height:560px)]:[-webkit-mask-image:linear-gradient(to_right,transparent,#000_18%)]"
+        sizes="100vw"
+        className="object-cover object-[center_22%]"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ECF3F8_0%,rgba(236,243,248,0.85)_12%,rgba(236,243,248,0)_38%,rgba(236,243,248,0)_55%,rgba(236,243,248,0.35)_78%,rgba(236,243,248,0)_100%)]"
+        aria-hidden
       />
     </div>
   );

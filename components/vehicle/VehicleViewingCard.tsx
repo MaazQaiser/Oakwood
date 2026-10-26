@@ -71,7 +71,8 @@ export function VehicleViewingCard({ vehicle }: { vehicle: VehicleDetail }) {
         <ul className="mt-3 space-y-1 text-body-sm">
           {salesHours.map((row) => (
             <li key={`${row.days}-${row.hours}`}>
-              <span className="text-muted">{row.days}</span> {row.hours}
+              <span className="text-muted">{row.days}</span>{" "}
+              <span className="font-semibold text-ink">{row.hours}</span>
             </li>
           ))}
         </ul>

@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Field, Input } from "@/components/forms/FormControls";
+import { Input } from "@/components/forms/FormControls";
 import { ValuationEntryDrawer } from "@/components/valuation-entry/ValuationEntryDrawer";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -81,8 +81,14 @@ export function ValuationEntryCard() {
         </h2>
         <p className="mt-1 text-body-sm text-white/85">{VE_CARD_SUPPORT}</p>
 
-        <div className="mt-4 grid grid-cols-2 items-start gap-3 [&_label]:text-white [&_.text-danger]:text-danger-soft">
-          <Field htmlFor={regId} label="Registration" error={regError}>
+        <div className="mt-4 grid grid-cols-1 gap-y-1.5 min-[400px]:grid-cols-2 min-[400px]:grid-rows-[auto_auto] min-[400px]:gap-x-3 min-[400px]:gap-y-1.5">
+          <label
+            htmlFor={regId}
+            className="text-caption font-semibold leading-snug text-white min-[400px]:col-start-1 min-[400px]:row-start-1"
+          >
+            Registration
+          </label>
+          <div className="min-w-0 min-[400px]:col-start-1 min-[400px]:row-start-2">
             <Input
               id={regId}
               className="h-9! min-h-9! border-transparent bg-white/95 py-0 font-semibold! tracking-wider text-navy uppercase"
@@ -92,13 +98,29 @@ export function ValuationEntryCard() {
               spellCheck={false}
               placeholder="AB21 CDE"
               error={Boolean(regError)}
+              aria-describedby={regError ? `${regId}-error` : undefined}
               onChange={(event) => {
                 setRegistration(formatRegistration(event.target.value));
                 setRegError(undefined);
               }}
             />
-          </Field>
-          <Field htmlFor={milesId} label="Current mileage" error={mileError}>
+            {regError ? (
+              <p
+                id={`${regId}-error`}
+                className="mt-1 text-caption text-danger-soft"
+                role="alert"
+              >
+                {regError}
+              </p>
+            ) : null}
+          </div>
+          <label
+            htmlFor={milesId}
+            className="text-caption font-semibold leading-snug text-white min-[400px]:col-start-2 min-[400px]:row-start-1"
+          >
+            Mileage
+          </label>
+          <div className="min-w-0 min-[400px]:col-start-2 min-[400px]:row-start-2">
             <Input
               id={milesId}
               className="h-9! min-h-9! border-transparent bg-white/95 py-0 text-navy"
@@ -106,12 +128,22 @@ export function ValuationEntryCard() {
               value={mileage}
               placeholder="42,000"
               error={Boolean(mileError)}
+              aria-describedby={mileError ? `${milesId}-error` : undefined}
               onChange={(event) => {
                 setMileage(formatMileageInput(event.target.value));
                 setMileError(undefined);
               }}
             />
-          </Field>
+            {mileError ? (
+              <p
+                id={`${milesId}-error`}
+                className="mt-1 text-caption text-danger-soft"
+                role="alert"
+              >
+                {mileError}
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <Button

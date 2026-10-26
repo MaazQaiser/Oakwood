@@ -30,14 +30,23 @@ function isPersistedDeal(value: unknown): value is DealSessionRecord {
     typeof record.id === "string" &&
     record.id.length <= 64 &&
     typeof record.vehicleStockId === "string" &&
-    (record.financeType === "hp" || record.financeType === "pcp") &&
+    (record.financeType === "hp" ||
+      record.financeType === "pcp" ||
+      record.financeType === undefined) &&
     typeof record.createdAt === "number" &&
     typeof record.updatedAt === "number" &&
     typeof record.expiresAt === "number" &&
     typeof record.cashDeposit === "number" &&
-    typeof record.term === "number" &&
-    Array.isArray(record.productIds)
+    typeof record.term === "number"
   );
+}
+
+function normalizePersistedDeal(record: DealSessionRecord): DealSessionRecord {
+  return {
+    ...record,
+    financeType: record.financeType === "pcp" ? "pcp" : "hp",
+    productIds: Array.isArray(record.productIds) ? record.productIds : [],
+  };
 }
 
 async function readPersistedDeals(): Promise<DealSessionRecord[]> {
@@ -48,8 +57,37 @@ async function readPersistedDeals(): Promise<DealSessionRecord[]> {
 /** Load the visitor's persisted deals into the store. Safe during RSC render. */
 export async function hydrateDealsFromCookie(): Promise<void> {
   for (const record of await readPersistedDeals()) {
-    restoreDealRecord(record);
+    restoreDealRecord(normalizePersistedDeal(record));
   }
+}
+
+/**
+ * Resolve a deal from memory or the signed state cookie. Cookie hydration can
+ * miss on the first paint after a redirect; reading the array again avoids a
+ * false "deal not found" when the record is already persisted.
+ */
+export async function findPersistedVehicleStockId(
+  dealId: string,
+): Promise<string | undefined> {
+  const persisted = await readPersistedDeals();
+  return persisted.find((item) => item.id === dealId)?.vehicleStockId;
+}
+
+export async function resolveDealRecord(
+  dealId: string,
+): Promise<DealSessionRecord | null> {
+  await hydrateDealsFromCookie();
+  const fromMemory = getDealRecord(dealId);
+  if (fromMemory) {
+    return fromMemory;
+  }
+  const persisted = await readPersistedDeals();
+  const match = persisted.find((item) => item.id === dealId);
+  if (!match) {
+    return null;
+  }
+  restoreDealRecord(normalizePersistedDeal(match));
+  return getDealRecord(dealId);
 }
 
 /** Save a deal to the state cookie. Server Functions / Route Handlers only. */

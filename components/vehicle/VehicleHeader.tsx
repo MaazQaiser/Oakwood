@@ -9,7 +9,7 @@ import { getVehicleIdentity } from "@/lib/vehicles/labels";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 const SPEC_CHIP =
-  "border-primary/20! bg-primary-soft! px-3 py-1.5 text-body-sm font-semibold! text-primary";
+  "border-primary/20! bg-primary-soft! px-2 py-0.5 text-caption font-semibold! leading-snug text-primary";
 
 export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
   const [shared, setShared] = useState<"idle" | "copied">("idle");
@@ -58,7 +58,7 @@ export function VehicleHeader({ vehicle }: { vehicle: VehicleDetail }) {
       {subtitle ? (
         <p className="mt-1 text-body-sm text-muted">{subtitle}</p>
       ) : null}
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <div className="mt-2.5 flex flex-wrap items-center gap-1">
         {badges.map((label) => (
           <Chip key={label} className={SPEC_CHIP}>
             {label}
