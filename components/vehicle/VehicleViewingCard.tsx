@@ -3,8 +3,16 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/forms/FormControls";
+import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { submitSupportEnquiry } from "@/features/support/actions";
+import { reservationConfig } from "@/config/reservation";
 import { getShowroomProfile, getStockLocation } from "@/config/locations";
+import {
+  formatHoldPeriod,
+  reservationAmountLabel,
+} from "@/lib/reservation/format";
+import { reservationCopy } from "@/lib/reservation/copy";
+import { isReservable } from "@/lib/vehicles/sold";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VehicleViewingCard({ vehicle }: { vehicle: VehicleDetail }) {
@@ -50,7 +58,7 @@ export function VehicleViewingCard({ vehicle }: { vehicle: VehicleDetail }) {
     <section
       id="view-this-car"
       aria-labelledby="view-this-car-heading"
-      className="rounded-[28px] border border-border bg-surface p-5 md:p-6"
+      className="scroll-mt-[calc(var(--oak-header-height)+1rem)] rounded-[28px] border border-border bg-surface p-5 md:p-6"
     >
       <h2 id="view-this-car-heading" className="text-h3">
         Book a test drive or viewing
@@ -73,9 +81,26 @@ export function VehicleViewingCard({ vehicle }: { vehicle: VehicleDetail }) {
         </p>
       )}
       {reference ? (
-        <p className="mt-4 text-body-sm" role="status">
-          Request received. Your reference is {reference}.
-        </p>
+        <div className="mt-4" role="status">
+          <p className="text-body-sm">
+            Request received. Your reference is {reference}.
+          </p>
+          {isReservable(vehicle) ? (
+            <div className="mt-4 rounded-lg border border-border bg-page-tint p-4">
+              <p className="text-label">Reserve this car</p>
+              <p className="mt-1 text-body-sm text-muted">
+                {reservationCopy.fullyRefundable}. Holds the car for{" "}
+                {formatHoldPeriod(reservationConfig.holdDurationDays)}. The{" "}
+                {reservationAmountLabel(reservationConfig.amount)} is applied to
+                the purchase.
+              </p>
+              <StartReservationButton
+                className="mt-3 w-full sm:w-auto"
+                stockId={vehicle.stockId}
+              />
+            </div>
+          ) : null}
+        </div>
       ) : (
         <form className="mt-4 grid gap-3 sm:grid-cols-2" onSubmit={submit}>
           <Field htmlFor="view-name" label="Name">

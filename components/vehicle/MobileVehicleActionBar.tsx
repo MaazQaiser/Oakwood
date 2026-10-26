@@ -2,77 +2,72 @@
 
 import { Button } from "@/components/ui/Button";
 import { StickyActionBar } from "@/components/ui/StickyActionBar";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
-import { IconPhone } from "@/components/ui/icons";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { getUsedCarsUrl } from "@/config/routes";
 import { getStockLocation } from "@/config/locations";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
-import { formatPounds } from "@/lib/format/money";
 import { toTelHref } from "@/lib/format/phone";
 
+const actionClass =
+  "btn-wrap h-full min-h-14 w-full px-2! py-2! text-center text-body-sm! leading-tight";
+
 export function MobileVehicleActionBar() {
-  const {
-    vehicle,
-    reservable,
-    priceView,
-    cashPrice,
-    monthlyPayment,
-    displayState,
-  } = useVehicleDeal();
+  const { vehicle, reservable } = useVehicleDeal();
   const location = getStockLocation(vehicle.locationSlug);
   const telephone = location?.telephone;
-  const showMonthly = priceView === "monthly" && displayState !== "missing";
 
   return (
     <StickyActionBar>
-      <div className="mx-auto flex max-w-[var(--oak-width-content)] items-center gap-3">
+      <div className="mx-auto grid max-w-[var(--oak-width-content)] grid-cols-3 items-stretch gap-2">
+        {reservable ? (
+          <StartVehicleDealButton
+            className="min-w-0"
+            size="sm"
+            label="Build your deal"
+            buttonClassName={actionClass}
+          />
+        ) : (
+          <Button
+            href={getUsedCarsUrl()}
+            variant="primary"
+            size="sm"
+            className={actionClass}
+          >
+            View similar cars
+          </Button>
+        )}
+        <Button
+          href="#view-this-car"
+          variant="outline"
+          size="sm"
+          className={actionClass}
+          onClick={() =>
+            trackEvent(analyticsEvents.contactClicked, { channel: "test-drive" })
+          }
+        >
+          Book a test drive
+        </Button>
         {telephone ? (
           <Button
             href={toTelHref(telephone)}
-            variant="icon"
-            aria-label="Call Oakwood"
-            className="shrink-0 border border-border"
+            variant="outline"
+            size="sm"
+            className={actionClass}
             onClick={() =>
               trackEvent(analyticsEvents.contactClicked, { channel: "call" })
             }
           >
-            <IconPhone />
+            Phone call
           </Button>
-        ) : null}
-        <div className="min-w-0 flex-1">
-          <p className="text-caption text-muted">
-            {showMonthly ? "Monthly payment" : "Cash price"}
-          </p>
-          <p className="truncate text-ink">
-            {showMonthly ? (
-              <FinancialNumber
-                value={formatPounds(monthlyPayment)}
-                suffix={displayState === "representative" ? "/mo*" : "/mo"}
-                size="sm"
-              />
-            ) : (
-              <FinancialNumber value={formatPounds(cashPrice)} size="sm" />
-            )}
-          </p>
-        </div>
-        {reservable ? (
-          <>
-            <StartVehicleDealButton
-              className="btn-compact min-w-0 shrink-0"
-              variant="secondary"
-              label="Build deal"
-            />
-            <StartReservationButton
-              stockId={vehicle.stockId}
-              className="btn-compact min-w-0 shrink-0"
-            />
-          </>
         ) : (
-          <Button href={getUsedCarsUrl()} className="btn-compact min-w-0 shrink-0" variant="secondary">
-            View similar cars
+          <Button
+            href="#vehicle-location-heading"
+            variant="outline"
+            size="sm"
+            className={actionClass}
+          >
+            Phone call
           </Button>
         )}
       </div>

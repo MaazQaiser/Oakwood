@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   FinancialNumber,
   MonthlyPayment,
@@ -9,13 +8,11 @@ import { Skeleton } from "@/components/ui/Loading";
 import { Button } from "@/components/ui/Button";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
 import { DealEntrySteps } from "@/components/deal/DealEntrySteps";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
 import { VehiclePriceToggle } from "@/components/vehicle/VehiclePriceToggle";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
-import { getEligibilityUrl, getSearchUrl, routes } from "@/config/routes";
-import { reservationConfig } from "@/config/reservation";
+import { getEligibilityUrl, getSearchUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import {
   DEAL_VDP_CARD_BODY,
@@ -23,11 +20,6 @@ import {
   DEAL_VDP_CARD_TITLE,
 } from "@/lib/deal/copy";
 import { formatPounds, formatTerm } from "@/lib/format/money";
-import {
-  formatHoldPeriod,
-  reservationAmountLabel,
-} from "@/lib/reservation/format";
-import { reservationCopy } from "@/lib/reservation/copy";
 import { getVehicleIdentity } from "@/lib/vehicles/labels";
 
 function scrollToFinance() {
@@ -53,9 +45,6 @@ export function VehiclePrice() {
     setPriceView,
   } = useVehicleDeal();
   const { title } = getVehicleIdentity(vehicle);
-  const image = vehicle.images[0];
-  const amount = reservationAmountLabel(reservationConfig.amount);
-  const hold = formatHoldPeriod(reservationConfig.holdDurationDays);
   const showMonthly = priceView === "monthly";
   const financeUnavailable = displayState === "missing";
 
@@ -144,45 +133,21 @@ export function VehiclePrice() {
         </p>
       ) : null}
 
-      <ValuationEntryCard />
-
       {reservable ? (
-        <div className="mt-5 overflow-hidden rounded-lg border border-border bg-page">
-          {image ? (
-            <div className="relative aspect-[16/10] bg-page-tint">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1024px) 22rem, 100vw"
-              />
-            </div>
-          ) : null}
-          <div className="p-4">
-            <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
-            <p className="mt-1 text-body font-semibold! text-navy">{title}</p>
-            <p className="mt-1">
-              <FinancialNumber value={formatPounds(cashPrice)} size="sm" />
-            </p>
-            <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
-            <DealEntrySteps />
-            <StartVehicleDealButton
-              className="mt-3 w-full"
-              label={DEAL_VDP_CARD_CTA}
-            />
-          </div>
+        <div className="mt-5 rounded-lg border border-border bg-page p-4">
+          <p className="text-label">{DEAL_VDP_CARD_TITLE}</p>
+          <p className="mt-1 text-body-sm text-muted">{DEAL_VDP_CARD_BODY}</p>
+          <DealEntrySteps />
+          <StartVehicleDealButton
+            className="mt-3 w-full"
+            label={DEAL_VDP_CARD_CTA}
+          />
         </div>
       ) : null}
 
+      <ValuationEntryCard />
+
       <div className="mt-4 hidden flex-col gap-2 lg:flex">
-        {reservable ? (
-          <StartReservationButton
-            stockId={vehicle.stockId}
-            className="w-full"
-            variant="secondary"
-          />
-        ) : null}
         {displayState === "representative" ? (
           <Button
             href={getEligibilityUrl()}
@@ -206,26 +171,6 @@ export function VehiclePrice() {
           </Button>
         ) : null}
       </div>
-
-      {reservable ? (
-        <p className="mt-4 text-caption text-muted">
-          Reserve for {amount}. {reservationCopy.fullyRefundable}. Holds the
-          vehicle for {hold}.{" "}
-          <a
-            href={routes.reservationTerms}
-            className="text-primary underline-offset-4 hover:underline"
-          >
-            Reservation terms
-          </a>
-          {" · "}
-          <a
-            href={routes.cancellationRefund}
-            className="text-primary underline-offset-4 hover:underline"
-          >
-            Cancellation and refund
-          </a>
-        </p>
-      ) : null}
     </div>
   );
 }

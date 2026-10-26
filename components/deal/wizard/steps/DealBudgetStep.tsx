@@ -259,14 +259,14 @@ export function DealBudgetStep() {
                   title: "Hire Purchase",
                   lead: DEAL_BUDGET_HP_LEAD,
                   body: DEAL_BUDGET_HP_BODY,
-                  termNote: "84 months",
+                  termNote: `${hpTerm} months`,
                 },
                 {
                   value: "pcp" as const,
                   title: "Personal Contract Purchase",
                   lead: DEAL_BUDGET_PCP_LEAD,
                   body: DEAL_BUDGET_PCP_BODY,
-                  termNote: "60 months",
+                  termNote: `${pcpTerm} months`,
                 },
               ]
             ).map((option) => {

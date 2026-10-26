@@ -98,6 +98,7 @@ export function Button({
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
     "disabled:cursor-not-allowed disabled:opacity-50",
     "active:translate-y-px",
+    wrap && "min-w-0 whitespace-normal",
     compact && variant === "primary"
       ? wrap
         ? "h-auto min-h-11 min-w-0 max-w-full justify-between gap-2 rounded-[14px] bg-primary py-1 pl-4 pr-1 text-white hover:bg-primary-hover lg:h-11 lg:shrink-0"
@@ -126,6 +127,8 @@ export function Button({
         >
           {children}
         </span>
+      ) : wrap ? (
+        <span className="block w-full min-w-0 text-balance leading-tight">{children}</span>
       ) : (
         children
       )}

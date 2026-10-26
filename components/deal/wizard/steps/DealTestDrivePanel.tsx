@@ -9,6 +9,7 @@ import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summar
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { dealSettings } from "@/config/deal-settings";
 import {
   formatShowroomAddress,
@@ -35,6 +36,12 @@ import {
   STEP4_TD_WALKAROUND_PLACEHOLDER,
   STEP4_TD_WHAT_TO_BRING,
 } from "@/lib/deal/step4-copy";
+import { reservationConfig } from "@/config/reservation";
+import {
+  formatHoldPeriod,
+  reservationAmountLabel,
+} from "@/lib/reservation/format";
+import { reservationCopy } from "@/lib/reservation/copy";
 import { cn } from "@/lib/cn";
 
 type TdPhase = "form" | "loading" | "confirm";
@@ -44,7 +51,7 @@ type Errors = Partial<
 >;
 
 export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
-  const { vehicle, draft, navigateTo } = useDealBuilder();
+  const { dealId, vehicle, draft, navigateTo } = useDealBuilder();
   const nameId = useId();
   const phoneId = useId();
   const emailId = useId();
@@ -246,6 +253,23 @@ export function DealTestDrivePanel({ onBack }: { onBack: () => void }) {
             <p className="mt-2 text-caption">{STEP4_TD_CHANNELS}</p>
           ) : null}
         </Alert>
+
+        {vehicle.availability === "available" ? (
+          <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+            <p className="text-label">Reserve this car</p>
+            <p className="mt-1 text-body-sm text-muted">
+              {reservationCopy.fullyRefundable}. Holds the car for{" "}
+              {formatHoldPeriod(reservationConfig.holdDurationDays)}. The{" "}
+              {reservationAmountLabel(reservationConfig.amount)} is applied to
+              the purchase.
+            </p>
+            <StartReservationButton
+              className="mt-3 w-full sm:w-auto"
+              stockId={vehicle.stockId}
+              dealId={dealId}
+            />
+          </section>
+        ) : null}
 
         <DealStepFooter
           showMonthly={false}

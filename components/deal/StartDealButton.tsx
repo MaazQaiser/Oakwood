@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button, type ButtonSize } from "@/components/ui/Button";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 import type { FinanceProductType } from "@/types/finance";
 
 export function StartDealButton({
@@ -17,6 +18,8 @@ export function StartDealButton({
   financeType,
   annualMileage,
   label = DEAL_VDP_CARD_CTA,
+  size,
+  buttonClassName,
 }: {
   stockId: string;
   className?: string;
@@ -26,6 +29,8 @@ export function StartDealButton({
   financeType?: FinanceProductType;
   annualMileage?: number;
   label?: string;
+  size?: ButtonSize;
+  buttonClassName?: string;
 }) {
   const finance = useCustomerFinance();
   const [failed, setFailed] = useState(false);
@@ -38,8 +43,9 @@ export function StartDealButton({
   }, []);
 
   return (
-    <div className={className}>
+    <div className={cn("h-full", className)}>
       <form
+        className="h-full"
         action="/api/deal/start"
         method="post"
         onSubmit={() => {
@@ -55,7 +61,12 @@ export function StartDealButton({
         {annualMileage ? (
           <input type="hidden" name="annualMileage" value={String(annualMileage)} />
         ) : null}
-        <Button className="w-full" variant={variant} type="submit">
+        <Button
+          className={cn("h-full w-full", buttonClassName)}
+          variant={variant}
+          size={size}
+          type="submit"
+        >
           {label}
         </Button>
       </form>
@@ -72,10 +83,14 @@ export function StartVehicleDealButton({
   className,
   variant = "primary",
   label,
+  size,
+  buttonClassName,
 }: {
   className?: string;
   variant?: "primary" | "secondary" | "tertiary";
   label?: string;
+  size?: ButtonSize;
+  buttonClassName?: string;
 }) {
   const { vehicle, financeType, deposit, term, annualMileage } = useVehicleDeal();
 
@@ -89,6 +104,8 @@ export function StartVehicleDealButton({
       className={className}
       variant={variant}
       label={label}
+      size={size}
+      buttonClassName={buttonClassName}
     />
   );
 }

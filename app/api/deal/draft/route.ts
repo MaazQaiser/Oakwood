@@ -7,7 +7,7 @@ import {
 } from "@/features/deal/store";
 import { listSelectedProducts } from "@/lib/deal/products";
 import { mockDealId } from "@/lib/mock/data";
-import type { DealDraft } from "@/types/deal";
+import type { DealCreditTier, DealDraft } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 /**
@@ -42,6 +42,13 @@ export async function POST(request: Request) {
 
   const financeType: FinanceProductType =
     draft.financeType === "pcp" ? "pcp" : "hp";
+  const creditTier: DealCreditTier | undefined =
+    draft.creditTier === "excellent" ||
+    draft.creditTier === "good" ||
+    draft.creditTier === "average" ||
+    draft.creditTier === "poor"
+      ? draft.creditTier
+      : undefined;
   const productIds = Array.from(new Set(draft.productIds)).filter(
     (id) => listSelectedProducts([id]).length > 0,
   );
@@ -54,6 +61,7 @@ export async function POST(request: Request) {
     px: draft.px,
     productIds,
     productYears: draft.productYears,
+    creditTier,
     decision: draft.decision,
     financeApplication: draft.financeApplication,
     stepsCompleted: draft.stepsCompleted,

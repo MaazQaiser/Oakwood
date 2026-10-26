@@ -25,7 +25,6 @@ import {
 import { getUsedCarsUrl, getEligibilityUrl } from "@/config/routes";
 import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
 import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
-import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
 import { isReservable } from "@/lib/vehicles/sold";
 import { createVehicleJsonLd } from "@/lib/seo/json-ld";
@@ -57,7 +56,7 @@ export function VehicleDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Section className="min-w-0 pt-4 pb-[calc(7rem+var(--oak-consent-offset,0px))] lg:pt-6 lg:pb-[var(--oak-section-y)]">
+      <Section className="min-w-0 pt-4 pb-[calc(8.5rem+var(--oak-consent-offset,0px))] lg:pt-6 lg:pb-[var(--oak-section-y)]">
         <Container width="wide">
           {breadcrumbs.length > 0 ? (
             <div className="mb-5">
@@ -128,7 +127,7 @@ export function VehicleDetailPage({
               </h2>
               <p className="mt-2 max-w-2xl text-body-sm text-secondary">
                 {reservable
-                  ? "Build your deal for part exchange, budget, cover and reserve — or reserve this car straight away."
+                  ? "Build your deal for part exchange, budget and cover. You can reserve the car after that, or after you book a test drive."
                   : reserved
                     ? "This car is reserved for another customer. Browse similar stock or check your finance eligibility."
                     : "Browse the latest cars or check your finance eligibility first."}
@@ -137,10 +136,6 @@ export function VehicleDetailPage({
                 {reservable ? (
                   <>
                     <StartVehicleDealButton label={DEAL_VDP_CARD_CTA} />
-                    <StartReservationButton
-                      stockId={vehicle.stockId}
-                      variant="secondary"
-                    />
                   </>
                 ) : (
                   <>
@@ -157,11 +152,6 @@ export function VehicleDetailPage({
                     <StartVehicleDealButton
                       className="w-full"
                       label={DEAL_VDP_CARD_CTA}
-                    />
-                    <StartReservationButton
-                      stockId={vehicle.stockId}
-                      className="w-full"
-                      variant="secondary"
                     />
                   </>
                 ) : (

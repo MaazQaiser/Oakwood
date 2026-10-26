@@ -4,7 +4,7 @@ import {
   RECOMMENDED_COVER_IDS,
   defaultCoverYears,
 } from "@/lib/deal/products";
-import type { DealDraft, DealShareSnapshot } from "@/types/deal";
+import type { DealCreditTier, DealDraft, DealShareSnapshot } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
 
 export const DEAL_SESSION_COOKIE = "oakwood_deal_session";
@@ -26,6 +26,7 @@ export interface DealSessionRecord {
   px?: DealDraft["px"];
   productIds: string[];
   productYears?: DealDraft["productYears"];
+  creditTier?: DealCreditTier;
   decision?: DealDraft["decision"];
   financeApplication?: DealDraft["financeApplication"];
   stepsCompleted?: DealDraft["stepsCompleted"];
@@ -337,6 +338,7 @@ export function toDealDraft(record: DealSessionRecord): DealDraft {
     px: record.px,
     productIds: record.productIds,
     productYears: record.productYears,
+    creditTier: record.creditTier,
     decision: record.decision,
     financeApplication: record.financeApplication,
     stepsCompleted: record.stepsCompleted,
