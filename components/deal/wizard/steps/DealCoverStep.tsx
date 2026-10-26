@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Drawer } from "@/components/ui/Dialogs";
+import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
@@ -14,11 +14,22 @@ import {
 import {
   DEAL_AA_BADGE,
   DEAL_AA_BREAKDOWN,
+  DEAL_CALCULATION_UNAVAILABLE,
   DEAL_CLEAR_ALL_COVER,
   DEAL_CONTINUE,
+  DEAL_ILLUSTRATION_PERSONALISED,
+  DEAL_PRICE_UNAVAILABLE,
+  DEAL_SOFT_SEARCH,
+  DEAL_TOTAL_PAYABLE_LABEL,
+  DEAL_VIDEO_UNAVAILABLE,
   DEAL_YOUR_DEAL_APR_DISCLAIMER,
+  DEAL_YOUR_DEAL_MOCK_PRICE,
+  DEAL_YOUR_DEAL_TIER_HINT,
 } from "@/lib/deal/copy";
-import { COVER_INFO, defaultCoverYears } from "@/lib/deal/products";
+import { COVER_INFO, defaultCoverYears, productPriceForYears } from "@/lib/deal/products";
+import { FINANCE_CALCULATOR_CONFIG } from "@/lib/finance/calculator-config";
+import { getRatesFromLabel } from "@/lib/finance/representative-example";
+import { formatPounds } from "@/lib/format/money";
 import { cn } from "@/lib/cn";
 
 const YEAR_OPTIONS = [1, 2, 3, 4] as const;
@@ -74,6 +85,8 @@ const PRODUCTS: CoverProduct[] = [
 type SavedCover = {
   selected: string[];
   years: Record<string, number>;
+  tier?: (typeof CREDIT_TIERS)[number];
+  financeType?: "hp" | "pcp";
 };
 
 function storageKey(dealId: string) {
@@ -189,14 +202,7 @@ function ProductInfo({
         className="mt-4 text-body-sm"
       >
         {tab === "video" ? (
-          <ul className="space-y-2">
-            {product.included.map((item) => (
-              <li key={item} className="flex gap-2">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden />
-                {item}
-              </li>
-            ))}
-          </ul>
+          <p className="text-body-sm text-muted">{DEAL_VIDEO_UNAVAILABLE}</p>
         ) : null}
         {tab === "included" && included.length > 0 ? (
           <ul className="space-y-2">
@@ -231,10 +237,29 @@ function ProductInfo({
   );
 }
 
+const TIER_TO_DRAFT = {
+  Excellent: "excellent",
+  Good: "good",
+  Average: "average",
+  Poor: "poor",
+} as const;
+
 export function DealCoverStep() {
-  const { dealId, draft } = useDealBuilder();
+  const {
+    dealId,
+    draft,
+    products,
+    calculation,
+    phase,
+    setFinanceType: persistFinanceType,
+    setCreditTier,
+    setCoverSelection,
+    productImpact,
+  } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("quote");
-  const [financeType, setFinanceType] = useState<"hp" | "pcp">("hp");
+  const [financeType, setFinanceType] = useState<"hp" | "pcp">(
+    draft.financeType === "pcp" ? "pcp" : "hp",
+  );
   const [tier, setTier] = useState<(typeof CREDIT_TIERS)[number]>("Good");
   const [selected, setSelected] = useState<string[]>(PRODUCTS.map((item) => item.id));
   const [years, setYears] = useState<Record<string, number>>(() =>
@@ -242,8 +267,13 @@ export function DealCoverStep() {
   );
   const [infoId, setInfoId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const seeded = useRef(false);
 
   useEffect(() => {
+    if (seeded.current) {
+      return;
+    }
+    seeded.current = true;
     const raw = window.sessionStorage.getItem(storageKey(dealId));
     if (raw) {
       try {
@@ -263,34 +293,62 @@ export function DealCoverStep() {
         }
         setSelected(nextSelected);
         setYears(nextYears);
+        if (
+          saved.tier &&
+          CREDIT_TIERS.includes(saved.tier)
+        ) {
+          setTier(saved.tier);
+        }
+        if (saved.financeType === "pcp" || saved.financeType === "hp") {
+          setFinanceType(saved.financeType);
+        }
         setHydrated(true);
         return;
       } catch {
         window.sessionStorage.removeItem(storageKey(dealId));
       }
     }
-    setYears(yearChoices(financeTermMonths(dealId, draft.term)));
-    setSelected(PRODUCTS.map((item) => item.id));
-    try {
-      const finance = JSON.parse(
-        window.sessionStorage.getItem(`oakwood-deal-finance:${dealId}`) ?? "{}",
-      ) as { financeType?: string };
-      setFinanceType(finance.financeType === "pcp" ? "pcp" : "hp");
-    } catch {
-      setFinanceType("hp");
+    const visited = draft.stepsCompleted?.some(
+      (step) => step === "quote" || step === "cover",
+    );
+    setYears({
+      ...yearChoices(financeTermMonths(dealId, draft.term)),
+      ...draft.productYears,
+    });
+    setSelected(
+      visited ? draft.productIds : PRODUCTS.map((item) => item.id),
+    );
+    setFinanceType(draft.financeType === "pcp" ? "pcp" : "hp");
+    const savedTier = CREDIT_TIERS.find(
+      (item) => TIER_TO_DRAFT[item] === draft.creditTier,
+    );
+    if (savedTier) {
+      setTier(savedTier);
     }
     setHydrated(true);
-  }, [dealId, draft.term]);
+  }, [dealId, draft]);
 
   useEffect(() => {
     if (!hydrated) {
       return;
     }
-    const saved: SavedCover = { selected, years };
+    const saved: SavedCover = { selected, years, tier, financeType };
     window.sessionStorage.setItem(storageKey(dealId), JSON.stringify(saved));
-  }, [dealId, hydrated, selected, years]);
+    setCoverSelection(selected, years);
+    persistFinanceType(financeType);
+    setCreditTier(TIER_TO_DRAFT[tier]);
+  }, [
+    dealId,
+    financeType,
+    hydrated,
+    persistFinanceType,
+    selected,
+    setCoverSelection,
+    setCreditTier,
+    tier,
+    years,
+  ]);
 
-  const openProduct = PRODUCTS.find((item) => item.id === infoId) ?? null;
   const chosen = PRODUCTS.filter((item) => selected.includes(item.id));
 
   function selectFinanceType(next: "hp" | "pcp") {
@@ -331,11 +389,34 @@ export function DealCoverStep() {
           <p className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-white/70">
             Monthly payment
           </p>
+          {phase === "CALCULATION_ERROR" || !calculation ? (
+            <p className="mt-2 text-body font-semibold!" role="status">
+              {DEAL_CALCULATION_UNAVAILABLE}
+            </p>
+          ) : (
+            <p className="mt-2" role="status">
+              <FinancialNumber
+                value={formatPounds(calculation.monthlyPayment)}
+                suffix="/mo"
+                size="lg"
+                className="text-white"
+              />
+            </p>
+          )}
           <p className="mt-2 text-body font-semibold!">
             {financeType === "hp" ? "Hire Purchase" : "Personal Contract Purchase"}
           </p>
+          {calculation ? (
+            <p className="mt-1 text-caption text-white/80">
+              {DEAL_TOTAL_PAYABLE_LABEL} {formatPounds(calculation.totalPayable)}
+            </p>
+          ) : null}
           <p className="mt-2 text-caption text-white/75">
-            {DEAL_YOUR_DEAL_APR_DISCLAIMER}
+            {DEAL_ILLUSTRATION_PERSONALISED} {DEAL_SOFT_SEARCH}{" "}
+            {DEAL_YOUR_DEAL_TIER_HINT} {DEAL_YOUR_DEAL_APR_DISCLAIMER}
+            {getRatesFromLabel(FINANCE_CALCULATOR_CONFIG.ratesFromApr)
+              ? ` ${getRatesFromLabel(FINANCE_CALCULATOR_CONFIG.ratesFromApr)}.`
+              : ""}
           </p>
         </div>
 
@@ -363,6 +444,13 @@ export function DealCoverStep() {
         {PRODUCTS.map((product) => {
           const on = selected.includes(product.id);
           const duration = years[product.id] ?? 1;
+          const catalogue = products.find((item) => item.id === product.id);
+          const configuredPrice =
+            catalogue && catalogue.price > 0
+              ? productPriceForYears(catalogue, product.years ? duration : 1)
+              : undefined;
+          const impact = on && configuredPrice ? productImpact(product.id) : undefined;
+          const detailsOpen = infoId === product.id;
           return (
             <DealCard key={product.id} className={cn(!on && "opacity-80")}>
               <div className="flex items-start justify-between gap-3">
@@ -426,16 +514,45 @@ export function DealCoverStep() {
                 </div>
               ) : null}
 
-              <div className="mt-4 flex flex-wrap items-end justify-end gap-3">
+              <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+                <div className="text-caption text-muted">
+                  {configuredPrice ? (
+                    <>
+                      <p className="font-semibold! text-ink">
+                        {formatPounds(configuredPrice)}
+                      </p>
+                      <p>{DEAL_YOUR_DEAL_MOCK_PRICE}</p>
+                      {impact !== undefined ? (
+                        <p>
+                          Indicative monthly impact {formatPounds(impact)}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <p>{DEAL_PRICE_UNAVAILABLE}</p>
+                  )}
+                </div>
                 <Button
                   type="button"
-                  variant="tertiary"
-                  className="min-h-11"
-                  onClick={() => setInfoId(product.id)}
+                  variant="icon"
+                  className="min-h-11 min-w-11"
+                  aria-expanded={detailsOpen}
+                  aria-controls={`${product.id}-info`}
+                  aria-label={`${product.name} product information`}
+                  onClick={() =>
+                    setInfoId((current) =>
+                      current === product.id ? null : product.id,
+                    )
+                  }
                 >
-                  Product information
+                  <Info className="h-5 w-5" aria-hidden />
                 </Button>
               </div>
+              {detailsOpen ? (
+                <div id={`${product.id}-info`} className="mt-4 border-t border-border pt-4">
+                  <ProductInfo product={product} />
+                </div>
+              ) : null}
             </DealCard>
           );
         })}
@@ -461,13 +578,6 @@ export function DealCoverStep() {
         showMonthly={false}
       />
 
-      <Drawer
-        open={openProduct !== null}
-        title={openProduct?.name ?? "Product information"}
-        onClose={() => setInfoId(null)}
-      >
-        {openProduct ? <ProductInfo key={openProduct.id} product={openProduct} /> : null}
-      </Drawer>
     </div>
   );
 }

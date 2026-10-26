@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { Accordion } from "@/components/ui/Accordion";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
 import { PxDealDrawer } from "@/components/part-exchange/PxDealDrawer";
 import { PxEquitySummary } from "@/components/part-exchange/PxEquitySummary";
@@ -14,14 +15,14 @@ export function PartExchange() {
   const [open, setOpen] = useState(false);
 
   return (
-    <section aria-labelledby="part-exchange-heading">
-      <h2 id="part-exchange-heading" className="text-label">
-        Part exchange
-      </h2>
-      <p className="mt-1 text-body-sm text-muted">
-        See how much your car could contribute to your deposit.
-      </p>
-      {px ? (
+    <section
+      id="part-exchange"
+      aria-labelledby="part-exchange-heading"
+      className="scroll-mt-24"
+    >
+      <Accordion title="Part exchange" id="part-exchange-heading">
+        <p>See how much your car could contribute to your deposit.</p>
+        {px ? (
         <div className="mt-4 space-y-4">
           <PxEquitySummary
             estimatedValue={px.value}
@@ -71,6 +72,7 @@ export function PartExchange() {
           </Button>
         </p>
       )}
+      </Accordion>
       <PxDealDrawer
         open={open}
         initialPx={px}

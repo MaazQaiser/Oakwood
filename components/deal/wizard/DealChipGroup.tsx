@@ -100,3 +100,67 @@ export function DealChipGroup<T extends string | number>({
     </fieldset>
   );
 }
+
+/** Multi-select chips. Same visual language as DealChipGroup, with checkboxes. */
+export function DealMultiChipGroup({
+  label,
+  values,
+  options,
+  onToggle,
+  columns = 2,
+  hint,
+}: {
+  label: string;
+  values: string[];
+  options: DealChipOption<string>[];
+  onToggle: (value: string) => void;
+  columns?: 2 | 3;
+  hint?: ReactNode;
+}) {
+  const name = useId();
+  const hintId = `${name}-hint`;
+
+  return (
+    <fieldset aria-describedby={hint ? hintId : undefined}>
+      <legend className="text-label">{label}</legend>
+      <div
+        className={cn(
+          "mt-2 grid gap-2",
+          columns === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2",
+        )}
+      >
+        {options.map((option) => {
+          const selected = values.includes(option.value);
+          return (
+            <label key={option.value} className="relative block cursor-pointer">
+              <input
+                type="checkbox"
+                name={name}
+                value={option.value}
+                className="peer sr-only"
+                checked={selected}
+                onChange={() => onToggle(option.value)}
+              />
+              <span
+                className={cn(
+                  "flex min-h-11 items-center justify-center rounded-[14px] border px-2 text-center text-body-sm transition-colors",
+                  "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus",
+                  selected
+                    ? "border-primary bg-primary font-semibold! text-white shadow-[0_6px_16px_rgb(0_97_162/0.22)]"
+                    : "border-transparent bg-page-tint text-ink hover:bg-surface-soft",
+                )}
+              >
+                {option.label}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      {hint ? (
+        <p id={hintId} className="mt-1.5 text-caption text-muted">
+          {hint}
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}

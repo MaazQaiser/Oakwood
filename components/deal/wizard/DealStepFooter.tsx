@@ -40,7 +40,10 @@ export function DealStepFooter({
   /** Node so a step can shorten it on phones, where the bar is tight. */
   backLabel?: ReactNode;
 }) {
-  const { calculation, apr, navigating } = useDealBuilder();
+  const { calculation, draft, navigating } = useDealBuilder();
+  const personalised =
+    draft.decision?.outcome === "approved" ||
+    draft.decision?.outcome === "approved_less";
 
   return (
     // Mobile: full-width bar lifted by a soft shadow. Desktop: a floating
@@ -49,7 +52,7 @@ export function DealStepFooter({
       {showMonthly ? (
         <div className="mb-2 flex items-baseline justify-between gap-3 lg:hidden">
           <span className="text-caption text-muted">
-            {apr !== undefined ? "Your monthly" : "Indicative monthly"}
+            {personalised ? "Your monthly" : "Indicative monthly"}
           </span>
           <FinancialNumber
             value={formatPounds(calculation?.monthlyPayment ?? 0)}

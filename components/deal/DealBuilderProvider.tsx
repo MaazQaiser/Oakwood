@@ -78,6 +78,10 @@ export interface DealBuilderContextValue {
   setProductYears: (id: string, years: number) => void;
   clearAllCover: () => void;
   addRecommendedCover: () => void;
+  setCoverSelection: (
+    productIds: string[],
+    productYears: DealDraft["productYears"],
+  ) => void;
   productImpact: (id: string) => number;
   /** The same deal priced as HP or PCP, for side-by-side quote tabs. */
   calculateFor: (
@@ -584,6 +588,24 @@ export function DealBuilderProvider({
     setDraft((current) => ({ ...current, productIds: [] }));
   }, []);
 
+  const setCoverSelection = useCallback(
+    (productIds: string[], productYears: DealDraft["productYears"]) => {
+      setDraft((current) => {
+        const sameIds =
+          current.productIds.length === productIds.length &&
+          current.productIds.every((id) => productIds.includes(id));
+        const sameYears =
+          JSON.stringify(current.productYears ?? {}) ===
+          JSON.stringify(productYears ?? {});
+        if (sameIds && sameYears) {
+          return current;
+        }
+        return { ...current, productIds, productYears };
+      });
+    },
+    [],
+  );
+
   const addRecommendedCover = useCallback(() => {
     setDraft((current) => {
       const productYears = { ...current.productYears };
@@ -761,6 +783,7 @@ export function DealBuilderProvider({
       setProductYears,
       clearAllCover,
       addRecommendedCover,
+      setCoverSelection,
       productImpact,
       calculateFor,
       coverMonthly,
@@ -776,6 +799,7 @@ export function DealBuilderProvider({
     };
   }, [
     addRecommendedCover,
+    setCoverSelection,
     applyDepositGap,
     applyPartExchange,
     calculateFor,

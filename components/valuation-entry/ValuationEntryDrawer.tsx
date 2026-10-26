@@ -6,6 +6,7 @@ import { BeforeYouGoModal } from "@/components/valuation-entry/BeforeYouGoModal"
 import { ValuationEntryFlow } from "@/components/valuation-entry/ValuationEntryFlow";
 import { VE_FLOW_TITLE } from "@/lib/valuation-entry/copy";
 import type { FinanceProductType } from "@/types/finance";
+import type { PxIdentifiedVehicle } from "@/types/part-exchange";
 
 export function ValuationEntryDrawer({
   open,
@@ -15,6 +16,7 @@ export function ValuationEntryDrawer({
   cashDeposit,
   term,
   financeType,
+  initialVehicle,
   onClose,
 }: {
   open: boolean;
@@ -24,6 +26,7 @@ export function ValuationEntryDrawer({
   cashDeposit?: number;
   term?: number;
   financeType?: FinanceProductType;
+  initialVehicle?: PxIdentifiedVehicle;
   onClose: () => void;
 }) {
   const [declineOpen, setDeclineOpen] = useState(false);
@@ -107,6 +110,7 @@ export function ValuationEntryDrawer({
             cashDeposit={cashDeposit}
             term={term}
             financeType={financeType}
+            initialVehicle={initialVehicle}
             onReachedResult={markResultReady}
             onRequestDecline={() => setDeclineOpen(true)}
             onCloseRequest={({ fromResult }) => {

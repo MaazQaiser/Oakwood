@@ -8,6 +8,7 @@ import {
 } from "@/features/deal/actions";
 import { getDealUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { negativeEquityBlocksDeal, partExchangePosition } from "@/lib/deal/valuation";
 import { mockPrefillExtras } from "@/lib/valuation-entry/extras";
 import {
   mockCalculateValuation,
@@ -53,6 +54,7 @@ export function useValuationEntry({
   cashDeposit,
   term,
   financeType,
+  initialVehicle,
   onCloseRequest,
 }: {
   stockId: string;
@@ -61,19 +63,24 @@ export function useValuationEntry({
   cashDeposit?: number;
   term?: number;
   financeType?: "hp" | "pcp";
+  initialVehicle?: PxIdentifiedVehicle;
   onCloseRequest: (opts: { fromResult: boolean }) => void;
 }) {
   const router = useRouter();
-  const [step, setStep] = useState<VeStep>("lookup");
+  const [step, setStep] = useState<VeStep>(initialVehicle ? "vehicle" : "lookup");
   const [registration, setRegistration] = useState(
     normaliseRegistration(initialRegistration),
   );
   const [mileage, setMileage] = useState(initialMileage);
-  const [vehicle, setVehicle] = useState<PxIdentifiedVehicle>();
+  const [vehicle, setVehicle] = useState<PxIdentifiedVehicle | undefined>(
+    initialVehicle,
+  );
   const [lookupError, setLookupError] = useState<string>();
   const [condition, setCondition] = useState<DealPxCondition>();
   const [serviceHistory, setServiceHistory] = useState<DealPxServiceHistory>();
-  const [extras, setExtras] = useState<DealPxExtraId[]>([]);
+  const [extras, setExtras] = useState<DealPxExtraId[]>(
+    initialVehicle ? mockPrefillExtras(initialRegistration) : [],
+  );
   const [privatePlateDisposition, setPrivatePlateDisposition] =
     useState<DealPxPrivatePlateDisposition>();
   const [otherNotes, setOtherNotes] = useState("");
@@ -174,6 +181,9 @@ export function useValuationEntry({
   }, [stockId]);
 
   useEffect(() => {
+    if (initialVehicle) {
+      return;
+    }
     void runLookup(normaliseRegistration(initialRegistration));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- start once on mount with card values
   }, []);
@@ -307,6 +317,10 @@ export function useValuationEntry({
         setFieldError(err);
         return;
       }
+      if (lender.trim().length === 0) {
+        setFieldError("Enter the finance lender.");
+        return;
+      }
     }
     setFieldError(undefined);
     setStep("valuing");
@@ -360,8 +374,33 @@ export function useValuationEntry({
       setFieldError("We couldn't start your deal. Please try again.");
       return;
     }
-    // Spec §3: Continue from entry valuation lands on Step 2 with PX prefilled.
-    router.push(getDealUrl(result.dealId, "budget"));
+    const position = partExchangePosition(px.value, px.settlement ?? 0);
+    router.push(
+      negativeEquityBlocksDeal(position.negativeEquity)
+        ? `${getDealUrl(result.dealId, "reserve")}?panel=callback`
+        : getDealUrl(result.dealId, "budget"),
+    );
+  }
+
+  async function requestCallback() {
+    const px = toDealPx();
+    if (!px) {
+      return;
+    }
+    setBusy(true);
+    const result = await createDealAction({
+      stockId,
+      cashDeposit,
+      term,
+      financeType,
+      px,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setFieldError("We couldn't start your callback. Please try again.");
+      return;
+    }
+    router.push(`${getDealUrl(result.dealId, "reserve")}?panel=callback`);
   }
 
   function submitEmail() {
@@ -473,6 +512,7 @@ export function useValuationEntry({
     continueExtras,
     continueFinance,
     continueToDeal,
+    requestCallback,
     submitEmail,
     submitSave,
     canTriggerAbandon,

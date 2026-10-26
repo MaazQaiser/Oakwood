@@ -157,6 +157,35 @@ export const DEAL_PX_NEGATIVE_BODY =
 
 export const DEAL_PX_CALLBACK = "Request a callback";
 
+export const DEAL_PX_EDIT = "Edit";
+
+export const DEAL_PX_EXTRAS_LABEL = "Vehicle extras";
+
+export const DEAL_PX_OTHER_LABEL = "Other details";
+
+export const DEAL_PX_UNAVAILABLE =
+  "We couldn't value this registration. Check it and try again, or request a callback.";
+
+export const DEAL_PX_EQUITY_LABEL = "Equity";
+
+export const DEAL_PX_SHORTFALL_LABEL = "Shortfall";
+
+export const DEAL_PX_NEGATIVE_INCLUDED =
+  "This shortfall can be included in the amount financed. The valuation is still indicative and subject to inspection.";
+
+export const DEAL_PX_NEGATIVE_BLOCKED =
+  "This shortfall is outside what the lender can include, so the deal can't continue on these figures.";
+
+export const DEAL_QUOTE_UNAVAILABLE = "A quote isn't available for this term.";
+
+export const DEAL_TOTAL_PAYABLE_LABEL = "Total amount payable";
+
+export const DEAL_PRICE_UNAVAILABLE =
+  "Pricing isn't configured for this product yet.";
+
+export const DEAL_VIDEO_UNAVAILABLE =
+  "The product video isn't available yet. You can still add or remove this product.";
+
 export const DEAL_PX_VALUING = "Getting your valuation…";
 
 export const DEAL_PX_GET_OFFER = "Get my valuation";

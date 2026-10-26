@@ -50,6 +50,8 @@ export function DealCloseStep() {
       setView("reserve");
     } else if (panel === "test-drive") {
       setView("drive");
+    } else if (panel === "callback") {
+      setView("callback");
     }
   }, []);
 

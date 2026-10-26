@@ -51,10 +51,26 @@ import {
   VE_SERVICE_HEADING,
   VE_VALUING_LABEL,
 } from "@/lib/valuation-entry/copy";
-import { formatRegistration } from "@/lib/part-exchange/validation";
+import {
+  negativeEquityBlocksDeal,
+  partExchangePosition,
+} from "@/lib/deal/valuation";
+import {
+  DEAL_PX_CALLBACK,
+  DEAL_PX_EQUITY_LABEL,
+  DEAL_PX_FINANCE_LABEL,
+  DEAL_PX_NEGATIVE_BLOCKED,
+  DEAL_PX_NEGATIVE_INCLUDED,
+  DEAL_PX_SHORTFALL_LABEL,
+  DEAL_PX_TOTAL_LABEL,
+  DEAL_PX_VALUATION_LABEL,
+} from "@/lib/deal/copy";
+import { formatPounds } from "@/lib/format/money";
+import { formatRegistration, parsePounds } from "@/lib/part-exchange/validation";
 import { cn } from "@/lib/cn";
 import type { DealPxCondition, DealPxServiceHistory } from "@/types/deal";
 import type { FinanceProductType } from "@/types/finance";
+import type { PxIdentifiedVehicle } from "@/types/part-exchange";
 
 const CONDITION_OPTIONS: { value: DealPxCondition; label: string }[] = [
   { value: "needs-work", label: "Rough" },
@@ -76,6 +92,7 @@ export function ValuationEntryFlow({
   cashDeposit,
   term,
   financeType,
+  initialVehicle,
   onReachedResult,
   onRequestDecline,
   onCloseRequest,
@@ -86,6 +103,7 @@ export function ValuationEntryFlow({
   cashDeposit?: number;
   term?: number;
   financeType?: FinanceProductType;
+  initialVehicle?: PxIdentifiedVehicle;
   onReachedResult?: () => void;
   onRequestDecline: () => void;
   onCloseRequest: (opts: { fromResult: boolean }) => void;
@@ -97,6 +115,7 @@ export function ValuationEntryFlow({
     cashDeposit,
     term,
     financeType,
+    initialVehicle,
     onCloseRequest,
   });
 
@@ -110,8 +129,6 @@ export function ValuationEntryFlow({
   const milesId = useId();
   const settleId = useId();
   const lenderId = useId();
-  const emailId = useId();
-  const phoneId = useId();
   const otherId = useId();
 
   const heading =
@@ -513,6 +530,31 @@ export function ValuationEntryFlow({
       ) : null}
 
       {flow.step === "result" && flow.valuation ? (
+        <ResultStep flow={flow} onRequestDecline={onRequestDecline} />
+      ) : null}
+    </div>
+  );
+}
+
+function ResultStep({
+  flow,
+  onRequestDecline,
+}: {
+  flow: ReturnType<typeof useValuationEntry>;
+  onRequestDecline: () => void;
+}) {
+  const emailId = useId();
+  const phoneId = useId();
+  if (!flow.valuation) {
+    return null;
+  }
+  const settlement = flow.financeOutstanding
+    ? parsePounds(flow.settlement) ?? 0
+    : 0;
+  const position = partExchangePosition(flow.valuation.estimatedValue, settlement);
+  const blocked = negativeEquityBlocksDeal(position.negativeEquity);
+
+  return (
         <div className="mt-4 space-y-5">
           {flow.vehicle ? (
             <PxVehicleSummary
@@ -524,12 +566,23 @@ export function ValuationEntryFlow({
             estimatedValue={flow.valuation.estimatedValue}
             deductions={flow.valuation.deductions}
           />
+          <ValuationEquity position={position} blocked={blocked} />
+          {blocked ? (
+            <Button
+              className="w-full"
+              busy={flow.busy}
+              onClick={() => void flow.requestCallback()}
+            >
+              {DEAL_PX_CALLBACK}
+            </Button>
+          ) : null}
           <Alert title="Subject to inspection" tone="info">
             {VE_INSPECTION_NOTE}
           </Alert>
 
           {flow.exitPanel === "none" ? (
             <div className="flex flex-col gap-2">
+              {blocked ? null : (
               <Button
                 className="w-full"
                 busy={flow.busy}
@@ -537,6 +590,7 @@ export function ValuationEntryFlow({
               >
                 {VE_EXIT_CONTINUE}
               </Button>
+              )}
               <Button
                 className="w-full"
                 variant="secondary"
@@ -680,7 +734,51 @@ export function ValuationEntryFlow({
             {VE_BACK}
           </Button>
         </div>
+  );
+}
+
+function ValuationEquity({
+  position,
+  blocked,
+}: {
+  position: ReturnType<typeof partExchangePosition>;
+  blocked: boolean;
+}) {
+  return (
+    <dl className="space-y-2 text-body-sm">
+      <div className="flex justify-between gap-4">
+        <dt>{DEAL_PX_VALUATION_LABEL}</dt>
+        <dd className="font-semibold!">{formatPounds(position.value)}</dd>
+      </div>
+      <div className="flex justify-between gap-4">
+        <dt>{DEAL_PX_FINANCE_LABEL}</dt>
+        <dd className="font-semibold!">
+          {position.settlement > 0
+            ? `−${formatPounds(position.settlement)}`
+            : formatPounds(0)}
+        </dd>
+      </div>
+      <div className="flex justify-between gap-4">
+        <dt>{DEAL_PX_EQUITY_LABEL}</dt>
+        <dd className="font-semibold!">{formatPounds(position.equity)}</dd>
+      </div>
+      {position.negativeEquity > 0 ? (
+        <div className="flex justify-between gap-4">
+          <dt>{DEAL_PX_SHORTFALL_LABEL}</dt>
+          <dd className="font-semibold!">{formatPounds(position.negativeEquity)}</dd>
+        </div>
       ) : null}
-    </div>
+      <div className="flex justify-between gap-4 border-t border-border pt-2">
+        <dt className="text-label">{DEAL_PX_TOTAL_LABEL}</dt>
+        <dd className="font-semibold! text-primary">
+          {formatPounds(position.depositContribution)}
+        </dd>
+      </div>
+      {position.negativeEquity > 0 ? (
+        <p className="text-body-sm text-navy">
+          {blocked ? DEAL_PX_NEGATIVE_BLOCKED : DEAL_PX_NEGATIVE_INCLUDED}
+        </p>
+      ) : null}
+    </dl>
   );
 }

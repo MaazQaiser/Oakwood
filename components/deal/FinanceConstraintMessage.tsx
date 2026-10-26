@@ -3,11 +3,13 @@
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { DEAL_PX_CALLBACK } from "@/lib/deal/copy";
 import { formatPounds } from "@/lib/format/money";
-import { getSearchUrl, getUsedCarsUrl } from "@/config/routes";
+import { getDealUrl, getSearchUrl, getUsedCarsUrl } from "@/config/routes";
 
 export function FinanceConstraintMessage() {
-  const { calculation, applyDepositGap, phase } = useDealBuilder();
+  const { calculation, applyDepositGap, phase, dealId, navigateTo } =
+    useDealBuilder();
   if (phase !== "INVALID" || !calculation?.constraints.length) {
     return null;
   }
@@ -30,6 +32,18 @@ export function FinanceConstraintMessage() {
             </Button>
             <Button href={getSearchUrl({ affordable: 1 })} variant="secondary" size="sm">
               Choose a lower-priced vehicle
+            </Button>
+          </div>
+        ) : null}
+        {primary.action === "contact" ? (
+          <div className="mt-3">
+            <Button
+              size="sm"
+              onClick={() =>
+                navigateTo(`${getDealUrl(dealId, "reserve")}?panel=callback`)
+              }
+            >
+              {DEAL_PX_CALLBACK}
             </Button>
           </div>
         ) : null}

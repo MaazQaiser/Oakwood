@@ -12,12 +12,15 @@ import {
   normaliseRegistration,
   registrationError,
 } from "@/lib/part-exchange/validation";
+import { mockLookupRegistration } from "@/lib/valuation-entry/mock";
 import {
   VE_CARD_CTA,
   VE_CARD_HEADING,
   VE_CARD_REASSURANCE,
   VE_CARD_SUPPORT,
+  VE_LOOKUP_LABEL,
 } from "@/lib/valuation-entry/copy";
+import type { PxIdentifiedVehicle } from "@/types/part-exchange";
 
 export function ValuationEntryCard() {
   const { vehicle, deposit, term, financeType } = useVehicleDeal();
@@ -27,20 +30,35 @@ export function ValuationEntryCard() {
   const [mileage, setMileage] = useState("42,000");
   const [regError, setRegError] = useState<string>();
   const [mileError, setMileError] = useState<string>();
+  const [lookupError, setLookupError] = useState<string>();
+  const [lookingUp, setLookingUp] = useState(false);
+  const [found, setFound] = useState<PxIdentifiedVehicle>();
   const [open, setOpen] = useState(false);
 
-  function start() {
+  async function start() {
     const nextReg = registrationError(registration);
     const nextMiles = mileageError(mileage);
     setRegError(nextReg);
     setMileError(nextMiles);
+    setLookupError(undefined);
     if (nextReg || nextMiles) {
       return;
     }
+    setLookingUp(true);
     trackEvent(analyticsEvents.pxStarted, {
       source: "entry_hook",
       stockId: vehicle.stockId,
     });
+    const result = await mockLookupRegistration(
+      normaliseRegistration(registration),
+    );
+    setLookingUp(false);
+    if (!result.ok) {
+      setFound(undefined);
+      setLookupError(result.message);
+      return;
+    }
+    setFound(result.vehicle);
     setOpen(true);
   }
 
@@ -90,10 +108,21 @@ export function ValuationEntryCard() {
 
         <Button
           className="mt-4 w-full border-transparent! bg-[#FFD100]! text-navy! hover:bg-[#ffe14d]!"
-          onClick={start}
+          busy={lookingUp}
+          onClick={() => void start()}
         >
-          {VE_CARD_CTA}
+          {lookingUp ? VE_LOOKUP_LABEL : VE_CARD_CTA}
         </Button>
+        {lookingUp ? (
+          <p className="mt-3 text-caption text-white/80" role="status">
+            {VE_LOOKUP_LABEL}
+          </p>
+        ) : null}
+        {lookupError ? (
+          <p className="mt-3 text-caption text-white" role="alert">
+            {lookupError} Check the registration and try again.
+          </p>
+        ) : null}
         <p className="mt-3 text-caption text-white/75">{VE_CARD_REASSURANCE}</p>
       </section>
 
@@ -102,10 +131,14 @@ export function ValuationEntryCard() {
         stockId={vehicle.stockId}
         registration={normaliseRegistration(registration)}
         mileage={mileage}
+        initialVehicle={found}
         cashDeposit={deposit}
         term={term}
         financeType={financeType}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false);
+          setFound(undefined);
+        }}
       />
     </>
   );

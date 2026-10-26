@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Field, Input } from "@/components/forms/FormControls";
+import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
+import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import {
@@ -16,7 +18,14 @@ import {
   DEAL_BUDGET_PCP_BODY,
   DEAL_BUDGET_PCP_LEAD,
   DEAL_BUDGET_PCP_TERM_BLOCK,
+  DEAL_CALCULATION_ERROR,
+  DEAL_ILLUSTRATION_REPRESENTATIVE,
+  DEAL_QUOTE_UNAVAILABLE,
+  DEAL_SOFT_SEARCH,
+  DEAL_TOTAL_PAYABLE_LABEL,
 } from "@/lib/deal/copy";
+import { FINANCE_CALCULATOR_CONFIG } from "@/lib/finance/calculator-config";
+import { getRatesFromLabel } from "@/lib/finance/representative-example";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import type { FinanceProductType } from "@/types/finance";
 
@@ -61,7 +70,20 @@ function withCommas(value: string): string {
 }
 
 export function DealBudgetStep() {
-  const { dealId, config, vehicle } = useDealBuilder();
+  const {
+    dealId,
+    config,
+    vehicle,
+    draft,
+    calculation,
+    phase,
+    calculateFor,
+    setCashDeposit,
+    setFinanceType: persistFinanceType,
+    setTerm: persistTerm,
+    setAnnualMileage,
+    retryCalculation,
+  } = useDealBuilder();
   const { goNext, goBack } = useDealStepNavigation("budget");
   const sliderId = useId();
   const amountId = useId();
@@ -76,11 +98,16 @@ export function DealBudgetStep() {
   const [otherMileage, setOtherMileage] = useState("");
   const [mileageError, setMileageError] = useState<string>();
   const [hydrated, setHydrated] = useState(false);
+  const seeded = useRef(false);
 
   const minDeposit = config.minDeposit;
   const maxDeposit = config.maxDepositCap;
 
   useEffect(() => {
+    if (seeded.current) {
+      return;
+    }
+    seeded.current = true;
     const raw = window.sessionStorage.getItem(financeKey(dealId));
     if (raw) {
       try {
@@ -108,13 +135,23 @@ export function DealBudgetStep() {
       }
     }
 
-    const tenPercent = Math.round(vehicle.cashPrice * 0.1);
-    const starting = clampDeposit(tenPercent, minDeposit, maxDeposit);
+    const savedType = draft.financeType === "pcp" ? "pcp" : "hp";
+    const savedTerm =
+      TERMS.find((item) => item === draft.term) ??
+      (savedType === "pcp" ? PCP_MAX_TERM : 84);
+    const starting = clampDeposit(draft.cashDeposit, minDeposit, maxDeposit);
     setDeposit(starting);
     setDepositText(String(starting));
-    setTerm(84);
+    setFinanceType(savedType);
+    setTerm(savedType === "pcp" && savedTerm > PCP_MAX_TERM ? PCP_MAX_TERM : savedTerm);
+    if (draft.annualMileage && MILEAGE_PRESETS.includes(draft.annualMileage as (typeof MILEAGE_PRESETS)[number])) {
+      setMileageChoice(String(draft.annualMileage) as MileageChoice);
+    } else if (draft.annualMileage) {
+      setMileageChoice("other");
+      setOtherMileage(String(draft.annualMileage));
+    }
     setHydrated(true);
-  }, [dealId, maxDeposit, minDeposit, vehicle.cashPrice]);
+  }, [dealId, draft.annualMileage, draft.cashDeposit, draft.financeType, draft.term, maxDeposit, minDeposit]);
 
   useEffect(() => {
     if (!hydrated) {
@@ -128,6 +165,18 @@ export function DealBudgetStep() {
       otherMileage,
     };
     window.sessionStorage.setItem(financeKey(dealId), JSON.stringify(saved));
+    setCashDeposit(deposit);
+    persistFinanceType(financeType);
+    persistTerm(term);
+    const miles =
+      financeType === "pcp"
+        ? mileageChoice === "other"
+          ? Number(otherMileage)
+          : Number(mileageChoice)
+        : undefined;
+    if (miles && Number.isFinite(miles) && miles > 0) {
+      setAnnualMileage(miles);
+    }
   }, [
     dealId,
     deposit,
@@ -135,6 +184,10 @@ export function DealBudgetStep() {
     hydrated,
     mileageChoice,
     otherMileage,
+    persistFinanceType,
+    persistTerm,
+    setAnnualMileage,
+    setCashDeposit,
     term,
   ]);
 
@@ -144,6 +197,15 @@ export function DealBudgetStep() {
       : 0;
 
   const activeDeposit = formatPounds(deposit);
+  const hpTerm = financeType === "hp" ? term : 84;
+  const pcpTerm = financeType === "pcp" ? Math.min(term, PCP_MAX_TERM) : PCP_MAX_TERM;
+  const hpQuote = calculateFor("hp", hpTerm);
+  const pcpQuote = calculateFor("pcp", pcpTerm);
+  const ratesFrom = getRatesFromLabel(FINANCE_CALCULATOR_CONFIG.ratesFromApr);
+  const quotes: Record<"hp" | "pcp", typeof hpQuote> = {
+    hp: hpQuote,
+    pcp: pcpQuote,
+  };
 
   function applyDeposit(next: number) {
     const clamped = clampDeposit(next, minDeposit, maxDeposit);
@@ -231,6 +293,28 @@ export function DealBudgetStep() {
                   <p className={`mt-2 text-caption font-semibold! ${selected ? "text-white" : "text-navy"}`}>
                     {option.termNote}
                   </p>
+                  {phase === "CALCULATION_ERROR" ? (
+                    <p className={`mt-2 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
+                      {DEAL_CALCULATION_ERROR}
+                    </p>
+                  ) : quotes[option.value] ? (
+                    <p className="mt-2">
+                      <FinancialNumber
+                        value={formatPounds(quotes[option.value]?.monthlyPayment ?? 0)}
+                        suffix="/mo"
+                        size="sm"
+                        className={selected ? "text-white" : "text-primary"}
+                      />
+                      <span className={`mt-1 block text-caption ${selected ? "text-white/75" : "text-muted"}`}>
+                        {DEAL_TOTAL_PAYABLE_LABEL}{" "}
+                        {formatPounds(quotes[option.value]?.totalPayable ?? 0)}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className={`mt-2 text-caption ${selected ? "text-white/80" : "text-muted"}`}>
+                      {DEAL_QUOTE_UNAVAILABLE}
+                    </p>
+                  )}
                 </button>
               );
             })}
@@ -240,6 +324,21 @@ export function DealBudgetStep() {
               {DEAL_BUDGET_PCP_TERM_BLOCK}
             </p>
           ) : null}
+          {phase === "CALCULATION_ERROR" ? (
+            <Button type="button" variant="secondary" onClick={retryCalculation}>
+              Try the quote again
+            </Button>
+          ) : null}
+          <div
+            className="rounded-2xl border border-dotted border-primary/40 bg-primary-soft px-4 py-3 text-caption text-navy"
+            role="note"
+          >
+            <p>{DEAL_ILLUSTRATION_REPRESENTATIVE}</p>
+            <p className="mt-1">
+              {DEAL_SOFT_SEARCH}
+              {ratesFrom ? ` ${ratesFrom}.` : ""}
+            </p>
+          </div>
 
           <section aria-labelledby={`${sliderId}-label`} className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -252,7 +351,15 @@ export function DealBudgetStep() {
               </p>
             </div>
             {hydrated ? (
-              <p className="text-caption text-muted">{DEAL_BUDGET_DEFAULT_DEPOSIT}</p>
+              <p className="text-caption text-muted">
+                {DEAL_BUDGET_DEFAULT_DEPOSIT}
+                {calculation && draft.px
+                  ? ` Part-exchange equity of ${formatPounds(calculation.pxEquity)} is added on top. Total towards the deposit: ${formatPounds(calculation.totalDeposit)}.`
+                  : ""}
+                {calculation && calculation.pxNegativeEquity > 0
+                  ? ` Shortfall of ${formatPounds(calculation.pxNegativeEquity)} is handled with the lender's negative-equity rule.`
+                  : ""}
+              </p>
             ) : null}
             <div>
               <label htmlFor={sliderId} className="sr-only">

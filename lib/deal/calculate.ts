@@ -1,3 +1,4 @@
+import { negativeEquityBlocksDeal } from "@/lib/deal/valuation";
 import { ILLUSTRATION_BASE_DEPOSIT, ILLUSTRATION_BASE_TERM } from "@/lib/finance/illustration";
 import {
   DEAL_PROVIDER_CONFIG,
@@ -159,6 +160,20 @@ function buildConstraints(
       title: "This term is not available for this vehicle.",
       body: `Choose one of the available terms, up to ${formatTerm(longest)}.`,
       action: "change_term",
+    });
+  }
+
+  const { negativeEquity } = pxFigures(input);
+  if (negativeEquityBlocksDeal(negativeEquity, config)) {
+    const cap = config.maxNegativeEquityInAdvance;
+    messages.push({
+      code: "negative_equity",
+      title: "This part exchange can't be included on these figures.",
+      body:
+        cap !== undefined
+          ? `The shortfall is ${formatPounds(negativeEquity)}. This lender can include up to ${formatPounds(cap)} of negative equity.`
+          : `The shortfall is ${formatPounds(negativeEquity)}. This lender is not set up to include negative equity in the finance.`,
+      action: "contact",
     });
   }
 

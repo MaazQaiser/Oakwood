@@ -4,27 +4,50 @@ import { useEffect, useId, useState } from "react";
 import { Field, Input } from "@/components/forms/FormControls";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
-import { DealChipGroup } from "@/components/deal/wizard/DealChipGroup";
+import {
+  DealChipGroup,
+  DealMultiChipGroup,
+} from "@/components/deal/wizard/DealChipGroup";
 import { requestDealAbandonment } from "@/components/deal/DealAbandonmentModal";
 import {
   DealCard,
   useDealStepNavigation,
 } from "@/components/deal/wizard/DealWizardShell";
-import { getVehicleUrl } from "@/config/routes";
+import { getDealUrl, getVehicleUrl } from "@/config/routes";
 import {
   DEAL_BACK,
   DEAL_CONTINUE,
+  DEAL_PX_CALLBACK,
+  DEAL_PX_EDIT,
+  DEAL_PX_EQUITY_LABEL,
+  DEAL_PX_EXTRAS_LABEL,
   DEAL_PX_FINANCE_LABEL,
   DEAL_PX_HELP_BODY,
   DEAL_PX_HELP_TITLE,
   DEAL_PX_INSPECTION,
+  DEAL_PX_NEGATIVE_BLOCKED,
+  DEAL_PX_NEGATIVE_INCLUDED,
   DEAL_PX_NOT_YOUR_VEHICLE,
+  DEAL_PX_OTHER_LABEL,
   DEAL_PX_SETTLEMENT_CHECK,
+  DEAL_PX_SHORTFALL_LABEL,
   DEAL_PX_TOTAL_LABEL,
+  DEAL_PX_UNAVAILABLE,
   DEAL_PX_VALUATION_LABEL,
 } from "@/lib/deal/copy";
+import {
+  negativeEquityBlocksDeal,
+  partExchangePosition,
+  quotePartExchange,
+} from "@/lib/deal/valuation";
+import { VE_EXTRA_OPTIONS } from "@/lib/valuation-entry/extras";
 import { formatPounds } from "@/lib/format/money";
-import type { DealPxCondition, DealPxServiceHistory } from "@/types/deal";
+import type {
+  DealPartExchangeInput,
+  DealPxCondition,
+  DealPxExtraId,
+  DealPxServiceHistory,
+} from "@/types/deal";
 
 const CONDITION_OPTIONS: { value: DealPxCondition; label: string }[] = [
   { value: "needs-work", label: "Rough" },
@@ -57,6 +80,8 @@ type SavedForm = {
   financeOutstanding?: boolean;
   settlementText: string;
   lender: string;
+  extras?: DealPxExtraId[];
+  otherNotes?: string;
 };
 
 function storageKey(dealId: string) {
@@ -77,13 +102,15 @@ function parseAmount(value: string): number {
 }
 
 export function DealPartExchangeStep() {
-  const { dealId, draft, vehicle } = useDealBuilder();
+  const { dealId, draft, vehicle, applyPartExchange, clearPartExchange, navigateTo } =
+    useDealBuilder();
   const { goNext } = useDealStepNavigation("part-exchange");
   const px = draft.px;
   const regId = useId();
   const milesId = useId();
   const settleId = useId();
   const lenderId = useId();
+  const otherId = useId();
 
   const [registration, setRegistration] = useState(px?.registration ?? "");
   const [mileage, setMileage] = useState(px?.mileage ? String(px.mileage) : "");
@@ -102,6 +129,8 @@ export function DealPartExchangeStep() {
       : "",
   );
   const [lender, setLender] = useState(px?.outstandingFinanceLender ?? "");
+  const [extras, setExtras] = useState<DealPxExtraId[]>(px?.extras?.selected ?? []);
+  const [otherNotes, setOtherNotes] = useState(px?.extras?.otherNotes ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
   const [hydrated, setHydrated] = useState(false);
 
@@ -117,6 +146,8 @@ export function DealPartExchangeStep() {
         setFinanceOutstanding(saved.financeOutstanding);
         setSettlementText(saved.settlementText ?? "");
         setLender(saved.lender ?? "");
+        setExtras(saved.extras ?? []);
+        setOtherNotes(saved.otherNotes ?? "");
       } catch {
         window.sessionStorage.removeItem(storageKey(dealId));
       }
@@ -136,6 +167,8 @@ export function DealPartExchangeStep() {
       financeOutstanding,
       settlementText,
       lender,
+      extras,
+      otherNotes,
     };
     window.sessionStorage.setItem(storageKey(dealId), JSON.stringify(saved));
   }, [
@@ -143,8 +176,10 @@ export function DealPartExchangeStep() {
     dealId,
     financeOutstanding,
     hydrated,
+    extras,
     lender,
     mileage,
+    otherNotes,
     registration,
     serviceHistory,
     settlementText,
@@ -215,6 +250,53 @@ export function DealPartExchangeStep() {
     }
   }
 
+  const quote =
+    formReady && Number.isFinite(miles)
+      ? quotePartExchange({
+          registration,
+          mileage: miles,
+          condition,
+          serviceHistory,
+          extras,
+        })
+      : undefined;
+  const position =
+    quote?.ok === true
+      ? partExchangePosition(
+          quote.valuation.estimatedValue,
+          financeOutstanding ? settlementAmount : 0,
+        )
+      : undefined;
+  const blocked = position
+    ? negativeEquityBlocksDeal(position.negativeEquity)
+    : false;
+
+  function toInput(): DealPartExchangeInput | undefined {
+    if (!quote?.ok || !position || !condition || !serviceHistory) {
+      return undefined;
+    }
+    return {
+      registration: registration.replace(/\s+/g, "").toUpperCase(),
+      mileage: miles,
+      value: position.value,
+      settlement: financeOutstanding ? position.settlement : undefined,
+      financeOutstanding,
+      outstandingFinanceAmount: financeOutstanding
+        ? position.settlement
+        : undefined,
+      outstandingFinanceLender: financeOutstanding ? lender.trim() : undefined,
+      condition,
+      serviceHistory,
+      extras: {
+        selected: extras,
+        otherNotes: extras.includes("other") ? otherNotes.trim() || undefined : undefined,
+      },
+      valuationDate: quote.valuation.valuationDate,
+      deductions: quote.valuation.deductions,
+      vehicle: draft.px?.vehicle,
+    };
+  }
+
   function continueToFinance() {
     const next = validate();
     setErrors(next);
@@ -222,11 +304,25 @@ export function DealPartExchangeStep() {
       focusFirst(next);
       return;
     }
+    const input = toInput();
+    if (!input || blocked) {
+      return;
+    }
+    applyPartExchange(input);
     goNext("budget");
   }
 
   function skipToFinance() {
+    clearPartExchange();
     goNext("budget");
+  }
+
+  function requestCallback() {
+    const input = toInput();
+    if (input) {
+      applyPartExchange(input);
+    }
+    navigateTo(`${getDealUrl(dealId, "reserve")}?panel=callback`);
   }
 
   return (
@@ -244,6 +340,8 @@ export function DealPartExchangeStep() {
               setFinanceOutstanding(undefined);
               setSettlementText("");
               setLender("");
+              setExtras([]);
+              setOtherNotes("");
               setErrors({});
               document.getElementById(regId)?.focus();
             }}
@@ -405,6 +503,34 @@ export function DealPartExchangeStep() {
             </div>
           ) : null}
 
+          <DealMultiChipGroup
+            label={DEAL_PX_EXTRAS_LABEL}
+            values={extras}
+            options={VE_EXTRA_OPTIONS.map((option) => ({
+              value: option.id,
+              label: option.label,
+            }))}
+            hint="Select anything that applies. Where a lookup has already identified extras, confirm or change them."
+            onToggle={(value) => {
+              const id = value as DealPxExtraId;
+              setExtras((current) =>
+                current.includes(id)
+                  ? current.filter((item) => item !== id)
+                  : [...current, id],
+              );
+            }}
+          />
+          {extras.includes("other") ? (
+            <Field htmlFor={otherId} label={DEAL_PX_OTHER_LABEL}>
+              <Input
+                id={otherId}
+                value={otherNotes}
+                placeholder="Describe the extra"
+                onChange={(event) => setOtherNotes(event.target.value)}
+              />
+            </Field>
+          ) : null}
+
           <details className="rounded-2xl bg-page-tint px-4 py-3">
             <summary className="cursor-pointer text-body-sm font-semibold! text-primary">
               {DEAL_PX_HELP_TITLE}
@@ -413,30 +539,55 @@ export function DealPartExchangeStep() {
           </details>
         </div>
 
-        {formReady ? (
+        {formReady && position ? (
           <div
             className="rounded-2xl bg-page-tint px-4 py-4"
             role="status"
             aria-label="Part-exchange breakdown"
           >
-            <p className="text-label text-navy">Part exchange</p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-label text-navy">Part exchange</p>
+              <button
+                type="button"
+                className="min-h-11 text-caption font-semibold! text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                onClick={() => document.getElementById(regId)?.focus()}
+              >
+                {DEAL_PX_EDIT}
+              </button>
+            </div>
             <dl className="mt-3 space-y-2 text-body-sm">
               <div className="flex items-baseline justify-between gap-3">
                 <dt>{DEAL_PX_VALUATION_LABEL}</dt>
                 <dd className="shrink-0 text-right font-semibold! text-ink">
-                  Subject to inspection
+                  {formatPounds(position.value)}
                 </dd>
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt>{DEAL_PX_FINANCE_LABEL}</dt>
                 <dd className="shrink-0 font-semibold! text-ink">
-                  {financeOutstanding ? `−${formatPounds(settlementAmount)}` : formatPounds(0)}
+                  {position.settlement > 0
+                    ? `−${formatPounds(position.settlement)}`
+                    : formatPounds(0)}
                 </dd>
               </div>
+              <div className="flex items-baseline justify-between gap-3">
+                <dt>{DEAL_PX_EQUITY_LABEL}</dt>
+                <dd className="shrink-0 font-semibold! text-ink">
+                  {formatPounds(position.equity)}
+                </dd>
+              </div>
+              {position.negativeEquity > 0 ? (
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt>{DEAL_PX_SHORTFALL_LABEL}</dt>
+                  <dd className="shrink-0 font-semibold! text-ink">
+                    {formatPounds(position.negativeEquity)}
+                  </dd>
+                </div>
+              ) : null}
               <div className="flex items-baseline justify-between gap-3 border-t border-border pt-2">
                 <dt className="font-semibold text-navy">{DEAL_PX_TOTAL_LABEL}</dt>
                 <dd className="shrink-0 text-right font-semibold! text-primary">
-                  Subject to inspection
+                  {formatPounds(position.depositContribution)}
                 </dd>
               </div>
             </dl>
@@ -444,6 +595,33 @@ export function DealPartExchangeStep() {
             {financeOutstanding ? (
               <p className="mt-1 text-caption text-muted">{DEAL_PX_SETTLEMENT_CHECK}</p>
             ) : null}
+            {position.negativeEquity > 0 ? (
+              <p className="mt-2 text-body-sm text-navy">
+                {blocked ? DEAL_PX_NEGATIVE_BLOCKED : DEAL_PX_NEGATIVE_INCLUDED}
+              </p>
+            ) : null}
+            {blocked ? (
+              <Button
+                type="button"
+                className="mt-3 w-full"
+                onClick={requestCallback}
+              >
+                {DEAL_PX_CALLBACK}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+        {formReady && quote && !quote.ok ? (
+          <div className="rounded-2xl bg-page-tint px-4 py-4" role="alert">
+            <p className="text-body-sm text-navy">{DEAL_PX_UNAVAILABLE}</p>
+            <Button
+              type="button"
+              className="mt-3 w-full"
+              variant="secondary"
+              onClick={requestCallback}
+            >
+              {DEAL_PX_CALLBACK}
+            </Button>
           </div>
         ) : null}
       </DealCard>
@@ -468,7 +646,12 @@ export function DealPartExchangeStep() {
           >
             Skip part exchange
           </Button>
-          <Button type="button" className="btn-compact w-full" onClick={continueToFinance}>
+          <Button
+            type="button"
+            className="btn-compact w-full"
+            disabled={formReady && (blocked || quote?.ok === false)}
+            onClick={continueToFinance}
+          >
             <span className="truncate">{DEAL_CONTINUE}</span>
           </Button>
         </div>
