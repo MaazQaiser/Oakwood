@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { SaveProgressPrompt } from "@/components/deal/SaveProgressPrompt";
 import { PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
-import {
-  DealCard,
-  useDealStepNavigation,
-} from "@/components/deal/wizard/DealWizardShell";
+import { useDealStepNavigation } from "@/components/deal/wizard/DealWizardShell";
 import { CallClosedModal } from "@/components/deal/wizard/steps/CallClosedModal";
 import { DealCallbackPanel } from "@/components/deal/wizard/steps/DealCallbackPanel";
 import { DealReservePanel } from "@/components/deal/wizard/steps/DealReservePanel";
@@ -17,7 +15,6 @@ import { DealTestDrivePanel } from "@/components/deal/wizard/steps/DealTestDrive
 import { getDealApplicationUrl } from "@/config/routes";
 import {
   STEP4_HUB_APPLY,
-  STEP4_HUB_APPLY_HINT,
   STEP4_HUB_CALL_BACK,
   STEP4_HUB_CALL_BACK_HINT,
   STEP4_HUB_CALL_NOW,
@@ -25,7 +22,6 @@ import {
   STEP4_HUB_RESERVE,
   STEP4_HUB_RESERVE_HINT,
   STEP4_HUB_TEST_DRIVE,
-  STEP4_HUB_TEST_DRIVE_HINT,
 } from "@/lib/deal/step4-copy";
 import {
   getMockShowroomOpenStatus,
@@ -122,33 +118,60 @@ export function DealCloseStep() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex-1 space-y-3 pb-5">
-        <DealCard className="space-y-2">
-          <h2 className="text-label text-navy">
-            {vehicle.year} {vehicle.make} {vehicle.model}
-          </h2>
-          <p className="text-body-sm text-muted">{vehicle.locationName}</p>
-          <p className="text-caption text-muted">
-            {status.open
-              ? `${STEP4_HUB_CALL_NOW_OPEN}. ${status.nextOpenLabel}.`
-              : `Showroom hours today: ${status.todayHours}.`}
-          </p>
-        </DealCard>
+      <div className="flex-1 space-y-3 pb-8">
+        <div className="overflow-hidden rounded-card bg-[linear-gradient(145deg,var(--oak-navy-deep)_0%,var(--oak-navy)_46%,#0a4d86_100%)] p-4 text-white shadow-card sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div className="flex min-w-0 flex-1 items-center gap-3.5">
+              <div className="relative h-[5.5rem] w-[7.25rem] shrink-0 overflow-hidden rounded-[16px] bg-white/10">
+                <Image
+                  src={vehicle.imageSrc}
+                  alt={vehicle.imageAlt}
+                  fill
+                  className="object-cover"
+                  sizes="116px"
+                />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-label text-white">
+                  {vehicle.year} {vehicle.make} {vehicle.model}
+                </h2>
+                {vehicle.derivative ? (
+                  <p className="mt-0.5 truncate text-caption text-white/80">
+                    {vehicle.derivative}
+                  </p>
+                ) : null}
+                <p className="mt-1 text-body-sm text-white/85">{vehicle.locationName}</p>
+                <p className="mt-1 text-caption leading-snug text-white/70">
+                  {status.open ? (
+                    <>
+                      <span className="block">{STEP4_HUB_CALL_NOW_OPEN}</span>
+                      <span className="block">{status.nextOpenLabel}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="block">Showroom hours today</span>
+                      <span className="block">{status.todayHours}</span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="w-fit shrink-0 text-body-sm font-semibold! text-white underline decoration-white/80 underline-offset-4 hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              onClick={() => navigateTo(getDealApplicationUrl(dealId))}
+            >
+              {STEP4_HUB_APPLY}
+            </button>
+          </div>
 
-        <Button type="button" className="w-full" onClick={() => setView("reserve")}>
-          {STEP4_HUB_RESERVE()}
-        </Button>
-        <p className="-mt-1 text-caption text-muted">{STEP4_HUB_RESERVE_HINT()}</p>
-
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={() => navigateTo(getDealApplicationUrl(dealId))}
-        >
-          {STEP4_HUB_APPLY}
-        </Button>
-        <p className="-mt-1 text-caption text-muted">{STEP4_HUB_APPLY_HINT}</p>
+          <div className="mt-4 space-y-2 rounded-[18px] bg-page-tint p-3 sm:p-4">
+            <p className="text-caption text-muted">{STEP4_HUB_RESERVE_HINT()}</p>
+            <Button type="button" className="w-full" onClick={() => setView("reserve")}>
+              {STEP4_HUB_RESERVE()}
+            </Button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <Button type="button" variant="tertiary" onClick={() => setView("drive")}>
@@ -168,9 +191,7 @@ export function DealCloseStep() {
             {STEP4_HUB_CALL_BACK}
           </Button>
         </div>
-        <p className="text-caption text-muted">
-          {STEP4_HUB_TEST_DRIVE_HINT} {STEP4_HUB_CALL_BACK_HINT}
-        </p>
+        <p className="text-caption text-muted">{STEP4_HUB_CALL_BACK_HINT}</p>
       </div>
       <DealStepFooter onBack={() => goBack("quote")} showMonthly={false} />
       <CallClosedModal open={closedOpen} onClose={() => setClosedOpen(false)} />

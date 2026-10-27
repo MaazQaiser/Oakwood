@@ -8,7 +8,6 @@ import {
   DealBuilderProvider,
   useDealBuilder,
 } from "@/components/deal/DealBuilderProvider";
-import { DealPinnedVehicle } from "@/components/deal/wizard/DealPinnedVehicle";
 import { DealProgress } from "@/components/deal/wizard/DealProgress";
 import { Container } from "@/components/layout/Container";
 import { JourneyChrome } from "@/components/layout/JourneyChrome";
@@ -17,10 +16,7 @@ import { getDealUrl, getVehicleUrl } from "@/config/routes";
 import { DEAL_AUTOSAVE_ERROR } from "@/lib/deal/copy";
 import { DEAL_STEP_META } from "@/lib/deal/steps";
 import type { DealPageModel } from "@/types/deal";
-import {
-  DealAbandonmentModal,
-  requestDealAbandonment,
-} from "@/components/deal/DealAbandonmentModal";
+import { DealAbandonmentModal } from "@/components/deal/DealAbandonmentModal";
 import { cn } from "@/lib/cn";
 
 function WizardInner({
@@ -37,20 +33,6 @@ function WizardInner({
     <>
       <JourneyChrome />
       <div className="flex min-h-[calc(100dvh-var(--oak-header-height))] flex-col bg-page-tint lg:px-6 lg:pt-6">
-        {/* Mobile: the car stays reachable without the desktop side panel. */}
-        <div className="sticky top-[var(--oak-header-height)] z-20 bg-surface px-4 py-2.5 shadow-card lg:hidden">
-          <button
-            type="button"
-            aria-label={`Back to the ${vehicle.make} ${vehicle.model} page`}
-            className="block w-full rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            onClick={() =>
-              requestDealAbandonment(getVehicleUrl(vehicle.slug))
-            }
-          >
-            <DealPinnedVehicle layout="strip" />
-          </button>
-        </div>
-
         <section className="deal-wizard mx-auto flex min-w-0 w-full max-w-3xl flex-1 flex-col lg:min-h-[calc(100dvh-var(--oak-header-height)-1.5rem)]">
           <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 sm:px-6 lg:px-0">
             <header className="pt-6 pb-5 lg:pt-2">

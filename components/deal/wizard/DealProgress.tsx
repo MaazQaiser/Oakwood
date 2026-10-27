@@ -68,17 +68,19 @@ export function DealProgress({
 
   return (
     <nav aria-label="Deal steps">
-      <ol className={row ? "flex gap-1 overflow-x-auto sm:overflow-visible" : "space-y-0.5"}>
+      <ol className={row ? "grid grid-cols-4 gap-1 sm:flex" : "space-y-0.5"}>
         {steps.map(({ item, meta, isCurrent, isDone, canJump, go }) => (
-          <li key={item} className={row ? "min-w-[10.25rem] flex-1 sm:min-w-0" : undefined}>
+          <li key={item} className={row ? "flex min-w-0 sm:flex-1" : undefined}>
             <button
               type="button"
               disabled={!canJump}
               aria-current={isCurrent ? "step" : undefined}
               onClick={go}
               className={cn(
-                "flex items-center gap-2 rounded-[14px] px-2 py-2 text-left text-body-sm transition-colors",
-                row ? "w-full min-w-0" : "w-full gap-3 px-2.5",
+                "flex items-center rounded-[14px] text-body-sm transition-colors",
+                row
+                  ? "h-full w-full min-w-0 flex-col gap-1 px-0.5 py-2 text-center sm:flex-row sm:justify-start sm:gap-2 sm:px-2 sm:text-left"
+                  : "w-full gap-3 px-2.5 py-2 text-left",
                 isCurrent && "bg-surface-soft font-semibold! text-navy",
                 !isCurrent && isDone && "text-ink hover:bg-page-tint",
                 !isCurrent && !isDone && "text-muted",
@@ -100,8 +102,10 @@ export function DealProgress({
                   meta.index
                 )}
               </span>
-              <span className="min-w-0 flex-1 leading-tight">
-                <span className="block truncate">{meta.shortTitle}</span>
+              <span className="min-w-0 leading-tight sm:flex-1">
+                <span className="block text-caption sm:truncate sm:text-body-sm">
+                  {meta.shortTitle}
+                </span>
                 {canJump ? (
                   <span className="block text-caption text-primary">Edit</span>
                 ) : null}

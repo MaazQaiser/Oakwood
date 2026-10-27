@@ -16,7 +16,7 @@ import { JourneyChrome } from "@/components/layout/JourneyChrome";
 import type { ReservationPageModel } from "@/features/reservation/load";
 import type { ReservationStep } from "@/config/routes";
 import { payBelowCopy, reservationCopy } from "@/lib/reservation/copy";
-import { formatPounds, formatTerm } from "@/lib/format/money";
+import { formatNumber, formatPounds, formatTerm } from "@/lib/format/money";
 import {
   formatHoldPeriod,
   reservationAmountLabel,
@@ -28,27 +28,54 @@ function ReservationPin({ model }: { model: ReservationPageModel }) {
     return null;
   }
   const deal = model.dealSnapshot;
-  const dealLine = deal
-    ? `${deal.financeType === "pcp" ? "PCP" : "HP"} · ${formatTerm(deal.term)} · ${formatPounds(deal.monthlyPayment)}/month`
-    : null;
+  const rows = deal
+    ? [
+        { label: "Finance", value: deal.financeType === "pcp" ? "PCP" : "HP" },
+        { label: "Term", value: formatTerm(deal.term) },
+        ...(deal.annualMileage
+          ? [
+              {
+                label: "Annual mileage",
+                value: `${formatNumber(deal.annualMileage)} miles`,
+              },
+            ]
+          : []),
+        { label: "Reservation", value: reservationAmountLabel(model.amount) },
+      ]
+    : [];
 
   return (
-    <div className="rounded-xl bg-navy px-4 py-3 text-white shadow-card">
-      <p className="text-caption text-white/70">
+    <div className="rounded-xl bg-[linear-gradient(145deg,var(--oak-navy-deep)_0%,var(--oak-navy)_46%,#0a4d86_100%)] px-4 py-4 text-white shadow-card">
+      <p className="text-[0.68rem] font-semibold! uppercase tracking-[0.14em] text-white/70">
         {deal ? "Your deal" : "Your reservation"}
       </p>
-      <div className="mt-1 flex items-baseline justify-between gap-3">
-        <p className="min-w-0 truncate text-body-sm font-semibold!">
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </p>
-        <span className="shrink-0 text-body-sm font-semibold!">
-          {reservationAmountLabel(model.amount)}
+      <p className="mt-1 text-label">
+        {vehicle.year} {vehicle.make} {vehicle.model}
+      </p>
+      <p className="mt-2">
+        <span className="financial-number text-white">
+          {deal
+            ? formatPounds(deal.monthlyPayment)
+            : reservationAmountLabel(model.amount)}
         </span>
-      </div>
-      {dealLine ? (
-        <p className="mt-0.5 truncate text-caption text-white/70">{dealLine}</p>
+        {deal ? <span className="text-body-sm text-white/70">/mo</span> : null}
+      </p>
+      {rows.length > 0 ? (
+        <div className="mt-3 space-y-1.5">
+          {rows.map((row) => (
+            <div
+              key={row.label}
+              className="flex items-baseline justify-between gap-3 text-caption"
+            >
+              <span className="text-white/70">{row.label}</span>
+              <span className="shrink-0 tabular-number font-semibold! text-white">
+                {row.value}
+              </span>
+            </div>
+          ))}
+        </div>
       ) : null}
-      <p className="mt-0.5 text-caption text-white/70">
+      <p className="mt-3 text-caption text-white/70">
         Refundable · held for {formatHoldPeriod(model.holdDurationDays)} after
         payment is confirmed
       </p>
@@ -100,6 +127,11 @@ function ReservationFlowBody({
                 </div>
                 <aside className="space-y-6 lg:sticky lg:top-[calc(var(--oak-header-height)+1.5rem)]">
                   {model.vehicle ? (
+                    <div className="hidden lg:block">
+                      <ReservationPin model={model} />
+                    </div>
+                  ) : null}
+                  {model.vehicle ? (
                     <ReservationVehicleSummary
                       vehicle={model.vehicle}
                       amount={model.amount}
@@ -107,10 +139,12 @@ function ReservationFlowBody({
                     />
                   ) : null}
                   {model.dealSnapshot ? (
-                    <ReservationDealSummary
-                      deal={model.dealSnapshot}
-                      dealChanged={model.dealChanged}
-                    />
+                    <div className={model.dealChanged ? undefined : "lg:hidden"}>
+                      <ReservationDealSummary
+                        deal={model.dealSnapshot}
+                        dealChanged={model.dealChanged}
+                      />
+                    </div>
                   ) : null}
                   <ReservationTerms
                     amount={model.amount}
