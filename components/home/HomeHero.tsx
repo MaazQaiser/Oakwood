@@ -63,7 +63,7 @@ function CurrentHero() {
             </p>
           </div>
           <HeroCompactPhoto className="-mx-6 mt-4 lg:hidden" />
-          <HomeSearchBar className="relative z-20 w-full max-lg:-mt-16 lg:mt-5" />
+          <HomeSearchBar className="relative z-20 w-full max-lg:-mt-8 lg:mt-5" />
           <div className="relative z-10 mt-8">
             <Link
               href={routes.partExchange}

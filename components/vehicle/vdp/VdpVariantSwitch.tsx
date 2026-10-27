@@ -2,6 +2,12 @@
 
 import { cn } from "@/lib/cn";
 import { useVdpVariant } from "@/components/vehicle/vdp/VdpVariantProvider";
+import type { VdpLayoutVariant } from "@/lib/vdp/variant";
+
+const options: Array<{ id: VdpLayoutVariant; label: string }> = [
+  { id: 1, label: "Current page" },
+  { id: 2, label: "New page" },
+];
 
 export function VdpVariantSwitch() {
   const { variant, setVariant, switchEnabled } = useVdpVariant();
@@ -11,37 +17,28 @@ export function VdpVariantSwitch() {
   }
 
   return (
-    <div
-      className="pointer-events-auto fixed bottom-[calc(7.5rem+env(safe-area-inset-bottom,0px))] left-[max(0.75rem,env(safe-area-inset-left,0px))] z-[55] max-w-[min(100vw-1.5rem,20rem)] rounded-xl border border-border bg-surface p-2 shadow-lg max-lg:bottom-auto max-lg:left-auto max-lg:right-[max(0.75rem,env(safe-area-inset-right,0px))] max-lg:top-[calc(var(--oak-header-height)+0.5rem)]"
-      role="region"
-      aria-label="Car detail page design variant (development only)"
-    >
-      <p className="px-1 pb-1 text-[0.65rem] font-semibold uppercase tracking-wide text-muted">
-        Dev: CDP variant
-      </p>
-      <div className="flex flex-col gap-1">
-        <button
-          type="button"
-          className={cn(
-            "min-h-11 rounded-lg px-3 py-2 text-left text-body-sm font-medium",
-            variant === 1 ? "bg-primary text-white" : "bg-page-tint text-ink hover:bg-page",
-          )}
-          aria-pressed={variant === 1}
-          onClick={() => setVariant(1)}
-        >
-          Variant 1 — Current design
-        </button>
-        <button
-          type="button"
-          className={cn(
-            "min-h-11 rounded-lg px-3 py-2 text-left text-body-sm font-medium",
-            variant === 2 ? "bg-primary text-white" : "bg-page-tint text-ink hover:bg-page",
-          )}
-          aria-pressed={variant === 2}
-          onClick={() => setVariant(2)}
-        >
-          Variant 2 — Mobile CDP
-        </button>
+    <div className="bg-page px-[var(--oak-page-x)] pt-4">
+      <div className="mx-auto flex w-full max-w-[var(--oak-width-wide)] justify-center">
+        <div className="inline-flex rounded-full border border-border bg-white p-1 shadow-[0_8px_20px_rgba(16,40,72,0.08)]">
+          <div className="flex" role="group" aria-label="Car detail page design">
+            {options.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={cn(
+                  "min-h-10 rounded-full px-4 text-sm font-semibold whitespace-nowrap",
+                  variant === option.id
+                    ? "bg-[#002852] text-white"
+                    : "bg-transparent text-[#002852]",
+                )}
+                aria-pressed={variant === option.id}
+                onClick={() => setVariant(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

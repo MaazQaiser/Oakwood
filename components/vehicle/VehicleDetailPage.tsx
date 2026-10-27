@@ -34,8 +34,8 @@ export function VehicleDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <VdpVariantProvider initialVariant={initialVdpVariant}>
-        <VdpVariantGate vehicle={vehicle} similar={similar} breadcrumbs={breadcrumbs} />
         <VdpVariantSwitch />
+        <VdpVariantGate vehicle={vehicle} similar={similar} breadcrumbs={breadcrumbs} />
       </VdpVariantProvider>
     </VehicleDealProvider>
   );

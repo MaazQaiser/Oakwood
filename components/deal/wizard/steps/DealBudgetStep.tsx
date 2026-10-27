@@ -270,13 +270,11 @@ export function DealBudgetStep() {
               [
                 {
                   value: "hp" as const,
-                  title: "HP",
                   name: "Hire Purchase",
                   months: hpTerm,
                 },
                 {
                   value: "pcp" as const,
-                  title: "PCP",
                   name: "Personal Contract Purchase",
                   months: pcpTerm,
                 },
@@ -346,9 +344,8 @@ export function DealBudgetStep() {
                       : "bg-page-tint text-ink hover:bg-surface-soft"
                   }`}
                 >
-                  <p className="text-[1.75rem] font-semibold! leading-none tracking-[-0.03em]">
-                    {option.title}
-                    <span className="sr-only"> {option.name}</span>
+                  <p className="text-[1.35rem] font-semibold! leading-snug tracking-[-0.02em] sm:min-h-[2.6em]">
+                    {option.name}
                   </p>
                   {phase === "CALCULATION_ERROR" ? (
                     <p className={`mt-3 text-caption ${quiet}`}>
