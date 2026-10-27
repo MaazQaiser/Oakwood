@@ -22,9 +22,13 @@ export function FeaturedVehicles() {
       <Container>
         <SectionIntro
           heading={
-            eligible
-              ? "Cars that fit your finance profile"
-              : "Cars worth taking a look at"
+            eligible ? (
+              "Cars that fit your finance profile"
+            ) : (
+              <>
+                Cars worth taking a <span className="whitespace-nowrap">look at</span>
+              </>
+            )
           }
           action={
             featuredVehicles.length > 0 ? (

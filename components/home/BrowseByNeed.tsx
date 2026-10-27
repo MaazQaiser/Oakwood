@@ -8,16 +8,10 @@ import { needPhotography } from "@/lib/home/photography";
 import { needCategories } from "@/lib/mock/home";
 
 function CategoryTitle({ title }: { title: string }) {
-  const splitAt = title.lastIndexOf(" ");
-  const lead = splitAt === -1 ? "" : title.slice(0, splitAt);
-  const tail = splitAt === -1 ? title : title.slice(splitAt + 1);
-
   return (
-    <h3 className="text-h5">
-      {lead ? <>{lead} </> : null}
-      <span className="whitespace-nowrap">
-        {tail}<IconArrow className="ml-1 inline-block align-[-0.125em] text-primary" />
-      </span>
+    <h3 className="flex items-center gap-1 whitespace-nowrap text-h5 leading-none text-navy">
+      {title}
+      <IconArrow className="shrink-0 text-primary" />
     </h3>
   );
 }
@@ -36,7 +30,7 @@ export function CategoryCard({
   return (
     <Link href={href} className="block h-full">
       <Card as="article" className="flex h-full flex-col overflow-hidden border-0 shadow-sm" padded={false}>
-        <div className="relative aspect-[16/10] max-h-40 overflow-hidden bg-page-tint sm:max-h-52">
+        <div className="relative aspect-[16/10] max-h-56 overflow-hidden bg-page-tint sm:max-h-52">
           <OakwoodPhotoSlot
             slot={needPhotography(id)}
             fill
@@ -59,11 +53,11 @@ export function BrowseByNeed() {
       aria-label="Shop by what you need"
       className="bg-[#ECF3F8] py-10! sm:py-12! lg:py-14!"
     >
-      <Container className="px-10! sm:px-12! lg:px-16!">
+      <Container className="px-6! sm:px-12! lg:px-16!">
         <SectionIntro align="center" heading="Shop by what you need">
           Start with the type of car that suits your everyday life.
         </SectionIntro>
-        <Grid columns="budget" className="mt-8">
+        <Grid columns="budget" className="mt-8 gap-3! lg:gap-4!">
           {needCategories.map((category) => (
             <CategoryCard
               key={category.id}

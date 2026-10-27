@@ -10,7 +10,7 @@ export function SectionIntro({
   headingClassName = "text-navy",
   bodyClassName = "text-muted",
 }: {
-  heading: string;
+  heading: ReactNode;
   children?: ReactNode;
   headingLevel?: "h2" | "h1";
   align?: "left" | "center";

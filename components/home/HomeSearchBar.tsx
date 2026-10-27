@@ -4,13 +4,12 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "@/components/forms/FormControls";
 import { MONTHLY_OPTIONS, PRICE_OPTIONS } from "@/components/search/constants";
-import { IconArrow, IconFilters, IconSearch } from "@/components/ui/icons";
+import { IconArrow, IconSearch } from "@/components/ui/icons";
 import { getSearchUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import { formatPounds } from "@/lib/format/money";
 import {
-  HOME_HERO_FILTERS,
   HOME_HERO_FILTER_MAX_MONTHLY,
   HOME_HERO_FILTER_MAX_PRICE,
   HOME_HERO_FILTER_MONTHLY,
@@ -31,7 +30,6 @@ type PriceMode = "monthly" | "total";
 export function HomeSearchBar({ className }: { className?: string }) {
   const router = useRouter();
   const [value, setValue] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(true);
   const [mode, setMode] = useState<PriceMode>("monthly");
   const [monthlyMax, setMonthlyMax] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -72,7 +70,6 @@ export function HomeSearchBar({ className }: { className?: string }) {
       }}
     >
       <div className="rounded-[22px] bg-white p-4 shadow-[0_16px_36px_rgba(16,40,72,0.1)] sm:p-5">
-        {filtersOpen ? (
         <div id="home-search-filters">
         <fieldset className="m-0 border-0 p-0">
           <legend className="sr-only">Price type</legend>
@@ -170,40 +167,21 @@ export function HomeSearchBar({ className }: { className?: string }) {
           </div>
         </div>
         </div>
-        ) : null}
 
-        <div className={cn("flex items-center gap-2", filtersOpen && "mt-3")}>
-          <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#D7E0E8] bg-white px-3">
-            <IconSearch className="shrink-0 text-[#8b95a3]" width={16} height={16} />
-            <label htmlFor="home-search" className="sr-only">
-              {HOME_HERO_FILTER_SEARCH}
-            </label>
-            <input
-              id="home-search"
-              name="q"
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder={HOME_HERO_FILTER_SEARCH}
-              autoComplete="off"
-              className="h-full w-full border-0 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b95a3]"
-            />
-          </div>
-          <button
-            type="button"
-            aria-expanded={filtersOpen}
-            aria-controls="home-search-filters"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#002852] text-white hover:bg-[#001c3d]"
-            onClick={() => {
-              const next = !filtersOpen;
-              setFiltersOpen(next);
-              if (next) {
-                trackEvent(analyticsEvents.filterOpened, { category: "car" });
-              }
-            }}
-          >
-            <IconFilters className="text-white" width={20} height={20} />
-            <span className="sr-only">{HOME_HERO_FILTERS}</span>
-          </button>
+        <div className="mt-3 flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-[#D7E0E8] bg-white px-3">
+          <IconSearch className="shrink-0 text-[#8b95a3]" width={16} height={16} />
+          <label htmlFor="home-search" className="sr-only">
+            {HOME_HERO_FILTER_SEARCH}
+          </label>
+          <input
+            id="home-search"
+            name="q"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder={HOME_HERO_FILTER_SEARCH}
+            autoComplete="off"
+            className="h-full w-full border-0 bg-transparent text-sm text-ink outline-none placeholder:text-[#8b95a3]"
+          />
         </div>
 
         <button

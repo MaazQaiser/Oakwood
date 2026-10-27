@@ -124,7 +124,7 @@ export function Grid({
     cards: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3",
     two: "grid-cols-1 md:grid-cols-2",
     featured: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    budget: "grid-cols-2 lg:grid-cols-3",
+    budget: "grid-cols-1 lg:grid-cols-3",
     listing: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3",
   }[columns];
 
