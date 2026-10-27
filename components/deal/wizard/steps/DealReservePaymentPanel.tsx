@@ -8,11 +8,10 @@ import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
 import { DealStep4Summary } from "@/components/deal/wizard/steps/DealStep4Summary";
 import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
-import { getVehicleUrl } from "@/config/routes";
+import { routes } from "@/config/routes";
 import { reservationConfig } from "@/config/reservation";
 import {
   STEP4_BACK_HUB,
-  STEP4_DONE,
   STEP4_RESERVE_FAILED_BODY,
   STEP4_RESERVE_FAILED_TITLE,
   STEP4_RESERVE_HOLD,
@@ -76,7 +75,10 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
     if (phase === "success" || phase === "failed") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [phase]);
+    if (phase === "success") {
+      navigateTo(routes.home);
+    }
+  }, [navigateTo, phase]);
 
   const clear = (key: keyof Errors) =>
     setErrors((current) =>
@@ -198,8 +200,6 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
           showMonthly={false}
           onBack={onBack}
           backLabel={STEP4_BACK_HUB}
-          onContinue={() => navigateTo(getVehicleUrl(vehicle.slug))}
-          continueLabel={STEP4_DONE}
         />
       </div>
     );

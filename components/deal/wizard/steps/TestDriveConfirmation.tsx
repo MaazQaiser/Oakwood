@@ -12,7 +12,7 @@ import { DealStepFooter } from "@/components/deal/wizard/DealStepFooter";
 import { StartReservationButton } from "@/components/reservation/StartReservationButton";
 import { loadTestDriveConfirmation } from "@/features/deal/test-drive-confirmation";
 import { reservationConfig } from "@/config/reservation";
-import { getVehicleUrl } from "@/config/routes";
+import { getVehicleUrl, routes } from "@/config/routes";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import {
   STEP4_BACK_HUB,
@@ -85,6 +85,12 @@ export function TestDriveConfirmation({
     request.channels,
     request.vehicleTitle,
   ]);
+
+  useEffect(() => {
+    if (!loading && model) {
+      navigateTo(routes.home);
+    }
+  }, [loading, model, navigateTo]);
 
   if (loading) {
     return (
@@ -290,8 +296,6 @@ export function TestDriveConfirmation({
         showMonthly={false}
         onBack={onBack}
         backLabel={STEP4_BACK_HUB}
-        onContinue={() => navigateTo(getVehicleUrl(vehicle.slug))}
-        continueLabel={STEP4_DONE}
       />
     </div>
   );

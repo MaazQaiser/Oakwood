@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/forms/FormControls";
@@ -17,7 +17,7 @@ import {
   getShowroomProfile,
   showrooms,
 } from "@/config/locations";
-import { getVehicleUrl } from "@/config/routes";
+import { routes } from "@/config/routes";
 import {
   getNextOpenDays,
   getSalesTimeSlots,
@@ -35,7 +35,6 @@ import {
   STEP4_CLOSED_BODY,
   STEP4_CLOSED_HOURS_REF,
   STEP4_CLOSED_TITLE,
-  STEP4_DONE,
 } from "@/lib/deal/step4-copy";
 import { cn } from "@/lib/cn";
 
@@ -78,6 +77,12 @@ export function DealCallbackPanel({
   }, [closedStatus?.nextOpenDate, mode]);
 
   const [phase, setPhase] = useState<Phase>("form");
+
+  useEffect(() => {
+    if (phase === "confirm") {
+      navigateTo(routes.home);
+    }
+  }, [navigateTo, phase]);
   const [showroomSlug, setShowroomSlug] = useState(defaultSlug);
   const [day, setDay] = useState(
     mode === "closed" && closedStatus?.nextOpenDate
@@ -219,8 +224,6 @@ export function DealCallbackPanel({
           showMonthly={false}
           onBack={onBack}
           backLabel={STEP4_BACK_HUB}
-          onContinue={() => navigateTo(getVehicleUrl(vehicle.slug))}
-          continueLabel={STEP4_DONE}
         />
       </div>
     );
