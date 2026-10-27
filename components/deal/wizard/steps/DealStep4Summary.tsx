@@ -71,18 +71,6 @@ export function DealStep4Summary({ title = "Your deal" }: { title?: string }) {
             ? products.map((product) => product.name).join(", ")
             : "None"}
         </Row>
-        {products.length ? (
-          <div>
-            <dt className="sr-only">Selected products</dt>
-            <dd>
-              <ul className="space-y-0.5 text-caption text-muted">
-                {products.map((product) => (
-                  <li key={product.id}>{product.name}</li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        ) : null}
       </dl>
     </section>
   );

@@ -488,7 +488,7 @@ export function DealBudgetStep() {
             label="Finance term"
             value={term}
             columns={3}
-            hint="Hire Purchase starts at 84 months. Personal Contract Purchase starts at 60 months. 72 and 84 months are Hire Purchase only."
+            hint="Hire Purchase starts at 24 months. Personal Contract Purchase starts at 24 months. 72 and 84 months are Hire Purchase only."
             options={TERMS.map((months) => ({
               value: months,
               label: `${months} months`,

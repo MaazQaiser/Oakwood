@@ -25,7 +25,7 @@ export const DEAL_STEP_META: Record<
   },
   budget: {
     index: 2,
-    title: "Finance preferences",
+    title: "Finance Preferences",
     shortTitle: "Finance",
     supporting: "Hire Purchase and Personal Contract Purchase, side by side.",
   },
