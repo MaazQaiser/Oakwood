@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppProviders } from "@/components/layout/AppProviders";
+import { CursorHydrationGuard } from "@/components/layout/CursorHydrationGuard";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SkipLink } from "@/components/layout/SkipLink";
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full w-full min-w-0 flex-col bg-page text-ink">
+        <CursorHydrationGuard />
         <AppProviders initialFinance={initialFinance}>
           <SkipLink />
           <SiteHeader />

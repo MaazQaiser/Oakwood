@@ -76,6 +76,10 @@ function isCompact(className?: string) {
   return Boolean(className && /(?:^|\s)btn-compact\b/.test(className));
 }
 
+function isGrouped(className?: string) {
+  return Boolean(className && /(?:^|\s)btn-grouped\b/.test(className));
+}
+
 function allowsWrap(className?: string) {
   return Boolean(className && /(?:^|\s)btn-wrap\b/.test(className));
 }
@@ -90,6 +94,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const compact = isCompact(className);
+  const grouped = isGrouped(className);
   const wrap = allowsWrap(className);
   const withArrow = variant === "primary" && size !== "sm" && !isIconOnly(className);
   const classes = cn(
@@ -102,7 +107,9 @@ export function Button({
     compact && variant === "primary"
       ? wrap
         ? "h-auto min-h-11 min-w-0 max-w-full justify-between gap-2 rounded-[14px] bg-primary py-1 pl-4 pr-1 text-white hover:bg-primary-hover lg:h-11 lg:shrink-0"
-        : "h-11 min-h-11 shrink-0 justify-between gap-2 whitespace-nowrap rounded-[14px] bg-primary py-1 pl-4 pr-1 text-white hover:bg-primary-hover"
+        : grouped
+          ? "h-11 min-h-11 shrink-0 justify-center gap-1 whitespace-nowrap rounded-[14px] bg-primary px-4 py-1 text-white hover:bg-primary-hover"
+          : "h-11 min-h-11 shrink-0 justify-between gap-2 whitespace-nowrap rounded-[14px] bg-primary py-1 pl-4 pr-1 text-white hover:bg-primary-hover"
       : compact && variant === "secondary"
         ? "h-11 min-h-11 shrink-0 justify-center whitespace-nowrap rounded-[14px] border border-transparent bg-white px-4 text-ink hover:bg-page-tint"
         : withArrow

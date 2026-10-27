@@ -142,7 +142,7 @@ export function FinancePersonalisationBanner({
         </div>
         <Button
           href={routes.eligibility}
-          className="btn-compact w-full justify-center gap-2 sm:w-fit sm:justify-start"
+          className="btn-compact btn-grouped w-full sm:w-fit"
           onClick={onEligibilityClick}
         >
           {copy.bannerCta}
