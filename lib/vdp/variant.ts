@@ -4,7 +4,7 @@ export const VDP_VARIANT_STORAGE_KEY = "oakwood_vdp_variant";
 export const VDP_VARIANT_QUERY = "vdp";
 
 export function isVdpVariantSwitchEnabled(): boolean {
-  return process.env.NODE_ENV !== "production";
+  return true;
 }
 
 export function parseVdpVariantParam(value: string | string[] | undefined): VdpLayoutVariant | null {
@@ -18,7 +18,7 @@ export function parseVdpVariantParam(value: string | string[] | undefined): VdpL
   return null;
 }
 
-/** Server-side initial variant from the URL (development only). */
+/** Server-side initial variant from the URL. */
 export function resolveVdpVariantFromSearchParams(
   searchParams?: Record<string, string | string[] | undefined>,
 ): VdpLayoutVariant {
