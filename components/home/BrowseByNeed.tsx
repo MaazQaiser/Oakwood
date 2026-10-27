@@ -7,6 +7,21 @@ import { SectionIntro } from "@/components/home/SectionIntro";
 import { needPhotography } from "@/lib/home/photography";
 import { needCategories } from "@/lib/mock/home";
 
+function CategoryTitle({ title }: { title: string }) {
+  const splitAt = title.lastIndexOf(" ");
+  const lead = splitAt === -1 ? "" : title.slice(0, splitAt);
+  const tail = splitAt === -1 ? title : title.slice(splitAt + 1);
+
+  return (
+    <h3 className="text-h5">
+      {lead ? <>{lead} </> : null}
+      <span className="whitespace-nowrap">
+        {tail}<IconArrow className="ml-1 inline-block align-[-0.125em] text-primary" />
+      </span>
+    </h3>
+  );
+}
+
 export function CategoryCard({
   id,
   title,
@@ -28,12 +43,9 @@ export function CategoryCard({
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         </div>
-        <div className="flex flex-1 items-start justify-between gap-3 p-5">
-          <div>
-            <h3 className="text-h5">{title}</h3>
-            <p className="mt-2 text-body-sm text-muted">{description}</p>
-          </div>
-          <IconArrow className="mt-1 shrink-0 text-primary" />
+        <div className="flex flex-1 flex-col p-5">
+          <CategoryTitle title={title} />
+          <p className="mt-2 text-body-sm text-muted">{description}</p>
         </div>
       </Card>
     </Link>
