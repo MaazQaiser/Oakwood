@@ -92,6 +92,6 @@ export const STEP4_CMB_CONFIRM_BODY =
 export const STEP4_CMB_ERROR =
   "We couldn't book your callback. Your details are still here.";
 
-export const STEP4_BACK_HUB = "Back to next steps";
+export const STEP4_BACK_HUB = "Back";
 /** Leaves the deal after a completed Step 4 action (reserve / test drive / callback). */
 export const STEP4_DONE = "Done";
