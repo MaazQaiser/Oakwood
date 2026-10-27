@@ -36,7 +36,7 @@ export function SaveVehicleButton({
       aria-pressed={saved}
       title={saved ? "Saved" : "Save for later"}
       className={cn(
-        "bg-surface shadow-sm",
+        "h-8! w-8! min-h-8! min-w-8! bg-surface p-0 shadow-sm [&_svg]:h-3.5! [&_svg]:w-3.5!",
         saved ? "text-primary" : "text-ink hover:bg-page-tint",
         className,
       )}

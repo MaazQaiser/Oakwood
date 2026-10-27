@@ -340,7 +340,7 @@ export function DealBudgetStep() {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => selectFinanceType(option.value)}
-                  className={`rounded-2xl px-4 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                  className={`flex h-full flex-col items-stretch justify-start rounded-2xl px-4 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                     selected
                       ? "bg-navy text-white"
                       : "bg-page-tint text-ink hover:bg-surface-soft"

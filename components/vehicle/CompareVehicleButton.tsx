@@ -82,7 +82,7 @@ export function CompareVehicleButton({
             : compareCopy.add
       }
       className={cn(
-        "bg-surface shadow-sm hover:bg-page-tint",
+        "h-8! w-8! min-h-8! min-w-8! bg-surface p-0 shadow-sm hover:bg-page-tint [&_svg]:h-3.5! [&_svg]:w-3.5!",
         selected ? "text-primary" : "text-ink",
         className,
       )}
