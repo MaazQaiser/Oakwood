@@ -72,13 +72,13 @@ export function SiteHeader() {
     >
       <header
         className={cn(
-          "relative px-6 lg:mx-[var(--oak-page-x)]",
+          "relative px-6 lg:px-0",
           !elevated && detailOpen && "rounded-t-[32px] bg-page",
         )}
       >
         <Container
           width="wide"
-          className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 px-0! xl:gap-10"
+          className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 px-0! lg:px-[var(--oak-page-x)]! xl:gap-10"
         >
           <div className="min-w-0">
             <Logo className="max-w-full" />

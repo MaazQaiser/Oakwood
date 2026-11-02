@@ -52,11 +52,11 @@ export function PageBanner({
   return (
     <section
       className={cn(
-        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.75rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:rounded-[32px] lg:px-[var(--oak-page-x)]",
+        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.75rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:rounded-[32px] lg:px-0",
         hideTitle ? "pb-6 lg:pb-7" : "pb-10 lg:pb-12",
       )}
     >
-      <div className={cn("mx-auto w-full", widthClass[width])}>
+      <div className={cn("mx-auto w-full lg:px-[var(--oak-page-x)]", widthClass[width])}>
         {crumbs && crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
         {hideTitle ? (
           <h1 className="sr-only">{title}</h1>

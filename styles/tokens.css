@@ -160,5 +160,9 @@
   :root {
     --oak-page-x: 2.5rem;
     --oak-section-y: 5.5rem;
+    /* Desktop column matches the home reviews and finance banners.
+       Their container is 75rem; page padding leaves a 1120px content
+       column, which stays under the 1140px ceiling. */
+    --oak-width-wide: 75rem;
   }
 }
