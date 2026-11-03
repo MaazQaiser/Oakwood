@@ -69,103 +69,103 @@ export function HomeSearchBar({ className }: { className?: string }) {
         submitSearch();
       }}
     >
-      <div className="rounded-[22px] bg-white p-4 shadow-[0_16px_36px_rgba(16,40,72,0.1)] sm:p-5">
+      <div className="rounded-[28px] bg-white p-5 shadow-[0_18px_40px_rgba(0,16,40,0.14)] sm:p-6">
         <div id="home-search-filters">
-        <fieldset className="m-0 border-0 p-0">
-          <legend className="sr-only">Price type</legend>
-          <div
-            role="tablist"
-            aria-label="Price type"
-            className="grid grid-cols-2 rounded-full bg-[#E7EEF4] p-1"
-          >
-            <PriceTab
-              selected={mode === "monthly"}
-              onClick={() => setMode("monthly")}
-              shortLabel="Monthly"
-              longLabel={HOME_HERO_FILTER_MONTHLY}
-            />
-            <PriceTab
-              selected={mode === "total"}
-              onClick={() => setMode("total")}
-              shortLabel="Total"
-              longLabel={HOME_HERO_FILTER_PRICE}
-            />
-          </div>
-        </fieldset>
+          <fieldset className="m-0 border-0 p-0">
+            <legend className="sr-only">Price type</legend>
+            <div
+              role="tablist"
+              aria-label="Price type"
+              className="grid grid-cols-2 rounded-full bg-[#E7EEF4] p-1"
+            >
+              <PriceTab
+                selected={mode === "monthly"}
+                onClick={() => setMode("monthly")}
+                shortLabel="Monthly"
+                longLabel={HOME_HERO_FILTER_MONTHLY}
+              />
+              <PriceTab
+                selected={mode === "total"}
+                onClick={() => setMode("total")}
+                shortLabel="Total"
+                longLabel={HOME_HERO_FILTER_PRICE}
+              />
+            </div>
+          </fieldset>
 
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="min-w-0">
-            <label htmlFor="home-search-budget" className="sr-only">
-              {mode === "monthly"
-                ? HOME_HERO_FILTER_MAX_MONTHLY
-                : HOME_HERO_FILTER_MAX_PRICE}
-            </label>
-            <Select
-              id="home-search-budget"
-              className={cn(fieldClass, "tabular-nums")}
-              value={mode === "monthly" ? monthlyMax : maxPrice}
-              onChange={(event) => {
-                if (mode === "monthly") {
-                  setMonthlyMax(event.target.value);
-                } else {
-                  setMaxPrice(event.target.value);
-                }
-              }}
-            >
-              <option value="">
-                {mode === "monthly" ? "Budget" : "Max price"}
-              </option>
-              {(mode === "monthly" ? MONTHLY_OPTIONS : PRICE_OPTIONS).map(
-                (amount) => (
-                  <option key={amount} value={amount}>
-                    {mode === "monthly"
-                      ? `${formatPounds(amount)}/mo`
-                      : formatPounds(amount)}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="min-w-0">
+              <label htmlFor="home-search-budget" className="sr-only">
+                {mode === "monthly"
+                  ? HOME_HERO_FILTER_MAX_MONTHLY
+                  : HOME_HERO_FILTER_MAX_PRICE}
+              </label>
+              <Select
+                id="home-search-budget"
+                className={cn(fieldClass, "tabular-nums")}
+                value={mode === "monthly" ? monthlyMax : maxPrice}
+                onChange={(event) => {
+                  if (mode === "monthly") {
+                    setMonthlyMax(event.target.value);
+                  } else {
+                    setMaxPrice(event.target.value);
+                  }
+                }}
+              >
+                <option value="">
+                  {mode === "monthly" ? "Budget" : "Max price"}
+                </option>
+                {(mode === "monthly" ? MONTHLY_OPTIONS : PRICE_OPTIONS).map(
+                  (amount) => (
+                    <option key={amount} value={amount}>
+                      {mode === "monthly"
+                        ? `${formatPounds(amount)}/mo`
+                        : formatPounds(amount)}
+                    </option>
+                  ),
+                )}
+              </Select>
+            </div>
+            <div className="min-w-0">
+              <label htmlFor="home-search-make" className="sr-only">
+                {HOME_HERO_FILTER_SELECT_MAKE}
+              </label>
+              <Select
+                id="home-search-make"
+                className={fieldClass}
+                value={make}
+                onChange={(event) => {
+                  setMake(event.target.value);
+                  setModel("");
+                }}
+              >
+                <option value="">Make</option>
+                {makes.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.name}
                   </option>
-                ),
-              )}
-            </Select>
+                ))}
+              </Select>
+            </div>
+            <div className="min-w-0">
+              <label htmlFor="home-search-model" className="sr-only">
+                {HOME_HERO_FILTER_SELECT_MODEL}
+              </label>
+              <Select
+                id="home-search-model"
+                className={fieldClass}
+                value={model}
+                onChange={(event) => setModel(event.target.value)}
+              >
+                <option value="">Model</option>
+                {models.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
-          <div className="min-w-0">
-            <label htmlFor="home-search-make" className="sr-only">
-              {HOME_HERO_FILTER_SELECT_MAKE}
-            </label>
-            <Select
-              id="home-search-make"
-              className={fieldClass}
-              value={make}
-              onChange={(event) => {
-                setMake(event.target.value);
-                setModel("");
-              }}
-            >
-              <option value="">Make</option>
-              {makes.map((item) => (
-                <option key={item.slug} value={item.slug}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="min-w-0">
-            <label htmlFor="home-search-model" className="sr-only">
-              {HOME_HERO_FILTER_SELECT_MODEL}
-            </label>
-            <Select
-              id="home-search-model"
-              className={fieldClass}
-              value={model}
-              onChange={(event) => setModel(event.target.value)}
-            >
-              <option value="">Model</option>
-              {models.map((item) => (
-                <option key={item.slug} value={item.slug}>
-                  {item.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </div>
         </div>
 
         <div className="mt-3 flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-[#D7E0E8] bg-white px-3">

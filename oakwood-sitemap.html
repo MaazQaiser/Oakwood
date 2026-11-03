@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Oakwood Motor Company — Site map</title>
+  <style>
+    :root {
+      --navy: #0a2f4d;
+      --blue: #0b4f82;
+      --blue-soft: #e8f1f8;
+      --blue-line: #b9d2e6;
+      --ink: #142033;
+      --muted: #5a6578;
+      --line: #dde3ec;
+      --bg: #f4f6fa;
+      --card: #ffffff;
+      --green: #1f7a4d;
+      --green-soft: #e6f4ec;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+
+    /* Title */
+    .title {
+      background: var(--navy);
+      color: #fff;
+      padding: 2.5rem 1.5rem 2rem;
+      margin: 0 -1.5rem 2rem;
+      text-align: center;
+    }
+    .title h1 { margin: 0; font-size: 2.6rem; letter-spacing: -0.02em; }
+    .title p { margin: 0.5rem 0 0; font-size: 1.05rem; opacity: 0.85; }
+
+    .print-hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: -1rem 0 2rem;
+    }
+
+    /* Sections */
+    section { margin-bottom: 2.5rem; }
+    section > h2 {
+      font-size: 1.5rem;
+      margin: 0 0 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    section > h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 1rem;
+    }
+    section > .lede { margin: 0 0 1.25rem; color: var(--muted); }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    /* Site map tree */
+    .tree-root {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding-bottom: 1.5rem;
+    }
+    .tree-root .node-home {
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.75rem 2.5rem;
+      border-radius: 10px;
+    }
+    .tree-root::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      height: 1.5rem;
+      background: var(--blue-line);
+    }
+    .tree-branches {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.75rem;
+      border-top: 2px solid var(--blue-line);
+      padding-top: 1.25rem;
+      position: relative;
+    }
+    .branch { position: relative; }
+    .branch::before {
+      content: "";
+      position: absolute;
+      top: -1.25rem;
+      left: 50%;
+      width: 2px;
+      height: 1.25rem;
+      background: var(--blue-line);
+    }
+    .branch h3 {
+      margin: 0 0 0.6rem;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 0.55rem 0.5rem;
+      border-radius: 8px;
+    }
+    .branch ul { list-style: none; margin: 0; padding: 0; }
+    .branch li {
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-line);
+      border-radius: 6px;
+      padding: 0.4rem 0.55rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+    }
+    .branch li.sub {
+      margin-left: 0.75rem;
+      background: #fff;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Menu */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+    }
+    .menu-col {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .menu-col h3 {
+      margin: 0;
+      background: var(--navy);
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.6rem 0.75rem;
+    }
+    .menu-col .group { padding: 0.6rem 0.75rem; border-top: 1px solid var(--line); }
+    .menu-col .group:first-of-type { border-top: 0; }
+    .menu-col .group-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .menu-col ul { margin: 0; padding-left: 1rem; font-size: 0.86rem; }
+    .menu-col li { margin: 0.15rem 0; }
+
+    .buttons-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .pill {
+      background: var(--green);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Flows */
+    .flow-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem 1.5rem;
+      margin-bottom: 1.25rem;
+      break-inside: avoid;
+    }
+    .flow-card h3 { margin: 0 0 0.2rem; font-size: 1.2rem; }
+    .flow-card .flow-desc { margin: 0 0 1rem; color: var(--muted); font-size: 0.92rem; }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      flex-wrap: wrap;
+      gap: 0.5rem 0;
+    }
+    .step {
+      flex: 1 1 0;
+      min-width: 140px;
+      background: var(--blue-soft);
+      border: 2px solid var(--blue);
+      border-radius: 12px;
+      padding: 0.75rem 0.8rem;
+      position: relative;
+    }
+    .step .n {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+    }
+    .step strong { display: block; font-size: 0.98rem; }
+    .step span { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+    .step.start { background: #fff; border-style: dashed; border-color: var(--muted); }
+    .step.start .n { background: var(--muted); }
+    .step.done { background: var(--green-soft); border-color: var(--green); }
+    .step.done .n { background: var(--green); }
+
+    .arrow {
+      flex: 0 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .choices {
+      margin-top: 1rem;
+      border-top: 2px dashed var(--blue-line);
+      padding-top: 0.9rem;
+    }
+    .choices-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .choices-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .choice {
+      background: #fff;
+      border: 2px solid var(--green);
+      color: var(--green);
+      border-radius: 10px;
+      padding: 0.5rem 0.8rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .choice small { display: block; font-weight: 400; color: var(--muted); font-size: 0.78rem; }
+
+    .side-note {
+      margin-top: 0.9rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 0.55rem 0.8rem;
+    }
+
+    /* Footer list */
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    .footer-grid div {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      background: #fff;
+    }
+    .footer-grid h4 { margin: 0 0 0.4rem; font-size: 0.95rem; }
+    .footer-grid p { margin: 0; font-size: 0.84rem; color: var(--muted); }
+
+    .note {
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+    }
+    .note p { margin: 0.35rem 0; }
+
+    /* User flow map */
+    .uf { width: 100%; height: auto; display: block; }
+    .uf .h { font-size: 12px; font-weight: 700; fill: var(--muted); text-anchor: middle; letter-spacing: 0.08em; }
+    .uf .t { font-size: 14px; font-weight: 700; text-anchor: middle; fill: var(--ink); }
+    .uf .s { font-size: 11.5px; text-anchor: middle; fill: var(--muted); }
+    .uf .b-home rect { fill: var(--navy); }
+    .uf .b-sec rect { fill: var(--blue); }
+    .uf .b-home text, .uf .b-sec text { fill: #fff; }
+    .uf .b-sec .s { fill: rgba(255, 255, 255, 0.85); }
+    .uf .b-page rect { fill: var(--blue-soft); stroke: var(--blue); stroke-width: 2; }
+    .uf .b-deal rect { fill: #fff; stroke: var(--blue); stroke-width: 3; }
+    .uf .b-out rect { fill: var(--green-soft); stroke: var(--green); stroke-width: 2; }
+    .uf .b-out .t { fill: #14532d; }
+    .uf .e { fill: none; stroke: var(--blue); stroke-width: 2; }
+    .uf .e.g { stroke: var(--green); }
+    .uf .e.d { stroke-dasharray: 6 5; }
+    .uf .lbl { font-size: 11.5px; fill: var(--blue); font-style: italic; }
+    .uf-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.75rem; font-size: 0.85rem; color: var(--muted); }
+    .uf-legend span::before { content: ""; display: inline-block; width: 28px; margin-right: 0.4rem; vertical-align: middle; border-top: 2px solid var(--blue); }
+    .uf-legend span.dashed::before { border-top-style: dashed; }
+    .uf-legend span.green::before { border-color: var(--green); }
+
+    @media (max-width: 900px) {
+      .tree-branches { grid-template-columns: repeat(3, 1fr); row-gap: 1.5rem; }
+      .menu-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      body { background: #fff; font-size: 11pt; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { max-width: none; padding: 0; }
+      .title { margin: 0 0 1rem; padding: 1.25rem; }
+      .print-hint { display: none; }
+      section { break-inside: avoid; }
+      section.page-break { break-before: page; }
+      .flow-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="title">
+      <h1>Site map</h1>
+      <p>Oakwood Motor Company website &middot; pages and customer journeys as currently built</p>
+    </header>
+
+    <p class="print-hint">To save as PDF: File &rarr; Print &rarr; Save as PDF (landscape is set automatically).</p>
+
+    <!-- 1. Site map -->
+    <section>
+      <h2><span class="num">1</span> Website structure</h2>
+      <p class="lede">Every main page on the site, grouped by what the customer is trying to do.</p>
+
+      <div class="panel">
+        <div class="tree-root"><div class="node-home">Home</div></div>
+        <div class="tree-branches">
+          <div class="branch">
+            <h3>Find a car</h3>
+            <ul>
+              <li>Used cars</li>
+              <li class="sub">By make</li>
+              <li class="sub">By model</li>
+              <li class="sub">By showroom</li>
+              <li>Used vans</li>
+              <li>Search</li>
+              <li>Car details page</li>
+              <li>Saved cars</li>
+              <li>Compare cars</li>
+            </ul>
+          </div>
+          <div class="branch">
+            <h3>Finance</h3>
+            <ul>
+              <li>Car finance</li>
+              <li>Finance calculator</li>
+              <li>Check my eligibility</li>
+              <li>Finance guides</li>
+              <li class="sub">HP and PCP</li>
+              <li class="sub">Bad credit, CCJ</li>
+              <li class="sub">No deposit</li>
+              <li class="sub">Self-employed</li>
+              <li class="sub">First-time buyer</li>
+            </ul>
+          </div>
+          <div class="branch">
+            <h3>Buy online</h3>
+            <ul>
+              <li>Deal builder</li>
+              <li>Finance application</li>
+              <li>Reserve a car</li>
+              <li>Manage reservation</li>
+              <li>Saved deal (resume)</li>
+              <li>Shared deal</li>
+            </ul>
+          </div>
+          <div class="branch">
+            <h3>Sell</h3>
+            <ul>
+              <li>Sell my car</li>
+              <li>Part exchange</li>
+              <li>Valuation</li>
+              <li class="sub">Valuation result</li>
+            </ul>
+          </div>
+          <div class="branch">
+            <h3>Aftersales</h3>
+            <ul>
+              <li>Aftersales overview</li>
+              <li>Servicing</li>
+              <li>Manufacturer servicing</li>
+              <li>MOT</li>
+              <li>Book a service or MOT</li>
+              <li>Warranty</li>
+              <li>Warranty claims</li>
+            </ul>
+          </div>
+          <div class="branch">
+            <h3>About Oakwood</h3>
+            <ul>
+              <li>About us</li>
+              <li>How it works</li>
+              <li>What to expect</li>
+              <li>Our garage</li>
+              <li>Reviews</li>
+              <li>AA standards</li>
+              <li>Delivery and collection</li>
+              <li>Showrooms</li>
+              <li class="sub">Bury</li>
+              <li class="sub">Chorley</li>
+              <li>Contact</li>
+              <li>FAQs</li>
+              <li>Complaints</li>
+              <li>Blog</li>
+              <li>Legal pages</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. User flow map -->
+    <section class="page-break">
+      <h2><span class="num">2</span> Site map: user flow</h2>
+      <p class="lede">How the pages connect, from arriving on the site to the customer's outcome. Read left to right.</p>
+
+      <div class="panel">
+        <svg class="uf" viewBox="0 0 1200 650" role="img" aria-label="User flow site map">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0L10 5L0 10z" fill="#0b4f82" />
+            </marker>
+            <marker id="arr-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0L10 5L0 10z" fill="#1f7a4d" />
+            </marker>
+          </defs>
+
+          <text class="h" x="95" y="20">START</text>
+          <text class="h" x="285" y="20">MENU SECTION</text>
+          <text class="h" x="475" y="20">KEY PAGE</text>
+          <text class="h" x="675" y="20">BUILD THE DEAL</text>
+          <text class="h" x="865" y="20">DECIDE</text>
+          <text class="h" x="1085" y="20">OUTCOME</text>
+
+          <g transform="translate(0,40)">
+            <!-- Edges: Home to menu sections -->
+            <path class="e" marker-end="url(#arr)" d="M170 310 H190 V67 H208" />
+            <path class="e" marker-end="url(#arr)" d="M170 310 H190 V187 H208" />
+            <path class="e" marker-end="url(#arr)" d="M170 310 H190 V327 H208" />
+            <path class="e" marker-end="url(#arr)" d="M170 310 H190 V457 H208" />
+            <path class="e" marker-end="url(#arr)" d="M170 310 H190 V567 H208" />
+
+            <!-- Menu section to key page -->
+            <path class="e" marker-end="url(#arr)" d="M360 67 H398" />
+            <path class="e" marker-end="url(#arr)" d="M360 187 H398" />
+            <path class="e" marker-end="url(#arr)" d="M360 327 H398" />
+            <path class="e" marker-end="url(#arr)" d="M360 457 H398" />
+            <path class="e" marker-end="url(#arr)" d="M360 567 H398" />
+
+            <!-- Key pages into the deal builder -->
+            <path class="e" marker-end="url(#arr)" d="M550 67 H575 V150 H598" />
+            <text class="lbl" x="582" y="102">Buy with cash</text>
+            <path class="e" marker-end="url(#arr)" d="M550 187 H598" />
+            <path class="e d" marker-end="url(#arr)" d="M550 327 H575 V215 H598" />
+            <text class="lbl" x="582" y="275">Use towards a car</text>
+            <path class="e d" marker-end="url(#arr)" d="M475 160 V97" />
+            <text class="lbl" x="468" y="133" text-anchor="end">Browse with your finance</text>
+
+            <!-- Deal builder to decision -->
+            <path class="e" marker-end="url(#arr)" d="M750 175 H788" />
+
+            <!-- Decision to outcomes -->
+            <path class="e g" marker-end="url(#arr-g)" d="M940 175 H965 V47 H988" />
+            <path class="e g" marker-end="url(#arr-g)" d="M940 175 H965 V122 H988" />
+            <path class="e g" marker-end="url(#arr-g)" d="M940 175 H965 V197 H988" />
+            <path class="e g" marker-end="url(#arr-g)" d="M940 175 H965 V272 H988" />
+
+            <!-- Aftersales booking -->
+            <path class="e g" marker-end="url(#arr-g)" d="M550 457 H988" />
+
+            <!-- Start -->
+            <g class="b-home">
+              <rect x="20" y="283" width="150" height="54" rx="10" />
+              <text class="t" x="95" y="315">Home</text>
+            </g>
+
+            <!-- Menu sections -->
+            <g class="b-sec">
+              <rect x="210" y="40" width="150" height="54" rx="10" />
+              <text class="t" x="285" y="64">Find a car</text>
+              <text class="s" x="285" y="81">Search, used cars, vans</text>
+            </g>
+            <g class="b-sec">
+              <rect x="210" y="160" width="150" height="54" rx="10" />
+              <text class="t" x="285" y="184">Finance</text>
+              <text class="s" x="285" y="201">Guides and calculator</text>
+            </g>
+            <g class="b-sec">
+              <rect x="210" y="300" width="150" height="54" rx="10" />
+              <text class="t" x="285" y="324">Sell</text>
+              <text class="s" x="285" y="341">Sell or part exchange</text>
+            </g>
+            <g class="b-sec">
+              <rect x="210" y="430" width="150" height="54" rx="10" />
+              <text class="t" x="285" y="454">Aftersales</text>
+              <text class="s" x="285" y="471">Service, MOT, warranty</text>
+            </g>
+            <g class="b-sec">
+              <rect x="210" y="540" width="150" height="54" rx="10" />
+              <text class="t" x="285" y="564">About Oakwood</text>
+              <text class="s" x="285" y="581">How it works, reviews</text>
+            </g>
+
+            <!-- Key pages -->
+            <g class="b-page">
+              <rect x="400" y="40" width="150" height="54" rx="10" />
+              <text class="t" x="475" y="64">Car details page</text>
+              <text class="s" x="475" y="81">Photos, price, finance</text>
+            </g>
+            <g class="b-page">
+              <rect x="400" y="160" width="150" height="54" rx="10" />
+              <text class="t" x="475" y="184">Eligibility check</text>
+              <text class="s" x="475" y="201">Questions, then result</text>
+            </g>
+            <g class="b-page">
+              <rect x="400" y="300" width="150" height="54" rx="10" />
+              <text class="t" x="475" y="324">Valuation</text>
+              <text class="s" x="475" y="341">Estimate for your car</text>
+            </g>
+            <g class="b-page">
+              <rect x="400" y="430" width="150" height="54" rx="10" />
+              <text class="t" x="475" y="454">Book service or MOT</text>
+              <text class="s" x="475" y="471">Showroom, date, time</text>
+            </g>
+            <g class="b-page">
+              <rect x="400" y="540" width="150" height="54" rx="10" />
+              <text class="t" x="475" y="564">Visit or contact us</text>
+              <text class="s" x="475" y="581">Bury, Chorley, FAQs</text>
+            </g>
+
+            <!-- Deal builder -->
+            <g class="b-deal">
+              <rect x="600" y="120" width="150" height="110" rx="12" />
+              <text class="t" x="675" y="146">Deal builder</text>
+              <text class="s" x="675" y="170">1. Part exchange</text>
+              <text class="s" x="675" y="190">2. Finance preferences</text>
+              <text class="s" x="675" y="210">3. Your deal</text>
+            </g>
+            <g class="b-deal">
+              <rect x="790" y="148" width="150" height="54" rx="10" />
+              <text class="t" x="865" y="172">4. Next step</text>
+              <text class="s" x="865" y="189">Customer chooses</text>
+            </g>
+
+            <!-- Outcomes -->
+            <g class="b-out">
+              <rect x="990" y="20" width="190" height="54" rx="10" />
+              <text class="t" x="1085" y="44">Reserve the car</text>
+              <text class="s" x="1085" y="61">Pay fee, then confirmed</text>
+            </g>
+            <g class="b-out">
+              <rect x="990" y="95" width="190" height="54" rx="10" />
+              <text class="t" x="1085" y="127">Apply for finance</text>
+            </g>
+            <g class="b-out">
+              <rect x="990" y="170" width="190" height="54" rx="10" />
+              <text class="t" x="1085" y="202">Book a test drive</text>
+            </g>
+            <g class="b-out">
+              <rect x="990" y="245" width="190" height="54" rx="10" />
+              <text class="t" x="1085" y="277">Call now or call me back</text>
+            </g>
+            <g class="b-out">
+              <rect x="990" y="430" width="190" height="54" rx="10" />
+              <text class="t" x="1085" y="462">Booking confirmed</text>
+            </g>
+          </g>
+        </svg>
+
+        <div class="uf-legend">
+          <span>Main path</span>
+          <span class="dashed">Optional path</span>
+          <span class="green">Leads to an outcome</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Main menu -->
+    <section class="page-break">
+      <h2><span class="num">3</span> Main menu (top of every page)</h2>
+      <p class="lede">Condensed to the client header document. Duplicate items removed; new Aftersales links added.</p>
+
+      <div class="panel">
+        <div class="menu-grid">
+          <div class="menu-col">
+            <h3>Cars</h3>
+            <div class="group">
+              <div class="group-label">Browse by budget</div>
+              <ul><li>Cars under £200</li><li>Cars under £300</li><li>Cars under £400</li><li>Cars under £500</li><li>Cars over £500</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Highlighted</div>
+              <ul><li>Used cars</li><li>Used vans</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Questions (flagged)</div>
+              <ul><li>How does buying work?</li><li>Can I reserve online?</li><li>Where can I view a car?</li></ul>
+            </div>
+          </div>
+          <div class="menu-col">
+            <h3>Finance</h3>
+            <div class="group">
+              <div class="group-label">Browse by budget</div>
+              <ul><li>Same budget links as Cars</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Highlighted</div>
+              <ul><li>Check eligibility (first — goes to the form)</li><li>Finance</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Questions</div>
+              <ul><li>Removed — already on the Finance page</li></ul>
+            </div>
+          </div>
+          <div class="menu-col">
+            <h3>Sell</h3>
+            <div class="group">
+              <div class="group-label">Your car</div>
+              <ul><li>Get a valuation</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Main CTA</div>
+              <ul><li>Part exchange (large box)</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Questions</div>
+              <ul><li>Removed</li></ul>
+            </div>
+          </div>
+          <div class="menu-col">
+            <h3>Aftersales</h3>
+            <div class="group">
+              <div class="group-label">Car care</div>
+              <ul><li>Servicing</li><li>MOT</li><li>Warranty claims</li><li>Book a 60-minute diagnosis</li><li>Make a complaint</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Highlighted</div>
+              <ul><li>Book a service</li><li>Warranty</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Questions</div>
+              <ul><li>When is my MOT due?</li><li>How do I book?</li><li>How do I claim?</li><li>How do I get a refund?</li></ul>
+            </div>
+          </div>
+          <div class="menu-col">
+            <h3>About</h3>
+            <div class="group">
+              <div class="group-label">Oakwood</div>
+              <ul><li>About us →</li><li>Contact →</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Highlighted</div>
+              <ul><li>How finance works</li><li>Visit us</li></ul>
+            </div>
+            <div class="group">
+              <div class="group-label">Questions</div>
+              <ul><li>Do I need an account?</li><li>How do I contact you?</li><li>How do I complain?</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons-row">
+          <strong>Always-visible buttons:</strong>
+          <span class="pill">Find Your Car</span>
+          <span class="pill">Check my eligibility</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Journeys -->
+    <section class="page-break">
+      <h2><span class="num">4</span> Customer journeys in detail</h2>
+      <p class="lede">How a customer moves through the site, step by step.</p>
+
+      <div class="flow-card">
+        <h3>Buying a car (overview)</h3>
+        <p class="flow-desc">The main path from landing on the site to securing a car.</p>
+        <div class="flow">
+          <div class="step start"><div class="n">1</div><strong>Home</strong><span>Or a search / advert link</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Browse cars</strong><span>Search, filters, monthly price</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">3</div><strong>Car details page</strong><span>Photos, price, finance example</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">4</div><strong>Deal builder</strong><span>Build the deal online</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">5</div><strong>Reserve, apply or visit</strong><span>Customer's chosen next step</span></div>
+        </div>
+        <div class="choices">
+          <div class="choices-label">On the car details page the customer can:</div>
+          <div class="choices-row">
+            <div class="choice">Buy with cash<small>Opens the deal builder</small></div>
+            <div class="choice">Get a finance check<small>Eligibility check</small></div>
+            <div class="choice">Part exchange<small>Value their current car</small></div>
+            <div class="choice">Book a test drive<small>Showroom, date and time</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <h3>Deal builder</h3>
+        <p class="flow-desc">Four steps, about two minutes. Starts from a specific car. Progress can be saved and resumed later, or shared.</p>
+        <div class="flow">
+          <div class="step start"><div class="n">&bull;</div><strong>Chosen car</strong><span>From the car details page</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">1</div><strong>Part exchange</strong><span>Current car and how it counts towards the deposit</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Finance preferences</strong><span>HP and PCP side by side</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">3</div><strong>Your deal</strong><span>Finance choice and cover</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">4</div><strong>Next step</strong><span>Customer picks how to proceed</span></div>
+        </div>
+        <div class="choices">
+          <div class="choices-label">At step 4 the customer chooses one:</div>
+          <div class="choices-row">
+            <div class="choice">Reserve this car<small>Pay a reservation fee</small></div>
+            <div class="choice">Apply for finance<small>Full application</small></div>
+            <div class="choice">Book a test drive</div>
+            <div class="choice">Call now<small>When the showroom is open</small></div>
+            <div class="choice">Call me back</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <h3>Finance eligibility check</h3>
+        <p class="flow-desc">A soft check that does not affect the customer's credit score. Can be saved and finished later.</p>
+        <div class="flow">
+          <div class="step start"><div class="n">1</div><strong>Start</strong><span>Intro and consent</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Questions</strong><span>Employment, income, housing, finance, contact</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">3</div><strong>Checking</strong><span>Soft search</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">4</div><strong>Result</strong><span>Personalised finance profile</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">5</div><strong>Browse or build a deal</strong><span>Prices shown with their finance</span></div>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <h3>Reserving a car</h3>
+        <p class="flow-desc">Holds the car for the customer. Reached from the deal builder or directly from a car.</p>
+        <div class="flow">
+          <div class="step start"><div class="n">1</div><strong>Reserve</strong><span>Confirm the car and details</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Payment</strong><span>Reservation fee</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">3</div><strong>Confirmed</strong><span>Or "payment failed" with retry</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">4</div><strong>Manage reservation</strong><span>View or cancel</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">5</div><strong>Refund request</strong><span>If cancelled</span></div>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <h3>Selling or part exchanging a car</h3>
+        <p class="flow-desc">The online figure is an estimate. It can be used towards a deal.</p>
+        <div class="flow">
+          <div class="step start"><div class="n">1</div><strong>Sell my car or Part exchange</strong><span>From the Sell menu</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Valuation</strong><span>Registration and mileage</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">3</div><strong>Valuation result</strong><span>Estimated value</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">4</div><strong>Use towards a car</strong><span>Feeds deal builder step 1</span></div>
+        </div>
+      </div>
+
+      <div class="flow-card">
+        <h3>Booking a service or MOT</h3>
+        <div class="flow">
+          <div class="step start"><div class="n">1</div><strong>Aftersales</strong><span>Or Servicing / MOT page</span></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">2</div><strong>Choose service or MOT</strong></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step"><div class="n">3</div><strong>Showroom, date and time</strong></div>
+          <div class="arrow">&rarr;</div>
+          <div class="step done"><div class="n">4</div><strong>Booking confirmed</strong></div>
+        </div>
+        <div class="side-note">Warranty and warranty claims sit alongside this in the Aftersales section.</div>
+      </div>
+    </section>
+
+    <!-- 5. Footer -->
+    <section class="page-break">
+      <h2><span class="num">5</span> Footer (bottom of every page)</h2>
+      <p class="lede">The footer carries the longer list of links, including pages that are not in the main menu.</p>
+      <div class="footer-grid">
+        <div><h4>Cars</h4><p>Used cars, Used vans, Search, Saved cars, Compare cars</p></div>
+        <div><h4>Finance</h4><p>Car finance, Eligibility, Build my deal, Reserve, Calculator, HP vs PCP, Bad credit, No deposit, CCJ, Self-employed, First-time buyer</p></div>
+        <div><h4>Sell and Aftersales</h4><p>Sell my car, Part exchange, Valuation, Servicing, Manufacturer servicing, MOT, Warranty, Warranty claims, Book a service</p></div>
+        <div><h4>Oakwood</h4><p>About, How it works, What to expect, Our garage, Reviews, AA standards, Delivery, Bury, Chorley, Contact, FAQs, Complaints, Blog</p></div>
+      </div>
+      <p class="side-note">Legal row: Terms of use, Privacy, Cookies, Purchase terms, Reservation terms, Cancellation and refund, Delivery, Distance selling, Status disclosure, Accessibility, Complaints.</p>
+    </section>
+
+    <!-- 6. Note -->
+    <section>
+      <h2><span class="num">6</span> About the menu</h2>
+      <div class="note">
+        <p><strong>Why the menu feels busy:</strong> each of the five items opens a large panel with quick links, highlighted pages and questions. Cars and Finance both repeat the same monthly price links.</p>
+        <p><strong>Where it came from:</strong> this structure was set up by the build team while developing the site. It was not based on a signed-off site map.</p>
+        <p><strong>Next step:</strong> once the site map is agreed, the menu can be simplified to match.</p>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>

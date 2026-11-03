@@ -23,6 +23,8 @@ import {
 } from "@/lib/support/copy";
 import type { SupportComplaintCategory } from "@/types/support";
 
+const DESCRIPTION_MAX = 1500;
+
 export function ComplaintForm({ telephone }: { telephone?: string }) {
   const started = useRef(false);
   const [name, setName] = useState("");
@@ -175,16 +177,27 @@ export function ComplaintForm({ telephone }: { telephone?: string }) {
             onChange={(event) => setExistingReference(event.target.value)}
           />
         </Field>
-        <Field htmlFor="complaint-description" label="What happened?">
+        <Field
+          htmlFor="complaint-description"
+          label="What happened?"
+          hint={`${description.length} / ${DESCRIPTION_MAX} characters`}
+        >
           <textarea
             id="complaint-description"
             name="description"
             rows={6}
             required
+            maxLength={DESCRIPTION_MAX}
             value={description}
             onChange={(event) => {
               markStarted();
-              setDescription(event.target.value);
+              setDescription(event.target.value.slice(0, DESCRIPTION_MAX));
+            }}
+            onPaste={(event) => {
+              event.preventDefault();
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
             }}
             className="min-h-40 w-full rounded-md border border-border bg-surface px-3 py-3 text-sm"
           />

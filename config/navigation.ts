@@ -1,4 +1,4 @@
-import { getFinanceIntentUrl, routes } from "@/config/routes";
+import { getBookingUrl, getFinanceIntentUrl, routes } from "@/config/routes";
 
 export interface NavigationItem {
   id: string;
@@ -23,8 +23,6 @@ export const primaryNavigation: NavigationGroup[] = [
     children: [
       { id: "used-cars", label: "Used cars", href: routes.usedCars },
       { id: "used-vans", label: "Used vans", href: routes.usedVans },
-      { id: "search", label: "Search cars", href: routes.search },
-      { id: "saved-cars", label: "Your cars", href: routes.savedCars },
     ],
   },
   {
@@ -35,31 +33,20 @@ export const primaryNavigation: NavigationGroup[] = [
       {
         id: "eligibility",
         label: "Check my eligibility",
-        href: routes.eligibility,
+        href: routes.eligibilityQuestions,
       },
       {
-        id: "deal",
-        label: "Build my deal",
-        href: routes.deal,
-      },
-      {
-        id: "reserve",
-        label: "Reserve a car",
-        href: routes.reserve,
-      },
-      {
-        id: "finance-calculator",
-        label: "Calculator",
-        href: routes.financeCalculator,
+        id: "finance-hub",
+        label: "Finance",
+        href: routes.finance,
       },
     ],
   },
   {
     id: "sell",
     label: "Sell",
-    href: routes.sellMyCar,
+    href: routes.partExchange,
     children: [
-      { id: "sell-my-car", label: "Sell my car", href: routes.sellMyCar },
       { id: "part-exchange", label: "Part exchange", href: routes.partExchange },
       { id: "valuation", label: "Valuation", href: routes.valuation },
     ],
@@ -70,13 +57,23 @@ export const primaryNavigation: NavigationGroup[] = [
     href: routes.aftersales,
     children: [
       { id: "booking", label: "Book a service", href: routes.booking },
-      { id: "service", label: "Service", href: routes.service },
-      { id: "mot", label: "MOT", href: routes.mot },
       { id: "warranty", label: "Warranty", href: routes.warranty },
+      { id: "service", label: "Servicing", href: routes.service },
+      { id: "mot", label: "MOT", href: routes.mot },
       {
         id: "warranty-claims",
         label: "Warranty claims",
         href: routes.warrantyClaims,
+      },
+      {
+        id: "diagnosis",
+        label: "Book a 60-minute diagnosis",
+        href: getBookingUrl({ type: "service" }),
+      },
+      {
+        id: "complaints",
+        label: "Make a complaint",
+        href: `${routes.complaints}#complaint-form`,
       },
     ],
   },
@@ -86,11 +83,13 @@ export const primaryNavigation: NavigationGroup[] = [
     href: routes.about,
     children: [
       { id: "about", label: "About us", href: routes.about },
-      { id: "how-it-works", label: "How it works", href: routes.howItWorks },
-      { id: "bury", label: "Bury", href: `${routes.locations}/bury` },
-      { id: "chorley", label: "Chorley", href: `${routes.locations}/chorley` },
       { id: "contact", label: "Contact", href: routes.contact },
-      { id: "faq", label: "FAQs", href: routes.faq },
+      {
+        id: "how-finance-works",
+        label: "How finance works",
+        href: routes.howItWorks,
+      },
+      { id: "visit-us", label: "Visit us", href: routes.locations },
     ],
   },
 ];

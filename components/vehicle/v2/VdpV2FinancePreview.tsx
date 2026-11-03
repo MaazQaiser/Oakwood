@@ -128,15 +128,15 @@ export function VdpV2FinancePreview() {
           </span>
         </p>
 
-        <div className="mt-4 grid grid-cols-3 gap-y-2">
+        <div className="mt-4 grid grid-cols-3 gap-y-2 md:gap-x-1">
           <p className="flex min-h-9 min-w-0 items-end pr-2 text-[12px] leading-[17px] text-[#68778B]">
             Deposit
           </p>
-          <p className="flex min-h-9 min-w-0 items-end border-l border-[#DCE4ED] px-3 text-[12px] leading-[17px] text-[#68778B]">
+          <p className="flex min-h-9 min-w-0 items-end border-l border-[#DCE4ED] px-2 text-[12px] leading-[17px] text-[#68778B] sm:px-3">
             Term
           </p>
           <p
-            className="flex min-h-9 min-w-0 items-end border-l border-[#DCE4ED] pl-3 text-[12px] leading-[17px] text-[#68778B]"
+            className="flex min-h-9 min-w-0 items-end border-l border-[#DCE4ED] pl-2 text-[12px] leading-[17px] text-[#68778B] sm:pl-3"
             title="Representative APR"
           >
             Rep. APR
@@ -144,10 +144,10 @@ export function VdpV2FinancePreview() {
           <p className="min-w-0 pr-2 text-[14px] font-semibold leading-[20px] whitespace-nowrap text-[#102747]">
             {formatPounds(deposit + extraDeposit)}
           </p>
-          <p className="min-w-0 border-l border-[#DCE4ED] px-3 text-[14px] font-semibold leading-[20px] whitespace-nowrap text-[#102747]">
+          <p className="min-w-0 border-l border-[#DCE4ED] px-2 text-[14px] font-semibold leading-[20px] whitespace-nowrap text-[#102747] sm:px-3">
             {formatTerm(term)}
           </p>
-          <p className="min-w-0 border-l border-[#DCE4ED] pl-3 text-[14px] font-semibold leading-[20px] text-[#102747]">
+          <p className="min-w-0 border-l border-[#DCE4ED] pl-2 text-[14px] font-semibold leading-[20px] text-[#102747] sm:pl-3">
             {aprLabel ? (
               <span className="whitespace-nowrap">{aprLabel}</span>
             ) : (

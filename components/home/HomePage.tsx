@@ -11,7 +11,7 @@ import { FinalFinanceCTA } from "@/components/home/FinalFinanceCTA";
 
 export function HomePage() {
   return (
-    <div className="max-lg:[--oak-page-x:1.5rem]">
+    <div className="max-md:[--oak-page-x:1.5rem] md:max-lg:[--oak-page-x:2rem]">
       <HomeHero />
       <BrandMakesRow />
       <BrowseByNeed />

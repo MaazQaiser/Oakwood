@@ -14,6 +14,49 @@ html[data-vdp-v2="true"] footer.mt-auto {
   html[data-vdp-v2="true"] footer.mt-auto .grid.grid-cols-2.gap-x-8 {
     display: none;
   }
+
+  .vdp-v2 .vdp-v2-gallery .vdp-v2-thumb-row {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .vdp-v2 .vdp-v2-gallery .vdp-v2-thumb-row button {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .vdp-v2 .vdp-v2-mobile-stack {
+    gap: 1.5rem;
+  }
+
+  .vdp-v2__section {
+    margin-top: 32px;
+  }
+
+  .vdp-v2__card,
+  .vdp-v2__surface-blue {
+    padding: 20px;
+  }
+
+  .vdp-v2 .vdp-v2-gallery [data-vdp-v2-main-image] {
+    border-radius: 14px;
+  }
+
+  .vdp-v2 .vdp-v2-gallery .vdp-v2-thumb-row button {
+    height: 56px;
+    width: 76px;
+  }
+
+  .vdp-v2 .vdp-v2-accordion-wrap details summary {
+    min-height: 56px;
+    font-size: 15px;
+  }
 }
 
 .vdp-v2 {

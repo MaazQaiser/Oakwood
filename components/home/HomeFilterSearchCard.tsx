@@ -2,20 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Select } from "@/components/forms/FormControls";
 import { MONTHLY_OPTIONS, PRICE_OPTIONS } from "@/components/search/constants";
 import { Button } from "@/components/ui/Button";
 import { IconSearch } from "@/components/ui/icons";
-import { getSearchUrl, routes } from "@/config/routes";
+import { getSearchUrl } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import {
-  HOME_HERO_CHIP_AUTOMATIC,
-  HOME_HERO_CHIP_SEVEN,
-  HOME_HERO_CHIP_SUV,
-  HOME_HERO_CHIP_UNDER_10K,
   HOME_HERO_FILTER_HEADING,
   HOME_HERO_FILTER_MAX_MONTHLY,
   HOME_HERO_FILTER_MAX_PRICE,
@@ -24,7 +19,6 @@ import {
   HOME_HERO_FILTER_SEARCH,
   HOME_HERO_FILTER_SELECT_MAKE,
   HOME_HERO_FILTER_SELECT_MODEL,
-  HOME_HERO_PX_QUOTE,
 } from "@/lib/home/copy";
 import { getMakes, getModels } from "@/lib/vehicles/labels";
 import { listVehicles } from "@/lib/vehicles/query";
@@ -35,7 +29,13 @@ type PriceMode = "monthly" | "total";
 
 const fieldClass = "min-h-10! w-full rounded-[12px]! px-3 text-[0.8125rem]!";
 
-export function HomeFilterSearchCard({ className }: { className?: string }) {
+export function HomeFilterSearchCard({
+  className,
+  hideHeading = false,
+}: {
+  className?: string;
+  hideHeading?: boolean;
+}) {
   const router = useRouter();
   const [mode, setMode] = useState<PriceMode>("monthly");
   const [queryText, setQueryText] = useState("");
@@ -43,36 +43,19 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
   const [monthlyMax, setMonthlyMax] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
-  const [bodyStyle, setBodyStyle] = useState("");
-  const [transmission, setTransmission] = useState("");
-  const [seats, setSeats] = useState("");
 
   const makes = getMakes("car");
   const models = make ? getModels(make, "car") : [];
-  const under10k = maxPrice === "10000";
 
   const query = useMemo((): SearchQuery => {
     const next: SearchQuery = {};
     if (queryText.trim()) next.q = queryText.trim();
     if (make) next.make = make;
     if (model) next.model = model;
-    if (bodyStyle) next.body_style = bodyStyle;
-    if (transmission) next.transmission = transmission;
-    if (seats) next.seats = seats;
     if (mode === "total" && maxPrice) next.max_price = maxPrice;
     if (mode === "monthly" && monthlyMax) next.monthly_max = monthlyMax;
     return next;
-  }, [
-    queryText,
-    make,
-    model,
-    bodyStyle,
-    transmission,
-    seats,
-    mode,
-    maxPrice,
-    monthlyMax,
-  ]);
+  }, [queryText, make, model, mode, maxPrice, monthlyMax]);
 
   const matchCount = useMemo(
     () => filterVehicles(listVehicles("car"), query).length,
@@ -97,12 +80,14 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
         className,
       )}
     >
-      <h1 className="text-[1.65rem] font-semibold tracking-[-0.03em] text-ink">
-        {HOME_HERO_FILTER_HEADING}
-      </h1>
+      {hideHeading ? null : (
+        <h1 className="text-[1.65rem] font-semibold tracking-[-0.03em] text-ink">
+          {HOME_HERO_FILTER_HEADING}
+        </h1>
+      )}
 
       <form
-        className="mt-5 flex flex-col gap-3"
+        className={cn("flex flex-col gap-3", hideHeading ? "mt-0" : "mt-5")}
         onSubmit={(event) => {
           event.preventDefault();
           submitSearch();
@@ -140,54 +125,7 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
           </div>
         </fieldset>
 
-        <label htmlFor="home-filter-search" className="sr-only">
-          {HOME_HERO_FILTER_SEARCH}
-        </label>
-        <div className={cn(fieldClass, "flex items-center gap-2 border border-border-input bg-surface")}>
-          <IconSearch className="shrink-0 text-subtle" width={16} height={16} />
-          <input
-            id="home-filter-search"
-            value={queryText}
-            onChange={(event) => setQueryText(event.target.value)}
-            placeholder={HOME_HERO_FILTER_SEARCH}
-            autoComplete="off"
-            className="h-9 w-full border-0 bg-transparent text-[0.8125rem] outline-none placeholder:text-subtle"
-          />
-        </div>
-
-        <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Chip
-            label={HOME_HERO_CHIP_UNDER_10K}
-            pressed={under10k}
-            onClick={() => {
-              if (under10k) {
-                setMaxPrice("");
-                return;
-              }
-              setMode("total");
-              setMaxPrice("10000");
-            }}
-          />
-          <Chip
-            label={HOME_HERO_CHIP_SUV}
-            pressed={bodyStyle === "SUV"}
-            onClick={() => setBodyStyle(bodyStyle === "SUV" ? "" : "SUV")}
-          />
-          <Chip
-            label={HOME_HERO_CHIP_AUTOMATIC}
-            pressed={transmission === "Automatic"}
-            onClick={() =>
-              setTransmission(transmission === "Automatic" ? "" : "Automatic")
-            }
-          />
-          <Chip
-            label={HOME_HERO_CHIP_SEVEN}
-            pressed={seats === "7"}
-            onClick={() => setSeats(seats === "7" ? "" : "7")}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <div className="min-w-0">
             <label htmlFor="home-filter-budget" className="sr-only">
               {mode === "monthly"
@@ -207,15 +145,13 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
               }}
             >
               <option value="">
-                {mode === "monthly"
-                  ? HOME_HERO_FILTER_MAX_MONTHLY
-                  : HOME_HERO_FILTER_MAX_PRICE}
+                {mode === "monthly" ? "Budget" : "Max price"}
               </option>
               {(mode === "monthly" ? MONTHLY_OPTIONS : PRICE_OPTIONS).map(
                 (amount) => (
                   <option key={amount} value={amount}>
                     {mode === "monthly"
-                      ? `${formatPounds(amount)} a month`
+                      ? `${formatPounds(amount)}/mo`
                       : formatPounds(amount)}
                   </option>
                 ),
@@ -235,8 +171,30 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
                 setModel("");
               }}
             >
-              <option value="">{HOME_HERO_FILTER_SELECT_MAKE}</option>
+              <option value="">Make</option>
               {makes.map((item) => (
+                <option key={item.slug} value={item.slug}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="min-w-0">
+            <label htmlFor="home-filter-model" className="sr-only">
+              {HOME_HERO_FILTER_SELECT_MODEL}
+            </label>
+            <Select
+              id="home-filter-model"
+              className={cn(
+                fieldClass,
+                "disabled:bg-page-tint! disabled:text-muted",
+              )}
+              value={model}
+              disabled={!make}
+              onChange={(event) => setModel(event.target.value)}
+            >
+              <option value="">Model</option>
+              {models.map((item) => (
                 <option key={item.slug} value={item.slug}>
                   {item.name}
                 </option>
@@ -245,66 +203,25 @@ export function HomeFilterSearchCard({ className }: { className?: string }) {
           </div>
         </div>
 
-        <label htmlFor="home-filter-model" className="sr-only">
-          {HOME_HERO_FILTER_SELECT_MODEL}
+        <label htmlFor="home-filter-search" className="sr-only">
+          {HOME_HERO_FILTER_SEARCH}
         </label>
-        <Select
-          id="home-filter-model"
-          className={cn(
-            fieldClass,
-            "disabled:bg-page-tint! disabled:text-muted",
-          )}
-          value={model}
-          disabled={!make}
-          onChange={(event) => setModel(event.target.value)}
-        >
-          <option value="">{HOME_HERO_FILTER_SELECT_MODEL}</option>
-          {models.map((item) => (
-            <option key={item.slug} value={item.slug}>
-              {item.name}
-            </option>
-          ))}
-        </Select>
+        <div className={cn(fieldClass, "flex items-center gap-2 border border-border-input bg-surface")}>
+          <IconSearch className="shrink-0 text-subtle" width={16} height={16} />
+          <input
+            id="home-filter-search"
+            value={queryText}
+            onChange={(event) => setQueryText(event.target.value)}
+            placeholder={HOME_HERO_FILTER_SEARCH}
+            autoComplete="off"
+            className="h-9 w-full border-0 bg-transparent text-[0.8125rem] outline-none placeholder:text-subtle"
+          />
+        </div>
 
         <Button type="submit" className="btn-compact w-full tabular-nums">
           Search {formatNumber(matchCount)} cars
         </Button>
       </form>
-
-      <div className="mt-6 border-t border-border pt-5 text-center">
-        <Link
-          href={routes.partExchange}
-          className="text-sm font-semibold text-primary-secondary no-underline hover:underline"
-        >
-          {HOME_HERO_PX_QUOTE}
-        </Link>
-      </div>
     </div>
-  );
-}
-
-function Chip({
-  label,
-  pressed,
-  onClick,
-}: {
-  label: string;
-  pressed: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        "shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold whitespace-nowrap",
-        pressed
-          ? "border-primary bg-primary text-white"
-          : "border-border-input bg-white text-ink",
-      )}
-      aria-pressed={pressed}
-      onClick={onClick}
-    >
-      {label}
-    </button>
   );
 }

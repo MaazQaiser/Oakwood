@@ -3,13 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { HomeFilterSearchCard } from "@/components/home/HomeFilterSearchCard";
+import { FinanceEligibilityCard } from "@/components/home/FinanceEligibilityCard";
 import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
 import { HomeProofStrip } from "@/components/home/HomeProofStrip";
 import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { HomeSearchCard } from "@/components/home/HomeSearchCard";
-import { HeroVariantToggle } from "@/components/home/HeroVariantToggle";
-import { useHomeHeroVariant } from "@/components/home/useHomeHeroVariant";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
 import {
@@ -20,21 +18,17 @@ import {
 } from "@/lib/home/copy";
 
 export function HomeHero() {
-  const { variant, changeVariant } = useHomeHeroVariant();
-
   return (
     <>
-      {variant === "filters" ? <FilterHero /> : <CurrentHero />}
+      <CurrentHero />
       <Container className="flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
-        <HeroVariantToggle variant={variant} onChange={changeVariant} />
         <HomeProofStrip />
-        {variant === "current" ? (
-          <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[#ECF3F8] py-10 sm:py-12 lg:py-14">
-            <div className="mx-auto w-full max-w-[var(--oak-width-content)] px-10 sm:px-12 lg:px-16">
-              <HomeSearchCard />
-            </div>
+        <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[#ECF3F8] py-10 sm:py-12 lg:py-14">
+          <div className="mx-auto w-full max-w-[var(--oak-width-content)] px-10 sm:px-12 lg:px-16">
+            <HomeSearchCard />
           </div>
-        ) : null}
+        </div>
+        <FinanceEligibilityCard />
         <HomeFinanceStrip />
       </Container>
     </>
@@ -55,7 +49,7 @@ function CurrentHero() {
           className="object-cover object-[34%_center] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)]"
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col pb-8 lg:flex-1 lg:justify-center lg:px-[var(--oak-page-x)] lg:pb-0 [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
+      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col pb-8 lg:flex-1 lg:justify-center lg:px-[var(--oak-page-x)] lg:pb-0">
         <div className="flex w-full max-w-xl flex-col">
           <div className="max-w-md">
             <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
@@ -79,28 +73,6 @@ function CurrentHero() {
             </p>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function FilterHero() {
-  return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] flex flex-col overflow-hidden bg-[#ECF3F8] px-5 pt-[calc(var(--oak-header-height)+1.5rem)] sm:px-6 lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:min-h-[calc(100dvh-9rem)] lg:rounded-[32px] lg:px-0 lg:pb-10">
-      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
-        <Image
-          src="/images/hero/open-sky.png"
-          alt="A smiling customer giving a thumbs up beside a car under an open sky"
-          fill
-          priority
-          quality={92}
-          sizes="78vw"
-          className="object-cover object-[34%_center] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)]"
-        />
-      </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col py-4 lg:flex-1 lg:justify-center lg:px-[var(--oak-page-x)] [@media(max-height:560px)]:max-lg:ml-0 [@media(max-height:560px)]:max-lg:mr-auto [@media(max-height:560px)]:max-lg:w-[54%] [@media(max-height:560px)]:max-lg:max-w-[54%] [@media(max-height:560px)]:max-lg:pb-6">
-        <HeroCompactPhoto className="-mx-5 mt-2 lg:hidden" />
-        <HomeFilterSearchCard className="mt-4 lg:mt-0" />
       </div>
     </section>
   );
