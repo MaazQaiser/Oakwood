@@ -156,7 +156,7 @@ export function SupportContactPage({
       <Related
         heading="Related"
         links={[
-          { href: routes.faq, label: "FAQs" },
+          { href: routes.help, label: "Help and support" },
           { href: routes.locations, label: "Locations" },
           { href: routes.aftersales, label: "Aftersales" },
           { href: routes.finance, label: "Car finance" },
@@ -181,7 +181,7 @@ export function SupportFaqPage() {
     <PageShell
       breadcrumbs={createBreadcrumbs([
         { label: "Home", href: routes.home },
-        { label: "FAQs", href: routes.faq },
+        { label: "Help and support", href: routes.help },
       ])}
     >
       <JsonLd data={createFaqJsonLd(faqs)} />
@@ -250,7 +250,7 @@ export function SupportComplaintsPage({
       </Section>
       <Section>
         <Container>
-          <div className="max-w-xl scroll-mb-32">
+          <div className="mx-auto max-w-xl scroll-mb-32">
             <ComplaintForm telephone={telephone} />
           </div>
         </Container>

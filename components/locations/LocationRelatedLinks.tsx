@@ -10,7 +10,7 @@ const LINKS = [
   { href: trustRoutes.ourOnlineReviews, label: "Reviews" },
   { href: trustRoutes.howItWorks, label: "How it works" },
   { href: routes.contact, label: "Contact" },
-  { href: routes.faq, label: "FAQs" },
+  { href: routes.help, label: "Help and support" },
 ];
 
 export function LocationRelatedLinks({ current }: { current?: string }) {

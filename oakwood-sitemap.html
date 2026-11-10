@@ -145,6 +145,57 @@
       font-size: 0.8rem;
       color: var(--muted);
     }
+    a.page-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+    a.page-link:hover {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .tree-root a.node-home {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+    }
+    .tree-root a.node-home:hover {
+      background: var(--blue);
+    }
+    .branch h3 a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .branch h3 a:hover { text-decoration: underline; }
+    .menu-col a.page-link,
+    .footer-grid a.page-link,
+    .side-note a.page-link {
+      color: var(--blue);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+    .menu-col a.page-link:hover,
+    .footer-grid a.page-link:hover,
+    .side-note a.page-link:hover {
+      border-bottom-color: var(--blue);
+    }
+    a.pill {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+    }
+    a.pill:hover { filter: brightness(1.08); }
+    .preview-base {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .preview-base:hover { background: rgba(255,255,255,0.25); }
 
     /* Menu */
     .menu-grid {
@@ -352,96 +403,99 @@
     <header class="title">
       <h1>Site map</h1>
       <p>Oakwood Motor Company website &middot; pages and customer journeys as currently built</p>
+      <a class="preview-base" href="https://oakwood-rho.vercel.app/" target="_blank" rel="noopener noreferrer">Preview: oakwood-rho.vercel.app</a>
     </header>
 
-    <p class="print-hint">To save as PDF: File &rarr; Print &rarr; Save as PDF (landscape is set automatically).</p>
+    <p class="print-hint">Click any page name to open it on the Vercel preview. To save as PDF: File &rarr; Print &rarr; Save as PDF (landscape is set automatically).</p>
 
     <!-- 1. Site map -->
     <section>
       <h2><span class="num">1</span> Website structure</h2>
-      <p class="lede">Every main page on the site, grouped by what the customer is trying to do.</p>
+      <p class="lede">Every main page on the site, grouped by what the customer is trying to do. Each name opens the live preview.</p>
 
       <div class="panel">
-        <div class="tree-root"><div class="node-home">Home</div></div>
+        <div class="tree-root"><a class="node-home" href="https://oakwood-rho.vercel.app/" target="_blank" rel="noopener noreferrer">Home</a></div>
         <div class="tree-branches">
           <div class="branch">
-            <h3>Find a car</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/used-cars" target="_blank" rel="noopener noreferrer">Find a car</a></h3>
             <ul>
-              <li>Used cars</li>
-              <li class="sub">By make</li>
-              <li class="sub">By model</li>
-              <li class="sub">By showroom</li>
-              <li>Used vans</li>
-              <li>Search</li>
-              <li>Car details page</li>
-              <li>Saved cars</li>
-              <li>Compare cars</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/used-cars" target="_blank" rel="noopener noreferrer">Used cars</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/used-cars/mercedes-benz" target="_blank" rel="noopener noreferrer">By make</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/used-cars/mercedes-benz/c-class" target="_blank" rel="noopener noreferrer">By model</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/used-cars/location/bury" target="_blank" rel="noopener noreferrer">By showroom</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/used-vans" target="_blank" rel="noopener noreferrer">Used vans</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/search" target="_blank" rel="noopener noreferrer">Search</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/used-mercedes-benz-c-class-bury-greater-manchester-7848117" target="_blank" rel="noopener noreferrer">Car details page</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/saved-cars" target="_blank" rel="noopener noreferrer">Saved cars</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/compare.php" target="_blank" rel="noopener noreferrer">Compare cars</a></li>
             </ul>
           </div>
           <div class="branch">
-            <h3>Finance</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Finance</a></h3>
             <ul>
-              <li>Car finance</li>
-              <li>Finance calculator</li>
-              <li>Check my eligibility</li>
-              <li>Finance guides</li>
-              <li class="sub">HP and PCP</li>
-              <li class="sub">Bad credit, CCJ</li>
-              <li class="sub">No deposit</li>
-              <li class="sub">Self-employed</li>
-              <li class="sub">First-time buyer</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Car finance</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/calculator" target="_blank" rel="noopener noreferrer">Finance calculator</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance-eligibility" target="_blank" rel="noopener noreferrer">Check my eligibility</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Finance guides</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/hp" target="_blank" rel="noopener noreferrer">How HP works</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/pcp" target="_blank" rel="noopener noreferrer">How PCP works</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/bad-credit" target="_blank" rel="noopener noreferrer">Bad credit</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/ccj" target="_blank" rel="noopener noreferrer">CCJ</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/no-deposit" target="_blank" rel="noopener noreferrer">No deposit</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/self-employed" target="_blank" rel="noopener noreferrer">Self-employed</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/first-time-buyer" target="_blank" rel="noopener noreferrer">First-time buyer</a></li>
             </ul>
           </div>
           <div class="branch">
-            <h3>Buy online</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/deal" target="_blank" rel="noopener noreferrer">Buy online</a></h3>
             <ul>
-              <li>Deal builder</li>
-              <li>Finance application</li>
-              <li>Reserve a car</li>
-              <li>Manage reservation</li>
-              <li>Saved deal (resume)</li>
-              <li>Shared deal</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/deal" target="_blank" rel="noopener noreferrer">Deal builder</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance-eligibility" target="_blank" rel="noopener noreferrer">Finance application</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/reserve" target="_blank" rel="noopener noreferrer">Reserve a car</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/reserve/7848117/manage" target="_blank" rel="noopener noreferrer">Manage reservation</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/deal/resume" target="_blank" rel="noopener noreferrer">Saved deal (resume)</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/deal/resume" target="_blank" rel="noopener noreferrer">Shared deal</a></li>
             </ul>
           </div>
           <div class="branch">
-            <h3>Sell</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/sell-my-car" target="_blank" rel="noopener noreferrer">Sell</a></h3>
             <ul>
-              <li>Sell my car</li>
-              <li>Part exchange</li>
-              <li>Valuation</li>
-              <li class="sub">Valuation result</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/sell-my-car" target="_blank" rel="noopener noreferrer">Sell my car</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/partex.php" target="_blank" rel="noopener noreferrer">Part exchange</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/valuation" target="_blank" rel="noopener noreferrer">Valuation</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/valuation/result" target="_blank" rel="noopener noreferrer">Valuation result</a></li>
             </ul>
           </div>
           <div class="branch">
-            <h3>Aftersales</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/aftersales" target="_blank" rel="noopener noreferrer">Aftersales</a></h3>
             <ul>
-              <li>Aftersales overview</li>
-              <li>Servicing</li>
-              <li>Manufacturer servicing</li>
-              <li>MOT</li>
-              <li>Book a service or MOT</li>
-              <li>Warranty</li>
-              <li>Warranty claims</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/aftersales" target="_blank" rel="noopener noreferrer">Aftersales overview</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/service" target="_blank" rel="noopener noreferrer">Servicing</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/servicing-audi.php" target="_blank" rel="noopener noreferrer">Manufacturer servicing</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/mot" target="_blank" rel="noopener noreferrer">MOT</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/booking" target="_blank" rel="noopener noreferrer">Book a service or MOT</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/warranty" target="_blank" rel="noopener noreferrer">Warranty</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/warranty-claims" target="_blank" rel="noopener noreferrer">Warranty claims</a></li>
             </ul>
           </div>
           <div class="branch">
-            <h3>About Oakwood</h3>
+            <h3><a href="https://oakwood-rho.vercel.app/about.php" target="_blank" rel="noopener noreferrer">About Oakwood</a></h3>
             <ul>
-              <li>About us</li>
-              <li>How it works</li>
-              <li>What to expect</li>
-              <li>Our garage</li>
-              <li>Reviews</li>
-              <li>AA standards</li>
-              <li>Delivery and collection</li>
-              <li>Showrooms</li>
-              <li class="sub">Bury</li>
-              <li class="sub">Chorley</li>
-              <li>Contact</li>
-              <li>FAQs</li>
-              <li>Complaints</li>
-              <li>Blog</li>
-              <li>Legal pages</li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/about.php" target="_blank" rel="noopener noreferrer">About us</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/how-it-works" target="_blank" rel="noopener noreferrer">How it works</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/what-to-expect" target="_blank" rel="noopener noreferrer">What to expect</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/our-garage.php" target="_blank" rel="noopener noreferrer">Our garage</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/our-online-reviews.php" target="_blank" rel="noopener noreferrer">Reviews</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/aa-standards.php" target="_blank" rel="noopener noreferrer">AA standards</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/delivery-and-collection" target="_blank" rel="noopener noreferrer">Delivery and collection</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/locations" target="_blank" rel="noopener noreferrer">Showrooms</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/locations/bury" target="_blank" rel="noopener noreferrer">Bury</a></li>
+              <li class="sub"><a class="page-link" href="https://oakwood-rho.vercel.app/locations/chorley" target="_blank" rel="noopener noreferrer">Chorley</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/contact" target="_blank" rel="noopener noreferrer">Contact</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/faq" target="_blank" rel="noopener noreferrer">FAQs</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/complaints" target="_blank" rel="noopener noreferrer">Complaints</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/blog" target="_blank" rel="noopener noreferrer">Blog</a></li>
+              <li><a class="page-link" href="https://oakwood-rho.vercel.app/legal" target="_blank" rel="noopener noreferrer">Legal pages</a></li>
             </ul>
           </div>
         </div>
@@ -625,41 +679,57 @@
             <h3>Cars</h3>
             <div class="group">
               <div class="group-label">Browse by budget</div>
-              <ul><li>Cars under £200</li><li>Cars under £300</li><li>Cars under £400</li><li>Cars under £500</li><li>Cars over £500</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_max=200" target="_blank" rel="noopener noreferrer">Cars under £200</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_max=300" target="_blank" rel="noopener noreferrer">Cars under £300</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_max=400" target="_blank" rel="noopener noreferrer">Cars under £400</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_max=500" target="_blank" rel="noopener noreferrer">Cars under £500</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_min=500" target="_blank" rel="noopener noreferrer">Cars over £500</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Highlighted</div>
-              <ul><li>Used cars</li><li>Used vans</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/used-cars" target="_blank" rel="noopener noreferrer">Used cars</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/used-vans" target="_blank" rel="noopener noreferrer">Used vans</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Questions (flagged)</div>
-              <ul><li>How does buying work?</li><li>Can I reserve online?</li><li>Where can I view a car?</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/how-it-works" target="_blank" rel="noopener noreferrer">How does buying work?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/reserve" target="_blank" rel="noopener noreferrer">Can I reserve online?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/locations" target="_blank" rel="noopener noreferrer">Where can I view a car?</a></li>
+              </ul>
             </div>
           </div>
           <div class="menu-col">
             <h3>Finance</h3>
             <div class="group">
               <div class="group-label">Browse by budget</div>
-              <ul><li>Same budget links as Cars</li></ul>
+              <ul><li><a class="page-link" href="https://oakwood-rho.vercel.app/search?monthly_max=300" target="_blank" rel="noopener noreferrer">Same budget links as Cars</a></li></ul>
             </div>
             <div class="group">
               <div class="group-label">Highlighted</div>
-              <ul><li>Check eligibility (first — goes to the form)</li><li>Finance</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance-eligibility" target="_blank" rel="noopener noreferrer">Check eligibility</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Finance</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Questions</div>
-              <ul><li>Removed — already on the Finance page</li></ul>
+              <ul><li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Removed — already on the Finance page</a></li></ul>
             </div>
           </div>
           <div class="menu-col">
             <h3>Sell</h3>
             <div class="group">
               <div class="group-label">Your car</div>
-              <ul><li>Get a valuation</li></ul>
+              <ul><li><a class="page-link" href="https://oakwood-rho.vercel.app/valuation" target="_blank" rel="noopener noreferrer">Get a valuation</a></li></ul>
             </div>
             <div class="group">
               <div class="group-label">Main CTA</div>
-              <ul><li>Part exchange (large box)</li></ul>
+              <ul><li><a class="page-link" href="https://oakwood-rho.vercel.app/partex.php" target="_blank" rel="noopener noreferrer">Part exchange</a></li></ul>
             </div>
             <div class="group">
               <div class="group-label">Questions</div>
@@ -670,38 +740,62 @@
             <h3>Aftersales</h3>
             <div class="group">
               <div class="group-label">Car care</div>
-              <ul><li>Servicing</li><li>MOT</li><li>Warranty claims</li><li>Book a 60-minute diagnosis</li><li>Make a complaint</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/service" target="_blank" rel="noopener noreferrer">Servicing</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/mot" target="_blank" rel="noopener noreferrer">MOT</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/warranty-claims" target="_blank" rel="noopener noreferrer">Warranty claims</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/booking" target="_blank" rel="noopener noreferrer">Book a 60-minute diagnosis</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/complaints" target="_blank" rel="noopener noreferrer">Make a complaint</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Highlighted</div>
-              <ul><li>Book a service</li><li>Warranty</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/booking" target="_blank" rel="noopener noreferrer">Book a service</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/warranty" target="_blank" rel="noopener noreferrer">Warranty</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Questions</div>
-              <ul><li>When is my MOT due?</li><li>How do I book?</li><li>How do I claim?</li><li>How do I get a refund?</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/mot" target="_blank" rel="noopener noreferrer">When is my MOT due?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/booking" target="_blank" rel="noopener noreferrer">How do I book?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/warranty-claims" target="_blank" rel="noopener noreferrer">How do I claim?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/legal/cancellation-refund" target="_blank" rel="noopener noreferrer">How do I get a refund?</a></li>
+              </ul>
             </div>
           </div>
           <div class="menu-col">
             <h3>About</h3>
             <div class="group">
               <div class="group-label">Oakwood</div>
-              <ul><li>About us →</li><li>Contact →</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/about.php" target="_blank" rel="noopener noreferrer">About us →</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/contact" target="_blank" rel="noopener noreferrer">Contact →</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Highlighted</div>
-              <ul><li>How finance works</li><li>Visit us</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">How finance works</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/locations" target="_blank" rel="noopener noreferrer">Visit us</a></li>
+              </ul>
             </div>
             <div class="group">
               <div class="group-label">Questions</div>
-              <ul><li>Do I need an account?</li><li>How do I contact you?</li><li>How do I complain?</li></ul>
+              <ul>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/faq" target="_blank" rel="noopener noreferrer">Do I need an account?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/contact" target="_blank" rel="noopener noreferrer">How do I contact you?</a></li>
+                <li><a class="page-link" href="https://oakwood-rho.vercel.app/complaints" target="_blank" rel="noopener noreferrer">How do I complain?</a></li>
+              </ul>
             </div>
           </div>
         </div>
 
         <div class="buttons-row">
           <strong>Always-visible buttons:</strong>
-          <span class="pill">Find Your Car</span>
-          <span class="pill">Check my eligibility</span>
+          <a class="pill" href="https://oakwood-rho.vercel.app/search" target="_blank" rel="noopener noreferrer">Find Your Car</a>
+          <a class="pill" href="https://oakwood-rho.vercel.app/finance-eligibility" target="_blank" rel="noopener noreferrer">Check my eligibility</a>
         </div>
       </div>
     </section>
@@ -828,12 +922,78 @@
       <h2><span class="num">5</span> Footer (bottom of every page)</h2>
       <p class="lede">The footer carries the longer list of links, including pages that are not in the main menu.</p>
       <div class="footer-grid">
-        <div><h4>Cars</h4><p>Used cars, Used vans, Search, Saved cars, Compare cars</p></div>
-        <div><h4>Finance</h4><p>Car finance, Eligibility, Build my deal, Reserve, Calculator, HP vs PCP, Bad credit, No deposit, CCJ, Self-employed, First-time buyer</p></div>
-        <div><h4>Sell and Aftersales</h4><p>Sell my car, Part exchange, Valuation, Servicing, Manufacturer servicing, MOT, Warranty, Warranty claims, Book a service</p></div>
-        <div><h4>Oakwood</h4><p>About, How it works, What to expect, Our garage, Reviews, AA standards, Delivery, Bury, Chorley, Contact, FAQs, Complaints, Blog</p></div>
+        <div>
+          <h4>Cars</h4>
+          <p>
+            <a class="page-link" href="https://oakwood-rho.vercel.app/used-cars" target="_blank" rel="noopener noreferrer">Used cars</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/used-vans" target="_blank" rel="noopener noreferrer">Used vans</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/search" target="_blank" rel="noopener noreferrer">Search</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/saved-cars" target="_blank" rel="noopener noreferrer">Saved cars</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/compare.php" target="_blank" rel="noopener noreferrer">Compare cars</a>
+          </p>
+        </div>
+        <div>
+          <h4>Finance</h4>
+          <p>
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php" target="_blank" rel="noopener noreferrer">Car finance</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance-eligibility" target="_blank" rel="noopener noreferrer">Eligibility</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/deal" target="_blank" rel="noopener noreferrer">Build my deal</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/reserve" target="_blank" rel="noopener noreferrer">Reserve</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/calculator" target="_blank" rel="noopener noreferrer">Calculator</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/pcp" target="_blank" rel="noopener noreferrer">HP vs PCP</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/bad-credit" target="_blank" rel="noopener noreferrer">Bad credit</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/no-deposit" target="_blank" rel="noopener noreferrer">No deposit</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/ccj" target="_blank" rel="noopener noreferrer">CCJ</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/self-employed" target="_blank" rel="noopener noreferrer">Self-employed</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/finance.php/first-time-buyer" target="_blank" rel="noopener noreferrer">First-time buyer</a>
+          </p>
+        </div>
+        <div>
+          <h4>Sell and Aftersales</h4>
+          <p>
+            <a class="page-link" href="https://oakwood-rho.vercel.app/sell-my-car" target="_blank" rel="noopener noreferrer">Sell my car</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/partex.php" target="_blank" rel="noopener noreferrer">Part exchange</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/valuation" target="_blank" rel="noopener noreferrer">Valuation</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/service" target="_blank" rel="noopener noreferrer">Servicing</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/servicing-audi.php" target="_blank" rel="noopener noreferrer">Manufacturer servicing</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/mot" target="_blank" rel="noopener noreferrer">MOT</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/warranty" target="_blank" rel="noopener noreferrer">Warranty</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/warranty-claims" target="_blank" rel="noopener noreferrer">Warranty claims</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/booking" target="_blank" rel="noopener noreferrer">Book a service</a>
+          </p>
+        </div>
+        <div>
+          <h4>Oakwood</h4>
+          <p>
+            <a class="page-link" href="https://oakwood-rho.vercel.app/about.php" target="_blank" rel="noopener noreferrer">About</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/how-it-works" target="_blank" rel="noopener noreferrer">How it works</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/what-to-expect" target="_blank" rel="noopener noreferrer">What to expect</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/our-garage.php" target="_blank" rel="noopener noreferrer">Our garage</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/our-online-reviews.php" target="_blank" rel="noopener noreferrer">Reviews</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/aa-standards.php" target="_blank" rel="noopener noreferrer">AA standards</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/delivery-and-collection" target="_blank" rel="noopener noreferrer">Delivery</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/locations/bury" target="_blank" rel="noopener noreferrer">Bury</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/locations/chorley" target="_blank" rel="noopener noreferrer">Chorley</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/contact" target="_blank" rel="noopener noreferrer">Contact</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/faq" target="_blank" rel="noopener noreferrer">FAQs</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/complaints" target="_blank" rel="noopener noreferrer">Complaints</a>,
+            <a class="page-link" href="https://oakwood-rho.vercel.app/blog" target="_blank" rel="noopener noreferrer">Blog</a>
+          </p>
+        </div>
       </div>
-      <p class="side-note">Legal row: Terms of use, Privacy, Cookies, Purchase terms, Reservation terms, Cancellation and refund, Delivery, Distance selling, Status disclosure, Accessibility, Complaints.</p>
+      <p class="side-note">Legal row:
+        <a class="page-link" href="https://oakwood-rho.vercel.app/terms-of-use.php" target="_blank" rel="noopener noreferrer">Terms of use</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/privacy-policy.php" target="_blank" rel="noopener noreferrer">Privacy</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/cookie-policy.php" target="_blank" rel="noopener noreferrer">Cookies</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/legal/vehicle-purchase" target="_blank" rel="noopener noreferrer">Purchase terms</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/legal/reservation" target="_blank" rel="noopener noreferrer">Reservation terms</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/legal/cancellation-refund" target="_blank" rel="noopener noreferrer">Cancellation and refund</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/legal/delivery" target="_blank" rel="noopener noreferrer">Delivery</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/distance-selling.php" target="_blank" rel="noopener noreferrer">Distance selling</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/status-disclosure.php" target="_blank" rel="noopener noreferrer">Status disclosure</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/accessibility" target="_blank" rel="noopener noreferrer">Accessibility</a>,
+        <a class="page-link" href="https://oakwood-rho.vercel.app/complaints" target="_blank" rel="noopener noreferrer">Complaints</a>.
+      </p>
     </section>
 
     <!-- 6. Note -->

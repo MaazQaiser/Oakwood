@@ -35,6 +35,7 @@ export function EligibilityNavigation({
   backLabel = "Back",
   backHref,
   className,
+  pinned,
 }: {
   onBack?: () => void;
   onContinue?: () => void;
@@ -43,11 +44,13 @@ export function EligibilityNavigation({
   backLabel?: string;
   backHref?: string;
   className?: string;
+  pinned?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "relative z-10 mt-8 bg-page py-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "relative z-10 bg-page py-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        pinned ? "mt-0 border-t border-border" : "mt-8",
         className,
       )}
     >
@@ -81,17 +84,40 @@ export function EligibilityNavigation({
 export function EligibilityLayout({
   children,
   footer,
+  pinFooter = false,
 }: {
   children: ReactNode;
   footer?: ReactNode;
+  pinFooter?: boolean;
 }) {
   return (
     <div className="bg-page">
       <JourneyChrome />
-      <Container width="narrow" className="flex min-h-[calc(100dvh-8rem)] flex-col py-6 pb-[calc(1.5rem+var(--oak-consent-offset,0px))] md:py-10">
-        <div className="mx-auto flex w-full max-w-[32rem] flex-1 flex-col">
-          {children}
-          {footer}
+      <Container
+        width="narrow"
+        className={
+          pinFooter
+            ? "flex h-[calc(100dvh-var(--oak-header-height))] flex-col overflow-hidden py-4 pb-[calc(1rem+var(--oak-consent-offset,0px))] md:py-6"
+            : "flex min-h-[calc(100dvh-8rem)] flex-col py-6 pb-[calc(1.5rem+var(--oak-consent-offset,0px))] md:py-10"
+        }
+      >
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-[32rem] flex-1 flex-col",
+            pinFooter && "min-h-0",
+          )}
+        >
+          {pinFooter ? (
+            <>
+              {children}
+              {footer ? <div className="shrink-0">{footer}</div> : null}
+            </>
+          ) : (
+            <>
+              {children}
+              {footer}
+            </>
+          )}
         </div>
       </Container>
     </div>

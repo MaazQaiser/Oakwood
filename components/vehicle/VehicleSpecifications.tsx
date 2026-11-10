@@ -32,23 +32,28 @@ export function VehicleSpecifications({
       aria-labelledby="key-spec-heading"
       className={cn(
         "vdp-hero__specs min-w-0",
-        embedded ? "pt-2" : "border-t border-border pt-8",
+        embedded ? "pt-2" : "",
       )}
     >
       {embedded ? (
         <h3 id="key-spec-heading" className="sr-only">
-          Key specification
+          At a glance
         </h3>
       ) : (
-        <h2 id="key-spec-heading" className="text-h3">
-          Key specification
+        <h2
+          id="key-spec-heading"
+          className="text-[1.75rem] font-medium leading-[1.15em] tracking-[-0.03em] text-navy sm:text-[2rem]"
+        >
+          At a glance
         </h2>
       )}
-      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3">
+      <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[24px] bg-[#E7EEF4] shadow-[0_10px_24px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4] sm:grid-cols-3">
         {items.map((item) => (
-          <div key={item.label} className="min-w-0">
-            <dt className="text-caption text-muted">{item.label}</dt>
-            <dd className="mt-1 text-body-sm font-medium text-ink">{item.value}</dd>
+          <div key={item.label} className="min-w-0 bg-white px-4 py-4">
+            <dt className="text-[0.72rem] font-semibold tracking-[0.06em] text-muted uppercase">
+              {item.label}
+            </dt>
+            <dd className="mt-1 text-[0.95rem] font-semibold text-[#002852]">{item.value}</dd>
           </div>
         ))}
       </dl>

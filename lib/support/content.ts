@@ -102,8 +102,8 @@ export const supportPathways: SupportPathway[] = [
     body: "Call, send a message, or request a callback.",
   },
   {
-    href: routes.faq,
-    title: "Frequently asked questions",
+    href: routes.help,
+    title: "Help and support",
     body: "Published answers about buying, finance, reservations and aftersales.",
   },
   {

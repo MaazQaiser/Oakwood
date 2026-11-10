@@ -1,13 +1,13 @@
-import { EligibilityQuestionsFlow } from "@/components/eligibility/EligibilityQuestionsFlow";
+import { ApplyFinanceFlow } from "@/components/apply-finance/ApplyFinanceFlow";
 import { routes } from "@/config/routes";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Eligibility questions",
+  title: "Apply for finance",
   path: routes.eligibilityQuestions,
   indexable: false,
 });
 
 export default function Page() {
-  return <EligibilityQuestionsFlow />;
+  return <ApplyFinanceFlow />;
 }

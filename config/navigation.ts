@@ -203,7 +203,7 @@ export const footerNavigation: NavigationGroup[] = [
       { id: "locations-bury", label: "Bury", href: `${routes.locations}/bury` },
       { id: "locations-chorley", label: "Chorley", href: `${routes.locations}/chorley` },
       { id: "contact", label: "Contact", href: routes.contact },
-      { id: "faq", label: "FAQs", href: routes.faq },
+      { id: "faq", label: "Help and support", href: routes.help },
       { id: "complaints", label: "Complaints", href: routes.complaints },
       { id: "blog", label: "Blog", href: routes.blog },
     ],

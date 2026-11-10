@@ -1,17 +1,16 @@
 import { Container, Section } from "@/components/layout/Container";
-import { Button } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
-import { TrustBlock } from "@/components/trust/TrustBlock";
 import { VehicleGallery } from "@/components/vehicle/VehicleGallery";
 import { VehicleHeader } from "@/components/vehicle/VehicleHeader";
-import { VehiclePrice } from "@/components/vehicle/VehiclePrice";
-import { VehicleDealColumn } from "@/components/vehicle/VehicleDealColumn";
+import { VehicleCertBadges } from "@/components/vehicle/VehicleCertBadges";
+import { VehicleDealPanel } from "@/components/vehicle/deal-panel/VehicleDealPanel";
+import { VehicleTalkCards } from "@/components/vehicle/VehicleTalkCards";
+import { VehicleWhatYouGet } from "@/components/vehicle/VehicleWhatYouGet";
 import { VehicleSpecifications } from "@/components/vehicle/VehicleSpecifications";
+import { VehicleAbout } from "@/components/vehicle/VehicleAbout";
+import { VehicleWhyOakwood } from "@/components/vehicle/VehicleWhyOakwood";
 import { VehicleDocumentation } from "@/components/vehicle/VehicleDocumentation";
-import { VehicleVideo } from "@/components/vehicle/VehicleVideo";
 import { VehicleLocation } from "@/components/vehicle/VehicleLocation";
-import { VehicleViewingCard } from "@/components/vehicle/VehicleViewingCard";
-import { VehicleAskPanel } from "@/components/vehicle/VehicleAskPanel";
 import { SimilarVehicles } from "@/components/vehicle/SimilarVehicles";
 import { MobileVehicleActionBar } from "@/components/vehicle/MobileVehicleActionBar";
 import {
@@ -19,11 +18,6 @@ import {
   SoldVehicleNotice,
   UnavailableVehicleNotice,
 } from "@/components/vehicle/ReservationCTA";
-import { getUsedCarsUrl, getEligibilityUrl } from "@/config/routes";
-import { ValuationEntryCard } from "@/components/valuation-entry/ValuationEntryCard";
-import { StartVehicleDealButton } from "@/components/deal/StartDealButton";
-import { DEAL_VDP_CARD_CTA } from "@/lib/deal/copy";
-import { isReservable } from "@/lib/vehicles/sold";
 import type { BreadcrumbItem } from "@/lib/seo";
 import type { Vehicle } from "@/types/vehicle";
 import type { VehicleDetail } from "@/types/vehicle-detail";
@@ -40,8 +34,7 @@ export function VehicleDetailPageV1({
   const sold = vehicle.availability === "sold";
   const reserved = vehicle.availability === "reserved";
   const unavailable = vehicle.availability === "expired";
-  const reservable = isReservable(vehicle);
-  const listingClosed = sold || unavailable;
+  const closed = sold || unavailable;
 
   return (
     <>
@@ -67,98 +60,41 @@ export function VehicleDetailPageV1({
             </div>
           ) : null}
 
-          <div className="vdp-hero">
-            <div className="vdp-hero__main">
+          <div className="vdp-listing">
+            <div className="vdp-listing__main min-w-0">
               <VehicleGallery vehicle={vehicle} />
-              <VehicleHeader vehicle={vehicle} />
-              <VehicleSpecifications vehicle={vehicle} />
-            </div>
-            <div className="vdp-hero__aside">
-              <div
-                className="vdp-hero__aside-scroll"
-                tabIndex={0}
-                aria-label="Vehicle price and deal details"
-              >
-                {listingClosed ? (
-                  <div className="vdp-hero__price rounded-[28px] bg-[#ECF3F8] p-5 md:p-6">
-                    <p className="text-body text-muted">
-                      This listing is kept available so you can still see the car and
-                      compare similar stock.
-                    </p>
-                    <ValuationEntryCard />
-                  </div>
-                ) : (
-                  <VehiclePrice />
-                )}
-                {listingClosed ? (
-                  <div className="vdp-hero__deal" />
-                ) : (
-                  <VehicleDealColumn />
-                )}
+              <div className="mt-4">
+                <VehicleCertBadges vehicle={vehicle} />
               </div>
-            </div>
-          </div>
+              <div className="mt-5">
+                <VehicleHeader vehicle={vehicle} />
+              </div>
 
-          <div className="mt-14 space-y-14">
-            <VehicleViewingCard vehicle={vehicle} />
-            <VehicleAskPanel vehicle={vehicle} />
-            <VehicleDocumentation vehicle={vehicle} />
-            <VehicleVideo vehicle={vehicle} />
-            <TrustBlock />
-            <VehicleLocation vehicle={vehicle} />
-            <SimilarVehicles vehicles={similar} />
-            <section
-              aria-labelledby="vdp-final-cta-heading"
-              className="rounded-[32px] bg-[#ECF3F8] px-6 py-10 text-[#002852] md:px-12 md:py-12"
-            >
-              <h2 id="vdp-final-cta-heading" className="text-h3">
-                {reservable ? "Ready to take the next step?" : "Find another car"}
-              </h2>
-              <p className="mt-2 max-w-2xl text-body-sm text-secondary">
-                {reservable
-                  ? "Build your deal for part exchange, budget and cover. You can reserve the car after that, or after you book a test drive."
-                  : reserved
-                    ? "This car is reserved for another customer. Browse similar stock or check your finance eligibility."
-                    : "Browse the latest cars or check your finance eligibility first."}
-              </p>
-              <div className="mt-5 hidden flex-wrap gap-3 lg:flex">
-                {reservable ? (
-                  <>
-                    <StartVehicleDealButton label={DEAL_VDP_CARD_CTA} />
-                  </>
-                ) : (
-                  <>
-                    <Button href={getUsedCarsUrl()}>Browse all cars</Button>
-                    <Button href={getEligibilityUrl()} variant="secondary">
-                      Check my eligibility
-                    </Button>
-                  </>
-                )}
+              <div className="mt-6 lg:hidden">
+                <VehicleDealPanel listingClosed={closed} />
               </div>
-              <div className="mt-5 flex flex-col gap-3 lg:hidden">
-                {reservable ? (
-                  <>
-                    <StartVehicleDealButton
-                      className="w-full"
-                      label={DEAL_VDP_CARD_CTA}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Button href={getUsedCarsUrl()} className="w-full">
-                      Browse all cars
-                    </Button>
-                    <Button href={getEligibilityUrl()} className="w-full" variant="secondary">
-                      Check my eligibility
-                    </Button>
-                  </>
-                )}
+
+              <div className="mt-8 space-y-12">
+                <VehicleTalkCards vehicle={vehicle} />
+                <VehicleWhatYouGet vehicle={vehicle} />
+                <VehicleSpecifications vehicle={vehicle} />
+                <VehicleAbout vehicle={vehicle} />
+                <VehicleWhyOakwood />
+                <VehicleDocumentation vehicle={vehicle} />
+                <VehicleLocation vehicle={vehicle} />
+                <SimilarVehicles vehicles={similar} />
               </div>
-            </section>
+            </div>
+
+            <aside className="vdp-listing__aside hidden min-w-0 lg:block">
+              <div className="vdp-listing__aside-sticky">
+                <VehicleDealPanel listingClosed={closed} />
+              </div>
+            </aside>
           </div>
         </Container>
       </Section>
-      <MobileVehicleActionBar />
+      {!closed ? <MobileVehicleActionBar /> : null}
     </>
   );
 }

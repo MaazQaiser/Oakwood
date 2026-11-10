@@ -93,6 +93,7 @@ export const routes = {
   whatToExpect: "/what-to-expect",
   deliveryAndCollection: "/delivery-and-collection",
   contact: "/contact",
+  help: "/help",
   faq: "/faq",
   complaints: "/complaints",
 
@@ -276,7 +277,7 @@ export function getContactUrl(options?: {
 }
 
 export function getFaqUrl(questionId?: string): string {
-  return questionId ? `${routes.faq}#${questionId}` : routes.faq;
+  return questionId ? `${routes.help}#${questionId}` : routes.help;
 }
 
 export function getLegalUrl(section?: string): string {
@@ -438,7 +439,8 @@ export const trustRoutes = {
 
 export const supportRoutes = {
   contact: routes.contact,
-  faq: routes.faq,
+  faq: routes.help,
+  help: routes.help,
   complaints: routes.complaints,
   complaintProcedure: routes.complaintProcedure,
   getAQuote: routes.getAQuote,

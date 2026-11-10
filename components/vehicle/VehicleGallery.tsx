@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconButton } from "@/components/ui/Button";
-import { IconArrow, IconPlay } from "@/components/ui/icons";
+import { IconArrow, IconPlay, IconShare } from "@/components/ui/icons";
 import { CompareVehicleButton } from "@/components/vehicle/CompareVehicleButton";
 import { SaveVehicleButton } from "@/components/vehicle/SaveVehicleButton";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
@@ -31,6 +31,7 @@ export function VehicleGallery({
   const [index, setIndex] = useState(0);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [broken, setBroken] = useState<Record<number, boolean>>({});
+  const [shared, setShared] = useState(false);
   const touchStart = useRef<number | null>(null);
   const current = items[index];
 
@@ -77,20 +78,12 @@ export function VehicleGallery({
           <p className="text-body-sm text-muted">
             Images are not available for this vehicle.
           </p>
-          <div className="absolute right-2 top-2 flex items-center gap-1.5">
-            <CompareVehicleButton
-              vehicleName={vehicleName}
-              stockId={vehicle.stockId}
-              category={vehicle.category}
-              className={galleryControlClass}
-            />
-            <SaveVehicleButton
-              vehicleName={vehicleName}
-              stockId={vehicle.stockId}
-              category={vehicle.category}
-              className={galleryControlClass}
-            />
-          </div>
+          <GalleryActions
+            vehicle={vehicle}
+            vehicleName={vehicleName}
+            shared={shared}
+            onShare={() => shareCar(vehicleName, setShared)}
+          />
         </div>
       </div>
     );
@@ -205,20 +198,12 @@ export function VehicleGallery({
           </div>
         ) : null}
 
-        <div className="absolute right-2 top-2 flex items-center gap-1.5">
-          <CompareVehicleButton
-            vehicleName={vehicleName}
-            stockId={vehicle.stockId}
-            category={vehicle.category}
-            className={galleryControlClass}
-          />
-          <SaveVehicleButton
-            vehicleName={vehicleName}
-            stockId={vehicle.stockId}
-            category={vehicle.category}
-            className={galleryControlClass}
-          />
-        </div>
+        <GalleryActions
+          vehicle={vehicle}
+          vehicleName={vehicleName}
+          shared={shared}
+          onShare={() => shareCar(vehicleName, setShared)}
+        />
       </div>
 
       <ul
@@ -267,6 +252,52 @@ export function VehicleGallery({
         ))}
       </ul>
       </div>
+    </div>
+  );
+}
+
+function shareCar(vehicleName: string, setShared: (shared: boolean) => void) {
+  const url = window.location.href;
+  const text = `${vehicleName} at Oakwood`;
+  if (navigator.share) {
+    void navigator.share({ title: text, url }).catch(() => undefined);
+    return;
+  }
+  void navigator.clipboard.writeText(url).then(() => setShared(true));
+}
+
+function GalleryActions({
+  vehicle,
+  vehicleName,
+  shared,
+  onShare,
+}: {
+  vehicle: VehicleDetail;
+  vehicleName: string;
+  shared: boolean;
+  onShare: () => void;
+}) {
+  return (
+    <div className="absolute right-2 top-2 flex items-center gap-1.5">
+      <IconButton
+        label={shared ? "Link copied" : "Share this car"}
+        className={galleryControlClass}
+        onClick={onShare}
+      >
+        <IconShare />
+      </IconButton>
+      <CompareVehicleButton
+        vehicleName={vehicleName}
+        stockId={vehicle.stockId}
+        category={vehicle.category}
+        className={galleryControlClass}
+      />
+      <SaveVehicleButton
+        vehicleName={vehicleName}
+        stockId={vehicle.stockId}
+        category={vehicle.category}
+        className={galleryControlClass}
+      />
     </div>
   );
 }

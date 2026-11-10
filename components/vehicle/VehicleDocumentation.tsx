@@ -38,14 +38,16 @@ export function VehicleDocumentation({ vehicle }: { vehicle: VehicleDetail }) {
       id="vehicle-documentation"
       aria-labelledby="vehicle-docs-heading"
     >
-      <h2 id="vehicle-docs-heading" className="text-h3">
-        Vehicle history & condition
+      <h2
+        id="vehicle-docs-heading"
+        className="text-[1.75rem] font-medium leading-[1.15em] tracking-[-0.03em] text-navy sm:text-[2rem]"
+      >
+        Paperwork
       </h2>
-      <p className="mt-2 text-body-sm text-muted">
-        Everything we have on this car is listed here, including items that need
-        attention.
+      <p className="mt-2 text-[0.95rem] text-muted">
+        Every document for this car, in one place.
       </p>
-      <div className="mt-6 border-t border-border">
+      <div className="mt-6 rounded-[24px] bg-white px-5 shadow-[0_10px_24px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4] md:px-6 [&>*:last-child]:border-b-0">
 
       <Accordion title="MOT history" defaultOpen>
         <p>

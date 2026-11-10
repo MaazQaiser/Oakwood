@@ -1,3 +1,4 @@
+import type { ApplyDraft } from "@/types/apply-finance";
 import type { FinanceProductType } from "@/types/finance";
 
 export type EligibilityMachineState =
@@ -87,6 +88,8 @@ export interface EligibilityAnswers {
   mobile?: string;
   postcode?: string;
   marketingConsent?: boolean;
+  /** Full one-question apply journey, restored with the eligibility session. */
+  applyDraft?: ApplyDraft;
 }
 
 export interface EligibilityConsentRecord {

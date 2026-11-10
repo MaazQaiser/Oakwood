@@ -187,7 +187,7 @@ export const sectionMenus: Record<string, SectionMenuContent> = {
     ],
     sideLabel: "FAQs",
     sideLinks: [
-      { label: "Do I need an account?", href: routes.faq },
+      { label: "Do I need an account?", href: routes.help },
       { label: "How do I contact Oakwood?", href: routes.contact },
       { label: "How do I raise a complaint?", href: routes.complaints },
     ],

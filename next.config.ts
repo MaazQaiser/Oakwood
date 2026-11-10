@@ -5,6 +5,15 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [75, 92],
   },
+  async redirects() {
+    return [
+      {
+        source: "/faq",
+        destination: "/help",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

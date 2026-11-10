@@ -48,8 +48,8 @@ export const HOME_PART_EXCHANGE_SUPPORT =
 export const HOME_PROOF_ITEMS = [
   {
     id: "reviews",
-    lead: "5-star rated",
-    detail: "On Google",
+    lead: "4.8",
+    detail: "Google reviews",
     accent: true,
   },
   {
