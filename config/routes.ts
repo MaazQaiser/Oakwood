@@ -96,6 +96,9 @@ export const routes = {
   help: "/help",
   faq: "/faq",
   complaints: "/complaints",
+  depositRules: "/deposit-rules",
+  requestRefund: "/request-a-refund",
+  electricCars: "/electric-cars",
 
   getAQuote: "/get-a-quote.php",
   bookingEnquiry: "/booking_enquiry.php",
@@ -373,7 +376,7 @@ export function getValuationUrl(result = false): string {
   return result ? routes.valuationResult : routes.valuation;
 }
 
-export type AftersalesBookingType = "service" | "mot";
+export type AftersalesBookingType = "service" | "mot" | "diagnostic";
 
 export type AftersalesBookingSource =
   | "aftersales"

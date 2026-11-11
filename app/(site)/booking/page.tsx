@@ -39,7 +39,9 @@ export default async function Page({
   const sourceValue = first(params.source);
   const locationValue = first(params.location);
   const serviceType: AftersalesBookingType | undefined =
-    typeValue === "service" || typeValue === "mot" ? typeValue : undefined;
+    typeValue === "service" || typeValue === "mot" || typeValue === "diagnostic"
+      ? typeValue
+      : undefined;
   const source: AftersalesBookingSource = SOURCES.includes(
     sourceValue as AftersalesBookingSource,
   )

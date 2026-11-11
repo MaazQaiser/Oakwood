@@ -322,10 +322,14 @@ export function HelpFaqClient() {
                   </span>
                 </p>
               ) : null}
-              {!searching && activeTopic.serviceLink ? (
-                <HelpArrowLink href={activeTopic.serviceLink.href} className="mt-6 w-full">
-                  {activeTopic.serviceLink.label}
-                </HelpArrowLink>
+              {!searching && activeTopic.serviceLinks && activeTopic.serviceLinks.length > 0 ? (
+                <div className="mt-6 flex flex-col gap-2">
+                  {activeTopic.serviceLinks.map((link) => (
+                    <HelpArrowLink key={link.href} href={link.href} className="w-full">
+                      {link.label}
+                    </HelpArrowLink>
+                  ))}
+                </div>
               ) : null}
             </div>
           </aside>

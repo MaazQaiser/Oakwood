@@ -132,12 +132,15 @@ export function filterVehicles(
   const maxYear = toNumber(query.max_year);
   const doors = toNumber(query.doors);
   const seats = toNumber(query.seats);
+  const minRange = toNumber(query.min_range);
+  const maxCharge = toNumber(query.max_charge);
   const fuels = splitFilterValues(query.fuel);
   const transmissions = splitFilterValues(query.transmission);
   const bodyStyles = splitFilterValues(query.body_style);
   const locations = splitFilterValues(query.location);
   const colours = splitFilterValues(query.colour);
   const affordable = query.affordable === "1";
+  const zeroRoadTax = query.road_tax === "0";
 
   return vehicles.filter((vehicle) => {
     if (vehicle.availability === "sold" || vehicle.availability === "expired") {
@@ -195,6 +198,21 @@ export function filterVehicles(
       return false;
     }
     if (!matchesNeed(vehicle, query.need)) {
+      return false;
+    }
+    if (
+      minRange !== undefined &&
+      (vehicle.evRangeMiles === undefined || vehicle.evRangeMiles < minRange)
+    ) {
+      return false;
+    }
+    if (
+      maxCharge !== undefined &&
+      (vehicle.evChargeHours === undefined || vehicle.evChargeHours > maxCharge)
+    ) {
+      return false;
+    }
+    if (zeroRoadTax && (vehicle.roadTaxCost ?? 0) !== 0) {
       return false;
     }
     if (

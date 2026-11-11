@@ -93,6 +93,7 @@ export function FilterFields({
   const selectedLocations = splitFilterValues(query.location);
   const selectedColours = splitFilterValues(query.colour);
   const eligible = financeMode === "personalised" || financeMode === "ineligible";
+  const electricOnly = locked.fuel?.toLowerCase() === "electric";
   const ageValue = query.min_year
     ? String(CURRENT_YEAR - Number(query.min_year))
     : "";
@@ -332,17 +333,89 @@ export function FilterFields({
         </div>
       </Accordion>
 
-      <Accordion title="Fuel">
-        {fuels.map((fuel) => (
+      {electricOnly ? (
+        <Accordion title="Electric filters" defaultOpen>
+          <Field htmlFor={fid("filter-min-range")} label="Minimum range">
+            <Select
+              id={fid("filter-min-range")}
+              value={query.min_range ?? ""}
+              onChange={(event) =>
+                onChange({ min_range: event.target.value || undefined })
+              }
+            >
+              <option value="">Any</option>
+              {[150, 200, 250, 300, 350].map((miles) => (
+                <option key={miles} value={miles}>
+                  {miles}+ miles
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field htmlFor={fid("filter-max-charge")} label="Charging time">
+            <Select
+              id={fid("filter-max-charge")}
+              value={query.max_charge ?? ""}
+              onChange={(event) =>
+                onChange({ max_charge: event.target.value || undefined })
+              }
+            >
+              <option value="">Any</option>
+              <option value="0.5">Under 30 minutes rapid</option>
+              <option value="1">Under 1 hour rapid</option>
+            </Select>
+          </Field>
           <Checkbox
-            key={fuel}
-            id={fid(`fuel-${fuel}`)}
-            label={fuel}
-            checked={selectedFuels.includes(fuel)}
-            onChange={() => toggleList("fuel", fuel, selectedFuels)}
+            id={fid("road-tax-zero")}
+            label="£0 road tax"
+            checked={query.road_tax === "0"}
+            onChange={() =>
+              onChange({ road_tax: query.road_tax === "0" ? undefined : "0" })
+            }
           />
-        ))}
-      </Accordion>
+          <p className="mt-3 text-label">Size of car</p>
+          {bodyTypes.map((body) => (
+            <Checkbox
+              key={body}
+              id={fid(`body-${body}`)}
+              label={body}
+              checked={selectedBodies.some(
+                (item) => item.toLowerCase() === body.toLowerCase(),
+              )}
+              onChange={() => toggleList("body_style", body, selectedBodies)}
+            />
+          ))}
+        </Accordion>
+      ) : (
+        <>
+          <Accordion title="Fuel">
+            {fuels.map((fuel) => (
+              <Checkbox
+                key={fuel}
+                id={fid(`fuel-${fuel}`)}
+                label={fuel}
+                checked={selectedFuels.includes(fuel)}
+                onChange={() => toggleList("fuel", fuel, selectedFuels)}
+              />
+            ))}
+          </Accordion>
+
+          {bodyTypes.length > 0 ? (
+            <Accordion title={copy.bodyFilterTitle}>
+              {bodyTypes.map((body) => (
+                <Checkbox
+                  key={body}
+                  id={fid(`body-${body}`)}
+                  label={body}
+                  checked={selectedBodies.some(
+                    (item) => item.toLowerCase() === body.toLowerCase(),
+                  )}
+                  onChange={() => toggleList("body_style", body, selectedBodies)}
+                />
+              ))}
+            </Accordion>
+          ) : null}
+        </>
+      )}
 
       <Accordion title="Transmission">
         {transmissions.map((transmission) => (
@@ -357,22 +430,6 @@ export function FilterFields({
           />
         ))}
       </Accordion>
-
-      {bodyTypes.length > 0 ? (
-        <Accordion title={copy.bodyFilterTitle}>
-          {bodyTypes.map((body) => (
-            <Checkbox
-              key={body}
-              id={fid(`body-${body}`)}
-              label={body}
-              checked={selectedBodies.some(
-                (item) => item.toLowerCase() === body.toLowerCase(),
-              )}
-              onChange={() => toggleList("body_style", body, selectedBodies)}
-            />
-          ))}
-        </Accordion>
-      ) : null}
 
       <Accordion title="Colour">
         {colours.map((colour) => (

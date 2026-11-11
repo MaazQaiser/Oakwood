@@ -7,12 +7,25 @@ import { MARKETING_CONSENT_WORDING } from "@/lib/eligibility/copy";
 
 const enquiries = new Map<string, SupportEnquiryRecord>();
 const complaints = new Map<string, SupportComplaintRecord>();
+const staffRefunds = new Map<
+  string,
+  {
+    id: string;
+    createdAt: number;
+    reference: string;
+    customerName: string;
+    registration: string;
+    salesExecutive?: string;
+    paymentMethod: "bacs" | "card";
+    reason: string;
+  }
+>();
 
 function opaqueId(): string {
   return randomBytes(16).toString("hex");
 }
 
-function reference(id: string, prefix: "ENQ" | "CMP"): string {
+function reference(id: string, prefix: "ENQ" | "CMP" | "RFN"): string {
   return `OAK-${prefix}-${id.slice(0, 8).toUpperCase()}`;
 }
 
@@ -171,4 +184,27 @@ export function createSupportComplaint(
   complaints.set(id, record);
   void eskimoIntegration.implemented;
   return record;
+}
+
+export function createStaffRefundRequest(input: {
+  customerName: string;
+  registration: string;
+  salesExecutive?: string;
+  paymentMethod: "bacs" | "card";
+  reason: string;
+}): { reference: string } {
+  const id = opaqueId();
+  const record = {
+    id,
+    createdAt: Date.now(),
+    reference: reference(id, "RFN"),
+    customerName: input.customerName,
+    registration: input.registration,
+    salesExecutive: input.salesExecutive,
+    paymentMethod: input.paymentMethod,
+    reason: input.reason,
+  };
+  staffRefunds.set(id, record);
+  void eskimoIntegration.implemented;
+  return { reference: record.reference };
 }

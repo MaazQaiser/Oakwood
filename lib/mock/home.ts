@@ -82,7 +82,7 @@ export const needCategories = [
     id: "hybrid-electric",
     title: "Hybrid & electric",
     description: "Explore efficient ways to drive.",
-    href: getSearchUrl({ fuel: "Electric", need: "hybrid-electric" }),
+    href: routes.electricCars,
   },
   {
     id: "low-mileage",

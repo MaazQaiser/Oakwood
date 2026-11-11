@@ -19,8 +19,9 @@ export function ServiceSelector({
       value={value}
       onChange={(next) => onChange(next as AftersalesBookingType)}
       options={[
-        { value: "service", label: "Service" },
         { value: "mot", label: "MOT" },
+        { value: "service", label: "Service" },
+        { value: "diagnostic", label: "60-minute diagnostic" },
       ]}
     />
   );

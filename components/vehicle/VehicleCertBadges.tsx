@@ -9,6 +9,16 @@ export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
           detail: vehicle.inspection.summary,
         }
       : null,
+    vehicle.batteryHealth?.certificateAvailable
+      ? {
+          mark: "AV",
+          title: "Aviloo tested",
+          detail:
+            vehicle.batteryHealth.stateOfHealthPercent !== undefined
+              ? `Battery state of health ${vehicle.batteryHealth.stateOfHealthPercent}%`
+              : vehicle.batteryHealth.summary,
+        }
+      : null,
     {
       mark: "HPI",
       title: "HPI checked",

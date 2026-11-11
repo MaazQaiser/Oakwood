@@ -47,6 +47,15 @@ function defaultBattery(vehicle: Vehicle): BatteryHealth | undefined {
     return undefined;
   }
 
+  if (vehicle.avilooCertificate) {
+    return {
+      applicable: true,
+      stateOfHealthPercent: 90,
+      certificateAvailable: true,
+      summary: "Aviloo battery certificate available",
+    };
+  }
+
   return {
     applicable: true,
     certificateAvailable: false,
@@ -251,7 +260,43 @@ const q4Battery: Partial<VehicleDetail> = {
 
 const overrides: Record<string, Partial<VehicleDetail>> = {
   "7848117": featuredCClass,
-  "1000002": q4Battery,
+  "1000002": {
+    ...q4Battery,
+    inspection: {
+      available: true,
+      summary: "AA independent inspection completed",
+      completedOn: "2 September 2026",
+      inspector: "AA engineer",
+    },
+  },
+  "1000091": {
+    batteryHealth: {
+      applicable: true,
+      stateOfHealthPercent: 88,
+      certificateAvailable: true,
+      summary: "Aviloo battery certificate available",
+    },
+    inspection: {
+      available: true,
+      summary: "AA independent inspection completed",
+      completedOn: "8 September 2026",
+      inspector: "AA engineer",
+    },
+  },
+  "1000093": {
+    batteryHealth: {
+      applicable: true,
+      stateOfHealthPercent: 94,
+      certificateAvailable: true,
+      summary: "Aviloo battery certificate available",
+    },
+    inspection: {
+      available: true,
+      summary: "AA independent inspection completed",
+      completedOn: "12 September 2026",
+      inspector: "AA engineer",
+    },
+  },
 };
 
 export function getVehicleDetail(vehicle: Vehicle): VehicleDetail {

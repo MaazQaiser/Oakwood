@@ -19,12 +19,14 @@ export function VehicleSearchPage({
   variant = "inventory",
   basePath,
   category = "car",
+  hideHeader = false,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
   locked?: LockedFilters;
   variant?: "inventory" | "search";
   basePath?: string;
   category?: VehicleCategory;
+  hideHeader?: boolean;
 }) {
   const query = parseSearchQuery(searchParams);
   const context = getInventoryContext(locked, {
@@ -40,7 +42,7 @@ export function VehicleSearchPage({
 
   return (
     <>
-      <SearchHeader context={context} query={query.q} />
+      {hideHeader ? null : <SearchHeader context={context} query={query.q} />}
       {/* White gutter under the budget box, matching the side inset, so the canvas does not sit against it. */}
       <section className="mt-[var(--oak-page-x)] bg-page-canvas pt-3 pb-10 sm:pt-4 md:pb-12 lg:pt-12 lg:pb-14">
         <Container width="wide">

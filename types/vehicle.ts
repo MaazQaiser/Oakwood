@@ -47,4 +47,12 @@ export interface Vehicle {
   registration?: string;
   /** ISO date. Present when the vehicle has been sold. */
   soldAt?: string;
+  /** Electric stock only. Official or manufacturer WLTP range in miles. */
+  evRangeMiles?: number;
+  /** Electric stock only. Typical rapid-charge hours for a useful top-up. */
+  evChargeHours?: number;
+  /** Listing road tax for filters. Prefer detail.runningCosts when present. */
+  roadTaxCost?: number;
+  /** True when an Aviloo battery certificate is available for this car. */
+  avilooCertificate?: boolean;
 }

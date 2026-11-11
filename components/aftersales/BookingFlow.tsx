@@ -53,8 +53,8 @@ import type { AftersalesVehicle, AftersalesVehicleContext } from "@/types/afters
 import type { BookingStep, BookingTimeWindow } from "@/types/booking";
 
 const PROGRESS = [
+  { id: "service", label: "What to book" },
   { id: "vehicle", label: "Vehicle" },
-  { id: "service", label: "Service" },
   { id: "location", label: "Location" },
   { id: "slot", label: "Date and time" },
   { id: "details", label: "Your details" },
@@ -311,9 +311,12 @@ export function BookingFlow({
   };
   let onBack: (() => void) | undefined;
 
-  if (state.step === "lookup") {
+  if (state.step === "lookup" || state.step === "vehicle") {
     question = "What's the vehicle registration?";
-    onContinue = undefined;
+    if (state.step === "lookup") {
+      onContinue = undefined;
+    }
+    onBack = () => void run(() => goToBookingStep("service"));
   } else if (state.step === "confirm-vehicle") {
     question = "Is this your car?";
     support = undefined;
@@ -339,19 +342,19 @@ export function BookingFlow({
       );
     onBack = () => void run(() => goToBookingStep("vehicle"));
   } else if (state.step === "service") {
-    question = "What do you need?";
-    support = "Service and MOT use the same booking request.";
+    question = "What would you like to book?";
+    support = "Choose one option to start your booking request.";
     continueLabel = "Continue";
     onContinue = () => {
       if (!state.serviceType) {
-        setLocalError("Choose a service type.");
+        setLocalError("Choose what you would like to book.");
         return;
       }
       void run(() => saveBookingServiceType({ serviceType: state.serviceType! })).then(
         () => trackEvent(analyticsEvents.bookingServiceSelected, { type: state.serviceType }),
       );
     };
-    onBack = () => void run(() => goToBookingStep("vehicle"));
+    onBack = undefined;
   } else if (state.step === "location") {
     question = "Which Oakwood location?";
     support = "Oakwood aftersales is available in Bury and Chorley.";
@@ -369,7 +372,9 @@ export function BookingFlow({
       );
     };
     onBack = () =>
-      void run(() => goToBookingStep(state.serviceType && serviceType ? "confirm-vehicle" : "service"));
+      void run(() =>
+        goToBookingStep(state.vehicle ? "confirm-vehicle" : "vehicle"),
+      );
   } else if (state.step === "slot") {
     const hasSlots =
       state.availability.status === "available" &&

@@ -67,7 +67,7 @@ export function sanitiseContact(input: {
 export function serviceTypeError(
   value?: AftersalesBookingType,
 ): string | undefined {
-  if (value !== "service" && value !== "mot") {
+  if (value !== "service" && value !== "mot" && value !== "diagnostic") {
     return "Choose a service type.";
   }
   return undefined;

@@ -37,6 +37,9 @@ export interface SearchQuery {
   sort?: string;
   page?: string;
   need?: string;
+  min_range?: string;
+  max_charge?: string;
+  road_tax?: string;
   error?: string;
 }
 
@@ -44,6 +47,7 @@ export interface LockedFilters {
   make?: string;
   model?: string;
   location?: string;
+  fuel?: string;
 }
 
 const SEARCH_KEYS: Array<keyof SearchQuery> = [
@@ -72,6 +76,9 @@ const SEARCH_KEYS: Array<keyof SearchQuery> = [
   "sort",
   "page",
   "need",
+  "min_range",
+  "max_charge",
+  "road_tax",
   "error",
 ];
 
@@ -158,6 +165,7 @@ export function applyLockedFilters(
     ...(locked.make ? { make: locked.make } : {}),
     ...(locked.model ? { model: locked.model } : {}),
     ...(locked.location ? { location: locked.location } : {}),
+    ...(locked.fuel ? { fuel: locked.fuel } : {}),
   };
 }
 
@@ -180,6 +188,9 @@ export function buildSearchHref(
       return;
     }
     if (key === "location" && locked.location) {
+      return;
+    }
+    if (key === "fuel" && locked.fuel) {
       return;
     }
 

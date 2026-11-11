@@ -156,10 +156,10 @@ export const startBookingSession = withSessionPersistence(async function startBo
     vehicle: input.vehicle ?? record.vehicle,
     step:
       record.status === "requested"
-        ? "vehicle"
-        : input.vehicle
+        ? "service"
+        : input.vehicle && record.serviceType
           ? "confirm-vehicle"
-          : "vehicle",
+          : "service",
     status: "started",
     failureReason: undefined,
   });
@@ -202,8 +202,7 @@ export const confirmBookingVehicle = withSessionPersistence(async function confi
   if (!record) {
     return { error: "session" };
   }
-  const nextStep: BookingStep = record.serviceType ? "location" : "service";
-  const patched = patchBookingRecord(record.id, { step: nextStep });
+  const patched = patchBookingRecord(record.id, { step: "location" });
   return toBookingUi(patched ?? record);
 });
 
@@ -221,10 +220,9 @@ export const saveBookingManualVehicle = withSessionPersistence(async function sa
   }
   const record = await getOrCreateBookingSession("aftersales");
   const vehicle = toManualVehicle(input);
-  const nextStep: BookingStep = record.serviceType ? "location" : "service";
   const patched = patchBookingRecord(record.id, {
     vehicle,
-    step: nextStep,
+    step: "location",
   });
   return toBookingUi(patched ?? record);
 });
@@ -237,9 +235,10 @@ export const saveBookingServiceType = withSessionPersistence(async function save
     return { error: invalid };
   }
   const record = await getOrCreateBookingSession("aftersales");
+  const nextStep: BookingStep = record.vehicle ? "confirm-vehicle" : "vehicle";
   const patched = patchBookingRecord(record.id, {
     serviceType: input.serviceType,
-    step: "location",
+    step: nextStep,
   });
   return toBookingUi(patched ?? record);
 });

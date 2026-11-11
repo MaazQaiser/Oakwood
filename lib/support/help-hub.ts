@@ -11,11 +11,16 @@ export type HelpTopicId =
   | "warranty"
   | "contact";
 
+export interface HelpTopicLink {
+  label: string;
+  href: string;
+}
+
 export interface HelpTopic {
   id: HelpTopicId;
   name: string;
   blurb: string;
-  serviceLink?: { label: string; href: string };
+  serviceLinks?: HelpTopicLink[];
 }
 
 export interface HelpFaqLink {
@@ -45,14 +50,67 @@ export interface HelpContactCard {
 
 export const HELP_TOPICS: HelpTopic[] = [
   { id: "all", name: "All topics", blurb: "Every question in one place. Pick a topic to narrow it down." },
-  { id: "buying", name: "Buying a car", blurb: "How Oakwood's finance-first buying journey works.", serviceLink: { label: "How it works", href: routes.howItWorks } },
-  { id: "finance", name: "Finance", blurb: "Eligibility, the calculator, HP and PCP, deposits and credit history.", serviceLink: { label: "Check my eligibility", href: routes.eligibility } },
-  { id: "partex", name: "Part exchange", blurb: "Valuing your car and putting it towards your deposit.", serviceLink: { label: "Value my car", href: routes.sellMyCar } },
-  { id: "reservations", name: "Reservations", blurb: "Holding a car for £99, refunds and what happens if plans change.", serviceLink: { label: "Reservation terms", href: routes.reservationTerms } },
-  { id: "delivery", name: "Delivery and collection", blurb: "Getting your car from Bury or Chorley, or delivered.", serviceLink: { label: "Delivery and collection", href: routes.deliveryAndCollection } },
-  { id: "servicing", name: "Servicing and MOT", blurb: "Booking a service or MOT at Bury or Chorley.", serviceLink: { label: "Book a service or MOT", href: routes.booking } },
-  { id: "warranty", name: "Warranty", blurb: "Your 12-month warranty and how to make a claim.", serviceLink: { label: "Start a warranty claim", href: routes.warrantyClaims } },
-  { id: "contact", name: "Contact and complaints", blurb: "Reaching the team, opening hours and raising a complaint.", serviceLink: { label: "Contact Oakwood", href: routes.contact } },
+  {
+    id: "buying",
+    name: "Buying a car",
+    blurb: "How Oakwood's finance-first buying journey works.",
+    serviceLinks: [{ label: "How it works", href: routes.howItWorks }],
+  },
+  {
+    id: "finance",
+    name: "Finance",
+    blurb: "Eligibility, the calculator, HP and PCP, deposits and credit history.",
+    serviceLinks: [{ label: "Check my eligibility", href: routes.eligibility }],
+  },
+  {
+    id: "partex",
+    name: "Part exchange",
+    blurb: "Valuing your car and putting it towards your deposit.",
+    serviceLinks: [
+      {
+        label:
+          "Choose your part-exchange car and see its value factored into your new car deal in real time.",
+        href: routes.search,
+      },
+    ],
+  },
+  {
+    id: "reservations",
+    name: "Reservations",
+    blurb: "Holding a car for £99, refunds and what happens if plans change.",
+    serviceLinks: [
+      { label: "Deposit rules", href: routes.depositRules },
+      { label: "Request a refund", href: routes.requestRefund },
+      { label: "Reservation terms", href: routes.reservationTerms },
+    ],
+  },
+  {
+    id: "delivery",
+    name: "Delivery and collection",
+    blurb: "Getting your car from Bury or Chorley, or delivered.",
+    serviceLinks: [
+      { label: "Delivery and collection", href: routes.deliveryAndCollection },
+      { label: "Distance selling information", href: routes.distanceSelling },
+    ],
+  },
+  {
+    id: "servicing",
+    name: "Servicing and MOT",
+    blurb: "Booking a service or MOT at Bury or Chorley.",
+    serviceLinks: [{ label: "Book a service or MOT", href: routes.booking }],
+  },
+  {
+    id: "warranty",
+    name: "Warranty",
+    blurb: "Your 12-month warranty and how to make a claim.",
+    serviceLinks: [{ label: "Start a warranty claim", href: routes.warrantyClaims }],
+  },
+  {
+    id: "contact",
+    name: "Contact and complaints",
+    blurb: "Reaching the team, opening hours and raising a complaint.",
+    serviceLinks: [{ label: "Contact Oakwood", href: routes.contact }],
+  },
 ];
 
 export const HELP_POPULAR_IDS = ["elig-credit", "res-99", "mot-book"] as const;

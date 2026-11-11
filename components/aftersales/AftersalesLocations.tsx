@@ -32,7 +32,10 @@ export function AftersalesLocations({
               <Button
                 href={getBookingUrl({
                   type: bookingType,
-                  source: bookingType,
+                  source:
+                    bookingType === "service" || bookingType === "mot"
+                      ? bookingType
+                      : "aftersales",
                   location: profile.slug,
                 })}
                 variant="text"

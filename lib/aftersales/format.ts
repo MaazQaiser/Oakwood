@@ -47,12 +47,17 @@ export function formatTimeWindow(window?: BookingTimeWindow): string {
   }
 }
 
-export function formatServiceType(type?: "service" | "mot"): string {
+export function formatServiceType(
+  type?: "service" | "mot" | "diagnostic",
+): string {
   if (type === "mot") {
     return "MOT";
   }
   if (type === "service") {
     return "Service";
+  }
+  if (type === "diagnostic") {
+    return "60-minute diagnostic";
   }
   return "";
 }

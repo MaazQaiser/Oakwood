@@ -255,40 +255,66 @@ export const cookiesDocument: LegalDocument = {
 
 export const distanceSellingDocument: LegalDocument = {
   slug: "distance-selling",
-  title: "Distance selling",
+  title: "Distance selling: your right to cancel",
   path: routes.distanceSelling,
   canonicalPath: routes.distanceSelling,
-  metaTitle: "Distance selling",
+  metaTitle: "Distance selling: your right to cancel",
   metaDescription:
-    "Distance-selling information for Oakwood Motor Company. Approved cooling-off and distance-selling wording is published when supplied.",
+    "Buy with confidence. Know your rights if you purchase a vehicle from Oakwood through a distance sale.",
   hubLabel: "Distance selling",
   hubDescription:
-    "Existing distance-selling URL. Approved cooling-off wording is not in the content source yet.",
-  missing: [
-    "Approved distance-selling / consumer-contracts cooling-off wording, timelines, and exceptions.",
-  ],
+    "Your 14-day right to cancel a distance sale, how to return the vehicle, and when your refund is paid.",
+  intro: "Buy with confidence. Know your rights.",
+  missing: [],
   sections: [
     {
-      id: "what-is-published",
-      title: "What is already published",
+      id: "your-right",
+      title: "Your right to cancel",
       paragraphs: [
-        deliverySections[2]?.body ??
-          "Distance-selling rights, where they apply, are described on the distance selling page.",
+        "If you purchase a vehicle from Oakwood Motor Company through a distance sale, you have the right to cancel your contract within 14 days, without giving a reason.",
+        "Your cancellation period begins on the day that you, or someone acting on your behalf, collects or takes delivery of your vehicle.",
       ],
     },
     {
-      id: "what-is-missing",
-      title: "What is not published",
+      id: "how-to-cancel",
+      title: "How to cancel your purchase",
       paragraphs: [
-        "Approved statutory cooling-off rights, refund timelines, and exceptions for distance contracts have not been supplied.",
-        "This page does not invent those rights.",
+        "If you decide to cancel your contract, simply let us know with a clear statement before the 14-day cancellation period expires.",
+        "You can contact us by post or email at Oakwood Motor Company, Whitelegge Street, Bury, BL8 1SW, or Support@oakwoodmotorcompany.com.",
+        "To meet the cancellation deadline, you only need to send your notice of cancellation before the 14-day period has ended.",
+      ],
+    },
+    {
+      id: "what-you-need",
+      title: "What you need to know",
+      paragraphs: [
+        "You are entitled to inspect and assess the vehicle, in the same way you would when considering a purchase in person.",
+        "We allow a standard test drive of up to 20 miles. If the vehicle is driven more than 20 miles, we may make a deduction of £1.50 for every additional mile from your refund.",
+        "We may also make deductions for any damage, excess wear or other reduction in the vehicle's value caused by unnecessary handling.",
+      ],
+    },
+    {
+      id: "returning",
+      title: "Returning the vehicle",
+      paragraphs: [
+        "If you cancel your purchase, you are responsible for returning the vehicle to us without undue delay and no later than 14 days after telling us that you wish to cancel.",
+        "You are responsible for the direct cost of returning the vehicle, for ensuring it is returned safely, and you remain responsible for the vehicle until it has been accepted back at our premises.",
+        "You remain liable for vehicle tax, insurance, fines, charges and penalties until the vehicle is accepted back. Please also return all items and documents supplied with the vehicle.",
+      ],
+    },
+    {
+      id: "refund",
+      title: "When will I receive my refund?",
+      paragraphs: [
+        "Once we have received the vehicle and all relevant documentation back in good order, we will process your reimbursement without undue delay and no later than 14 days after receiving the returned vehicle and relevant paperwork.",
+        "Your refund will normally be made using the same method of payment you used for the original transaction, unless we have agreed otherwise.",
       ],
     },
   ],
   related: related([
-    { href: routes.deliveryTerms, label: "Delivery terms" },
-    { href: routes.cancellationRefund, label: "Cancellation and refund" },
     { href: routes.deliveryAndCollection, label: "Delivery and collection" },
+    { href: routes.cancellationRefund, label: "Cancellation and refund" },
+    { href: routes.help, label: "Help and support" },
   ]),
 };
 
@@ -470,6 +496,7 @@ export const reservationDocument: LegalDocument = {
         reservationCopy.fullyRefundable + ".",
         reservationCopy.appliedToPurchase,
         `The vehicle is held for ${hold}.`,
+        "All payments, whether made by cash, card, or BACS, will be processed within 3–5 days.",
       ],
     },
     {
@@ -521,6 +548,8 @@ export const reservationDocument: LegalDocument = {
     },
   ],
   related: related([
+    { href: routes.depositRules, label: "Deposit rules" },
+    { href: routes.requestRefund, label: "Request a refund" },
     { href: routes.cancellationRefund, label: "Cancellation and refund" },
     { href: routes.vehiclePurchaseTerms, label: "Vehicle purchase terms" },
     { href: routes.usedCars, label: "Used cars" },
