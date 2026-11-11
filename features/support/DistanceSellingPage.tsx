@@ -126,31 +126,10 @@ export function DistanceSellingPage() {
           className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,_rgba(142,191,223,0.28),_transparent_70%)]"
         />
         <Container width="narrow" className="relative">
-          <nav aria-label="On this page" className="mb-10">
-            <p className="oak-eyebrow">On this page</p>
-            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-              {SECTIONS.map((section) => (
-                <li key={section.id}>
-                  <a
-                    href={`#${section.id}`}
-                    className="inline-flex min-h-10 items-center text-body-sm text-primary underline-offset-4 hover:underline"
-                  >
-                    {section.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
           <div className="max-w-prose space-y-12">
-            {SECTIONS.map((section, index) => (
+            {SECTIONS.map((section) => (
               <section key={section.id} id={section.id} className="scroll-mt-24">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-sm tabular-nums text-[#8EBFDF]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <h2 className="text-h2">{section.title}</h2>
-                </div>
+                <h2 className="text-h2">{section.title}</h2>
                 {section.paragraphs.map((paragraph) => (
                   <p key={paragraph} className="mt-3 text-body text-muted">
                     {paragraph}

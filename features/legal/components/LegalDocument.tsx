@@ -3,7 +3,6 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { Container, Section } from "@/components/layout/Container";
 import { IconArrow } from "@/components/ui/icons";
 import { LegalMissingNotice } from "@/features/legal/components/LegalMissingNotice";
-import { LegalToc } from "@/features/legal/components/LegalToc";
 import { LegalViewTracker } from "@/features/legal/components/LegalViewTracker";
 import { CookiePreferencesLink } from "@/features/legal/components/CookiePreferencesLink";
 import { reservationConfig } from "@/config/reservation";
@@ -92,22 +91,12 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
                 <CookiePreferencesLink />
               </p>
             ) : null}
-            <div className="mt-8">
-              <LegalToc sections={document.sections} />
-            </div>
-            <div className="max-w-prose space-y-10">
-              {document.sections.map((section, index) => {
+            <div className="mt-8 max-w-prose space-y-10">
+              {document.sections.map((section) => {
                 const isHowItWorks = isReservation && section.id === "how-it-works";
                 return (
                   <section key={section.id} id={section.id} className="scroll-mt-24">
-                    <div className="flex items-baseline gap-3">
-                      {isReservation ? (
-                        <span className="font-mono text-sm tabular-nums text-[#8EBFDF]">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                      ) : null}
-                      <h2 className="text-h2">{section.title}</h2>
-                    </div>
+                    <h2 className="text-h2">{section.title}</h2>
                     {isHowItWorks ? (
                       <ol className="mt-5 space-y-0">
                         {section.paragraphs.map((paragraph, stepIndex) => (
