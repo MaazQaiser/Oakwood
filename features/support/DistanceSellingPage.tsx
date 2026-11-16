@@ -92,7 +92,7 @@ const RETURN_CHECKLIST = [
 export function DistanceSellingPage() {
   const breadcrumbs = createBreadcrumbs([
     { label: "Home", href: routes.home },
-    { label: "Legal", href: routes.legal },
+    { label: "Help and support", href: routes.help },
     { label: "Distance selling", href: routes.distanceSelling },
   ]);
 

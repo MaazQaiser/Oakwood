@@ -25,6 +25,7 @@ import type { LegalDocument } from "@/types/legal";
 const bury = getShowroom("bury");
 
 export function LegalDocumentView({ document }: { document: LegalDocument }) {
+  const parent = document.parent ?? { label: "Legal", href: routes.legal };
   const breadcrumbs = createBreadcrumbs(
     document.path === routes.legal
       ? [
@@ -33,7 +34,7 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
         ]
       : [
           { label: "Home", href: routes.home },
-          { label: "Legal", href: routes.legal },
+          parent,
           { label: document.title, href: document.path },
         ],
   );

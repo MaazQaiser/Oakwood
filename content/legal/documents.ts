@@ -484,6 +484,7 @@ export const reservationDocument: LegalDocument = {
   hubLabel: "Reservation terms",
   hubDescription: `How the ${amount} reservation works, using the live reservation configuration and published reservation copy.`,
   intro: introSupportingCopy(reservationConfig.amount),
+  parent: { label: "Help and support", href: routes.help },
   missing: [
     "A solicitor-approved reservation/deposit terms document beyond the Platform Spec Addendum mechanics and published reservation copy.",
   ],

@@ -28,6 +28,11 @@ export interface LegalRelatedLink {
   label: string;
 }
 
+export interface LegalBreadcrumbParent {
+  label: string;
+  href: string;
+}
+
 export interface LegalDocument {
   slug: LegalDocumentSlug;
   title: string;
@@ -39,6 +44,8 @@ export interface LegalDocument {
   hubDescription: string;
   intro?: string;
   lastUpdated?: string;
+  /** When set, the trail uses this parent instead of Legal. */
+  parent?: LegalBreadcrumbParent;
   missing: string[];
   sections: LegalSection[];
   related: LegalRelatedLink[];
