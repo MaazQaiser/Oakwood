@@ -52,7 +52,7 @@ export function ReviewsSection() {
         className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_15%_0%,_rgba(142,191,223,0.28),_transparent_60%)]"
       />
       <Container className="relative">
-        <SectionIntro align="center" heading={HOME_REVIEWS_TITLE}>
+        <SectionIntro heading={HOME_REVIEWS_TITLE}>
           {HOME_REVIEWS_SUBTITLE}
         </SectionIntro>
 
@@ -60,7 +60,7 @@ export function ReviewsSection() {
           <div className="min-w-0">
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="oak-eyebrow">Customer reviews</p>
-              <div className="hidden items-center gap-2 sm:flex">
+              <div className="flex items-center gap-2">
                 <CarouselButton
                   label="Previous reviews"
                   direction="prev"
@@ -76,24 +76,13 @@ export function ReviewsSection() {
               </div>
             </div>
 
-            <div
-              ref={trackRef}
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden"
-            >
-              {HOME_BATCH3_REVIEWS.map((review) => (
-                <div key={review.id} className="w-[85%] shrink-0 snap-start">
-                  <ReviewQuoteCard review={review} />
-                </div>
-              ))}
-            </div>
-
-            <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+            <div ref={trackRef} className="flex flex-col gap-4">
               {visibleReviews.map((review) => (
                 <ReviewQuoteCard key={`${review.id}-${start}`} review={review} />
               ))}
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-2 sm:justify-start">
+            <div className="mt-5 flex items-center justify-start gap-2">
               {Array.from({ length: pageCount }).map((_, index) => (
                 <button
                   key={index}
@@ -161,7 +150,7 @@ function ReviewQuoteCard({ review }: { review: HomepageReview }) {
   const icon = REVIEW_SOURCE_ICON[review.source];
 
   return (
-    <article className="relative flex h-full min-h-[14.5rem] flex-col rounded-[22px] bg-white p-5 shadow-[0_14px_34px_rgba(0,40,82,0.08)] sm:p-6">
+    <article className="relative flex flex-col rounded-[22px] bg-white p-5 shadow-[0_14px_34px_rgba(0,40,82,0.08)] sm:p-6">
       <Image
         src={icon.src}
         alt={icon.label}
@@ -172,7 +161,7 @@ function ReviewQuoteCard({ review }: { review: HomepageReview }) {
       <blockquote className="pr-8 text-[0.98rem] leading-relaxed text-[#002852]">
         “{review.text}”
       </blockquote>
-      <footer className="mt-auto pt-5">
+      <footer className="mt-4">
         <p className="text-sm font-semibold text-[#002852]">{review.reviewer}</p>
         <p className="mt-0.5 text-caption text-secondary">{icon.label} review</p>
       </footer>
