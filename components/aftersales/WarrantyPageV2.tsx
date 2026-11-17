@@ -49,36 +49,66 @@ export function WarrantyPageV2() {
         upgradeLine={WARRANTY_V2.upgradeLine}
       >
         <div className="grid gap-4 md:grid-cols-3">
-          {WARRANTY_V2.tiers.map((tier) => (
-            <article
-              key={tier.id}
-              className="relative flex flex-col rounded-[24px] border border-[#E7EEF4] bg-white p-6 text-[#002852] shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
-            >
-              {tier.badge ? (
-                <span className="absolute -top-3 right-5 rounded-full bg-[#0097DB] px-3 py-1 text-[0.75rem] font-semibold text-white">
-                  {tier.badge}
-                </span>
-              ) : null}
-              <CoverBars count={tier.bars} />
-              <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em]">{tier.name}</h2>
-              <ul className="mt-4 flex flex-1 list-none flex-col gap-2.5 p-0">
-                {tier.bullets.map((item) => (
-                  <li key={item} className="flex gap-2 text-sm leading-snug text-[#3d4f63]">
-                    <IconCheck className="mt-0.5 shrink-0 text-[#0097DB]" aria-hidden />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-5 text-sm font-semibold text-[#002852]">{tier.bestFor}</p>
-              <Link
-                href="#compare-cover"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#0097DB] no-underline hover:underline"
+          {WARRANTY_V2.tiers.map((tier) => {
+            const featured = tier.id === "plus";
+            return (
+              <article
+                key={tier.id}
+                className={cn(
+                  "relative flex flex-col rounded-[24px] border p-6 shadow-[0_10px_24px_rgba(16,40,72,0.06)]",
+                  featured
+                    ? "border-transparent bg-[linear-gradient(145deg,#001c3d_0%,#002852_45%,#0061A2_100%)] text-white"
+                    : "border-[#E7EEF4] bg-white text-[#002852]",
+                )}
               >
-                See what&apos;s covered
-                <IconArrow width={16} height={16} />
-              </Link>
-            </article>
-          ))}
+                {tier.badge ? (
+                  <span className="absolute -top-3 right-5 rounded-full bg-[#0097DB] px-3 py-1 text-[0.75rem] font-semibold text-white">
+                    {tier.badge}
+                  </span>
+                ) : null}
+                <CoverBars count={tier.bars} onDark={featured} />
+                <h2 className="mt-4 text-xl font-semibold tracking-[-0.02em]">{tier.name}</h2>
+                <ul className="mt-4 flex flex-1 list-none flex-col gap-2.5 p-0">
+                  {tier.bullets.map((item) => (
+                    <li
+                      key={item}
+                      className={cn(
+                        "flex gap-2 text-sm leading-snug",
+                        featured ? "text-white/80" : "text-[#3d4f63]",
+                      )}
+                    >
+                      <IconCheck
+                        className={cn(
+                          "mt-0.5 shrink-0",
+                          featured ? "text-[#8EBFDF]" : "text-[#0097DB]",
+                        )}
+                        aria-hidden
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <p
+                  className={cn(
+                    "mt-5 text-sm font-semibold",
+                    featured ? "text-white" : "text-[#002852]",
+                  )}
+                >
+                  {tier.bestFor}
+                </p>
+                <Link
+                  href="#compare-cover"
+                  className={cn(
+                    "mt-4 inline-flex items-center gap-2 text-sm font-semibold no-underline hover:underline",
+                    featured ? "text-[#8EBFDF]" : "text-[#0097DB]",
+                  )}
+                >
+                  See what&apos;s covered
+                  <IconArrow width={16} height={16} />
+                </Link>
+              </article>
+            );
+          })}
         </div>
       </AftersalesFeatureHero>
 
@@ -221,7 +251,7 @@ export function WarrantyPageV2() {
   );
 }
 
-function CoverBars({ count }: { count: number }) {
+function CoverBars({ count, onDark = false }: { count: number; onDark?: boolean }) {
   return (
     <div className="flex gap-1.5" aria-hidden>
       {[1, 2, 3].map((n) => (
@@ -229,7 +259,13 @@ function CoverBars({ count }: { count: number }) {
           key={n}
           className={cn(
             "h-2 w-8 rounded-full",
-            n <= count ? "bg-[#0097DB]" : "bg-[#D7E6F2]",
+            n <= count
+              ? onDark
+                ? "bg-[#8EBFDF]"
+                : "bg-[#0097DB]"
+              : onDark
+                ? "bg-white/20"
+                : "bg-[#D7E6F2]",
           )}
         />
       ))}
