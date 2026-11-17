@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 48" role="img" aria-label="ŠKODA">
+  <circle cx="22" cy="24" r="16" fill="#4BA82E"/>
+  <path d="M14 24h16M22 16v16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="44" y="29" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#1a1a1a">ŠKODA</text>
+</svg>

@@ -53,7 +53,7 @@ export function SiteHeader() {
       data-elevated="true"
       className="sticky top-0 z-[var(--oak-z-header)] w-full bg-page pt-3 -mb-3 shadow-[0_1px_0_var(--oak-border),0_10px_28px_rgba(66,69,78,0.06)] lg:pt-4 lg:-mb-4"
     >
-      <header className="relative px-6 lg:px-0">
+      <header className="relative px-[var(--oak-page-x)] lg:px-0">
         <Container
           width="wide"
           className="flex h-[var(--oak-header-height)] min-w-0 items-center gap-6 px-0! lg:px-[var(--oak-page-x)]! xl:gap-10"

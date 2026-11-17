@@ -17,8 +17,8 @@ import {
 const serviceHrefs = {
   mot: routes.mot,
   servicing: routes.service,
-  diagnostics: routes.aftersales,
-  mechanical: routes.aftersales,
+  diagnostics: getBookingUrl({ type: "service", source: "aftersales" }),
+  mechanical: getBookingUrl({ type: "service", source: "aftersales" }),
 } as const;
 
 function WorkshopPhotoSlot() {

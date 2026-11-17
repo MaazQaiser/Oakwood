@@ -150,7 +150,7 @@ export function MakeCarousel({
 
   return (
     <div className="mx-auto w-full lg:max-w-[var(--oak-width-content)]">
-      <div className="flex items-center justify-between gap-4 px-6 sm:px-10 lg:px-14">
+      <div className="flex items-center justify-between gap-4 px-[var(--oak-page-x)]">
         <h2 className="text-h3 text-navy">Browse by make</h2>
         <div className="flex shrink-0 gap-2">
           <button
@@ -176,7 +176,7 @@ export function MakeCarousel({
         </div>
       </div>
 
-      <div className="mt-8 px-6 sm:px-10 lg:px-14">
+      <div className="mt-8 px-[var(--oak-page-x)]">
       <ul
         id="browse-by-make-scroller"
         ref={scroller}
@@ -209,7 +209,7 @@ export function MakeCarousel({
       </div>
 
       {/* Drag the line to move through the makes. Arrows page five at a time. */}
-      <div className="mt-5 px-6 sm:px-10 lg:px-14">
+      <div className="mt-5 px-[var(--oak-page-x)]">
         <div
           ref={track}
           role="scrollbar"

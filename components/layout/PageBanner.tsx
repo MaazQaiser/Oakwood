@@ -52,11 +52,18 @@ export function PageBanner({
   return (
     <section
       className={cn(
-        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.75rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:px-0",
-        hideTitle ? "pb-6 lg:pb-7" : "pb-10 lg:pb-12",
+        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#ECF3F8]",
+        "px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+2.5rem)]",
+        "lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:px-0",
+        hideTitle ? "pb-8 lg:pb-10" : "pb-14 lg:min-h-[18rem] lg:pb-20",
       )}
     >
-      <div className={cn("mx-auto w-full lg:px-[var(--oak-page-x)]", widthClass[width])}>
+      <div
+        className={cn(
+          "mx-auto w-full max-w-[var(--oak-width-wide)] lg:px-[var(--oak-page-x)]",
+          width !== "wide" && widthClass[width],
+        )}
+      >
         {crumbs && crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
         {hideTitle ? (
           <h1 className="sr-only">{title}</h1>
@@ -64,18 +71,20 @@ export function PageBanner({
           <h1
             className={cn(
               "max-w-3xl text-[2.15rem] font-medium leading-[1.15em] tracking-[-0.03em] text-ink sm:text-[2.75rem]",
-              crumbs?.length ? "mt-5" : "mt-0",
+              crumbs?.length ? "mt-6" : "mt-0",
             )}
           >
             {title}
           </h1>
         )}
         {description ? (
-          <div className="mt-4 max-w-xl text-[0.95rem] leading-relaxed text-[#8b95a3]">{description}</div>
+          <div className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-[#8b95a3]">
+            {description}
+          </div>
         ) : null}
-        {actions ? <div className="mt-8">{actions}</div> : null}
+        {actions ? <div className="mt-10">{actions}</div> : null}
         {!actions && (primary || secondary) ? (
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             {primary ? (
               <Link
                 href={primary.href}
@@ -101,7 +110,7 @@ export function PageBanner({
           </div>
         ) : null}
         {children ? (
-          <div className={hideTitle ? "mt-4" : "mt-8"}>{children}</div>
+          <div className={hideTitle ? "mt-4" : "mt-10"}>{children}</div>
         ) : null}
       </div>
     </section>

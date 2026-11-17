@@ -35,7 +35,7 @@ export function HomeFinanceStrip({
             {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
           </p>
           <p className="mt-auto w-full pt-5">
-            <Button href={routes.eligibility} className="btn-compact w-full sm:w-auto">
+            <Button href={routes.eligibility} className="btn-compact w-auto self-start">
               {HOME_FINANCE_ELIGIBILITY_CTA}
             </Button>
           </p>
@@ -49,7 +49,7 @@ export function HomeFinanceStrip({
             {HOME_FINANCE_BEAT_DESCRIPTION}
           </p>
           <p className="mt-auto w-full pt-5">
-            <Button href={routes.finance} className="btn-compact w-full sm:w-auto">
+            <Button href={routes.finance} className="btn-compact w-auto self-start">
               {HOME_FINANCE_BEAT_CTA}
             </Button>
           </p>
@@ -74,7 +74,7 @@ export function HomeFinanceStrip({
           {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
         </p>
         <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.eligibility} className="btn-compact w-full">
+          <Button href={routes.eligibility} className="btn-compact w-auto self-start">
             {HOME_FINANCE_ELIGIBILITY_CTA}
           </Button>
         </p>
@@ -90,7 +90,7 @@ export function HomeFinanceStrip({
           {HOME_FINANCE_RATES_SUPPORT}
         </p>
         <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.financeCalculator} className="btn-compact w-full">
+          <Button href={routes.financeCalculator} className="btn-compact w-auto self-start">
             {HOME_FINANCE_RATES_CTA}
           </Button>
         </p>
@@ -104,7 +104,7 @@ export function HomeFinanceStrip({
           {HOME_FINANCE_BEAT_DESCRIPTION}
         </p>
         <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.finance} className="btn-compact w-full">
+          <Button href={routes.finance} className="btn-compact w-auto self-start">
             {HOME_FINANCE_BEAT_CTA}
           </Button>
         </p>

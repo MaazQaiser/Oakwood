@@ -24,7 +24,7 @@ export function HomeHero() {
       <Container className="flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
         <HomeProofStrip />
         <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[#ECF3F8] py-10 sm:py-12 lg:py-14">
-          <div className="mx-auto w-full max-w-[var(--oak-width-content)] px-10 sm:px-12 lg:px-16">
+          <div className="mx-auto w-full max-w-[var(--oak-width-content)] px-[var(--oak-page-x)]">
             <HomeSearchCard />
           </div>
         </div>
@@ -37,31 +37,67 @@ export function HomeHero() {
 
 function CurrentHero() {
   return (
-    <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] flex flex-col overflow-hidden bg-[#ECF3F8] px-6 pt-[calc(var(--oak-header-height)+1.5rem)] lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:min-h-[calc(100dvh-9rem)] lg:rounded-[32px] lg:px-0 lg:pb-10">
-      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[78%] lg:block">
+    <section
+      className={cn(
+        "relative -mt-[calc(var(--oak-header-height)-0.75rem)] flex flex-col overflow-hidden bg-[#ECF3F8]",
+        "px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+1.5rem)] pb-10",
+        "md:-mt-[calc(var(--oak-header-height)-1rem)] md:min-h-[calc(100dvh-6rem)] md:px-0 md:pb-12",
+        "lg:min-h-[calc(100dvh-4rem)] lg:pb-14",
+      )}
+    >
+      {/* Desktop / tablet photo plane */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[72%] md:block lg:w-[78%]">
         <Image
           src="/images/hero/open-sky.png"
           alt="A smiling customer giving a thumbs up beside a car under an open sky"
           fill
           priority
           quality={92}
-          sizes="78vw"
+          sizes="(min-width: 1024px) 78vw, 72vw"
           className="object-cover object-[34%_center] [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_14%,#000_34%)]"
         />
       </div>
-      <div className="relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col pb-8 lg:flex-1 lg:justify-center lg:px-[var(--oak-page-x)] lg:pb-0">
-        <div className="flex w-full max-w-xl flex-col">
-          <div className="max-w-md">
-            <h1 className="text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy sm:text-[3.15rem] sm:leading-[1.12em] lg:text-[3.45rem] lg:leading-[1.1em]">
-              {HOME_HERO_HEADING}
-            </h1>
-            <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted">
-              {HOME_HERO_DESCRIPTION}
-            </p>
+
+      <div
+        className={cn(
+          "relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col",
+          "md:flex-1 md:justify-center md:px-[var(--oak-page-x)]",
+          "md:pt-10 md:pb-10 lg:pt-14 lg:pb-14",
+        )}
+      >
+        <div className="flex w-full max-w-xl flex-col md:max-w-[26rem] lg:max-w-[30.6rem]">
+          {/* Mobile order: Title → Floating box+photo → Sub heading → Part-ex
+              Desktop/tablet: Title → Sub → Search → Part-ex */}
+          <h1
+            className={cn(
+              "order-1 text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy",
+              "sm:text-[3.15rem] sm:leading-[1.12em]",
+              "md:text-[2.85rem] md:leading-[1.12em]",
+              "lg:text-[3.45rem] lg:leading-[1.1em]",
+            )}
+          >
+            {HOME_HERO_HEADING}
+          </h1>
+
+          <p
+            className={cn(
+              "order-3 mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted",
+              "md:order-2 md:mt-5",
+            )}
+          >
+            {HOME_HERO_DESCRIPTION}
+          </p>
+
+          {/* Mobile: photo behind floating search box */}
+          <div className="order-2 relative mt-4 md:hidden">
+            <HeroCompactPhoto />
+            <HomeSearchBar className="relative z-20 -mt-14 px-0" compact />
           </div>
-          <HeroCompactPhoto className="-mx-6 mt-4 lg:hidden" />
-          <HomeSearchBar className="relative z-20 w-full max-lg:-mt-2 lg:mt-5" />
-          <div className="relative z-10 mt-8">
+
+          {/* Tablet / desktop search */}
+          <HomeSearchBar className="order-3 relative z-20 mt-5 hidden w-full md:block lg:mt-6" compact />
+
+          <div className="order-4 relative z-10 mt-6 md:mt-8">
             <Link
               href={routes.partExchange}
               className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
@@ -82,7 +118,7 @@ function HeroCompactPhoto({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative h-52 shrink-0 overflow-hidden sm:h-60",
+        "relative h-52 shrink-0 overflow-hidden rounded-[20px] sm:h-60",
         className,
       )}
     >
@@ -96,7 +132,7 @@ function HeroCompactPhoto({ className }: { className?: string }) {
         className="object-cover object-[center_32%]"
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ECF3F8_0%,rgba(236,243,248,0.42)_16%,rgba(236,243,248,0)_40%,rgba(236,243,248,0)_58%,rgba(236,243,248,0.72)_86%,#ECF3F8_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ECF3F8_0%,rgba(236,243,248,0.42)_12%,rgba(236,243,248,0)_36%,rgba(236,243,248,0)_55%,rgba(236,243,248,0.55)_82%,#ECF3F8_100%)]"
         aria-hidden
       />
     </div>

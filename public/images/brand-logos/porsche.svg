@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 48" role="img" aria-label="Porsche">
+  <ellipse cx="22" cy="24" rx="14" ry="16" fill="#D5001C"/>
+  <text x="16" y="28" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#fff">P</text>
+  <text x="44" y="29" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#1a1a1a">Porsche</text>
+</svg>

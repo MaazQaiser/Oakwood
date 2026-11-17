@@ -14,8 +14,8 @@ export interface HandoverPhoto {
   family?: boolean;
 }
 
-export const HOME_REVIEWS_TITLE = "Don’t take our word for it.";
-export const HOME_REVIEWS_SUBTITLE = "Trusted by thousands of happy customers.";
+export const HOME_REVIEWS_TITLE = "Don’t take our word for it";
+export const HOME_REVIEWS_SUBTITLE = "Trusted by thousands of happy customers";
 
 /** Eve’s Batch 3 cropped reviews — wording kept exact. */
 export const HOME_BATCH3_REVIEWS: HomepageReview[] = [

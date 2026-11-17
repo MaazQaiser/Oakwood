@@ -53,20 +53,22 @@ export function BrowseByNeed() {
       aria-label="Shop by what you need"
       className="bg-[#ECF3F8] py-10! sm:py-12! lg:py-14!"
     >
-      <Container className="px-6! sm:px-12! lg:px-16!">
+      <Container>
         <SectionIntro align="center" heading="Shop by what you need">
           Start with the type of car that suits your everyday life.
         </SectionIntro>
         <Grid columns="budget" className="mt-8 gap-3! lg:gap-4!">
-          {needCategories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              id={category.id}
-              title={category.title}
-              description={category.description}
-              href={category.href}
-            />
-          ))}
+          {needCategories
+            .filter((category) => category.id !== "low-mileage")
+            .map((category) => (
+              <CategoryCard
+                key={category.id}
+                id={category.id}
+                title={category.title}
+                description={category.description}
+                href={category.href}
+              />
+            ))}
         </Grid>
       </Container>
     </Section>

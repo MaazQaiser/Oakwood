@@ -15,114 +15,202 @@ import {
   type HomepageReview,
 } from "@/lib/home/reviews-batch3";
 
-const VISIBLE = 3;
-
 export function ReviewsSection() {
-  const [start, setStart] = useState(0);
+  const reviewTrackRef = useRef<HTMLDivElement>(null);
+  const photoTrackRef = useRef<HTMLDivElement>(null);
+  const [reviewPage, setReviewPage] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const maxStart = Math.max(0, HOME_BATCH3_REVIEWS.length - VISIBLE);
-  const pageCount = maxStart + 1;
+  const [paused, setPaused] = useState(false);
+  const [perView, setPerView] = useState(1);
 
   useEffect(() => {
+    function update() {
+      const width = window.innerWidth;
+      if (width >= 1024) setPerView(3);
+      else if (width >= 768) setPerView(2);
+      else setPerView(1);
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const reviewPageCount = Math.max(1, HOME_BATCH3_REVIEWS.length - perView + 1);
+
+  useEffect(() => {
+    if (paused) return;
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
     const id = window.setInterval(() => {
       setPhotoIndex((current) => (current + 1) % HOME_HANDOVER_PHOTOS.length);
     }, 4500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [paused]);
 
-  function go(delta: number) {
-    setStart((current) => Math.min(maxStart, Math.max(0, current + delta)));
+  useEffect(() => {
+    const track = photoTrackRef.current;
+    if (!track) return;
+    const child = track.children[photoIndex] as HTMLElement | undefined;
+    if (!child) return;
+    track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+  }, [photoIndex]);
+
+  function scrollReviews(delta: number) {
+    const track = reviewTrackRef.current;
+    if (!track) return;
+    const next = Math.min(reviewPageCount - 1, Math.max(0, reviewPage + delta));
+    setReviewPage(next);
+    const child = track.children[next] as HTMLElement | undefined;
+    if (child) {
+      track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+    }
   }
 
-  const visibleReviews = HOME_BATCH3_REVIEWS.slice(start, start + VISIBLE);
-  const primaryPhoto = HOME_HANDOVER_PHOTOS[photoIndex] ?? HOME_HANDOVER_PHOTOS[0];
-  const secondaryPhoto =
-    HOME_HANDOVER_PHOTOS[(photoIndex + 1) % HOME_HANDOVER_PHOTOS.length] ??
-    HOME_HANDOVER_PHOTOS[1];
+  function onReviewScroll() {
+    const track = reviewTrackRef.current;
+    if (!track) return;
+    const children = Array.from(track.children) as HTMLElement[];
+    if (!children.length) return;
+    let closest = 0;
+    let best = Number.POSITIVE_INFINITY;
+    children.forEach((child, index) => {
+      const dist = Math.abs(child.offsetLeft - track.scrollLeft);
+      if (dist < best) {
+        best = dist;
+        closest = index;
+      }
+    });
+    setReviewPage(Math.min(reviewPageCount - 1, closest));
+  }
+
+  function onPhotoScroll() {
+    const track = photoTrackRef.current;
+    if (!track) return;
+    const children = Array.from(track.children) as HTMLElement[];
+    let closest = 0;
+    let best = Number.POSITIVE_INFINITY;
+    children.forEach((child, index) => {
+      const dist = Math.abs(child.offsetLeft - track.scrollLeft);
+      if (dist < best) {
+        best = dist;
+        closest = index;
+      }
+    });
+    setPhotoIndex(closest);
+  }
 
   return (
     <Section
       id="reviews"
       aria-label="Reviews"
-      className="relative overflow-hidden bg-[linear-gradient(180deg,#F4F8FC_0%,#FFFFFF_55%)]"
+      className="relative overflow-hidden bg-[#ECF3F8] py-12! sm:py-14! lg:py-16!"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_15%_0%,_rgba(142,191,223,0.28),_transparent_60%)]"
-      />
       <Container className="relative">
         <SectionIntro heading={HOME_REVIEWS_TITLE}>
           {HOME_REVIEWS_SUBTITLE}
         </SectionIntro>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:items-stretch lg:gap-10">
+        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
           <div className="min-w-0">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <p className="oak-eyebrow">Customer reviews</p>
-              <div className="flex items-center gap-2">
-                <CarouselButton
-                  label="Previous reviews"
-                  direction="prev"
-                  disabled={start === 0}
-                  onClick={() => go(-1)}
-                />
-                <CarouselButton
-                  label="Next reviews"
-                  direction="next"
-                  disabled={start >= maxStart}
-                  onClick={() => go(1)}
-                />
-              </div>
+            <div className="mb-4 flex items-center justify-end gap-2">
+              <CarouselButton
+                label="Previous reviews"
+                direction="prev"
+                disabled={reviewPage === 0}
+                onClick={() => scrollReviews(-1)}
+              />
+              <CarouselButton
+                label="Next reviews"
+                direction="next"
+                disabled={reviewPage >= reviewPageCount - 1}
+                onClick={() => scrollReviews(1)}
+              />
             </div>
 
-            <div ref={trackRef} className="flex flex-col gap-4">
-              {visibleReviews.map((review) => (
-                <ReviewQuoteCard key={`${review.id}-${start}`} review={review} />
+            <div
+              ref={reviewTrackRef}
+              onScroll={onReviewScroll}
+              className={cn(
+                "flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3",
+                "[scrollbar-width:thin] [scrollbar-color:#8EBFDF_#ECF3F8]",
+                "[&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#8EBFDF] [&::-webkit-scrollbar-track]:bg-[#D7E6F2]",
+              )}
+            >
+              {HOME_BATCH3_REVIEWS.map((review) => (
+                <div
+                  key={review.id}
+                  className={cn(
+                    "snap-start shrink-0",
+                    perView === 1 && "w-[88%]",
+                    perView === 2 && "w-[calc((100%-1rem)/2)]",
+                    perView === 3 && "w-[calc((100%-2rem)/3)]",
+                  )}
+                >
+                  <ReviewQuoteCard review={review} />
+                </div>
               ))}
             </div>
 
             <div className="mt-5 flex items-center justify-start gap-2">
-              {Array.from({ length: pageCount }).map((_, index) => (
+              {Array.from({ length: reviewPageCount }).map((_, index) => (
                 <button
                   key={index}
                   type="button"
                   aria-label={`Show reviews starting at ${index + 1}`}
-                  aria-current={index === start}
-                  onClick={() => setStart(index)}
+                  aria-current={index === reviewPage}
+                  onClick={() => {
+                    setReviewPage(index);
+                    const track = reviewTrackRef.current;
+                    const child = track?.children[index] as HTMLElement | undefined;
+                    if (track && child) {
+                      track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+                    }
+                  }}
                   className={cn(
                     "h-2.5 rounded-full transition-[width,background-color] duration-[var(--oak-motion-base)]",
-                    index === start ? "w-7 bg-[#002852]" : "w-2.5 bg-[#D7E6F2] hover:bg-[#8EBFDF]",
+                    index === reviewPage
+                      ? "w-7 bg-[#002852]"
+                      : "w-2.5 bg-[#D7E6F2] hover:bg-[#8EBFDF]",
                   )}
                 />
               ))}
             </div>
           </div>
 
-          <aside aria-label="Customer handovers" className="min-w-0">
+          <aside
+            aria-label="Customer handovers"
+            className="min-w-0"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onTouchStart={() => setPaused(true)}
+            onTouchEnd={() => setPaused(false)}
+          >
             <p className="oak-eyebrow mb-4">Recent handovers</p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 lg:gap-4">
-              <figure className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(0,40,82,0.08)] lg:aspect-[5/6]">
-                <Image
-                  key={primaryPhoto.id}
-                  src={primaryPhoto.src}
-                  alt={primaryPhoto.alt}
-                  fill
-                  sizes="(max-width: 1024px) 50vw, 28vw"
-                  className="object-cover transition-opacity duration-[var(--oak-motion-slow)]"
-                  priority={false}
-                />
-              </figure>
-              <figure className="relative aspect-[4/5] overflow-hidden rounded-[24px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(0,40,82,0.08)] sm:aspect-[4/5] lg:aspect-[16/11]">
-                <Image
-                  key={secondaryPhoto.id}
-                  src={secondaryPhoto.src}
-                  alt={secondaryPhoto.alt}
-                  fill
-                  sizes="(max-width: 1024px) 50vw, 28vw"
-                  className="object-cover"
-                />
-              </figure>
+            <div
+              ref={photoTrackRef}
+              onScroll={onPhotoScroll}
+              className={cn(
+                "flex snap-x snap-mandatory gap-3 overflow-x-auto",
+                "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+              )}
+            >
+              {HOME_HANDOVER_PHOTOS.map((photo) => (
+                <figure
+                  key={photo.id}
+                  className="relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(0,40,82,0.08)] lg:aspect-[5/6]"
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(max-width: 1024px) 88vw, 28vw"
+                    className="object-cover"
+                  />
+                </figure>
+              ))}
             </div>
             <div className="mt-4 flex justify-center gap-1.5 lg:justify-start">
               {HOME_HANDOVER_PHOTOS.map((photo, index) => (
@@ -150,7 +238,7 @@ function ReviewQuoteCard({ review }: { review: HomepageReview }) {
   const icon = REVIEW_SOURCE_ICON[review.source];
 
   return (
-    <article className="relative flex flex-col rounded-[22px] bg-white p-5 shadow-[0_14px_34px_rgba(0,40,82,0.08)] sm:p-6">
+    <article className="relative flex h-full flex-col rounded-[22px] bg-white p-5 shadow-[0_14px_34px_rgba(0,40,82,0.08)] sm:p-6">
       <Image
         src={icon.src}
         alt={icon.label}

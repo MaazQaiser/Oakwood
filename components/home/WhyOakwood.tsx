@@ -30,7 +30,12 @@ const financePoints = [
 
 export function WhyOakwood() {
   return (
-    <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING}>
+    <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING} className="relative">
+      {/* Mobile-only blue divider, sat halfway into the gap above */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-[var(--oak-page-x)] top-0 h-0.5 -translate-y-1/2 bg-[#0097DB] md:hidden"
+      />
       <Container width="wide">
         <SectionIntro heading={WHY_OAKWOOD_HEADING} headingClassName="text-navy">
           {WHY_OAKWOOD_INTRO_LEAD}

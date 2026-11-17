@@ -9,7 +9,10 @@ import { AftersalesRelatedLinks } from "@/components/aftersales/AftersalesRelate
 import { AftersalesViewTracker } from "@/components/aftersales/AftersalesViewTracker";
 import { BookingList } from "@/components/aftersales/BookingList";
 import { CallbackEnquiryForm } from "@/components/aftersales/CallbackEnquiryForm";
+import { MotPageV2 } from "@/components/aftersales/MotPageV2";
 import { ServiceCard } from "@/components/aftersales/ServiceCard";
+import { ServicePageV2 } from "@/components/aftersales/ServicePageV2";
+import { WarrantyPageV2 } from "@/components/aftersales/WarrantyPageV2";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/cards/Card";
@@ -20,22 +23,12 @@ import {
   audiServiceCopy,
   audiServiceFaqs,
   manufacturerServicing,
-  motChecks,
-  motFailCopy,
-  motFaqs,
-  motPageCopy,
-  motWhenRequired,
-  serviceFaqs,
   serviceIncludedStatus,
   serviceIntervalsStatus,
   serviceOverview,
-  servicePageCopy,
   servicePricingStatus,
-  warrantyCoverage,
-  warrantyFaqs,
-  warrantyPageCopy,
 } from "@/lib/aftersales/content";
-import { CMS_NOTICE, WARRANTY_ENGINE_NOTICE } from "@/lib/aftersales/copy";
+import { CMS_NOTICE } from "@/lib/aftersales/copy";
 import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import { createBreadcrumbs, type BreadcrumbItem } from "@/lib/seo";
 import type { AftersalesFaqItem, AftersalesPageCopy } from "@/types/aftersales";
@@ -107,11 +100,13 @@ export function ServicePage({
   variant?: "service" | "audi";
   bookings?: BookingListEntry[];
 }) {
-  const copy: AftersalesPageCopy =
-    variant === "audi" ? audiServiceCopy : servicePageCopy;
-  const faqs: AftersalesFaqItem[] =
-    variant === "audi" ? audiServiceFaqs : serviceFaqs;
-  const path = variant === "audi" ? routes.servicingAudi : routes.service;
+  if (variant !== "audi") {
+    return <ServicePageV2 bookings={bookings} />;
+  }
+
+  const copy: AftersalesPageCopy = audiServiceCopy;
+  const faqs: AftersalesFaqItem[] = audiServiceFaqs;
+  const path = routes.servicingAudi;
   const breadcrumbs = createBreadcrumbs([
     { label: "Home", href: routes.home },
     { label: "Aftersales", href: routes.aftersales },
@@ -150,26 +145,24 @@ export function ServicePage({
               </section>
             ))}
 
-            {variant === "audi" ? (
-              <section aria-labelledby="audi-servicing-heading">
-                <h2 id="audi-servicing-heading" className="text-h3">
-                  {audiManufacturerCopy.title}
-                </h2>
-                <p className="mt-3 text-body text-muted">{audiManufacturerCopy.body}</p>
-              </section>
-            ) : (
-              <section aria-labelledby="manufacturer-servicing-heading">
-                <h2 id="manufacturer-servicing-heading" className="text-h3">
-                  {manufacturerServicing.title}
-                </h2>
-                <p className="mt-3 text-body text-muted">{manufacturerServicing.body}</p>
-                <p className="mt-4">
-                  <Button href={manufacturerServicing.href} variant="secondary">
-                    {manufacturerServicing.cta}
-                  </Button>
-                </p>
-              </section>
-            )}
+            <section aria-labelledby="audi-servicing-heading">
+              <h2 id="audi-servicing-heading" className="text-h3">
+                {audiManufacturerCopy.title}
+              </h2>
+              <p className="mt-3 text-body text-muted">{audiManufacturerCopy.body}</p>
+            </section>
+
+            <section aria-labelledby="manufacturer-servicing-heading">
+              <h2 id="manufacturer-servicing-heading" className="text-h3">
+                {manufacturerServicing.title}
+              </h2>
+              <p className="mt-3 text-body text-muted">{manufacturerServicing.body}</p>
+              <p className="mt-4">
+                <Button href={manufacturerServicing.href} variant="secondary">
+                  {manufacturerServicing.cta}
+                </Button>
+              </p>
+            </section>
 
             <Grid columns="two">
               <Card>
@@ -200,144 +193,11 @@ export function MotPage({
 }: {
   bookings?: BookingListEntry[];
 }) {
-  const breadcrumbs = createBreadcrumbs([
-    { label: "Home", href: routes.home },
-    { label: "Aftersales", href: routes.aftersales },
-    { label: "MOT", href: routes.mot },
-  ]);
-
-  return (
-    <PageShell breadcrumbs={breadcrumbs}>
-      <AftersalesViewTracker page="mot" />
-      <JsonLd data={createFaqJsonLd(motFaqs)} />
-      <AftersalesHero
-        title={motPageCopy.title}
-        description={motPageCopy.description}
-        primary={{
-          href: getBookingUrl({ type: "mot", source: "mot" }),
-          label: "Book an MOT",
-        }}
-        secondary={{
-          href: routes.bookingEnquiry,
-          label: "Request a callback",
-        }}
-      />
-      <BookingList bookings={bookings} filter="mot" />
-      <Section>
-        <Container>
-          <Stack gap="8">
-            <section aria-labelledby="mot-overview-heading">
-              <h2 id="mot-overview-heading" className="text-h3">
-                MOT service
-              </h2>
-              <p className="mt-3 text-body text-muted">
-                An MOT is a UK roadworthiness test. Oakwood takes MOT booking
-                requests for Bury and Chorley and will confirm the appointment
-                with you.
-              </p>
-            </section>
-            <section aria-labelledby="mot-checks-heading">
-              <h2 id="mot-checks-heading" className="text-h3">
-                What an MOT checks
-              </h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-body text-muted">
-                {motChecks.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-            <section aria-labelledby="mot-when-heading">
-              <h2 id="mot-when-heading" className="text-h3">
-                When an MOT is required
-              </h2>
-              <p className="mt-3 text-body text-muted">{motWhenRequired}</p>
-            </section>
-            <section aria-labelledby="mot-fail-heading">
-              <h2 id="mot-fail-heading" className="text-h3">
-                If the vehicle fails
-              </h2>
-              <p className="mt-3 text-body text-muted">{motFailCopy}</p>
-            </section>
-            <Alert title="MOT prices" tone="info">
-              MOT prices are not published here. Oakwood will confirm any cost
-              when we take your booking request.
-            </Alert>
-            <AftersalesLocations bookingType="mot" />
-            <AftersalesFaq items={motFaqs} />
-            <AftersalesRelatedLinks current={routes.mot} />
-          </Stack>
-        </Container>
-      </Section>
-    </PageShell>
-  );
+  return <MotPageV2 bookings={bookings} />;
 }
 
 export function WarrantyPage() {
-  const breadcrumbs = createBreadcrumbs([
-    { label: "Home", href: routes.home },
-    { label: "Aftersales", href: routes.aftersales },
-    { label: "Warranty", href: routes.warranty },
-  ]);
-
-  return (
-    <PageShell breadcrumbs={breadcrumbs}>
-      <AftersalesViewTracker page="warranty" />
-      <JsonLd data={createFaqJsonLd(warrantyFaqs)} />
-      <AftersalesHero
-        title={warrantyPageCopy.title}
-        description={warrantyPageCopy.description}
-        primary={{
-          href: routes.warrantyClaims,
-          label: "Make a warranty claim",
-        }}
-        secondary={{
-          href: routes.bookingEnquiry,
-          label: "Contact Oakwood",
-        }}
-      />
-      <Section>
-        <Container>
-          <Stack gap="8">
-            <section aria-labelledby="warranty-cover-heading">
-              <h2 id="warranty-cover-heading" className="text-h3">
-                Oakwood warranty coverage
-              </h2>
-              <p className="mt-3 text-body text-muted">{warrantyCoverage.summary}</p>
-              <p className="mt-3 text-body text-muted">{warrantyCoverage.expect}</p>
-            </section>
-            <section aria-labelledby="warranty-use-heading">
-              <h2 id="warranty-use-heading" className="text-h3">
-                How to use the warranty
-              </h2>
-              <p className="mt-3 text-body text-muted">{warrantyCoverage.howToUse}</p>
-            </section>
-            <section aria-labelledby="warranty-covered-heading">
-              <h2 id="warranty-covered-heading" className="text-h3">
-                What is covered
-              </h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-body text-muted">
-                {warrantyCoverage.covered.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-            <section aria-labelledby="warranty-not-heading">
-              <h2 id="warranty-not-heading" className="text-h3">
-                What isn&apos;t covered
-              </h2>
-              <p className="mt-3 text-body text-muted">{warrantyCoverage.notPublished}</p>
-            </section>
-            <Alert title="Warranty terms" tone="info">
-              {WARRANTY_ENGINE_NOTICE}
-            </Alert>
-            <AftersalesLocations />
-            <AftersalesFaq items={warrantyFaqs} />
-            <AftersalesRelatedLinks current={routes.warranty} />
-          </Stack>
-        </Container>
-      </Section>
-    </PageShell>
-  );
+  return <WarrantyPageV2 />;
 }
 
 export function BookingEnquiryPage() {

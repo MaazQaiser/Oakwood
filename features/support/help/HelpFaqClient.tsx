@@ -117,7 +117,7 @@ export function HelpFaqClient() {
   return (
     <>
       {/* Hero */}
-      <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#002852] px-6 pt-[calc(var(--oak-header-height)+2.25rem)] pb-12 text-white lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:rounded-[32px] lg:px-0 lg:pb-16">
+      <section className="relative -mt-[calc(var(--oak-header-height)-0.75rem)] overflow-hidden bg-[#002852] px-[var(--oak-page-x)] pt-[calc(var(--oak-header-height)+2.25rem)] pb-12 text-white lg:-mt-[calc(var(--oak-header-height)-1rem)] lg:mx-[var(--oak-page-x)] lg:rounded-[32px] lg:px-0 lg:pb-16">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_70%_at_100%_0%,rgba(0,156,224,0.45)_0%,rgba(0,156,224,0)_60%),radial-gradient(60%_60%_at_0%_100%,rgba(0,97,162,0.55)_0%,rgba(0,97,162,0)_70%),linear-gradient(135deg,#001c3d_0%,#002852_45%,#0061a2_100%)]"
@@ -241,7 +241,7 @@ export function HelpFaqClient() {
       {/* Browse by topic */}
       <nav
         aria-label="Help topics"
-        className="relative z-20 px-6 pt-10 md:sticky md:top-[calc(var(--oak-header-height)+0.5rem)] md:pt-6 lg:px-0"
+        className="relative z-20 px-[var(--oak-page-x)] pt-10 md:sticky md:top-[calc(var(--oak-header-height)+0.5rem)] md:pt-6 lg:px-0"
       >
         <div className={cn("mx-auto w-full max-w-[var(--oak-width-wide)] lg:px-[var(--oak-page-x)]", MOBILE_WIDTH)}>
           <div className="rounded-[24px] bg-white p-3 shadow-[0_10px_30px_rgba(16,40,72,0.08)] ring-1 ring-[#E7EEF4] md:p-2">
@@ -290,7 +290,7 @@ export function HelpFaqClient() {
       <section
         id="help-answers"
         aria-labelledby="help-answers-heading"
-        className="scroll-mt-[calc(var(--oak-header-height)+6rem)] px-6 py-10 md:py-14 lg:px-0"
+        className="scroll-mt-[calc(var(--oak-header-height)+6rem)] px-[var(--oak-page-x)] py-10 md:py-14 lg:px-0"
       >
         <div
           className={cn(

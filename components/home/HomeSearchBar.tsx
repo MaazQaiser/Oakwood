@@ -27,7 +27,14 @@ const fieldClass =
 
 type PriceMode = "monthly" | "total";
 
-export function HomeSearchBar({ className }: { className?: string }) {
+export function HomeSearchBar({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  /** 15% smaller floating box for desktop / overlapping mobile hero */
+  compact?: boolean;
+}) {
   const router = useRouter();
   const [value, setValue] = useState("");
   const [mode, setMode] = useState<PriceMode>("monthly");
@@ -69,7 +76,12 @@ export function HomeSearchBar({ className }: { className?: string }) {
         submitSearch();
       }}
     >
-      <div className="rounded-[28px] bg-white p-5 shadow-[0_18px_40px_rgba(0,16,40,0.14)] sm:p-6">
+      <div
+        className={cn(
+          "rounded-[28px] bg-white shadow-[0_18px_40px_rgba(0,16,40,0.14)]",
+          compact ? "p-4 sm:p-5" : "p-5 sm:p-6",
+        )}
+      >
         <div id="home-search-filters">
           <fieldset className="m-0 border-0 p-0">
             <legend className="sr-only">Price type</legend>
@@ -186,10 +198,10 @@ export function HomeSearchBar({ className }: { className?: string }) {
 
         <button
           type="submit"
-          className="mt-3 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl bg-[#002852] py-1.5 pl-5 pr-1.5 text-base font-semibold text-white hover:bg-[#001c3d]"
+          className="mt-3 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl bg-[#0097DB] py-1.5 pl-5 pr-1.5 text-[1.05rem] font-bold text-white hover:bg-[#0086C3]"
         >
           <span>{HOME_HERO_PRIMARY}</span>
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-[#002852]">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-[#0097DB]">
             <IconArrow width={18} height={18} />
           </span>
         </button>

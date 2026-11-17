@@ -18,7 +18,7 @@ export function HelpContactCards() {
     <section
       id="contact"
       aria-labelledby="help-contact-heading"
-      className="scroll-mt-[calc(var(--oak-header-height)+1rem)] px-6 pb-16 lg:px-0 lg:pb-20"
+      className="scroll-mt-[calc(var(--oak-header-height)+1rem)] px-[var(--oak-page-x)] pb-16 lg:px-0 lg:pb-20"
     >
       <div className="mx-auto w-full max-w-[var(--oak-width-wide)] lg:px-[var(--oak-page-x)] max-[480px]:max-w-[350px]">
         <div className="rounded-[32px] bg-[#ECF3F8] p-6 sm:p-8 lg:p-10">
