@@ -3,6 +3,7 @@ import { AftersalesFeatureHero } from "@/components/aftersales/AftersalesFeature
 import { AftersalesRelatedLinks } from "@/components/aftersales/AftersalesRelatedLinks";
 import { AftersalesViewTracker } from "@/components/aftersales/AftersalesViewTracker";
 import { Container, Section } from "@/components/layout/Container";
+import { Button } from "@/components/ui/Button";
 import { IconArrow, IconCheck } from "@/components/ui/icons";
 import { showroomProfiles } from "@/config/locations";
 import { routes } from "@/config/routes";
@@ -51,10 +52,10 @@ export function WarrantyPageV2() {
           {WARRANTY_V2.tiers.map((tier) => (
             <article
               key={tier.id}
-              className="relative flex flex-col rounded-[24px] bg-white p-6 text-[#002852] shadow-[0_18px_40px_rgba(0,16,40,0.18)]"
+              className="relative flex flex-col rounded-[24px] border border-[#E7EEF4] bg-white p-6 text-[#002852] shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
             >
               {tier.badge ? (
-                <span className="absolute -top-3 right-5 rounded-full bg-[#0097DB] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.06em] text-white">
+                <span className="absolute -top-3 right-5 rounded-full bg-[#0097DB] px-3 py-1 text-[0.75rem] font-semibold text-white">
                   {tier.badge}
                 </span>
               ) : null}
@@ -83,7 +84,7 @@ export function WarrantyPageV2() {
 
       <Section id="compare-cover" className="scroll-mt-[calc(var(--oak-header-height)+1.5rem)]">
         <Container>
-          <p className="oak-eyebrow">What&apos;s included</p>
+          <p className="text-sm font-semibold text-primary-secondary">What&apos;s included</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852] sm:text-[2.15rem]">
             Compare cover
           </h2>
@@ -137,7 +138,7 @@ export function WarrantyPageV2() {
 
       <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow">Making a claim</p>
+          <p className="text-sm font-semibold text-primary-secondary">Making a claim</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             How a claim works
           </h2>
@@ -160,7 +161,7 @@ export function WarrantyPageV2() {
 
       <Section>
         <Container>
-          <p className="oak-eyebrow">Exclusions</p>
+          <p className="text-sm font-semibold text-primary-secondary">Exclusions</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             What no warranty covers
           </h2>
@@ -199,18 +200,16 @@ export function WarrantyPageV2() {
               )}
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={routes.usedCars}
-                className="inline-flex min-h-12 items-center justify-center rounded-[14px] bg-white px-5 text-sm font-semibold text-[#002852] no-underline hover:bg-[#E7F1F8]"
-              >
+              <Button href={routes.usedCars} className="btn-compact w-auto self-start bg-white text-[#002852] hover:bg-[#E7F1F8]">
                 Browse covered cars
-              </Link>
-              <Link
+              </Button>
+              <Button
                 href={routes.warrantyClaims}
-                className="inline-flex min-h-12 items-center justify-center rounded-[14px] border border-white/35 px-5 text-sm font-semibold text-white no-underline hover:bg-white/10"
+                variant="secondary"
+                className="btn-compact w-auto self-start border border-white/35 bg-transparent text-white hover:bg-white/10"
               >
                 Make a claim
-              </Link>
+              </Button>
             </div>
           </div>
           <div className="mt-12">

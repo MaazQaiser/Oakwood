@@ -53,7 +53,7 @@ export function ServicePageV2({
         breadcrumbs={breadcrumbs}
         eyebrow={
           <span className="inline-flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-[#0097DB] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-white">
+            <span className="rounded-[14px] bg-white px-3 py-1.5 text-[0.8rem] font-semibold text-[#002852] shadow-[0_6px_16px_rgba(16,40,72,0.08)]">
               {SERVICE_V2.usp}
             </span>
             <span>{SERVICE_V2.eyebrow}</span>
@@ -73,7 +73,7 @@ export function ServicePageV2({
             <Link
               key={card.title}
               href={card.href}
-              className="flex flex-col rounded-[22px] bg-white p-5 text-[#002852] no-underline shadow-[0_14px_34px_rgba(0,16,40,0.16)] transition-transform duration-[var(--oak-motion-fast)] hover:-translate-y-0.5"
+              className="flex flex-col rounded-[22px] border border-[#E7EEF4] bg-white p-5 text-[#002852] no-underline shadow-[0_10px_24px_rgba(16,40,72,0.06)] transition-transform duration-[var(--oak-motion-fast)] hover:-translate-y-0.5"
             >
               <h2 className="text-lg font-semibold tracking-[-0.02em]">{card.title}</h2>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-[#3d4f63]">
@@ -90,31 +90,31 @@ export function ServicePageV2({
 
       <BookingList bookings={bookings} filter="service" />
 
-      <Section className="bg-[#002852]! text-white">
+      <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow text-white/65">Volkswagen Group</p>
-          <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] sm:text-[2.15rem]">
+          <p className="text-sm font-semibold text-primary-secondary">Volkswagen Group</p>
+          <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852] sm:text-[2.15rem]">
             Volkswagen Group specialists
           </h2>
-          <p className="mt-4 max-w-3xl text-[0.98rem] leading-relaxed text-white/80">
+          <p className="mt-4 max-w-3xl text-[0.98rem] leading-relaxed text-muted">
             {SERVICE_V2.vagIntro}
           </p>
-          <p className="mt-4 max-w-2xl rounded-[18px] bg-white/10 px-5 py-4 text-sm leading-relaxed text-white/90 ring-1 ring-white/15">
+          <p className="mt-4 max-w-2xl rounded-[18px] bg-white px-5 py-4 text-sm leading-relaxed text-[#3d4f63] shadow-[0_8px_20px_rgba(16,40,72,0.05)]">
             {SERVICE_V2.vagCallout}
           </p>
           <ul className="mt-8 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICE_V2.vagBrands.map((brand) => (
               <li
                 key={brand.name}
-                className="flex items-center gap-4 rounded-[18px] bg-white/8 px-4 py-4 ring-1 ring-white/12"
+                className="flex items-center gap-4 rounded-[18px] border border-[#E7EEF4] bg-white px-4 py-4"
               >
-                <span className="relative grid h-12 w-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-white px-1">
+                <span className="relative grid h-12 w-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-[#F7FAFC] px-1">
                   <BrandLogo src={brand.logo} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold">{brand.name}</span>
+                  <span className="block text-sm font-semibold text-[#002852]">{brand.name}</span>
                   {brand.tag ? (
-                    <span className="mt-1 inline-flex rounded-full bg-[#0097DB]/30 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em]">
+                    <span className="mt-1 inline-flex rounded-[10px] bg-[#ECF3F8] px-2 py-0.5 text-[0.75rem] font-semibold text-[#0061A2]">
                       {brand.tag}
                     </span>
                   ) : null}
@@ -123,16 +123,16 @@ export function ServicePageV2({
             ))}
           </ul>
 
-          <div className="mt-10 flex flex-col gap-4 rounded-[24px] bg-white/10 p-6 ring-1 ring-white/15 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-10 flex flex-col gap-4 rounded-[24px] bg-[#ECF3F8] p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-lg font-semibold">Not a Volkswagen Group car?</p>
-              <p className="mt-1 text-sm text-white/75">
+              <p className="text-lg font-semibold text-[#002852]">Not a Volkswagen Group car?</p>
+              <p className="mt-1 text-sm text-muted">
                 We MOT, service and repair all makes and models.
               </p>
             </div>
             <Button
               href={getBookingUrl({ type: "service", source: "service" })}
-              className="btn-compact w-auto self-start bg-white text-[#002852] hover:bg-[#E7F1F8]"
+              className="btn-compact w-auto self-start"
             >
               Book your car in
             </Button>
@@ -142,7 +142,7 @@ export function ServicePageV2({
 
       <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow">German brand specialists</p>
+          <p className="text-sm font-semibold text-primary-secondary">German brand specialists</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             German brand expertise
           </h2>
@@ -169,7 +169,7 @@ export function ServicePageV2({
                   {brand.name}
                 </span>
                 {brand.vag ? (
-                  <span className="mt-2 rounded-full bg-[#ECF3F8] px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-[#0061A2]">
+                  <span className="mt-2 rounded-[10px] bg-[#ECF3F8] px-2.5 py-0.5 text-[0.75rem] font-semibold text-[#0061A2]">
                     VAG
                   </span>
                 ) : null}
@@ -181,7 +181,7 @@ export function ServicePageV2({
 
       <Section>
         <Container>
-          <p className="oak-eyebrow">Locations</p>
+          <p className="text-sm font-semibold text-primary-secondary">Locations</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             Our workshops
           </h2>
@@ -192,7 +192,7 @@ export function ServicePageV2({
                 className="rounded-[24px] border border-[#E7EEF4] bg-white p-6 shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
               >
                 {profile.slug === "bury" ? (
-                  <span className="inline-flex rounded-full bg-[#ECF3F8] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.06em] text-[#0061A2]">
+                  <span className="inline-flex rounded-[10px] bg-[#ECF3F8] px-3 py-1 text-[0.8rem] font-semibold text-[#0061A2]">
                     VAG specialist workshop
                   </span>
                 ) : null}
@@ -235,7 +235,7 @@ export function ServicePageV2({
 
       <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow">Top questions</p>
+          <p className="text-sm font-semibold text-primary-secondary">Top questions</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             Common questions
           </h2>

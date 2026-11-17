@@ -105,7 +105,7 @@ export function HomeSearchBar({
             </div>
           </fieldset>
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <div className="min-w-0">
               <label htmlFor="home-search-budget" className="sr-only">
                 {mode === "monthly"

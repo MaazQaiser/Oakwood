@@ -40,15 +40,7 @@ export function MotPageV2({
         breadcrumbs={breadcrumbs}
         eyebrow={MOT_V2.eyebrow}
         title={MOT_V2.title}
-        description={
-          <>
-            A{" "}
-            <mark className="rounded bg-[#FFF6D6] px-1.5 py-0.5 font-semibold text-[#002852]">
-              DVSA-approved
-            </mark>{" "}
-            test, with clear results and straight answers if anything needs fixing.
-          </>
-        }
+        description="A DVSA-approved test, with clear results and straight answers if anything needs fixing."
         bullets={MOT_V2.bullets}
         primary={{
           href: getBookingUrl({ type: "mot", source: "mot" }),
@@ -63,14 +55,12 @@ export function MotPageV2({
           {MOT_V2.factCards.map((card) => (
             <article
               key={card.title}
-              className="rounded-[24px] bg-white p-6 text-[#002852] shadow-[0_14px_34px_rgba(0,16,40,0.16)]"
+              className="rounded-[24px] border border-[#E7EEF4] bg-white p-6 text-[#002852] shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
             >
               <h2 className="text-lg font-semibold">{card.title}</h2>
               {card.highlight ? (
-                <p className="mt-3">
-                  <mark className="rounded bg-[#FFF6D6] px-2 py-1 text-xl font-bold text-[#002852]">
-                    {card.highlight}
-                  </mark>
+                <p className="mt-3 text-xl font-semibold text-[#002852]">
+                  {card.highlight}
                 </p>
               ) : null}
               <p className="mt-3 text-sm leading-relaxed text-[#3d4f63]">{card.body}</p>
@@ -83,7 +73,7 @@ export function MotPageV2({
 
       <Section>
         <Container>
-          <p className="oak-eyebrow">What&apos;s checked</p>
+          <p className="text-sm font-semibold text-primary-secondary">What&apos;s checked</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             What an MOT covers
           </h2>
@@ -114,7 +104,7 @@ export function MotPageV2({
 
       <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow">Your results</p>
+          <p className="text-sm font-semibold text-primary-secondary">Your results</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             Understanding your MOT result
           </h2>
@@ -131,7 +121,7 @@ export function MotPageV2({
               >
                 <span
                   className={cn(
-                    "inline-flex rounded-full px-2.5 py-0.5 text-[0.68rem] font-bold uppercase tracking-[0.06em] text-white",
+                    "inline-flex rounded-[10px] px-2.5 py-0.5 text-[0.8rem] font-semibold text-white",
                     result.tone === "fail" && "bg-[#D64545]",
                     result.tone === "pass-warn" && "bg-[#E2A93B]",
                     result.tone === "pass" && "bg-[#3D9B5F]",
@@ -164,7 +154,7 @@ export function MotPageV2({
 
       <Section>
         <Container>
-          <p className="oak-eyebrow">Locations</p>
+          <p className="text-sm font-semibold text-primary-secondary">Locations</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             Where to book your MOT
           </h2>
@@ -211,7 +201,7 @@ export function MotPageV2({
 
       <Section className="bg-[#F7FAFC]!">
         <Container>
-          <p className="oak-eyebrow">Top questions</p>
+          <p className="text-sm font-semibold text-primary-secondary">Top questions</p>
           <h2 className="mt-3 text-[1.85rem] font-semibold tracking-[-0.03em] text-[#002852]">
             Common questions
           </h2>

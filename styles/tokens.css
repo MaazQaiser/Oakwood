@@ -78,8 +78,8 @@
   --oak-space-12: 3rem;
   --oak-space-16: 4rem;
   --oak-space-20: 5rem;
-  /* Mobile gutters: was 1.25rem; +12px for cleaner side spacing sitewide. */
-  --oak-page-x: 2rem;
+  /* Mobile gutters: 8px so content and floating cards have room to breathe. */
+  --oak-page-x: 0.5rem;
   --oak-section-y: 3rem;
 
   /* Radius — soft marketplace, not luxury */
