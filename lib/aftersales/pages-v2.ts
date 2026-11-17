@@ -203,10 +203,10 @@ export const SERVICE_V2 = {
   vagBrands: [
     { name: "Volkswagen", logo: "/images/brand-logos/volkswagen.svg", tag: null },
     { name: "Audi", logo: "/images/brand-logos/audi.svg", tag: null },
-    { name: "ŠKODA", logo: "/images/brand-logos/skoda.svg", tag: null },
-    { name: "SEAT", logo: "/images/brand-logos/seat.svg", tag: null },
-    { name: "CUPRA", logo: "/images/brand-logos/cupra.svg", tag: null },
-    { name: "Porsche", logo: "/images/brand-logos/porsche.svg", tag: null },
+    { name: "ŠKODA", logo: "/images/brand-logos/skoda.png", tag: null },
+    { name: "SEAT", logo: "/images/brand-logos/seat.png", tag: null },
+    { name: "CUPRA", logo: "/images/brand-logos/cupra.png", tag: null },
+    { name: "Porsche", logo: "/images/brand-logos/porsche.png", tag: null },
     {
       name: "Volkswagen Commercial Vehicles",
       logo: "/images/brand-logos/volkswagen.svg",
@@ -218,8 +218,8 @@ export const SERVICE_V2 = {
   germanBrands: [
     { name: "Audi", logo: "/images/brand-logos/audi.svg", vag: true },
     { name: "BMW", logo: "/images/brand-logos/bmw.png", vag: false },
-    { name: "Mercedes-Benz", logo: "/images/brand-logos/mercedes.svg", vag: false },
-    { name: "Porsche", logo: "/images/brand-logos/porsche.svg", vag: true },
+    { name: "Mercedes-Benz", logo: "/images/brand-logos/mercedes.png", vag: false },
+    { name: "Porsche", logo: "/images/brand-logos/porsche.png", vag: true },
     { name: "Volkswagen", logo: "/images/brand-logos/volkswagen.svg", vag: true },
   ],
 };
