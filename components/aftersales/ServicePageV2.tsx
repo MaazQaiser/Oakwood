@@ -16,10 +16,9 @@ import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import type { BookingListEntry } from "@/types/booking";
 
 function BrandLogo({ src, name }: { src: string; name: string }) {
-  // No frame — larger mark, same size, one navy colour.
+  // Original brand colours on transparent marks — no tint filter.
   const wrap = "relative block h-16 w-16 shrink-0 sm:h-20 sm:w-20";
-  const imgClass =
-    "object-contain [filter:brightness(0)_saturate(100%)_invert(14%)_sepia(42%)_saturate(1800%)_hue-rotate(186deg)_brightness(0.95)]";
+  const imgClass = "object-contain";
 
   if (src.endsWith(".svg")) {
     return (
