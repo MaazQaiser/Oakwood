@@ -26,7 +26,7 @@ function BrandLogo({ src, name }: { src: string; name: string }) {
       <span className={wrap}>
         {/* SVG brand marks are static public assets; skip the image optimizer. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="" className={`h-full w-full ${imgClass}`} />
+        <img src={src} alt={name} className={`h-full w-full ${imgClass}`} />
       </span>
     );
   }
@@ -112,21 +112,14 @@ export function ServicePageV2({
           <p className="mt-4 max-w-2xl rounded-[18px] bg-white px-5 py-4 text-sm leading-relaxed text-[#3d4f63] shadow-[0_8px_20px_rgba(16,40,72,0.05)]">
             {SERVICE_V2.vagCallout}
           </p>
-          <ul className="mt-8 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid list-none grid-cols-3 gap-3 p-0 sm:grid-cols-4 lg:grid-cols-7">
             {SERVICE_V2.vagBrands.map((brand) => (
               <li
                 key={brand.name}
-                className="flex items-center gap-4 rounded-[18px] border border-[#E7EEF4] bg-white px-4 py-4"
+                className="flex items-center justify-center rounded-[18px] border border-[#E7EEF4] bg-white px-3 py-5"
+                aria-label={brand.name}
               >
                 <BrandLogo src={brand.logo} name={brand.name} />
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-[#002852]">{brand.name}</span>
-                  {brand.tag ? (
-                    <span className="mt-1 inline-flex rounded-[10px] bg-[#ECF3F8] px-2 py-0.5 text-[0.75rem] font-semibold text-[#0061A2]">
-                      {brand.tag}
-                    </span>
-                  ) : null}
-                </span>
               </li>
             ))}
           </ul>
