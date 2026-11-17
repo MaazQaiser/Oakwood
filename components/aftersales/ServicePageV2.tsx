@@ -109,9 +109,6 @@ export function ServicePageV2({
           <p className="mt-4 max-w-3xl text-[0.98rem] leading-relaxed text-muted">
             {SERVICE_V2.vagIntro}
           </p>
-          <p className="mt-4 max-w-2xl rounded-[18px] bg-white px-5 py-4 text-sm leading-relaxed text-[#3d4f63] shadow-[0_8px_20px_rgba(16,40,72,0.05)]">
-            {SERVICE_V2.vagCallout}
-          </p>
           <ul className="mt-8 grid list-none grid-cols-3 gap-3 p-0 sm:grid-cols-4 lg:grid-cols-7">
             {SERVICE_V2.vagBrands.map((brand) => (
               <li
