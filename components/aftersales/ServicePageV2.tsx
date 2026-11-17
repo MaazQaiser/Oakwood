@@ -16,16 +16,14 @@ import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import type { BookingListEntry } from "@/types/booking";
 
 function BrandLogo({ src, name }: { src: string; name: string }) {
-  // Fixed square + navy mono so every original mark reads at the same size and colour.
-  const frame =
-    "relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#F7FAFC] ring-1 ring-[#E7EEF4]";
-  // Original artwork, forced to one brand navy so the set looks uniform.
+  // No frame — larger mark, same size, one navy colour.
+  const wrap = "relative block h-12 w-12 shrink-0 sm:h-14 sm:w-14";
   const imgClass =
-    "object-contain p-2.5 [filter:brightness(0)_saturate(100%)_invert(14%)_sepia(42%)_saturate(1800%)_hue-rotate(186deg)_brightness(0.95)]";
+    "object-contain [filter:brightness(0)_saturate(100%)_invert(14%)_sepia(42%)_saturate(1800%)_hue-rotate(186deg)_brightness(0.95)]";
 
   if (src.endsWith(".svg")) {
     return (
-      <span className={frame}>
+      <span className={wrap}>
         {/* SVG brand marks are static public assets; skip the image optimizer. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt="" className={`h-full w-full ${imgClass}`} />
@@ -34,7 +32,7 @@ function BrandLogo({ src, name }: { src: string; name: string }) {
   }
 
   return (
-    <span className={frame}>
+    <span className={wrap}>
       <Image src={src} alt={`${name} logo`} fill sizes="56px" className={imgClass} />
     </span>
   );
