@@ -5,6 +5,7 @@ import { AftersalesRelatedLinks } from "@/components/aftersales/AftersalesRelate
 import { AftersalesViewTracker } from "@/components/aftersales/AftersalesViewTracker";
 import { BookingList } from "@/components/aftersales/BookingList";
 import { Container, Section } from "@/components/layout/Container";
+import { LocationMap } from "@/components/locations/LocationMap";
 import { Button } from "@/components/ui/Button";
 import { IconArrow, IconChevron } from "@/components/ui/icons";
 import { getBookingUrl, getFaqUrl, routes } from "@/config/routes";
@@ -184,43 +185,48 @@ export function ServicePageV2({
             {showroomProfiles.map((profile) => (
               <article
                 key={profile.slug}
-                className="rounded-[24px] border border-[#E7EEF4] bg-white p-6 shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
+                className="overflow-hidden rounded-[24px] border border-[#E7EEF4] bg-white shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
               >
-                {profile.slug === "bury" ? (
-                  <span className="inline-flex rounded-[10px] bg-[#ECF3F8] px-3 py-1 text-[0.8rem] font-semibold text-[#0061A2]">
-                    VAG specialist workshop
-                  </span>
-                ) : null}
-                <h3 className="mt-3 text-xl font-semibold text-[#002852]">
-                  {profile.h1}
-                </h3>
-                <p className="mt-3 text-sm text-muted">
-                  {[profile.postcode, profile.region].filter(Boolean).join(", ")}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[#002852]">
-                  {profile.telephone}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  Open Monday to Saturday, 09:00 to 18:00
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Button
-                    href={getBookingUrl({
-                      type: "service",
-                      source: "service",
-                      location: profile.slug,
-                    })}
-                    className="btn-compact w-auto"
+                <LocationMap profile={profile} />
+                <div className="p-6">
+                  {profile.slug === "bury" ? (
+                    <span className="inline-flex rounded-[10px] bg-[#ECF3F8] px-3 py-1 text-[0.8rem] font-semibold text-[#0061A2]">
+                      VAG specialist workshop
+                    </span>
+                  ) : null}
+                  <h3
+                    className={`text-xl font-semibold text-[#002852] ${profile.slug === "bury" ? "mt-3" : ""}`}
                   >
-                    Book at {profile.name}
-                  </Button>
-                  <Button
-                    href={getDirectionsUrl(profile)}
-                    variant="secondary"
-                    className="btn-compact w-auto"
-                  >
-                    Get directions
-                  </Button>
+                    {profile.h1}
+                  </h3>
+                  <p className="mt-3 text-sm text-muted">
+                    {[profile.postcode, profile.region].filter(Boolean).join(", ")}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#002852]">
+                    {profile.telephone}
+                  </p>
+                  <p className="mt-1 text-sm text-muted">
+                    Open Monday to Saturday, 09:00 to 18:00
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Button
+                      href={getBookingUrl({
+                        type: "service",
+                        source: "service",
+                        location: profile.slug,
+                      })}
+                      className="btn-compact w-auto"
+                    >
+                      Book at {profile.name}
+                    </Button>
+                    <Button
+                      href={getDirectionsUrl(profile)}
+                      variant="secondary"
+                      className="btn-compact w-auto"
+                    >
+                      Get directions
+                    </Button>
+                  </div>
                 </div>
               </article>
             ))}
