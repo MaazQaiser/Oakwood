@@ -17,7 +17,7 @@ import type { BookingListEntry } from "@/types/booking";
 
 function BrandLogo({ src, name }: { src: string; name: string }) {
   // No frame — larger mark, same size, one navy colour.
-  const wrap = "relative block h-12 w-12 shrink-0 sm:h-14 sm:w-14";
+  const wrap = "relative block h-16 w-16 shrink-0 sm:h-20 sm:w-20";
   const imgClass =
     "object-contain [filter:brightness(0)_saturate(100%)_invert(14%)_sepia(42%)_saturate(1800%)_hue-rotate(186deg)_brightness(0.95)]";
 
@@ -33,7 +33,7 @@ function BrandLogo({ src, name }: { src: string; name: string }) {
 
   return (
     <span className={wrap}>
-      <Image src={src} alt={`${name} logo`} fill sizes="56px" className={imgClass} />
+      <Image src={src} alt={`${name} logo`} fill sizes="80px" className={imgClass} />
     </span>
   );
 }
@@ -116,7 +116,7 @@ export function ServicePageV2({
             {SERVICE_V2.vagBrands.map((brand) => (
               <li
                 key={brand.name}
-                className="flex items-center justify-center rounded-[18px] border border-[#E7EEF4] bg-white px-3 py-5"
+                className="flex items-center justify-center rounded-[18px] border border-[#E7EEF4] bg-white px-3 py-6"
                 aria-label={brand.name}
               >
                 <BrandLogo src={brand.logo} name={brand.name} />
