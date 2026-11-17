@@ -66,11 +66,9 @@ function CurrentHero() {
         )}
       >
         <div className="flex w-full max-w-xl flex-col md:max-w-[26rem] lg:max-w-[30.6rem]">
-          {/* Mobile order: Title → Floating box+photo → Sub heading → Part-ex
-              Desktop/tablet: Title → Sub → Search → Part-ex */}
           <h1
             className={cn(
-              "order-1 text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy",
+              "text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy",
               "sm:text-[3.15rem] sm:leading-[1.12em]",
               "md:text-[2.85rem] md:leading-[1.12em]",
               "lg:text-[3.45rem] lg:leading-[1.1em]",
@@ -79,25 +77,27 @@ function CurrentHero() {
             {HOME_HERO_HEADING}
           </h1>
 
-          <p
-            className={cn(
-              "order-3 mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted",
-              "md:order-2 md:mt-5",
-            )}
-          >
+          {/* Desktop/tablet: subheading directly under title */}
+          <p className="mt-5 hidden max-w-[22rem] text-[0.95rem] leading-relaxed text-muted md:block">
             {HOME_HERO_DESCRIPTION}
           </p>
 
-          {/* Mobile: photo behind floating search box */}
-          <div className="order-2 relative mt-4 md:hidden">
-            <HeroCompactPhoto />
-            <HomeSearchBar className="relative z-20 -mt-14 px-0" compact />
+          {/* Mobile: photo with search floating over it.
+              Desktop/tablet: search only (side photo is absolute). */}
+          <div className="relative mt-4 md:mt-5 lg:mt-6">
+            <HeroCompactPhoto className="md:hidden" />
+            <HomeSearchBar
+              className="relative z-20 max-md:-mt-14 md:mt-0"
+              compact
+            />
           </div>
 
-          {/* Tablet / desktop search */}
-          <HomeSearchBar className="order-3 relative z-20 mt-5 hidden w-full md:block lg:mt-6" compact />
+          {/* Mobile: subheading after the floating box */}
+          <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted md:hidden">
+            {HOME_HERO_DESCRIPTION}
+          </p>
 
-          <div className="order-4 relative z-10 mt-6 md:mt-8">
+          <div className="relative z-10 mt-6 md:mt-8">
             <Link
               href={routes.partExchange}
               className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"

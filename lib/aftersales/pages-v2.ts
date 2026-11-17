@@ -214,7 +214,7 @@ export const SERVICE_V2 = {
     },
   ],
   germanIntro:
-    "Technicians trained to dealership standards, with manufacturer technical data for every premium German make below. We also offer Audi manufacturer servicing.",
+    "Technicians trained to dealership standards, with manufacturer technical data for every premium German make below.",
   germanBrands: [
     { name: "Audi", logo: "/images/brand-logos/audi.png", vag: true },
     { name: "BMW", logo: "/images/brand-logos/bmw.png", vag: false },

@@ -147,7 +147,7 @@ export function ServicePageV2({
             German brand expertise
           </h2>
           <p className="mt-4 max-w-3xl text-body text-muted">
-            {SERVICE_V2.germanIntro}{" "}
+            {SERVICE_V2.germanIntro} We also offer{" "}
             <Link
               href={routes.servicingAudi}
               className="font-semibold text-[#0097DB] underline-offset-2 hover:underline"

@@ -34,11 +34,11 @@ export function HomeFinanceStrip({
           <p className="mt-2 text-sm leading-relaxed text-secondary">
             {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
           </p>
-          <p className="mt-auto w-full pt-5">
-            <Button href={routes.eligibility} className="btn-compact w-auto self-start">
+          <div className="mt-auto pt-5">
+            <Button href={routes.eligibility} className="btn-compact w-auto">
               {HOME_FINANCE_ELIGIBILITY_CTA}
             </Button>
-          </p>
+          </div>
         </article>
         <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-6 sm:p-7">
           <OfferIcon />
@@ -48,11 +48,11 @@ export function HomeFinanceStrip({
           <p className="mt-2 text-sm leading-relaxed text-secondary">
             {HOME_FINANCE_BEAT_DESCRIPTION}
           </p>
-          <p className="mt-auto w-full pt-5">
-            <Button href={routes.finance} className="btn-compact w-auto self-start">
+          <div className="mt-auto pt-5">
+            <Button href={routes.finance} className="btn-compact w-auto">
               {HOME_FINANCE_BEAT_CTA}
             </Button>
-          </p>
+          </div>
         </article>
       </nav>
     );
@@ -73,11 +73,11 @@ export function HomeFinanceStrip({
         <p className="mt-1 text-sm leading-snug text-secondary">
           {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
         </p>
-        <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.eligibility} className="btn-compact w-auto self-start">
+        <div className="mt-4 mt-auto pt-4">
+          <Button href={routes.eligibility} className="btn-compact w-auto">
             {HOME_FINANCE_ELIGIBILITY_CTA}
           </Button>
-        </p>
+        </div>
       </div>
       <div className="flex min-w-0 flex-col border-ink/10 lg:border-l lg:pl-8">
         <RatesIcon />
@@ -89,11 +89,11 @@ export function HomeFinanceStrip({
         <p className="mt-1 text-sm leading-snug text-secondary">
           {HOME_FINANCE_RATES_SUPPORT}
         </p>
-        <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.financeCalculator} className="btn-compact w-auto self-start">
+        <div className="mt-4 mt-auto pt-4">
+          <Button href={routes.financeCalculator} className="btn-compact w-auto">
             {HOME_FINANCE_RATES_CTA}
           </Button>
-        </p>
+        </div>
       </div>
       <div className="flex min-w-0 flex-col border-ink/10 lg:border-l lg:pl-8">
         <OfferIcon />
@@ -103,11 +103,11 @@ export function HomeFinanceStrip({
         <p className="mt-1 text-sm leading-snug text-secondary">
           {HOME_FINANCE_BEAT_DESCRIPTION}
         </p>
-        <p className="mt-4 mt-auto w-full pt-4">
-          <Button href={routes.finance} className="btn-compact w-auto self-start">
+        <div className="mt-4 mt-auto pt-4">
+          <Button href={routes.finance} className="btn-compact w-auto">
             {HOME_FINANCE_BEAT_CTA}
           </Button>
-        </p>
+        </div>
       </div>
     </div>
   );

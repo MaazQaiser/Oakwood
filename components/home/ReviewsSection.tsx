@@ -144,9 +144,9 @@ export function ReviewsSection() {
                   key={review.id}
                   className={cn(
                     "snap-start shrink-0",
-                    perView === 1 && "w-[88%]",
-                    perView === 2 && "w-[calc((100%-1rem)/2)]",
-                    perView === 3 && "w-[calc((100%-2rem)/3)]",
+                    perView === 1 && "w-[min(100%,22rem)] min-w-[88%]",
+                    perView === 2 && "w-[calc((100%-1rem)/2)] min-w-[calc((100%-1rem)/2)]",
+                    perView === 3 && "w-[calc((100%-2rem)/3)] min-w-[calc((100%-2rem)/3)]",
                   )}
                 >
                   <ReviewQuoteCard review={review} />
@@ -200,7 +200,7 @@ export function ReviewsSection() {
               {HOME_HANDOVER_PHOTOS.map((photo) => (
                 <figure
                   key={photo.id}
-                  className="relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(0,40,82,0.08)] lg:aspect-[5/6]"
+                  className="relative aspect-[4/5] w-full min-w-full shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#ECF3F8] shadow-[0_18px_40px_rgba(0,40,82,0.08)] lg:aspect-[5/6]"
                 >
                   <Image
                     src={photo.src}
