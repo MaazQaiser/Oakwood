@@ -15,16 +15,28 @@ import { createBreadcrumbs } from "@/lib/seo";
 import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import type { BookingListEntry } from "@/types/booking";
 
-function BrandLogo({ src }: { src: string }) {
+function BrandLogo({ src, name }: { src: string; name: string }) {
+  // Fixed square + navy mono so every original mark reads at the same size and colour.
+  const frame =
+    "relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#F7FAFC] ring-1 ring-[#E7EEF4]";
+  // Original artwork, forced to one brand navy so the set looks uniform.
+  const imgClass =
+    "object-contain p-2.5 [filter:brightness(0)_saturate(100%)_invert(14%)_sepia(42%)_saturate(1800%)_hue-rotate(186deg)_brightness(0.95)]";
+
   if (src.endsWith(".svg")) {
     return (
-      // SVG brand marks are static public assets; skip the image optimizer.
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt="" width={80} height={40} className="object-contain" />
+      <span className={frame}>
+        {/* SVG brand marks are static public assets; skip the image optimizer. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" className={`h-full w-full ${imgClass}`} />
+      </span>
     );
   }
+
   return (
-    <Image src={src} alt="" width={80} height={40} className="object-contain" />
+    <span className={frame}>
+      <Image src={src} alt={`${name} logo`} fill sizes="56px" className={imgClass} />
+    </span>
   );
 }
 
@@ -108,9 +120,7 @@ export function ServicePageV2({
                 key={brand.name}
                 className="flex items-center gap-4 rounded-[18px] border border-[#E7EEF4] bg-white px-4 py-4"
               >
-                <span className="relative grid h-12 w-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-[#F7FAFC] px-1">
-                  <BrandLogo src={brand.logo} />
-                </span>
+                <BrandLogo src={brand.logo} name={brand.name} />
                 <span className="min-w-0">
                   <span className="block text-sm font-semibold text-[#002852]">{brand.name}</span>
                   {brand.tag ? (
@@ -160,11 +170,9 @@ export function ServicePageV2({
             {SERVICE_V2.germanBrands.map((brand) => (
               <li
                 key={brand.name}
-                className="flex flex-col items-start rounded-[22px] bg-white p-5 shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
+                className="flex flex-col items-start rounded-[22px] border border-[#E7EEF4] bg-white p-5 shadow-[0_10px_24px_rgba(16,40,72,0.06)]"
               >
-                <span className="relative grid h-14 w-24 place-items-center overflow-hidden rounded-xl bg-[#F7FAFC] px-1">
-                  <BrandLogo src={brand.logo} />
-                </span>
+                <BrandLogo src={brand.logo} name={brand.name} />
                 <span className="mt-4 text-base font-semibold text-[#002852]">
                   {brand.name}
                 </span>
