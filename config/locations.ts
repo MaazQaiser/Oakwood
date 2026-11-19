@@ -16,6 +16,7 @@ export const showrooms: Location[] = [
     name: "Chorley",
     region: "Lancashire",
     regionSlug: "lancashire",
+    postcode: "PR6 9RG",
     telephone: "01257 826 530",
     isShowroom: true,
   },
@@ -84,10 +85,10 @@ export const showroomProfiles: ShowroomProfile[] = [
     h1: "Oakwood Chorley",
     eyebrow: "Chorley showroom",
     descriptor:
-      "Used car sales in Chorley and Adlington. Visit Oakwood in Lancashire or browse the cars available at this location.",
+      "Used car sales at Railway Road, Adlington, Chorley, PR6 9RG. Visit Oakwood in Lancashire or browse the cars available at this location.",
     metaTitle: "Oakwood Chorley | Car sales Chorley and Adlington",
     metaDescription:
-      "Visit Oakwood Motor Company in Chorley for used car sales in Chorley and Adlington. Browse stock, check finance, and book aftersales in Lancashire.",
+      "Visit Oakwood Motor Company at Railway Road, Adlington, Chorley, PR6 9RG. Browse stock, check finance, and book aftersales in Lancashire.",
     services: SHOWROOM_SERVICES,
     openingHours: STANDARD_OPENING_HOURS,
     exceptions: [
@@ -113,5 +114,15 @@ export function getStockLocation(slug: string): Location | undefined {
 }
 
 export function formatShowroomAddress(location: Location): string {
+  if (location.slug === "chorley") {
+    return ["Railway Road, Adlington", location.postcode, location.region]
+      .filter(Boolean)
+      .join(", ");
+  }
+  if (location.slug === "bury") {
+    return ["Whitelegge Street", location.postcode, location.region]
+      .filter(Boolean)
+      .join(", ");
+  }
   return [location.postcode, location.region].filter(Boolean).join(", ");
 }

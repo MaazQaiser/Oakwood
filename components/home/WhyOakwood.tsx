@@ -4,8 +4,8 @@ import { HomeRepresentativeExample } from "@/components/home/HomeRepresentativeE
 import { SectionIntro } from "@/components/home/SectionIntro";
 import { Container, Section } from "@/components/layout/Container";
 import { OakwoodPhotoSlot } from "@/components/media/OakwoodPhotoSlot";
-import { Button } from "@/components/ui/Button";
-import { getFinanceIntentUrl, routes } from "@/config/routes";
+import { routes } from "@/config/routes";
+import { showPreviewNotices } from "@/lib/env/preview";
 import { HOME_WARRANTY_AA_UPGRADE } from "@/lib/home/copy";
 import {
   HOME_FINANCE_IMAGES,
@@ -19,19 +19,15 @@ import {
   WHY_OAKWOOD_INTRO_LEAD,
   WHY_OAKWOOD_LINKS,
   WHY_OAKWOOD_PREPARATION,
+  WHY_OAKWOOD_PREVIEW_ELIGIBILITY,
   WHY_OAKWOOD_WARRANTY,
 } from "@/lib/home/why-oakwood";
 
-const financePoints = [
-  { label: "Deposit", href: routes.financeCalculator },
-  { label: "Monthly payments", href: routes.finance },
-  { label: "Final payment", href: getFinanceIntentUrl("pcp") },
-];
-
 export function WhyOakwood() {
+  const preview = showPreviewNotices();
+
   return (
     <Section id="why-oakwood" aria-label={WHY_OAKWOOD_HEADING} className="relative">
-      {/* Mobile-only blue divider, sat halfway into the gap above */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-[var(--oak-page-x)] top-0 h-0.5 -translate-y-1/2 bg-[#0097DB] md:hidden"
@@ -56,24 +52,30 @@ export function WhyOakwood() {
                 Check eligibility and see a personalised finance profile. Monthly
                 figures before a full application are illustrations.
               </p>
-              <p className="mt-4 text-[0.98rem] text-[#002852]">
-                Preview eligibility is simulated — no live credit check yet.
-              </p>
-              <Button href={routes.eligibility} className="mt-6">
-                Check eligibility
-              </Button>
-            </div>
-            <div className="pt-8 lg:mt-auto">
-              <div className="grid grid-cols-3 gap-x-3 gap-y-2 border-t border-ink/10 pt-5 text-center">
-                {financePoints.map((point) => (
-                  <Link
-                    key={point.label}
-                    href={point.href}
-                    className="min-w-0 px-1 text-[0.68rem] font-semibold uppercase leading-snug tracking-[0.04em] text-primary-secondary no-underline hover:underline sm:tracking-[0.08em]"
-                  >
-                    {point.label}
-                  </Link>
-                ))}
+              {preview ? (
+                <p className="mt-4 text-[0.98rem] text-[#002852]">
+                  {WHY_OAKWOOD_PREVIEW_ELIGIBILITY}
+                </p>
+              ) : null}
+              <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
+                <Link
+                  href={routes.financeCalculator}
+                  className="text-primary-secondary no-underline hover:underline"
+                >
+                  Finance calculator
+                </Link>
+                <Link
+                  href={routes.finance}
+                  className="text-primary-secondary no-underline hover:underline"
+                >
+                  How finance works
+                </Link>
+                <Link
+                  href={routes.eligibility}
+                  className="text-primary-secondary no-underline hover:underline"
+                >
+                  Check eligibility
+                </Link>
               </div>
             </div>
           </article>
@@ -89,7 +91,7 @@ export function WhyOakwood() {
               </div>
               <div className="relative flex min-w-0 flex-col justify-center bg-[#E7F3C4] px-6 py-6 lg:py-8 lg:pr-6 lg:pl-16">
                 <span className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-[#002852] text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.04em] text-white tabular-nums lg:absolute lg:top-1/2 lg:left-0 lg:mb-0 lg:h-[4.6rem] lg:w-[4.6rem] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[1.15rem]">
-                  12
+                  6
                   <br />
                   month
                   <br />
@@ -172,7 +174,12 @@ export function WhyOakwood() {
           <HomeRepresentativeExample />
         </div>
 
-        <HomeFinanceStrip variant="eligibility" className="mt-12 lg:mt-16" />
+        {/* Claims line only — no second eligibility button (hero + footer CTAs). */}
+        <HomeFinanceStrip
+          variant="eligibility"
+          showEligibilityCta={false}
+          className="mt-12 lg:mt-16"
+        />
       </Container>
     </Section>
   );

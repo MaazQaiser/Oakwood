@@ -42,7 +42,7 @@ export function FeaturedVehicles() {
         >
           {eligible
             ? "These vehicles are within the finance profile you've already checked."
-            : "Explore some of the cars customers are viewing today."}
+            : "A selection of cars from our current stock."}
         </SectionIntro>
 
         {ineligible ? (

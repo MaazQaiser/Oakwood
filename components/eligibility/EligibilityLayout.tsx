@@ -10,6 +10,7 @@ import {
 } from "@/lib/eligibility/copy";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
+import { showPreviewNotices } from "@/lib/env/preview";
 
 export function EligibilityHeader(_props?: { eyebrow?: string }) {
   return null;
@@ -20,6 +21,9 @@ export function EligibilityTrustMessage({
 }: {
   className?: string;
 }) {
+  if (!showPreviewNotices()) {
+    return null;
+  }
   return (
     <p className={cn("text-caption text-muted", className)}>
       {ELIGIBILITY_TRUST_LINE}

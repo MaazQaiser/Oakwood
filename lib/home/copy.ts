@@ -60,8 +60,14 @@ export const HOME_PROOF_ITEMS = [
   },
   {
     id: "warranty",
-    lead: "12-month warranty",
+    lead: "6-month warranty",
     detail: "AA warranty available up to 4 years",
+    accent: false,
+  },
+  {
+    id: "stock",
+    lead: "500+ cars in stock",
+    detail: "Ready to view and drive away",
     accent: false,
   },
   {
@@ -88,7 +94,9 @@ export const HOME_ZERO_PERCENT_SHORT =
 
 export const HOME_FINANCE_ELIGIBILITY_TITLE = "Unsure on your APR?";
 export const HOME_FINANCE_ELIGIBILITY_DESCRIPTION =
-  "Find out in 60 seconds. Preview only — no live credit check yet.";
+  "Find out in 60 seconds.";
+export const HOME_FINANCE_ELIGIBILITY_PREVIEW =
+  "Preview only — no live credit check yet.";
 export const HOME_FINANCE_ELIGIBILITY_CTA = "Check my eligibility";
 export const HOME_FINANCE_ELIGIBILITY =
   `${HOME_FINANCE_ELIGIBILITY_TITLE} ${HOME_FINANCE_ELIGIBILITY_DESCRIPTION}`.trim();
@@ -111,7 +119,7 @@ export const HOME_META_TITLE = "Used cars in stock";
 export const HOME_META_DESCRIPTION =
   "Find a used car in Oakwood stock, or search by monthly budget or total price. AA-inspected cars, two showrooms and our own workshop.";
 
-export const HOME_WARRANTY_INCLUDED = "12-month warranty included";
+export const HOME_WARRANTY_INCLUDED = "6-month warranty included";
 export const HOME_WARRANTY_AA_UPGRADE =
   "AA warranty available — upgrade up to 4 years";
 
@@ -119,7 +127,7 @@ export const HOME_AFTERSALES_EYEBROW = "Aftersales";
 export const HOME_AFTERSALES_HEADING =
   "MOT, servicing and mechanical support from Oakwood";
 export const HOME_AFTERSALES_SUPPORT =
-  "Keep your car running after you buy.";
+  "MOT, servicing and mechanical work at our own workshop. All cars welcome, wherever you bought it.";
 export const HOME_AFTERSALES_CTA = "Book a service";
 export const HOME_AFTERSALES_WORKSHOP = "Own workshop · Bury and Chorley";
 

@@ -36,9 +36,11 @@ import {
   preparationCopy,
   preparationSections,
   reviewsCopy,
+  REVIEWS_PROVIDER_PREVIEW,
   whatToExpectCopy,
   whatToExpectSections,
 } from "@/lib/trust/content";
+import { showPreviewNotices } from "@/lib/env/preview";
 import { LegalDocumentView } from "@/features/legal/components/LegalDocument";
 import { regulatoryDocument } from "@/content/legal/documents";
 import type { TrustPageCopy, TrustSection } from "@/types/trust";
@@ -271,11 +273,11 @@ export function ReviewsPageView() {
         <Container>
           <ReviewSummary feed={feed} />
           <ReviewsGrid reviews={feed.items} />
-          <p className="mt-8 text-body-sm text-muted">
-            When reviews are connected, this page will show mixed ratings, location,
-            date and named colleagues where the provider supplies them. It will not
-            use an auto-advancing carousel.
-          </p>
+          {showPreviewNotices() ? (
+            <p className="mt-8 text-body-sm text-muted">
+              {REVIEWS_PROVIDER_PREVIEW}
+            </p>
+          ) : null}
           <div className="mt-12">
             <LocationRelatedLinks current={routes.ourOnlineReviews} />
           </div>

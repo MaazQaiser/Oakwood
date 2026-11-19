@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Card } from "@/components/cards/Card";
+import { FinanceEligibilityCard } from "@/components/home/FinanceEligibilityCard";
+import { RepresentativeExampleCard } from "@/components/finance/RepresentativeExampleCard";
 import { Container, Grid, Section } from "@/components/layout/Container";
-import { getFinanceIntentUrl, routes } from "@/config/routes";
+import { getFinanceIntentUrl, getVehicleUrl, routes } from "@/config/routes";
 import { FinanceCTA } from "@/features/finance/intent/components/FinanceCTA";
 import { FinanceDisclaimer } from "@/features/finance/intent/components/FinanceDisclaimer";
 import { FinanceFAQ } from "@/features/finance/intent/components/FinanceFAQ";
@@ -22,6 +24,7 @@ import {
   CALCULATOR_ELIGIBILITY_EXPLAIN,
   CALCULATOR_ESTIMATE_EXPLAIN,
 } from "@/lib/finance/calculator-copy";
+import { getRepresentativeFinanceExample } from "@/lib/finance/representative-example";
 import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import { createBreadcrumbs } from "@/lib/seo";
 
@@ -39,6 +42,7 @@ export function FinanceHubPage() {
     { label: "Home", href: routes.home },
     { label: "Finance", href: routes.finance },
   ]);
+  const example = getRepresentativeFinanceExample();
 
   return (
     <>
@@ -55,6 +59,19 @@ export function FinanceHubPage() {
         title={financeHubContent.journeyTitle}
         steps={financeJourneySteps}
       />
+      <Section>
+        <Container>
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+            <FinanceEligibilityCard />
+            {example ? (
+              <RepresentativeExampleCard
+                example={example}
+                href={getVehicleUrl(example.slug)}
+              />
+            ) : null}
+          </div>
+        </Container>
+      </Section>
       <Section>
         <Container>
           <h2 className="text-h2">Estimate, eligibility and application</h2>

@@ -1,90 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Container, Section } from "@/components/layout/Container";
-import { FinancialNumber } from "@/components/finance/FinancePrimitives";
+import { RepresentativeExampleCard } from "@/components/finance/RepresentativeExampleCard";
 import { IconArrow } from "@/components/ui/icons";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { getFinanceCalculatorUrl, getSearchUrl, getVehicleUrl, routes } from "@/config/routes";
-import {
-  getExampleApr,
-  getRepresentativeFinanceExample,
-} from "@/lib/finance/representative-example";
-import { formatApr, formatPounds, formatTerm } from "@/lib/format/money";
+import { getRepresentativeFinanceExample } from "@/lib/finance/representative-example";
 import { HOME_FINANCE_ELIGIBILITY_CTA } from "@/lib/home/copy";
-import { representativeExamplePhotography } from "@/lib/home/photography";
-import { findVehicleByStockId } from "@/lib/vehicles/query";
-
-function ExampleCard() {
-  const example = getRepresentativeFinanceExample();
-  if (!example) {
-    return null;
-  }
-
-  const vehicle = findVehicleByStockId(example.stockId);
-  const photo = representativeExamplePhotography(vehicle);
-  const title = `${example.year} ${example.make} ${example.model}`;
-  const apr = getExampleApr(example);
-  const financeTypeLabel = example.financeType === "pcp" ? "PCP" : "HP";
-
-  return (
-    <Link
-      href={getVehicleUrl(example.slug)}
-      aria-label={`View ${title}`}
-      className="flex h-full min-w-0 flex-col overflow-hidden rounded-[24px] bg-white text-[#002852] no-underline shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
-    >
-      <div className="relative h-44 w-full bg-[#ECF3F8] sm:h-48">
-        {photo.src ? (
-          <Image
-            src={photo.src}
-            alt={photo.alt ?? title}
-            fill
-            sizes="22rem"
-            className="object-contain object-center p-3"
-          />
-        ) : (
-          <div
-            className="flex h-full items-end p-4"
-            role="img"
-            aria-label={`${photo.label} photography slot. ${photo.intended}.`}
-          >
-            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
-              {photo.label}
-            </p>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-primary-secondary">
-          Representative example
-        </p>
-        <p className="mt-2 text-lg font-semibold tracking-[-0.02em]">{title}</p>
-        {example.derivative ? (
-          <p className="mt-0.5 text-sm text-secondary">{example.derivative}</p>
-        ) : null}
-        <p className="mt-4 text-caption text-muted">From</p>
-        <p className="mt-1 text-primary">
-          <FinancialNumber
-            value={formatPounds(example.monthlyPayment)}
-            suffix="/month*"
-            size="md"
-          />
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-secondary">
-          {formatTerm(example.term)} {financeTypeLabel}
-          {" · "}
-          {formatPounds(example.deposit)} deposit
-        </p>
-        {apr !== undefined ? (
-          <p className="mt-0.5 text-sm leading-relaxed text-secondary">
-            {formatApr(apr)}
-          </p>
-        ) : null}
-      </div>
-    </Link>
-  );
-}
 
 export function FinalFinanceCTA() {
   const { mode } = useCustomerFinance();
@@ -106,7 +29,7 @@ export function FinalFinanceCTA() {
               <h2 className="max-w-xl text-[1.7rem] font-semibold leading-tight tracking-[-0.03em] md:text-[2rem]">
                 {eligible
                   ? "Your finance profile is ready — browse cars that fit your budget"
-                  : "Know your budget before you shop, then browse cars that fit"}
+                  : "Check what you could afford, then browse cars that fit"}
               </h2>
               <div className="mt-7">
                 <Link
@@ -121,7 +44,14 @@ export function FinalFinanceCTA() {
               </div>
             </div>
             <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-              <ExampleCard />
+              {example ? (
+                <RepresentativeExampleCard
+                  example={example}
+                  href={getVehicleUrl(example.slug)}
+                  tone="dark-panel"
+                  showDisclaimer={false}
+                />
+              ) : null}
             </div>
             <p className="text-sm leading-relaxed text-white/80 lg:col-start-1 lg:row-start-2 lg:self-end">
               No impact on your credit score.{" "}

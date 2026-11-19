@@ -2,6 +2,7 @@ import {
   IconAaBadge,
   IconGoogleReview,
   IconProofLocations,
+  IconProofStock,
   IconWarrantyBadge,
 } from "@/components/home/HomeProofIcons";
 import { cn } from "@/lib/cn";
@@ -12,6 +13,7 @@ const PROOF_ICONS = {
   reviews: IconGoogleReview,
   aa: IconAaBadge,
   warranty: IconWarrantyBadge,
+  stock: IconProofStock,
   locations: IconProofLocations,
 } as const;
 
@@ -51,7 +53,7 @@ export function HomeProofStrip({ className }: { className?: string }) {
     <ul
       aria-label="Oakwood at a glance"
       className={cn(
-        "my-4 grid w-full grid-cols-2 gap-3 md:my-6 md:grid-cols-4 md:gap-4",
+        "my-4 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:my-6 md:grid-cols-5 md:gap-3",
         className,
       )}
     >
@@ -61,7 +63,7 @@ export function HomeProofStrip({ className }: { className?: string }) {
         return (
           <li
             key={point.id}
-            className="flex min-w-0 flex-col items-start gap-4 rounded-[20px] bg-white px-3.5 py-4 shadow-[0_10px_24px_rgba(16,40,72,0.06)] md:gap-5 md:px-4 md:py-5"
+            className="flex min-w-0 flex-col items-start gap-4 rounded-[20px] bg-white px-3.5 py-4 shadow-[0_10px_24px_rgba(16,40,72,0.06)] md:gap-5 md:px-3.5 md:py-5"
           >
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center md:h-11 md:w-11">
               <Icon />

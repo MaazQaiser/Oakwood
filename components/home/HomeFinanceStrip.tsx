@@ -1,149 +1,82 @@
-import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
+import { showPreviewNotices } from "@/lib/env/preview";
 import {
-  HOME_FINANCE_BEAT_CTA,
-  HOME_FINANCE_BEAT_DESCRIPTION,
   HOME_FINANCE_BEAT_TITLE,
   HOME_FINANCE_ELIGIBILITY_CTA,
-  HOME_FINANCE_ELIGIBILITY_DESCRIPTION,
+  HOME_FINANCE_ELIGIBILITY_PREVIEW,
   HOME_FINANCE_ELIGIBILITY_TITLE,
-  HOME_FINANCE_RATES_CTA,
-  HOME_FINANCE_RATES_SUPPORT,
   HOME_RATES_FROM,
 } from "@/lib/home/copy";
 
+/**
+ * Single finance claims line — links only, not three full-width cards.
+ * Homepage should have at most one eligibility CTA here (plus FinalFinanceCTA).
+ */
 export function HomeFinanceStrip({
   variant = "reassurance",
   className,
+  showEligibilityCta = true,
 }: {
   variant?: "reassurance" | "eligibility";
   className?: string;
+  /** When false, claims still link but the explicit eligibility button is omitted. */
+  showEligibilityCta?: boolean;
 }) {
-  if (variant === "eligibility") {
-    return (
-      <nav
-        aria-label="Finance routes"
-        className={cn("grid gap-4 lg:grid-cols-2", className)}
-      >
-        <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-6 sm:p-7">
-          <EligibilityIcon />
-          <p className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#002852]">
-            {HOME_FINANCE_ELIGIBILITY_TITLE}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-secondary">
-            {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
-          </p>
-          <div className="mt-auto pt-5">
-            <Button href={routes.eligibility} className="btn-compact w-auto">
-              {HOME_FINANCE_ELIGIBILITY_CTA}
-            </Button>
-          </div>
-        </article>
-        <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-6 sm:p-7">
-          <OfferIcon />
-          <p className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[#002852]">
-            {HOME_FINANCE_BEAT_TITLE}
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-secondary">
-            {HOME_FINANCE_BEAT_DESCRIPTION}
-          </p>
-          <div className="mt-auto pt-5">
-            <Button href={routes.finance} className="btn-compact w-auto">
-              {HOME_FINANCE_BEAT_CTA}
-            </Button>
-          </div>
-        </article>
-      </nav>
-    );
-  }
+  const preview = showPreviewNotices();
 
   return (
-    <div
+    <nav
+      aria-label="Finance routes"
       className={cn(
-        "grid gap-4 rounded-[28px] bg-white p-5 shadow-[0_10px_24px_rgba(16,40,72,0.06)] sm:p-6 lg:grid-cols-3 lg:gap-8",
+        "flex flex-col gap-3 rounded-[22px] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(16,40,72,0.06)] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2",
         className,
       )}
     >
-      <div className="flex min-w-0 flex-col">
-        <EligibilityIcon />
-        <p className="mt-4 text-base font-semibold leading-snug text-ink">
+      <p className="m-0 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-secondary">
+        <Link
+          href={routes.eligibility}
+          className="font-semibold text-[#002852] no-underline hover:underline"
+        >
           {HOME_FINANCE_ELIGIBILITY_TITLE}
-        </p>
-        <p className="mt-1 text-sm leading-snug text-secondary">
-          {HOME_FINANCE_ELIGIBILITY_DESCRIPTION}
-        </p>
-        <div className="mt-4 mt-auto pt-4">
-          <Button href={routes.eligibility} className="btn-compact w-auto">
-            {HOME_FINANCE_ELIGIBILITY_CTA}
-          </Button>
-        </div>
-      </div>
-      <div className="flex min-w-0 flex-col border-ink/10 lg:border-l lg:pl-8">
-        <RatesIcon />
+        </Link>
+        <span aria-hidden className="text-ink/25">
+          ·
+        </span>
         {HOME_RATES_FROM ? (
-          <p className="mt-4 text-base font-semibold leading-snug text-ink tabular-nums">
-            {HOME_RATES_FROM}
-          </p>
+          <>
+            <Link
+              href={routes.financeCalculator}
+              className="font-semibold text-[#002852] no-underline hover:underline tabular-nums"
+            >
+              {HOME_RATES_FROM}
+            </Link>
+            <span aria-hidden className="text-ink/25">
+              ·
+            </span>
+          </>
         ) : null}
-        <p className="mt-1 text-sm leading-snug text-secondary">
-          {HOME_FINANCE_RATES_SUPPORT}
-        </p>
-        <div className="mt-4 mt-auto pt-4">
-          <Button href={routes.financeCalculator} className="btn-compact w-auto">
-            {HOME_FINANCE_RATES_CTA}
-          </Button>
-        </div>
-      </div>
-      <div className="flex min-w-0 flex-col border-ink/10 lg:border-l lg:pl-8">
-        <OfferIcon />
-        <p className="mt-4 text-base font-semibold leading-snug text-ink">
+        <Link
+          href={routes.finance}
+          className="font-semibold text-[#002852] no-underline hover:underline"
+        >
           {HOME_FINANCE_BEAT_TITLE}
-        </p>
-        <p className="mt-1 text-sm leading-snug text-secondary">
-          {HOME_FINANCE_BEAT_DESCRIPTION}
-        </p>
-        <div className="mt-4 mt-auto pt-4">
-          <Button href={routes.finance} className="btn-compact w-auto">
-            {HOME_FINANCE_BEAT_CTA}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EligibilityIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-primary">
-      <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M9.8 9.4A2.2 2.2 0 0 1 12 7.7c1.4 0 2.4.9 2.4 2.1 0 1-.5 1.5-1.3 2-.7.4-1.1.9-1.1 1.7"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="16.4" r="0.95" fill="currentColor" />
-    </svg>
-  );
-}
-
-function RatesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-primary">
-      <circle cx="8" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.6" />
-      <circle cx="16" cy="16" r="2.2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M7.2 16.8 16.8 7.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function OfferIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-primary">
-      <rect x="3.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-      <rect x="13.5" y="5.5" width="7" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M6 10h2M6 13.5h2M16 10h2M16 13.5h2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
+        </Link>
+        {preview && variant === "reassurance" ? (
+          <span className="w-full basis-full text-[0.75rem] text-muted sm:w-auto sm:basis-auto">
+            {HOME_FINANCE_ELIGIBILITY_PREVIEW}
+          </span>
+        ) : null}
+      </p>
+      {showEligibilityCta ? (
+        <Link
+          href={routes.eligibility}
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-[12px] bg-[#002852] px-4 text-sm font-semibold text-white no-underline hover:bg-[#001c3d]"
+        >
+          {HOME_FINANCE_ELIGIBILITY_CTA}
+        </Link>
+      ) : null}
+    </nav>
   );
 }

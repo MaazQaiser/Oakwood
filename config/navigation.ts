@@ -1,4 +1,9 @@
-import { getBookingUrl, getFinanceIntentUrl, routes } from "@/config/routes";
+import {
+  getBookingUrl,
+  getFinanceIntentUrl,
+  getLocationStockUrl,
+  routes,
+} from "@/config/routes";
 
 export interface NavigationItem {
   id: string;
@@ -130,8 +135,10 @@ export const footerNavigation: NavigationGroup[] = [
       { id: "electric-cars", label: "Electric cars", href: routes.electricCars },
       { id: "used-vans", label: "Used vans", href: routes.usedVans },
       { id: "search", label: "Search cars", href: routes.search },
-      { id: "saved-cars", label: "Your cars", href: routes.savedCars },
+      { id: "saved-cars", label: "Saved cars", href: routes.savedCars },
       { id: "compare", label: "Compare cars", href: routes.compare },
+      { id: "bury-stock", label: "Cars in Bury", href: getLocationStockUrl("bury") },
+      { id: "chorley-stock", label: "Cars in Chorley", href: getLocationStockUrl("chorley") },
     ],
   },
   {
@@ -141,17 +148,10 @@ export const footerNavigation: NavigationGroup[] = [
     children: [
       { id: "finance-hub", label: "Car finance", href: routes.finance },
       { id: "eligibility", label: "Finance eligibility", href: routes.eligibility },
-      { id: "deal", label: "Build my deal", href: routes.deal },
-      { id: "reserve", label: "Reserve a car", href: routes.reserve },
       { id: "calculator", label: "Finance calculator", href: routes.financeCalculator },
-      { id: "hp-pcp", label: "HP vs PCP", href: getFinanceIntentUrl("pcp") },
       { id: "hp", label: "How HP works", href: getFinanceIntentUrl("hp") },
       { id: "pcp", label: "How PCP works", href: getFinanceIntentUrl("pcp") },
-      { id: "bad-credit", label: "Bad credit", href: getFinanceIntentUrl("bad-credit") },
-      { id: "no-deposit", label: "No deposit", href: getFinanceIntentUrl("no-deposit") },
-      { id: "ccj", label: "CCJ", href: getFinanceIntentUrl("ccj") },
-      { id: "self-employed", label: "Self-employed", href: getFinanceIntentUrl("self-employed") },
-      { id: "first-time-buyer", label: "First-time buyer", href: getFinanceIntentUrl("first-time-buyer") },
+      { id: "deal", label: "Build my deal", href: routes.deal },
     ],
   },
   {

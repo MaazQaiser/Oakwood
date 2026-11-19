@@ -21,6 +21,7 @@ import {
 } from "@/lib/home/copy";
 import type { SearchQuery } from "@/lib/validation/search";
 import { getMakes, getModels } from "@/lib/vehicles/labels";
+import { listVehicles } from "@/lib/vehicles/query";
 
 const fieldClass =
   "min-h-12! w-full min-w-0 rounded-2xl! border-[#D7E0E8]! bg-white! px-3! py-2.5! pr-9! text-sm! leading-normal! font-medium text-ink!";
@@ -45,6 +46,13 @@ export function HomeSearchBar({
 
   const makes = getMakes("car");
   const models = getModels(make || undefined, "car");
+  const availableCount = listVehicles("car").filter(
+    (vehicle) => vehicle.availability === "available",
+  ).length;
+  const findCtaLabel =
+    availableCount > 0
+      ? `${HOME_HERO_PRIMARY}, ${availableCount} available`
+      : HOME_HERO_PRIMARY;
 
   const query = useMemo((): SearchQuery => {
     const next: SearchQuery = {};
@@ -200,7 +208,7 @@ export function HomeSearchBar({
           type="submit"
           className="mt-3 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl bg-[#0097DB] py-1.5 pl-5 pr-1.5 text-[1.05rem] font-bold text-white hover:bg-[#0086C3]"
         >
-          <span>{HOME_HERO_PRIMARY}</span>
+          <span>{findCtaLabel}</span>
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-[#0097DB]">
             <IconArrow width={18} height={18} />
           </span>

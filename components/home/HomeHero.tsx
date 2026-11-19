@@ -3,11 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { FinanceEligibilityCard } from "@/components/home/FinanceEligibilityCard";
 import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
 import { HomeProofStrip } from "@/components/home/HomeProofStrip";
 import { HomeSearchBar } from "@/components/home/HomeSearchBar";
-import { HomeSearchCard } from "@/components/home/HomeSearchCard";
 import { routes } from "@/config/routes";
 import { cn } from "@/lib/cn";
 import {
@@ -23,13 +21,8 @@ export function HomeHero() {
       <CurrentHero />
       <Container className="flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
         <HomeProofStrip />
-        <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2 bg-[#ECF3F8] py-10 sm:py-12 lg:py-14">
-          <div className="mx-auto w-full max-w-[var(--oak-width-content)] px-[var(--oak-page-x)]">
-            <HomeSearchCard />
-          </div>
-        </div>
-        <FinanceEligibilityCard />
-        <HomeFinanceStrip />
+        {/* One finance claims line + eligibility CTA; footer CTA is the second. */}
+        <HomeFinanceStrip showEligibilityCta />
       </Container>
     </>
   );

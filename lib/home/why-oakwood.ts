@@ -25,13 +25,16 @@ export interface WhyOakwoodTechnician {
 export const WHY_OAKWOOD_HEADING = "Why Oakwood";
 
 export const WHY_OAKWOOD_INTRO_LEAD =
-  "Every car is carefully selected by Oakwood.";
+  "Oakwood Motor Company has been selling used cars since 2003.";
 
 export const WHY_OAKWOOD_INTRO_BODY =
-  "We inspect and prepare each vehicle in-house, so we know what we're putting on the road.";
+  "We've handed over thousands of cars, keep 500+ in stock, and put every one through an over 130-point AA inspection before it reaches the forecourt.";
 
 export const WHY_OAKWOOD_INTRO_CLOSE =
-  "With two showrooms, our own workshop and warranty and aftersales support, we're here for you long after you drive away.";
+  "Preparation happens in our own centre, and aftersales runs from our own workshop in Bury and Chorley — so support stays with us after you drive away.";
+
+export const WHY_OAKWOOD_PREVIEW_ELIGIBILITY =
+  "Preview eligibility is simulated — no live credit check yet.";
 
 export const WHY_OAKWOOD_CMS_NOTICE = CMS_TRUST_NOTICE;
 

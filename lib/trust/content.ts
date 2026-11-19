@@ -207,11 +207,15 @@ export const reviewsCopy: TrustPageCopy = {
   eyebrow: "Reviews",
   title: "Customer reviews",
   description:
-    "Reviews will be shown by rating, location and date when the review provider is connected. Mixed ratings will be included.",
+    "Customer reviews of Oakwood Motor Company in Bury and Chorley.",
   metaTitle: "Our online reviews",
   metaDescription:
-    "Customer reviews of Oakwood Motor Company in Bury and Chorley. Ratings, comments and location will appear when the review provider is connected.",
+    "Customer reviews of Oakwood Motor Company in Bury and Chorley.",
 };
+
+/** Staging-only — gate with showPreviewNotices() before rendering. */
+export const REVIEWS_PROVIDER_PREVIEW =
+  "Reviews will be shown by rating, location and date when the review provider is connected. Mixed ratings will be included.";
 
 export const contactCopy: TrustPageCopy = {
   eyebrow: "Contact",

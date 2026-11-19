@@ -597,7 +597,9 @@ export const mockVehicles: Vehicle[] = [
     colour: "Red",
     doors: 5,
     seats: 5,
-    cashPrice: 12995,
+    // Catalogue representative example — cash price reconciles with
+    // £1,000 deposit, 48 × £179 and rates-from 9.4% APR.
+    cashPrice: 8138,
     monthlyPayment: 179,
     listedAt: "2026-06-11",
     ...chorley,

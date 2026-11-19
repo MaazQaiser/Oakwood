@@ -78,7 +78,7 @@ export function IconAaBadge({
   );
 }
 
-/** 12-month warranty — shield with a clear “12”, fully inside the badge. */
+/** 6-month warranty — shield with a clear “6”, fully inside the badge. */
 export function IconWarrantyBadge(props: IconProps) {
   return (
     <svg
@@ -103,8 +103,33 @@ export function IconWarrantyBadge(props: IconProps) {
         fontWeight="700"
         fontFamily="Arial, Helvetica, sans-serif"
       >
-        12
+        6
       </text>
+    </svg>
+  );
+}
+
+/** Stock count / cars available. */
+export function IconProofStock(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+      width="40"
+      height="40"
+      {...props}
+    >
+      <rect width="40" height="40" rx="12" fill="#E6F4FB" />
+      <path
+        d="M11 24.5h18M13.5 24.5l1.2-7.2h10.6l1.2 7.2M15.2 17.3h9.6"
+        stroke="#0061A2"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="16.2" cy="26.6" r="1.5" fill="#0061A2" />
+      <circle cx="23.8" cy="26.6" r="1.5" fill="#0061A2" />
     </svg>
   );
 }
