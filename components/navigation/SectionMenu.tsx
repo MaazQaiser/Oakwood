@@ -23,7 +23,6 @@ import {
 import {
   getBookingUrl,
   getFaqUrl,
-  getFinanceIntentUrl,
   getLocationStockUrl,
   routes,
 } from "@/config/routes";
@@ -53,6 +52,11 @@ export interface SectionMenuLink {
   external?: boolean;
 }
 
+export interface SectionMenuGroup {
+  label: string;
+  links: SectionMenuLink[];
+}
+
 export interface SectionMenuCard {
   title: string;
   description: string;
@@ -64,40 +68,63 @@ export interface SectionMenuCard {
 }
 
 export interface SectionMenuContent {
-  listLabel: string;
-  links: SectionMenuLink[];
+  /** Flat list column. Prefer `linkGroups` when links need sub-headings. */
+  listLabel?: string;
+  links?: SectionMenuLink[];
+  /** Grouped browse column (Fiverr-style section labels). */
+  linkGroups?: SectionMenuGroup[];
+  /** Optional second browse column. */
+  secondaryListLabel?: string;
+  secondaryLinks?: SectionMenuLink[];
+  secondaryLinkGroups?: SectionMenuGroup[];
   cards: SectionMenuCard[];
   sideLabel: string;
   sideLinks: { label: string; href: string }[];
-  /** Optional second browse column (cash bands, body, fuel). */
-  secondaryListLabel?: string;
-  secondaryLinks?: SectionMenuLink[];
 }
 
 export const sectionMenus: Record<string, SectionMenuContent> = {
   buy: {
-    listLabel: "Browse by monthly budget",
-    links: [...browseMonthlyBudgetLinks],
-    secondaryListLabel: "Browse by cash, body and fuel",
-    secondaryLinks: [
-      ...browseCashBudgetLinks.slice(0, 3),
-      ...browseBodyTypeLinks.slice(0, 3),
-      ...browseFuelLinks.slice(0, 2),
-      { label: "Automatics", href: routes.usedCarsAutomatic },
-      { label: "Cheap to run", href: routes.cheapToRun },
+    linkGroups: [
       {
-        label: "Cars in Bury",
-        href: getLocationStockUrl("bury"),
+        label: "Monthly budget",
+        links: [...browseMonthlyBudgetLinks],
       },
       {
-        label: "Cars in Chorley",
-        href: getLocationStockUrl("chorley"),
+        label: "Cash price",
+        links: [...browseCashBudgetLinks.slice(0, 3)],
+      },
+    ],
+    secondaryLinkGroups: [
+      {
+        label: "Body type",
+        links: [...browseBodyTypeLinks.slice(0, 3)],
+      },
+      {
+        label: "Fuel & drive",
+        links: [
+          ...browseFuelLinks.slice(0, 2),
+          { label: "Automatics", href: routes.usedCarsAutomatic },
+        ],
+      },
+      {
+        label: "More ways to browse",
+        links: [
+          { label: "Cheap to run", href: routes.cheapToRun },
+          {
+            label: "Cars in Bury",
+            href: getLocationStockUrl("bury"),
+          },
+          {
+            label: "Cars in Chorley",
+            href: getLocationStockUrl("chorley"),
+          },
+        ],
       },
     ],
     cards: [
       {
         title: "30 day guarantee",
-        description: guaranteeCopy.headline,
+        description: guaranteeCopy.proofDetail,
         href: routes.thirtyDayGuarantee,
         icon: "check",
       },
@@ -122,8 +149,12 @@ export const sectionMenus: Record<string, SectionMenuContent> = {
     ],
   },
   finance: {
-    listLabel: "Browse by monthly budget",
-    links: [...browseMonthlyBudgetLinks],
+    linkGroups: [
+      {
+        label: "Monthly budget",
+        links: [...browseMonthlyBudgetLinks],
+      },
+    ],
     cards: [
       {
         title: "Check my rate",
@@ -253,70 +284,115 @@ const menuIcons: Record<MenuIcon, LucideIcon> = {
 
 function MenuGlyph({ name }: { name: MenuIcon }) {
   const Icon = menuIcons[name];
-  return <Icon aria-hidden className="h-11 w-11 text-primary" strokeWidth={1.75} />;
+  return (
+    <Icon aria-hidden className="h-8 w-8 text-primary" strokeWidth={1.75} />
+  );
 }
 
 function gridTemplate(
-  hasList: boolean,
-  hasSecondary: boolean,
+  browseCols: number,
+  hasCards: boolean,
   cardSlots: number,
   hasSide: boolean,
 ): string {
   const cols: string[] = [];
-  if (hasList) cols.push("minmax(12rem,15rem)");
-  if (hasSecondary) cols.push("minmax(12rem,15rem)");
-  for (let i = 0; i < cardSlots; i += 1) {
-    cols.push("minmax(0,1fr)");
+  for (let i = 0; i < browseCols; i += 1) {
+    cols.push("minmax(10rem,12.5rem)");
   }
-  if (hasSide) cols.push("minmax(13rem,17rem)");
+  if (hasCards) {
+    cols.push(`minmax(${Math.max(cardSlots, 1) * 10.5}rem, ${cardSlots}fr)`);
+  }
+  if (hasSide) cols.push("minmax(10rem,13rem)");
   return cols.join(" ");
+}
+
+function MenuLinkItem({
+  link,
+  onNavigate,
+}: {
+  link: SectionMenuLink;
+  onNavigate: () => void;
+}) {
+  return (
+    <li>
+      <Link
+        href={link.href}
+        className="flex items-center gap-1.5 rounded-md py-1 text-[0.84rem] leading-snug text-ink no-underline hover:underline"
+        onClick={onNavigate}
+        {...(link.external
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
+      >
+        <span>
+          {link.label}
+          {link.price ? (
+            <>
+              {" "}
+              <span className="font-semibold">{link.price}</span>
+            </>
+          ) : null}
+        </span>
+        {link.arrow ? (
+          <ArrowRight
+            aria-hidden
+            className="h-3 w-3 shrink-0"
+            strokeWidth={1.75}
+          />
+        ) : null}
+      </Link>
+    </li>
+  );
 }
 
 function MenuLinkList({
   label,
   links,
   onNavigate,
+  headingId,
 }: {
   label: string;
   links: SectionMenuLink[];
   onNavigate: () => void;
+  headingId?: string;
 }) {
   return (
     <div>
-      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-ink">
+      <p
+        id={headingId}
+        className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-secondary"
+      >
         {label}
       </p>
-      <ul className="mt-4 space-y-1">
+      <ul className="mt-2.5 space-y-0.5">
         {links.map((link) => (
-          <li key={link.href + link.label + (link.price ?? "")}>
-            <Link
-              href={link.href}
-              className="flex items-center gap-2 rounded-md py-1.5 text-[0.95rem] text-ink no-underline hover:underline"
-              onClick={onNavigate}
-              {...(link.external
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
-            >
-              <span>
-                {link.label}
-                {link.price ? (
-                  <>
-                    {" "}
-                    <span className="font-semibold">{link.price}</span>
-                  </>
-                ) : null}
-              </span>
-              {link.arrow ? (
-                <ArrowRight
-                  aria-hidden
-                  className="h-3.5 w-3.5 shrink-0"
-                  strokeWidth={1.75}
-                />
-              ) : null}
-            </Link>
-          </li>
+          <MenuLinkItem
+            key={link.href + link.label + (link.price ?? "")}
+            link={link}
+            onNavigate={onNavigate}
+          />
         ))}
       </ul>
+    </div>
+  );
+}
+
+function MenuLinkGroups({
+  groups,
+  onNavigate,
+}: {
+  groups: SectionMenuGroup[];
+  onNavigate: () => void;
+}) {
+  return (
+    <div className="space-y-5">
+      {groups.map((group) => (
+        <MenuLinkList
+          key={group.label}
+          label={group.label}
+          links={group.links}
+          onNavigate={onNavigate}
+        />
+      ))}
     </div>
   );
 }
@@ -331,77 +407,99 @@ export function SectionMenu({
   labelledBy: string;
   onNavigate: () => void;
 }) {
-  const hasList = menu.links.length > 0;
-  const hasSecondary = Boolean(menu.secondaryLinks?.length);
+  const primaryGroups =
+    menu.linkGroups ??
+    (menu.links?.length
+      ? [{ label: menu.listLabel ?? "Browse", links: menu.links }]
+      : []);
+  const secondaryGroups =
+    menu.secondaryLinkGroups ??
+    (menu.secondaryLinks?.length
+      ? [
+          {
+            label: menu.secondaryListLabel ?? "Browse",
+            links: menu.secondaryLinks,
+          },
+        ]
+      : []);
+  const browseCols =
+    (primaryGroups.length > 0 ? 1 : 0) + (secondaryGroups.length > 0 ? 1 : 0);
   const hasSide = menu.sideLinks.length > 0;
+  const hasCards = menu.cards.length > 0;
   const hasFeatured = menu.cards.some((card) => card.featured);
-  const cardSlots =
-    menu.cards.length === 0
-      ? 0
-      : hasFeatured
-        ? Math.max(2, menu.cards.length)
-        : menu.cards.length;
-  const template = gridTemplate(hasList, hasSecondary, cardSlots, hasSide);
+  const cardSlots = !hasCards
+    ? 0
+    : hasFeatured
+      ? Math.max(2, menu.cards.length)
+      : menu.cards.length;
+  const template = gridTemplate(browseCols, hasCards, cardSlots, hasSide);
 
   return (
     <div
-      className="grid grid-cols-1 items-stretch gap-6 lg:gap-5 lg:[grid-template-columns:var(--menu-cols)] xl:gap-8"
+      className="grid grid-cols-1 items-start gap-6 lg:gap-4 lg:[grid-template-columns:var(--menu-cols)] xl:gap-5"
       style={{ ["--menu-cols" as string]: template }}
     >
-      {hasList ? (
-        <MenuLinkList
-          label={menu.listLabel}
-          links={menu.links}
-          onNavigate={onNavigate}
-        />
+      {primaryGroups.length > 0 ? (
+        <MenuLinkGroups groups={primaryGroups} onNavigate={onNavigate} />
       ) : null}
 
-      {hasSecondary && menu.secondaryLinks ? (
-        <MenuLinkList
-          label={menu.secondaryListLabel ?? "Browse"}
-          links={menu.secondaryLinks}
-          onNavigate={onNavigate}
-        />
+      {secondaryGroups.length > 0 ? (
+        <MenuLinkGroups groups={secondaryGroups} onNavigate={onNavigate} />
       ) : null}
 
-      {menu.cards.map((card) => (
-        <Link
-          key={card.href + card.title}
-          href={card.href}
-          onClick={onNavigate}
-          {...(card.external
-            ? { target: "_blank", rel: "noopener noreferrer" }
-            : {})}
+      {hasCards ? (
+        <div
           className={cn(
-            "group flex h-full min-h-52 flex-col rounded-[14px] bg-white p-5 text-ink no-underline transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(66,69,78,0.12)]",
-            card.featured && "lg:col-span-2",
+            "grid grid-cols-1 items-stretch gap-3 self-start sm:grid-cols-2",
+            cardSlots >= 3 && "xl:grid-cols-3",
+            cardSlots === 2 && "xl:grid-cols-2",
+            cardSlots === 1 && "xl:grid-cols-1",
           )}
         >
-          <MenuGlyph name={card.icon} />
-          <span className="mt-8 inline-flex items-center gap-2 text-[1.05rem] font-semibold group-hover:underline">
-            {card.title}
-            <ArrowRight aria-hidden className="h-4 w-4" strokeWidth={1.75} />
-          </span>
-          <span className="mt-2 text-[0.92rem] leading-relaxed text-secondary">
-            {card.description}
-          </span>
-        </Link>
-      ))}
+          {menu.cards.map((card) => (
+            <Link
+              key={card.href + card.title}
+              href={card.href}
+              onClick={onNavigate}
+              {...(card.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+              className={cn(
+                "group flex h-full min-h-[10.5rem] flex-col rounded-[12px] bg-white p-4 text-ink no-underline transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(66,69,78,0.12)]",
+                card.featured && "sm:col-span-2",
+              )}
+            >
+              <MenuGlyph name={card.icon} />
+              <span className="mt-3 inline-flex items-center gap-1.5 text-[0.92rem] font-semibold group-hover:underline">
+                {card.title}
+                <ArrowRight
+                  aria-hidden
+                  className="h-3.5 w-3.5"
+                  strokeWidth={1.75}
+                />
+              </span>
+              <span className="mt-1.5 flex-1 text-[0.8rem] leading-relaxed text-secondary">
+                {card.description}
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
 
       {hasSide ? (
         <div>
           <p
             id={labelledBy}
-            className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-ink"
+            className="text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-secondary"
           >
             {menu.sideLabel}
           </p>
-          <ul className="mt-4 space-y-3" aria-labelledby={labelledBy}>
+          <ul className="mt-2.5 space-y-2" aria-labelledby={labelledBy}>
             {menu.sideLinks.map((link) => (
               <li key={link.href + link.label}>
                 <Link
                   href={link.href}
-                  className="block text-[0.95rem] leading-snug text-ink no-underline hover:underline"
+                  className="block text-[0.84rem] leading-snug text-ink no-underline hover:underline"
                   onClick={onNavigate}
                 >
                   {link.label}

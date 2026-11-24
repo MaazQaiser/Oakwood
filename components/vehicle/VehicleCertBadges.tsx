@@ -7,8 +7,8 @@ export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
     isVehicleGuaranteeEligible(vehicle)
       ? {
           mark: "30D",
-          title: guaranteeCopy.badgeTitle,
-          detail: guaranteeCopy.badgeDetail,
+          title: "30 Day Guarantee",
+          detail: guaranteeCopy.proofDetail,
         }
       : null,
     vehicle.inspection.available
@@ -57,25 +57,25 @@ export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
 
   return (
     <ul
-      className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
+      className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3"
       aria-label="Certificates"
     >
       {badges.map((badge) => (
         <li
           key={badge.mark}
-          className="flex min-w-[11rem] flex-1 shrink-0 items-center gap-3 rounded-[16px] bg-white p-2.5 pr-3 shadow-[0_6px_18px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4]"
+          className="flex min-h-[3.75rem] items-center gap-2.5 rounded-[14px] bg-white px-2.5 py-2 shadow-[0_6px_18px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4]"
         >
           <span
             aria-hidden
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-[#002852] text-[0.7rem] font-bold tracking-wide text-white"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#002852] text-[0.65rem] font-bold tracking-wide text-white"
           >
             {badge.mark}
           </span>
-          <span className="min-w-0">
-            <span className="block text-caption font-semibold text-ink">
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[0.78rem] font-semibold leading-tight text-ink">
               {badge.title}
             </span>
-            <span className="mt-0.5 block text-[0.7rem] leading-snug text-muted line-clamp-2">
+            <span className="mt-0.5 block truncate text-[0.68rem] leading-snug text-muted">
               {badge.detail}
             </span>
           </span>
