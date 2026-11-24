@@ -1,18 +1,32 @@
+import { guaranteeCopy } from "@/lib/guarantee/copy";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
   const badges = [
+    isVehicleGuaranteeEligible(vehicle)
+      ? {
+          mark: "30D",
+          title: guaranteeCopy.badgeTitle,
+          detail: guaranteeCopy.badgeDetail,
+        }
+      : null,
     vehicle.inspection.available
       ? {
           mark: "AA",
-          title: "AA Inspected",
+          title: vehicle.inspection.result
+            ? `AA ${vehicle.inspection.result}`
+            : "AA Inspected",
           detail: vehicle.inspection.summary,
         }
       : null,
     vehicle.batteryHealth?.certificateAvailable
       ? {
           mark: "AV",
-          title: "Aviloo tested",
+          title:
+            vehicle.batteryHealth.stateOfHealthPercent !== undefined
+              ? `Aviloo ${vehicle.batteryHealth.stateOfHealthPercent}%`
+              : "Aviloo tested",
           detail:
             vehicle.batteryHealth.stateOfHealthPercent !== undefined
               ? `Battery state of health ${vehicle.batteryHealth.stateOfHealthPercent}%`
@@ -21,7 +35,10 @@ export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
       : null,
     {
       mark: "HPI",
-      title: "HPI checked",
+      title:
+        vehicle.provenance.outstandingFinance === "clear"
+          ? "HPI Clear"
+          : "HPI checked",
       detail:
         vehicle.provenance.outstandingFinance === "clear"
           ? "Clear finance and write-off check"
@@ -32,16 +49,26 @@ export function VehicleCertBadges({ vehicle }: { vehicle: VehicleDetail }) {
       title: `MOT ${vehicle.mot.latestResult}`,
       detail: `Valid until ${vehicle.motStatus.validUntil}`,
     },
-  ].filter(Boolean) as Array<{ mark: string; title: string; detail: string }>;
+  ].filter(Boolean) as Array<{
+    mark: string;
+    title: string;
+    detail: string;
+  }>;
 
   return (
-    <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" aria-label="Certificates">
+    <ul
+      className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
+      aria-label="Certificates"
+    >
       {badges.map((badge) => (
         <li
           key={badge.mark}
           className="flex min-w-[11rem] flex-1 shrink-0 items-center gap-3 rounded-[16px] bg-white p-2.5 pr-3 shadow-[0_6px_18px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4]"
         >
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-[#002852] text-[0.65rem] font-bold tracking-wide text-white">
+          <span
+            aria-hidden
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-[#002852] text-[0.7rem] font-bold tracking-wide text-white"
+          >
             {badge.mark}
           </span>
           <span className="min-w-0">

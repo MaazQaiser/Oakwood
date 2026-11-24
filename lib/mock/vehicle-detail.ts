@@ -1,5 +1,7 @@
+import { EV_RUNNING_COSTS } from "@/config/ev";
 import { vehicleCardImage, vehicleGalleryImages, stockImages } from "@/lib/media/stock";
 import { getGalleryItems } from "@/lib/vehicles/similar";
+import { OAKWOOD_WARRANTY_VEHICLE_SUMMARY } from "@/lib/warranty/copy";
 import type { Vehicle } from "@/types/vehicle";
 import type {
   BatteryHealth,
@@ -40,6 +42,18 @@ function defaultImages(vehicle: Vehicle): VehicleImage[] {
 function isElectrified(vehicle: Vehicle): boolean {
   const fuel = vehicle.fuelType.toLowerCase();
   return fuel === "electric" || fuel === "hybrid";
+}
+
+function defaultEvRunningCosts(vehicle: Vehicle) {
+  if (vehicle.fuelType.toLowerCase() !== "electric") {
+    return undefined;
+  }
+  const wltp = vehicle.evRangeMiles ?? 260;
+  return {
+    wltpRangeMiles: wltp,
+    realRangeMiles: Math.round(wltp * EV_RUNNING_COSTS.realWorldRangeFactor),
+    costPerMilePence: 8,
+  };
 }
 
 function defaultBattery(vehicle: Vehicle): BatteryHealth | undefined {
@@ -112,10 +126,21 @@ function defaultDetail(vehicle: Vehicle): VehicleDetail {
       plateChanges: 0,
       previousKeepers: 2,
     },
+    vehicleCheck: {
+      summary: "HPI and provenance checks completed",
+      items: [
+        { label: "Outstanding finance", value: "Clear" },
+        { label: "Write-off status", value: "Clear" },
+        { label: "Stolen marker", value: "Clear" },
+        { label: "Mileage anomaly", value: "Clear" },
+        { label: "Safety recalls", value: "No outstanding safety recalls" },
+      ],
+    },
     inspection: {
       available: false,
       summary: "Inspection certificate unavailable",
     },
+    evRunningCosts: defaultEvRunningCosts(vehicle),
     batteryHealth: defaultBattery(vehicle),
     preparation: {
       completed: true,
@@ -143,7 +168,7 @@ function defaultDetail(vehicle: Vehicle): VehicleDetail {
       insuranceGroup: "24E",
     },
     warranty: {
-      summary: "12-month warranty",
+      summary: OAKWOOD_WARRANTY_VEHICLE_SUMMARY,
       covered:
         vehicle.availability === "available"
           ? [
@@ -203,6 +228,18 @@ const featuredCClass: Partial<VehicleDetail> = {
     summary: "Vehicle inspection completed",
     completedOn: "5 September 2026",
     inspector: "Oakwood technician",
+    result: "Pass",
+    checklist: [
+      { category: "Exterior", check: "Panels and paint", result: "Pass" },
+      { category: "Wheels", check: "Tyre tread", result: "Advisory" },
+      { category: "Brakes", check: "Discs and pads", result: "Pass" },
+      { category: "Engine", check: "Oil leaks", result: "Pass" },
+      { category: "Road test", check: "Noise and vibration", result: "Pass" },
+    ],
+  },
+  pricePosition: {
+    amountBelowAverage: 1240,
+    comparableCount: 16,
   },
   serviceHistory: {
     summary: "Full service history",
@@ -267,6 +304,12 @@ const overrides: Record<string, Partial<VehicleDetail>> = {
       summary: "AA independent inspection completed",
       completedOn: "2 September 2026",
       inspector: "AA engineer",
+      result: "Pass",
+      checklist: [
+        { category: "Exterior", check: "Corrosion", result: "Pass" },
+        { category: "Battery", check: "High-voltage warnings", result: "Pass" },
+        { category: "Charging", check: "Charge port", result: "Pass" },
+      ],
     },
   },
   "1000091": {
@@ -281,6 +324,7 @@ const overrides: Record<string, Partial<VehicleDetail>> = {
       summary: "AA independent inspection completed",
       completedOn: "8 September 2026",
       inspector: "AA engineer",
+      result: "Pass",
     },
   },
   "1000093": {
@@ -295,6 +339,7 @@ const overrides: Record<string, Partial<VehicleDetail>> = {
       summary: "AA independent inspection completed",
       completedOn: "12 September 2026",
       inspector: "AA engineer",
+      result: "Pass",
     },
   },
 };
@@ -314,6 +359,9 @@ export function getVehicleDetail(vehicle: Vehicle): VehicleDetail {
     recalls: extra.recalls ?? base.recalls,
     provenance: extra.provenance ?? base.provenance,
     inspection: extra.inspection ?? base.inspection,
+    vehicleCheck: extra.vehicleCheck ?? base.vehicleCheck,
+    evRunningCosts: extra.evRunningCosts ?? base.evRunningCosts,
+    pricePosition: extra.pricePosition ?? base.pricePosition,
     batteryHealth: extra.batteryHealth ?? base.batteryHealth,
     preparation: extra.preparation ?? base.preparation,
     serviceHistory: extra.serviceHistory ?? base.serviceHistory,

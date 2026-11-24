@@ -13,6 +13,7 @@ const PATHS: Record<HelpTopicId, string> = {
   servicing:
     "M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z",
   warranty: "M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6zM8.5 12l2.5 2.5 4.5-5",
+  guarantee: "M12 3l8 3v6c0 4.2-3.2 7.6-7.2 8.8L12 22l-.8-.2C7.2 20.6 4 17.2 4 13V6z",
   contact: "M4 4h16v12H8l-4 4z",
 };
 

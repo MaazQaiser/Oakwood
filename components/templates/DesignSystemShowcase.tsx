@@ -33,7 +33,9 @@ import {
   PersonalisedPricingIndicator,
 } from "@/components/finance/FinancePrimitives";
 import { CustomerFinanceControl } from "@/components/finance/CustomerFinanceControl";
+import { GuaranteeStrip } from "@/components/layout/GuaranteeStrip";
 import { Container, Grid, Inline, Section, Stack } from "@/components/layout/Container";
+import { GuaranteeBadge } from "@/components/vehicle/GuaranteeBadge";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
 import { mockVehicles } from "@/lib/mock/data";
 
@@ -278,6 +280,21 @@ export function DesignSystemShowcase() {
             <Deposit amount={1000} />
             <FinanceTerm months={48} />
           </div>
+        </Stack>
+      </Section>
+
+      <Section>
+        <Stack gap="4">
+          <ShowcaseHeading id="guarantee">Guarantee</ShowcaseHeading>
+          <p className="text-body-sm text-muted">
+            Site-wide strip lives in the root layout; badge appears on vehicle detail and cards.
+          </p>
+          <div className="overflow-hidden rounded-md border border-border">
+            <GuaranteeStrip />
+          </div>
+          <Inline>
+            <GuaranteeBadge />
+          </Inline>
         </Stack>
       </Section>
 

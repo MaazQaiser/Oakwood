@@ -37,6 +37,10 @@ export interface Vehicle {
   doors?: number;
   seats?: number;
   cashPrice: number;
+  /** Previous list price when the car has been reduced. */
+  previousPrice?: number;
+  /** ISO timestamp for when the list price last dropped. */
+  priceDroppedAt?: string;
   monthlyPayment: number;
   listedAt: string;
   image?: string;
@@ -55,4 +59,11 @@ export interface Vehicle {
   roadTaxCost?: number;
   /** True when an Aviloo battery certificate is available for this car. */
   avilooCertificate?: boolean;
+  /**
+   * 30 Day Guarantee eligibility. Defaults to true when omitted.
+   * Off for trade sales and sold-as-seen cars.
+   */
+  guaranteeEligible?: boolean;
+  /** Present when the car is not sold to a private retail customer. */
+  saleType?: "retail" | "trade" | "sold_as_seen";
 }

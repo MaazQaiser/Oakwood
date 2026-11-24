@@ -58,7 +58,7 @@ export const locationServiceCatalog: Record<LocationServiceKey, LocationServiceI
   warranty: {
     key: "warranty",
     title: "Warranty",
-    copy: "Available cars include a 12-month warranty. Claim details are listed with the vehicle.",
+    copy: "Available cars include a 6-month warranty. Claim details are listed with the vehicle.",
     href: routes.warranty,
     cta: "Warranty",
   },

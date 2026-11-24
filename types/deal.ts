@@ -229,6 +229,8 @@ export interface DealVehicleSummary {
   imageSrc: string;
   imageAlt: string;
   availability: VehicleAvailability;
+  guaranteeEligible?: boolean;
+  saleType?: "retail" | "trade" | "sold_as_seen";
 }
 
 export interface DealFinanceContext {

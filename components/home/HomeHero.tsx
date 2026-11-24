@@ -22,7 +22,8 @@ export function HomeHero() {
       <Container className="flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
         <HomeProofStrip />
         {/* One finance claims line + eligibility CTA; footer CTA is the second. */}
-        <HomeFinanceStrip showEligibilityCta />
+        {/* Rate CTA lives at the foot of the homepage only — not in the hero. */}
+        <HomeFinanceStrip showEligibilityCta={false} />
       </Container>
     </>
   );
@@ -54,11 +55,17 @@ function CurrentHero() {
       <div
         className={cn(
           "relative z-10 mx-auto flex w-full max-w-[var(--oak-width-wide)] flex-col",
-          "md:flex-1 md:justify-center md:px-[var(--oak-page-x)]",
+          "items-center text-center",
+          "md:items-start md:text-left md:flex-1 md:justify-center md:px-[var(--oak-page-x)]",
           "md:pt-10 md:pb-10 lg:pt-14 lg:pb-14",
         )}
       >
-        <div className="flex w-full max-w-xl flex-col md:max-w-[26rem] lg:max-w-[30.6rem]">
+        <div
+          className={cn(
+            "flex w-full max-w-xl flex-col items-center",
+            "md:items-start md:max-w-[26rem] lg:max-w-[30.6rem]",
+          )}
+        >
           <h1
             className={cn(
               "text-[2.55rem] font-medium leading-[1.22em] tracking-[-0.03em] text-navy",
@@ -70,22 +77,16 @@ function CurrentHero() {
             {HOME_HERO_HEADING}
           </h1>
 
-          {/* Desktop/tablet: subheading directly under title */}
+          {/* Desktop/tablet: subheading under the title, beside the photo. */}
           <p className="mt-5 hidden max-w-[22rem] text-[0.95rem] leading-relaxed text-muted md:block">
             {HOME_HERO_DESCRIPTION}
           </p>
 
-          {/* Mobile: photo with search floating over it.
-              Desktop/tablet: search only (side photo is absolute). */}
-          <div className="relative mt-4 md:mt-5 lg:mt-6">
-            <HeroCompactPhoto className="md:hidden" />
-            <HomeSearchBar
-              className="relative z-20 max-md:-mt-14 md:mt-0"
-              compact
-            />
+          {/* Mobile Spacing mock: title → search → copy. Desktop photo is absolute. */}
+          <div className="relative mt-6 w-full md:mt-5 lg:mt-6">
+            <HomeSearchBar className="relative z-20" compact />
           </div>
 
-          {/* Mobile: subheading after the floating box */}
           <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted md:hidden">
             {HOME_HERO_DESCRIPTION}
           </p>
@@ -104,30 +105,5 @@ function CurrentHero() {
         </div>
       </div>
     </section>
-  );
-}
-
-function HeroCompactPhoto({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "relative h-52 shrink-0 overflow-hidden rounded-[20px] sm:h-60",
-        className,
-      )}
-    >
-      <Image
-        src="/images/hero/open-sky-mobile.png"
-        alt="A smiling customer giving a thumbs up beside a car under an open sky"
-        fill
-        priority
-        quality={92}
-        sizes="100vw"
-        className="object-cover object-[center_32%]"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#ECF3F8_0%,rgba(236,243,248,0.42)_12%,rgba(236,243,248,0)_36%,rgba(236,243,248,0)_55%,rgba(236,243,248,0.55)_82%,#ECF3F8_100%)]"
-        aria-hidden
-      />
-    </div>
   );
 }

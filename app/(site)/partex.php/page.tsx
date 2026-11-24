@@ -19,5 +19,10 @@ export default async function Page({
     ? params.registration[0]
     : params.registration;
 
-  return <SellMyCarExperience initialRegistration={registration} />;
+  return (
+    <SellMyCarExperience
+      initialRegistration={registration}
+      askIntent={false}
+    />
+  );
 }

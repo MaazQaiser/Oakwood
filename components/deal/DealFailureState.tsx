@@ -49,7 +49,7 @@ export function DealFailureState({
               Browse cars
             </Button>
             <Button href={getEligibilityUrl()} variant="text" size="sm">
-              Check my eligibility
+              Check my rate
             </Button>
           </div>
         </Alert>
@@ -82,7 +82,7 @@ export function DealFailureState({
             </Button>
           ) : null}
           <Button href={getEligibilityUrl()} variant="secondary" size="sm">
-            Check my eligibility
+            Check my rate
           </Button>
         </div>
       </Alert>

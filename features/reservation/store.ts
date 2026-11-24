@@ -3,7 +3,6 @@ import { reservationConfig } from "@/config/reservation";
 import { mockVehicleId } from "@/lib/mock/data";
 import type {
   MockPaymentOutcome,
-  RefundReasonCode,
   ReservationDealSnapshot,
   ReservationPaymentState,
   ReservationStockState,
@@ -36,13 +35,11 @@ export interface ReservationRecord {
   webhookDueAt?: number;
   webhookApplied?: boolean;
   mockOutcome?: MockPaymentOutcome;
-  refund?: {
-    reason: RefundReasonCode;
-    requestedAtIso: string;
-  };
   financeAllRoutesUnavailable?: boolean;
   locationSlug?: string;
   registration?: string;
+  /** Set when the customer ticks the 30 Day Guarantee terms on payment. */
+  guaranteeTermsAccepted?: boolean;
 }
 
 const reservations = new Map<string, ReservationRecord>();
@@ -204,7 +201,7 @@ export function applyDueTransitions(
     next.stockState === "reserved" &&
     next.expiresAtIso &&
     Date.parse(next.expiresAtIso) <= now &&
-    reservationConfig.automaticRefundOnExpiry
+    reservationConfig.autoReleaseOnExpiry
   ) {
     releaseStock(next.vehicleStockId, next.id);
     next =
@@ -212,7 +209,7 @@ export function applyDueTransitions(
         next.id,
         {
           stockState: "expired",
-          paymentState: "refunded",
+          paymentState: "released",
         },
         now,
       ) ?? next;
@@ -299,7 +296,7 @@ export function applyMockWebhook(
       next.id,
       {
         stockState: "expired",
-        paymentState: "refunded",
+        paymentState: "released",
         expiresAtIso: new Date(now).toISOString(),
       },
       now,
@@ -312,29 +309,23 @@ export function applyMockWebhook(
       next.id,
       {
         stockState: "sold",
-        paymentState: reservationConfig.sameDayRefundOnVehicleUnavailable
-          ? "refunded"
-          : "refund_pending",
+        paymentState: "released",
       },
       now,
     );
   }
 
   if (next && outcome === "finance_unavailable") {
+    releaseStock(next.vehicleStockId, next.id);
     next = patchReservation(
       next.id,
       {
         financeAllRoutesUnavailable: true,
-        stockState: "refund_requested",
-        paymentState: reservationConfig.sameDayRefundOnFinanceUnavailable
-          ? "refunded"
-          : "refund_pending",
+        stockState: "expired",
+        paymentState: "released",
       },
       now,
     );
-    if (next && reservationConfig.releaseStockOnRefundRequest) {
-      releaseStock(next.vehicleStockId, next.id);
-    }
   }
 
   return next;

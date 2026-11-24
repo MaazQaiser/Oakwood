@@ -73,7 +73,7 @@ export function FinanceEligibilityCard() {
             href={routes.eligibility}
             className="btn-compact w-auto shrink-0 self-start"
           >
-            Check my eligibility
+            Check my rate
           </Button>
         </div>
       </div>

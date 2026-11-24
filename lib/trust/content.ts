@@ -1,4 +1,5 @@
 import { getEligibilityUrl, routes } from "@/config/routes";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 import type { ProcessStep, TrustPageCopy, TrustSection } from "@/types/trust";
 
 export const CMS_TRUST_NOTICE =
@@ -45,7 +46,7 @@ export const howItWorksSteps: ProcessStep[] = [
     title: "Check your finance eligibility",
     copy: "Answer a short set of questions. Oakwood uses a soft search, so this will not affect your credit score.",
     href: getEligibilityUrl(),
-    cta: "Check my eligibility",
+    cta: "Check my rate",
   },
   {
     number: "2",
@@ -89,6 +90,13 @@ export const howItWorksSteps: ProcessStep[] = [
     href: routes.deliveryAndCollection,
     cta: "Delivery and collection",
   },
+  {
+    number: guaranteeCopy.howItWorksJourneyStep.number,
+    title: guaranteeCopy.howItWorksJourneyStep.title,
+    copy: guaranteeCopy.howItWorksJourneyStep.copy,
+    href: routes.thirtyDayGuarantee,
+    cta: guaranteeCopy.howItWorksJourneyStep.cta,
+  },
 ];
 
 export const whatToExpectCopy: TrustPageCopy = {
@@ -128,11 +136,11 @@ export const whatToExpectSections: TrustSection[] = [
   },
   {
     title: "Collection or delivery",
-    body: "You can collect from the showroom where the car is located. Delivery options and any charges are confirmed with you. Prices are not published here until the content source provides them.",
+    body: `You can collect from the showroom where the car is located. Delivery options and any charges are confirmed with you. Prices are not published here until the content source provides them.${guaranteeCopy.whatToExpectSentence}`,
   },
   {
     title: "Aftercare",
-    body: "Available cars include a 12-month warranty. Servicing, MOT and warranty claim requests can be started from Aftersales.",
+    body: "Available cars include a 6-month warranty. Servicing, MOT and warranty claim requests can be started from Aftersales.",
   },
 ];
 
@@ -190,12 +198,16 @@ export const deliveryCopy: TrustPageCopy = {
 
 export const deliverySections: TrustSection[] = [
   {
-    title: "Collection",
-    body: "Collect from Oakwood Bury or Oakwood Chorley, matching the location shown on the vehicle page. Bring identification and any documents Oakwood asks for when the appointment is confirmed.",
+    title: "Click & collect",
+    body: "Reserve or buy the car online, then collect from the Oakwood showroom shown on the vehicle page — usually Bury or Chorley. We confirm a handover slot, go through the paperwork with you, and you can drive away once payment and ID checks are complete.",
   },
   {
-    title: "Delivery",
-    body: "If delivery is available for your purchase, Oakwood will confirm where we can deliver and what you need to do on the day. Delivery pricing and coverage are not published here until the content source provides them.",
+    title: "Delivery by postcode",
+    body: "Ask us to deliver to your home or workplace where we offer it. Share your postcode when you enquire and we will confirm whether delivery is available, any charge, and what happens on the day. You can still inspect the car at handover before you accept it.",
+  },
+  {
+    title: "Move a car between Bury and Chorley",
+    body: "Sometimes the car you want is at our other showroom. Use “Move to my nearest site” on the vehicle page to ask us to transfer it between Bury and Chorley for click & collect or viewing. Timing depends on workshop and transporter availability — we confirm before you travel.",
   },
   {
     title: "Handover",

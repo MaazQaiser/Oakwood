@@ -14,7 +14,7 @@ const points = [
   },
   {
     title: "Warranty included",
-    copy: "Available cars include a 12-month warranty. Claim details are listed with the vehicle.",
+    copy: "Available cars include a 6-month warranty. Claim details are listed with the vehicle.",
     href: routes.warranty,
   },
   {

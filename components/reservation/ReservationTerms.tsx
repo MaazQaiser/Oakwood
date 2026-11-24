@@ -50,7 +50,9 @@ export function ReservationTerms({
           Status disclosure
         </Link>
       </p>
-      <p className="mt-2 text-caption text-muted">{reservationCopy.fullyRefundable}.</p>
+      <p className="mt-2 text-caption text-muted">
+        {reservationCopy.cardAuthorisation}.
+      </p>
     </section>
   );
 }

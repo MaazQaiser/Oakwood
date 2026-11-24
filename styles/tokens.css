@@ -102,10 +102,12 @@
   --oak-shadow-card: 0 10px 24px rgb(16 40 72 / 0.06);
   --oak-radius-card: 28px;
 
-  /* Layout — desktop content column is exactly 1140px inside page gutters */
+  /* Layout — mobile column is fixed at 320px so side spacing comes from the
+     column itself (do not stretch to the screen edge when gutters change).
+     Desktop (64rem+) sets the 1140px content column inside page gutters. */
   --oak-width-narrow: 40rem;
-  --oak-width-content: calc(1140px + 2 * var(--oak-page-x));
-  --oak-width-wide: calc(1140px + 2 * var(--oak-page-x));
+  --oak-width-content: 320px;
+  --oak-width-wide: 320px;
   --oak-header-height: 4rem;
   --oak-touch: 2.75rem;
   --oak-consent-offset: 0px;
@@ -153,6 +155,9 @@
     --oak-page-x: 2rem;
     --oak-section-y: 4.5rem;
     --oak-header-height: 4.5rem;
+    /* Leave the 320px mobile measure; tablet and up use the full column. */
+    --oak-width-content: calc(1140px + 2 * var(--oak-page-x));
+    --oak-width-wide: calc(1140px + 2 * var(--oak-page-x));
   }
 }
 

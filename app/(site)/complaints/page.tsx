@@ -1,17 +1,7 @@
-import { SupportComplaintsPage } from "@/features/support/SupportPages";
+import { permanentRedirect } from "next/navigation";
 import { routes } from "@/config/routes";
-import {
-  COMPLAINTS_META_DESCRIPTION,
-  COMPLAINTS_META_TITLE,
-} from "@/lib/support/copy";
-import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata = createPageMetadata({
-  title: COMPLAINTS_META_TITLE,
-  path: routes.complaints,
-  description: COMPLAINTS_META_DESCRIPTION,
-});
-
+/** Complaints sit on Problem with your car?, not a separate hub. */
 export default function Page() {
-  return <SupportComplaintsPage />;
+  permanentRedirect(routes.problemWithYourCar);
 }

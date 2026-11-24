@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/Button";
 import {
-  financeCta,
   primaryNavigation,
   visibleGroups,
   visibleItems,
@@ -14,6 +12,9 @@ import { cn } from "@/lib/cn";
 function isCurrentPath(pathname: string, href: string): boolean {
   if (href === "/") {
     return pathname === "/";
+  }
+  if (href.startsWith("http")) {
+    return false;
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -28,11 +29,6 @@ export function MobileNav({ onNavigate }: { onNavigate: () => void }) {
 
   return (
     <nav aria-label="Mobile">
-      <div className="mb-5" onClick={onNavigate}>
-        <Button href={financeCta.href} className="btn-compact justify-start gap-2">
-          {financeCta.anonymousLabel}
-        </Button>
-      </div>
       <ul className="flex flex-col gap-3.5">
         {groups.map((group) => (
           <li key={group.id}>
@@ -57,18 +53,30 @@ export function MobileNav({ onNavigate }: { onNavigate: () => void }) {
               {visibleItems(group.children).map((item) =>
                 item.href ? (
                   <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      aria-current={isCurrentPath(pathname, item.href) ? "page" : undefined}
-                      className={cn(
-                        "flex min-h-10 items-center",
-                        menuFont,
-                        isCurrentPath(pathname, item.href) && "text-primary",
-                      )}
-                      onClick={onNavigate}
-                    >
-                      {item.label}
-                    </Link>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        className={cn("flex min-h-10 items-center", menuFont)}
+                        onClick={onNavigate}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        aria-current={isCurrentPath(pathname, item.href) ? "page" : undefined}
+                        className={cn(
+                          "flex min-h-10 items-center",
+                          menuFont,
+                          isCurrentPath(pathname, item.href) && "text-primary",
+                        )}
+                        onClick={onNavigate}
+                      >
+                        {item.label}
+                      </Link>
+                    )}
                   </li>
                 ) : null,
               )}

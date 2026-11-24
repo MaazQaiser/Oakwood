@@ -30,7 +30,7 @@ export function CategoryCard({
   return (
     <Link href={href} className="block h-full">
       <Card as="article" className="flex h-full flex-col overflow-hidden border-0 shadow-sm" padded={false}>
-        <div className="relative aspect-[16/10] max-h-56 overflow-hidden bg-page-tint sm:max-h-52">
+        <div className="relative aspect-[16/10] overflow-hidden bg-page-tint">
           <OakwoodPhotoSlot
             slot={needPhotography(id)}
             fill

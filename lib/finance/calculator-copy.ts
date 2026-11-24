@@ -78,7 +78,7 @@ export const CALCULATOR_INCREASE_DEPOSIT = "Increase deposit";
 
 export const CALCULATOR_BROWSE_BUDGET = "Browse cars within your budget";
 
-export const CALCULATOR_ELIGIBILITY_CTA = "Check my eligibility";
+export const CALCULATOR_ELIGIBILITY_CTA = "Check my rate";
 
 export const CALCULATOR_ELIGIBILITY_SUPPORTING =
   "Get a personalised finance profile with no impact on your credit score.";

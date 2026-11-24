@@ -378,9 +378,13 @@ export function FilterFields({
               key={body}
               id={fid(`body-${body}`)}
               label={body}
-              checked={selectedBodies.some(
-                (item) => item.toLowerCase() === body.toLowerCase(),
-              )}
+              checked={
+                selectedBodies.some(
+                  (item) => item.toLowerCase() === body.toLowerCase(),
+                ) ||
+                locked.body_style?.toLowerCase() === body.toLowerCase()
+              }
+              disabled={Boolean(locked.body_style)}
               onChange={() => toggleList("body_style", body, selectedBodies)}
             />
           ))}
@@ -393,7 +397,11 @@ export function FilterFields({
                 key={fuel}
                 id={fid(`fuel-${fuel}`)}
                 label={fuel}
-                checked={selectedFuels.includes(fuel)}
+                checked={
+                  selectedFuels.includes(fuel) ||
+                  locked.fuel?.toLowerCase() === fuel.toLowerCase()
+                }
+                disabled={Boolean(locked.fuel)}
                 onChange={() => toggleList("fuel", fuel, selectedFuels)}
               />
             ))}
@@ -406,9 +414,13 @@ export function FilterFields({
                   key={body}
                   id={fid(`body-${body}`)}
                   label={body}
-                  checked={selectedBodies.some(
-                    (item) => item.toLowerCase() === body.toLowerCase(),
-                  )}
+                  checked={
+                    selectedBodies.some(
+                      (item) => item.toLowerCase() === body.toLowerCase(),
+                    ) ||
+                    locked.body_style?.toLowerCase() === body.toLowerCase()
+                  }
+                  disabled={Boolean(locked.body_style)}
                   onChange={() => toggleList("body_style", body, selectedBodies)}
                 />
               ))}
@@ -423,7 +435,11 @@ export function FilterFields({
             key={transmission}
             id={fid(`transmission-${transmission}`)}
             label={transmission}
-            checked={selectedTransmissions.includes(transmission)}
+            checked={
+              selectedTransmissions.includes(transmission) ||
+              locked.transmission?.toLowerCase() === transmission.toLowerCase()
+            }
+            disabled={Boolean(locked.transmission)}
             onChange={() =>
               toggleList("transmission", transmission, selectedTransmissions)
             }
@@ -520,7 +536,7 @@ export function FilterFields({
                 href={getEligibilityUrl()}
                 className="font-semibold text-primary underline-offset-2 hover:underline"
               >
-                Check eligibility
+                Check my rate
               </Link>
             </>
           )}

@@ -13,7 +13,6 @@ export interface ReservationStatusSnapshot {
   reference?: string;
   reservedAtIso?: string;
   expiresAtIso?: string;
-  refundRequestedAtIso?: string;
   financeAllRoutesUnavailable?: boolean;
   reconciliationRequired: boolean;
   paymentFailed: boolean;
@@ -35,10 +34,10 @@ export function phaseFromStates(
     return "EXPIRED";
   }
   if (stock === "refund_requested") {
-    return "REFUND_REQUESTED";
+    return "EXPIRED";
   }
   if (stock === "refunded") {
-    return "REFUNDED";
+    return "EXPIRED";
   }
   if (stock === "reserved" && payment === "paid") {
     return "RESERVED";
@@ -81,7 +80,6 @@ export function toStatusSnapshot(
     reference: record.reference,
     reservedAtIso: record.reservedAtIso,
     expiresAtIso: record.expiresAtIso,
-    refundRequestedAtIso: record.refund?.requestedAtIso,
     financeAllRoutesUnavailable: record.financeAllRoutesUnavailable,
     reconciliationRequired:
       record.stockState === "reconciliation" && record.paymentState === "paid",

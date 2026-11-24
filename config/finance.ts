@@ -6,6 +6,7 @@ export const FINANCE_INTENTS: FinanceIntent[] = [
   { slug: "ccj", title: "CCJ" },
   { slug: "self-employed", title: "Self employed" },
   { slug: "first-time-buyer", title: "First time buyer" },
+  { slug: "0-percent", title: "0% finance" },
   { slug: "hp", title: "HP" },
   { slug: "pcp", title: "PCP" },
 ];
@@ -33,5 +34,5 @@ import { reservationConfig } from "@/config/reservation";
 export const reservationDefaults = {
   amount: reservationConfig.amount,
   holdDays: reservationConfig.holdDurationDays,
-  refundable: reservationConfig.refundable,
+  captureMode: reservationConfig.captureMode,
 } as const;

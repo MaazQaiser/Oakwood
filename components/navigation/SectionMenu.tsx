@@ -8,13 +8,27 @@ import {
   Info,
   KeyRound,
   MapPin,
+  Percent,
   ShieldCheck,
   Van,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { getBookingUrl, getSearchUrl, routes } from "@/config/routes";
+import {
+  browseBodyTypeLinks,
+  browseCashBudgetLinks,
+  browseFuelLinks,
+  browseMonthlyBudgetLinks,
+} from "@/config/navigation";
+import {
+  getBookingUrl,
+  getFaqUrl,
+  getFinanceIntentUrl,
+  getLocationStockUrl,
+  routes,
+} from "@/config/routes";
 import { cn } from "@/lib/cn";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 
 type MenuIcon =
   | "car"
@@ -26,7 +40,8 @@ type MenuIcon =
   | "wrench"
   | "shield"
   | "pin"
-  | "info";
+  | "info"
+  | "percent";
 
 export interface SectionMenuLink {
   label: string;
@@ -35,6 +50,7 @@ export interface SectionMenuLink {
   price?: string;
   /** Show a trailing arrow on the link. */
   arrow?: boolean;
+  external?: boolean;
 }
 
 export interface SectionMenuCard {
@@ -44,6 +60,7 @@ export interface SectionMenuCard {
   icon: MenuIcon;
   /** Span both card columns — used for the Sell Part exchange CTA. */
   featured?: boolean;
+  external?: boolean;
 }
 
 export interface SectionMenuContent {
@@ -52,66 +69,93 @@ export interface SectionMenuContent {
   cards: SectionMenuCard[];
   sideLabel: string;
   sideLinks: { label: string; href: string }[];
+  /** Optional second browse column (cash bands, body, fuel). */
+  secondaryListLabel?: string;
+  secondaryLinks?: SectionMenuLink[];
 }
 
-const browseByBudget: SectionMenuLink[] = [
-  { label: "Cars under", price: "£200", href: getSearchUrl({ monthly_max: 200 }) },
-  { label: "Cars under", price: "£300", href: getSearchUrl({ monthly_max: 300 }) },
-  { label: "Cars under", price: "£400", href: getSearchUrl({ monthly_max: 400 }) },
-  { label: "Cars under", price: "£500", href: getSearchUrl({ monthly_max: 500 }) },
-  { label: "Cars over", price: "£500", href: getSearchUrl({ monthly_min: 500 }) },
-];
-
 export const sectionMenus: Record<string, SectionMenuContent> = {
-  cars: {
-    listLabel: "Browse by budget",
-    links: browseByBudget,
-    cards: [
+  buy: {
+    listLabel: "Browse by monthly budget",
+    links: [...browseMonthlyBudgetLinks],
+    secondaryListLabel: "Browse by cash, body and fuel",
+    secondaryLinks: [
+      ...browseCashBudgetLinks.slice(0, 3),
+      ...browseBodyTypeLinks.slice(0, 3),
+      ...browseFuelLinks.slice(0, 2),
+      { label: "Automatics", href: routes.usedCarsAutomatic },
+      { label: "Cheap to run", href: routes.cheapToRun },
       {
-        title: "Used cars",
-        description:
-          "Browse cars in stock with a cash price and an example monthly payment",
-        href: routes.usedCars,
-        icon: "car",
+        label: "Cars in Bury",
+        href: getLocationStockUrl("bury"),
       },
       {
-        title: "Used vans",
-        description: "Practical vehicles for work, with the same clear pricing",
-        href: routes.usedVans,
-        icon: "van",
+        label: "Cars in Chorley",
+        href: getLocationStockUrl("chorley"),
       },
     ],
-    sideLabel: "FAQs",
+    cards: [
+      {
+        title: "30 day guarantee",
+        description: guaranteeCopy.headline,
+        href: routes.thirtyDayGuarantee,
+        icon: "check",
+      },
+      {
+        title: "How it works",
+        description: "From browsing to collecting or delivery, step by step.",
+        href: routes.howItWorks,
+        icon: "info",
+      },
+      {
+        title: "Price drops",
+        description: "The biggest recent reductions across our stock.",
+        href: routes.priceDrops,
+        icon: "finance",
+      },
+    ],
+    sideLabel: "Questions",
     sideLinks: [
-      { label: "How does buying a car from Oakwood work?", href: routes.howItWorks },
-      { label: "Can I reserve a car online?", href: routes.reserve },
-      { label: "Where can I view a car?", href: routes.locations },
+      { label: "Can I reserve online?", href: getFaqUrl("reserve-online") },
+      { label: "Where can I view a car?", href: getFaqUrl("view-a-car") },
+      { label: "Can you deliver?", href: getFaqUrl("delivery") },
     ],
   },
   finance: {
-    listLabel: "Browse by budget",
-    links: browseByBudget,
+    listLabel: "Browse by monthly budget",
+    links: [...browseMonthlyBudgetLinks],
     cards: [
       {
-        title: "Check eligibility",
+        title: "Check my rate",
         description:
           "See a personalised finance profile, with no impact on your credit score",
         href: routes.eligibilityQuestions,
         icon: "check",
       },
       {
-        title: "Finance",
-        description: "Learn about buying your car with a monthly payment",
-        href: routes.finance,
-        icon: "finance",
+        title: "0% finance",
+        description: "0% APR on any car in stock, subject to status",
+        href: routes.interestFree,
+        icon: "percent",
       },
     ],
-    sideLabel: "FAQs",
-    sideLinks: [],
+    sideLabel: "Questions",
+    sideLinks: [
+      {
+        label: "Will checking affect my credit score?",
+        href: getFaqUrl("credit-score"),
+      },
+      { label: "HP or PCP?", href: getFaqUrl("hp-or-pcp") },
+    ],
   },
   sell: {
-    listLabel: "Your car",
-    links: [{ label: "Get a valuation", href: routes.valuation }],
+    listLabel: "Sell",
+    links: [
+      {
+        label: "Sell my car",
+        href: routes.sellMyCar,
+      },
+    ],
     cards: [
       {
         title: "Part exchange",
@@ -121,28 +165,27 @@ export const sectionMenus: Record<string, SectionMenuContent> = {
         featured: true,
       },
     ],
-    sideLabel: "FAQs",
-    sideLinks: [],
+    sideLabel: "Questions",
+    sideLinks: [
+      { label: "How is my car valued?", href: getFaqUrl("how-valued") },
+    ],
   },
-  aftersales: {
-    listLabel: "Car care",
+  servicing: {
+    listLabel: "Browse",
     links: [
       { label: "Servicing", href: routes.service },
+      { label: "Manufacturer servicing", href: routes.servicingAudi },
       { label: "MOT", href: routes.mot },
-      { label: "Warranty claims", href: routes.warrantyClaims },
       {
-        label: "Book a 60-minute diagnosis",
-        href: getBookingUrl({ type: "service" }),
+        label: "60 minute diagnostic",
+        href: getBookingUrl({ type: "diagnostic" }),
       },
-      {
-        label: "Make a complaint",
-        href: `${routes.complaints}#complaint-form`,
-      },
+      { label: "Service plans", href: routes.servicingPlans },
     ],
     cards: [
       {
-        title: "Book a service",
-        description: "Arrange servicing or an MOT at Oakwood",
+        title: "Book a service or MOT",
+        description: "Arrange servicing, an MOT or a diagnostic at Oakwood",
         href: routes.booking,
         icon: "wrench",
       },
@@ -153,43 +196,43 @@ export const sectionMenus: Record<string, SectionMenuContent> = {
         icon: "shield",
       },
     ],
-    sideLabel: "FAQs",
+    sideLabel: "Questions",
     sideLinks: [
-      { label: "When does my car need an MOT?", href: routes.mot },
-      { label: "How do I book a service?", href: routes.booking },
-      { label: "How do I make a warranty claim?", href: routes.warrantyClaims },
+      { label: "When is my MOT due?", href: getFaqUrl("mot-due") },
       {
-        label: "How do I get a refund?",
-        href: routes.cancellationRefund,
+        label: "How do I claim on my warranty?",
+        href: getFaqUrl("warranty-claim"),
       },
     ],
   },
-  "about-trust": {
-    listLabel: "Oakwood",
+  about: {
+    listLabel: "Browse",
     links: [
       { label: "About us", href: routes.about, arrow: true },
-      { label: "Contact", href: routes.contact, arrow: true },
+      { label: "Reviews", href: routes.ourOnlineReviews, arrow: true },
+      { label: "Bury", href: `${routes.locations}/bury`, arrow: true },
+      { label: "Chorley", href: `${routes.locations}/chorley`, arrow: true },
+      { label: "AA standards", href: routes.aaStandards, arrow: true },
+      { label: "Our garage", href: routes.ourGarage, arrow: true },
     ],
     cards: [
-      {
-        title: "How finance works",
-        description:
-          "Check your budget, choose a car, then buy in a way that suits you",
-        href: routes.howItWorks,
-        icon: "info",
-      },
       {
         title: "Visit us",
         description: "See cars at our Bury and Chorley showrooms",
         href: routes.locations,
         icon: "pin",
       },
+      {
+        title: "Contact",
+        description: "Phone, email or a callback from the team",
+        href: routes.contact,
+        icon: "info",
+      },
     ],
-    sideLabel: "FAQs",
+    sideLabel: "Questions",
     sideLinks: [
-      { label: "Do I need an account?", href: routes.help },
-      { label: "How do I contact Oakwood?", href: routes.contact },
-      { label: "How do I raise a complaint?", href: routes.complaints },
+      { label: "Do I need an account?", href: getFaqUrl("need-account") },
+      { label: "How do I contact you?", href: getFaqUrl("contact-you") },
     ],
   },
 };
@@ -205,6 +248,7 @@ const menuIcons: Record<MenuIcon, LucideIcon> = {
   shield: ShieldCheck,
   pin: MapPin,
   info: Info,
+  percent: Percent,
 };
 
 function MenuGlyph({ name }: { name: MenuIcon }) {
@@ -214,16 +258,67 @@ function MenuGlyph({ name }: { name: MenuIcon }) {
 
 function gridTemplate(
   hasList: boolean,
+  hasSecondary: boolean,
   cardSlots: number,
   hasSide: boolean,
 ): string {
   const cols: string[] = [];
   if (hasList) cols.push("minmax(12rem,15rem)");
+  if (hasSecondary) cols.push("minmax(12rem,15rem)");
   for (let i = 0; i < cardSlots; i += 1) {
     cols.push("minmax(0,1fr)");
   }
   if (hasSide) cols.push("minmax(13rem,17rem)");
   return cols.join(" ");
+}
+
+function MenuLinkList({
+  label,
+  links,
+  onNavigate,
+}: {
+  label: string;
+  links: SectionMenuLink[];
+  onNavigate: () => void;
+}) {
+  return (
+    <div>
+      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-ink">
+        {label}
+      </p>
+      <ul className="mt-4 space-y-1">
+        {links.map((link) => (
+          <li key={link.href + link.label + (link.price ?? "")}>
+            <Link
+              href={link.href}
+              className="flex items-center gap-2 rounded-md py-1.5 text-[0.95rem] text-ink no-underline hover:underline"
+              onClick={onNavigate}
+              {...(link.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              <span>
+                {link.label}
+                {link.price ? (
+                  <>
+                    {" "}
+                    <span className="font-semibold">{link.price}</span>
+                  </>
+                ) : null}
+              </span>
+              {link.arrow ? (
+                <ArrowRight
+                  aria-hidden
+                  className="h-3.5 w-3.5 shrink-0"
+                  strokeWidth={1.75}
+                />
+              ) : null}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export function SectionMenu({
@@ -237,16 +332,16 @@ export function SectionMenu({
   onNavigate: () => void;
 }) {
   const hasList = menu.links.length > 0;
+  const hasSecondary = Boolean(menu.secondaryLinks?.length);
   const hasSide = menu.sideLinks.length > 0;
   const hasFeatured = menu.cards.some((card) => card.featured);
-  // Featured single card spans two card columns so it reads as the main CTA.
   const cardSlots =
     menu.cards.length === 0
       ? 0
       : hasFeatured
         ? Math.max(2, menu.cards.length)
         : menu.cards.length;
-  const template = gridTemplate(hasList, cardSlots, hasSide);
+  const template = gridTemplate(hasList, hasSecondary, cardSlots, hasSide);
 
   return (
     <div
@@ -254,39 +349,19 @@ export function SectionMenu({
       style={{ ["--menu-cols" as string]: template }}
     >
       {hasList ? (
-        <div>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-ink">
-            {menu.listLabel}
-          </p>
-          <ul className="mt-4 space-y-1">
-            {menu.links.map((link) => (
-              <li key={link.href + link.label + (link.price ?? "")}>
-                <Link
-                  href={link.href}
-                  className="flex items-center gap-2 rounded-md py-1.5 text-[0.95rem] text-ink no-underline hover:underline"
-                  onClick={onNavigate}
-                >
-                  <span>
-                    {link.label}
-                    {link.price ? (
-                      <>
-                        {" "}
-                        <span className="font-semibold">{link.price}</span>
-                      </>
-                    ) : null}
-                  </span>
-                  {link.arrow ? (
-                    <ArrowRight
-                      aria-hidden
-                      className="h-3.5 w-3.5 shrink-0"
-                      strokeWidth={1.75}
-                    />
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <MenuLinkList
+          label={menu.listLabel}
+          links={menu.links}
+          onNavigate={onNavigate}
+        />
+      ) : null}
+
+      {hasSecondary && menu.secondaryLinks ? (
+        <MenuLinkList
+          label={menu.secondaryListLabel ?? "Browse"}
+          links={menu.secondaryLinks}
+          onNavigate={onNavigate}
+        />
       ) : null}
 
       {menu.cards.map((card) => (
@@ -294,6 +369,9 @@ export function SectionMenu({
           key={card.href + card.title}
           href={card.href}
           onClick={onNavigate}
+          {...(card.external
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
           className={cn(
             "group flex h-full min-h-52 flex-col rounded-[14px] bg-white p-5 text-ink no-underline transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(66,69,78,0.12)]",
             card.featured && "lg:col-span-2",

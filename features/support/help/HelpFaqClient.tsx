@@ -17,11 +17,11 @@ import {
 
 const POPULAR_LABELS: Record<(typeof HELP_POPULAR_IDS)[number], { tag: string; title: string }> = {
   "elig-credit": { tag: "Finance", title: "Will checking eligibility affect my credit score?" },
-  "res-99": { tag: "Reservations", title: "How does the £99 reservation work?" },
+  "res-99": { tag: "Reservations", title: "How does the £49 reservation work?" },
   "mot-book": { tag: "Servicing and MOT", title: "How do I book an MOT?" },
 };
 
-const MOBILE_WIDTH = "max-[480px]:max-w-[350px]";
+const MOBILE_WIDTH = "max-md:max-w-[var(--oak-width-content)]";
 
 function isTopicId(value: string): value is HelpTopicId {
   return HELP_TOPICS.some((topic) => topic.id === value);

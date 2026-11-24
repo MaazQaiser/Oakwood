@@ -8,6 +8,8 @@ import { DealCard } from "@/components/deal/wizard/DealWizardShell";
 import { reservationConfig } from "@/config/reservation";
 import { routes } from "@/config/routes";
 import { STEP4_RESERVE_REFUNDABLE } from "@/lib/deal/step4-copy";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
 import {
   formatHoldPeriod,
   reservationAmountLabel,
@@ -18,6 +20,7 @@ export function DealReservePanel({ onBack }: { onBack: () => void }) {
   const { vehicle, dealId } = useDealBuilder();
   const fee = reservationAmountLabel(reservationConfig.amount);
   const hold = formatHoldPeriod(reservationConfig.holdDurationDays);
+  const showGuarantee = isVehicleGuaranteeEligible(vehicle);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -31,12 +34,17 @@ export function DealReservePanel({ onBack }: { onBack: () => void }) {
           <p className="text-body-sm text-secondary">
             {vehicle.year} {vehicle.make} {vehicle.model}
           </p>
-          <p className="text-label">{fee} refundable reservation</p>
+          <p className="text-label">{fee} card authorisation</p>
           <p className="text-body-sm text-muted">{STEP4_RESERVE_REFUNDABLE}</p>
           <p className="text-body-sm text-muted">
             After payment is confirmed, the car is held for {hold} under the
             reservation terms.
           </p>
+          {showGuarantee ? (
+            <p className="text-body-sm text-muted">
+              {guaranteeCopy.badgeDetail} You confirm the terms when you pay.
+            </p>
+          ) : null}
           <p className="text-body-sm">
             <a
               href={routes.reservationTerms}
@@ -44,6 +52,17 @@ export function DealReservePanel({ onBack }: { onBack: () => void }) {
             >
               Reservation terms
             </a>
+            {showGuarantee ? (
+              <>
+                {" · "}
+                <a
+                  href={routes.thirtyDayGuaranteeTerms}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  30 Day Guarantee terms
+                </a>
+              </>
+            ) : null}
           </p>
         </DealCard>
         <StartReservationButton

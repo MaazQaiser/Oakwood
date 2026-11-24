@@ -8,7 +8,8 @@ export type LegalDocumentSlug =
   | "reservation"
   | "cancellation-refund"
   | "delivery"
-  | "accessibility";
+  | "accessibility"
+  | "30-day-guarantee";
 
 export interface LegalSubsection {
   id: string;

@@ -65,6 +65,13 @@ export const HOME_PROOF_ITEMS = [
     accent: false,
   },
   {
+    id: "guarantee",
+    lead: "30 Day Guarantee",
+    /** Prefer guaranteeCopy.proofDetail at render time — kept short here to avoid a circular import. */
+    detail: "Live with it, then swap or get your money back",
+    accent: false,
+  },
+  {
     id: "stock",
     lead: "500+ cars in stock",
     detail: "Ready to view and drive away",
@@ -97,7 +104,7 @@ export const HOME_FINANCE_ELIGIBILITY_DESCRIPTION =
   "Find out in 60 seconds.";
 export const HOME_FINANCE_ELIGIBILITY_PREVIEW =
   "Preview only — no live credit check yet.";
-export const HOME_FINANCE_ELIGIBILITY_CTA = "Check my eligibility";
+export const HOME_FINANCE_ELIGIBILITY_CTA = "Check my rate";
 export const HOME_FINANCE_ELIGIBILITY =
   `${HOME_FINANCE_ELIGIBILITY_TITLE} ${HOME_FINANCE_ELIGIBILITY_DESCRIPTION}`.trim();
 export const HOME_FINANCE_RATES_SUPPORT =
@@ -119,9 +126,10 @@ export const HOME_META_TITLE = "Used cars in stock";
 export const HOME_META_DESCRIPTION =
   "Find a used car in Oakwood stock, or search by monthly budget or total price. AA-inspected cars, two showrooms and our own workshop.";
 
-export const HOME_WARRANTY_INCLUDED = "6-month warranty included";
-export const HOME_WARRANTY_AA_UPGRADE =
-  "AA warranty available — upgrade up to 4 years";
+export {
+  OAKWOOD_WARRANTY_AA_UPGRADE as HOME_WARRANTY_AA_UPGRADE,
+  OAKWOOD_WARRANTY_INCLUDED as HOME_WARRANTY_INCLUDED,
+} from "@/lib/warranty/copy";
 
 export const HOME_AFTERSALES_EYEBROW = "Aftersales";
 export const HOME_AFTERSALES_HEADING =

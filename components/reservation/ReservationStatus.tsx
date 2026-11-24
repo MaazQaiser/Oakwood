@@ -6,16 +6,17 @@ import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { ReservationVehicleSummary } from "@/components/reservation/ReservationVehicleSummary";
-import { RefundConfirmation } from "@/components/reservation/RefundConfirmation";
 import { ReservationExpired } from "@/components/reservation/ReservationExpired";
 import { ReservationUnavailable } from "@/components/reservation/ReservationUnavailable";
 import { ReservationError } from "@/components/reservation/ReservationError";
-import { lookupReservationAction } from "@/features/reservation/actions";
+import {
+  cancelReservationAction,
+  lookupReservationAction,
+} from "@/features/reservation/actions";
 import type { ReservationPageModel } from "@/features/reservation/load";
 import {
   getDealUrl,
   getEligibilityUrl,
-  getReserveUrl,
   getVehicleUrl,
   supportRoutes,
 } from "@/config/routes";
@@ -28,17 +29,15 @@ import {
 
 function statusLabel(model: ReservationPageModel): string {
   if (model.financeAllRoutesUnavailable) {
-    return "Refund in progress";
+    return "Authorisation released";
   }
   switch (model.stockState) {
     case "reserved":
       return "Reserved";
-    case "refund_requested":
-      return "Refund requested";
-    case "refunded":
-      return "Refunded";
     case "expired":
-      return "Expired";
+      return model.paymentState === "released"
+        ? "Cancelled"
+        : "Expired";
     case "sold":
       return "No longer available";
     case "reconciliation":
@@ -51,15 +50,17 @@ function statusLabel(model: ReservationPageModel): string {
 function paymentLabel(model: ReservationPageModel): string {
   switch (model.paymentState) {
     case "paid":
-      return `${reservationAmountLabel(model.amount)} paid`;
+      return `${reservationAmountLabel(model.amount)} authorised`;
+    case "released":
+      return "Authorisation released";
     case "refund_pending":
-      return "Refund pending";
+      return "Authorisation releasing";
     case "refunded":
-      return "Refunded";
+      return "Authorisation released";
     case "failed":
-      return "Payment failed";
+      return "Authorisation failed";
     default:
-      return "Payment pending";
+      return "Authorisation pending";
   }
 }
 
@@ -126,6 +127,10 @@ function LookupForm({ stockId }: { stockId?: string }) {
 }
 
 export function ReservationStatus({ model }: { model: ReservationPageModel }) {
+  const router = useRouter();
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [cancelling, startCancel] = useTransition();
+
   if (!model.reservationId) {
     return <LookupForm stockId={model.vehicle?.stockId} />;
   }
@@ -147,18 +152,15 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
     );
   }
 
-  if (model.phase === "REFUND_REQUESTED" || model.phase === "REFUNDED") {
-    if (model.financeAllRoutesUnavailable) {
-      return (
-        <div className="space-y-6">
-          <Alert title={reservationCopy.financeUnavailableHeading} tone="info">
-            {reservationCopy.financeUnavailableSupporting}
-          </Alert>
-          <RefundConfirmation model={model} />
-        </div>
-      );
-    }
-    return <RefundConfirmation model={model} />;
+  if (model.financeAllRoutesUnavailable) {
+    return (
+      <div className="space-y-6">
+        <Alert title={reservationCopy.financeUnavailableHeading} tone="info">
+          {reservationCopy.financeUnavailableSupporting}
+        </Alert>
+        <ReservationExpired model={model} />
+      </div>
+    );
   }
 
   const vehicle = model.vehicle;
@@ -211,7 +213,7 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
           {model.appliedToPurchase ? (
             <div className="flex justify-between gap-4">
               <dt className="text-muted">Purchase</dt>
-              <dd>Applied to purchase</dd>
+              <dd>Applied to purchase if you proceed</dd>
             </div>
           ) : null}
           {model.reference ? (
@@ -222,6 +224,7 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
           ) : null}
         </dl>
       </section>
+      {cancelError ? <Alert title={cancelError} tone="warning" /> : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Button
           href={purchaseHref}
@@ -235,10 +238,26 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
         </Button>
         {vehicle && model.phase === "RESERVED" ? (
           <Button
-            href={getReserveUrl(vehicle.stockId, "refund")}
             variant="secondary"
+            disabled={cancelling}
+            onClick={() => {
+              setCancelError(null);
+              startCancel(() => {
+                void cancelReservationAction().then((result) => {
+                  if (!result.ok) {
+                    setCancelError("We couldn't cancel this reservation.");
+                    return;
+                  }
+                  trackEvent(analyticsEvents.reservationExpired, {
+                    stockId: vehicle.stockId,
+                    reason: "cancelled",
+                  });
+                  router.refresh();
+                });
+              });
+            }}
           >
-            Request a refund
+            {cancelling ? "Cancelling…" : "Cancel reservation"}
           </Button>
         ) : null}
         {vehicle ? (
@@ -250,6 +269,7 @@ export function ReservationStatus({ model }: { model: ReservationPageModel }) {
           Contact Oakwood
         </Button>
       </div>
+      <p className="text-body-sm text-muted">{reservationCopy.cancelSupporting}</p>
     </div>
   );
 }

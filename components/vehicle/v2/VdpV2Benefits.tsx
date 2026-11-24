@@ -1,9 +1,18 @@
 import { Button } from "@/components/ui/Button";
 import { routes, trustRoutes } from "@/config/routes";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
 import type { VehicleDetail } from "@/types/vehicle-detail";
 
 export function VdpV2Benefits({ vehicle }: { vehicle: VehicleDetail }) {
   const items = [
+    isVehicleGuaranteeEligible(vehicle)
+      ? {
+          title: guaranteeCopy.badgeTitle,
+          body: guaranteeCopy.badgeDetail,
+          href: routes.thirtyDayGuarantee,
+        }
+      : null,
     vehicle.inspection.available
       ? {
           title: "AA inspection",

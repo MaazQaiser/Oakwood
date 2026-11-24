@@ -4,7 +4,7 @@ const LINKS = [
   { href: routes.locations, label: "Locations" },
   { href: routes.usedCars, label: "Used cars" },
   { href: routes.finance, label: "Finance" },
-  { href: getEligibilityUrl(), label: "Check my eligibility" },
+  { href: getEligibilityUrl(), label: "Check my rate" },
   { href: routes.partExchange, label: "Part exchange" },
   { href: aftersalesRoutes.hub, label: "Aftersales" },
   { href: trustRoutes.ourOnlineReviews, label: "Reviews" },

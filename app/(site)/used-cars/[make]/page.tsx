@@ -1,6 +1,8 @@
+import { notFound } from "next/navigation";
 import { VehicleSearchPage } from "@/components/search/VehicleSearchPage";
 import { getMakeUrl } from "@/config/routes";
 import { listMakes } from "@/lib/vehicles/query";
+import { isReservedUsedCarsMakeSlug } from "@/lib/vehicles/reserved-segments";
 import { getInventoryTitle } from "@/lib/vehicles/labels";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
@@ -31,6 +33,10 @@ export default async function Page({
 }) {
   const { make } = await params;
   const query = await searchParams;
+
+  if (isReservedUsedCarsMakeSlug(make)) {
+    notFound();
+  }
 
   return (
     <VehicleSearchPage

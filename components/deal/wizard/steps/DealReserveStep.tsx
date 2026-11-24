@@ -343,7 +343,7 @@ export function DealReserveStep() {
           </h2>
           <p className="mt-2 text-h4 text-navy">{feeLabel}</p>
           <p className="mt-1 text-body-sm font-semibold! text-ink">
-            {feeLabel} refundable reservation fee
+            {feeLabel} card authorisation
           </p>
           <p className="mt-1 text-body-sm text-ink">{hold}</p>
           <p className="mt-2 text-caption text-muted">
@@ -363,7 +363,7 @@ export function DealReserveStep() {
               taken and the vehicle has not been reserved.
             </Alert>
             <p className="mt-2 text-caption text-muted">
-              {feeLabel} refundable reservation fee · {hold}
+              {feeLabel} card authorisation · {hold}
             </p>
           </div>
         ) : (
@@ -606,7 +606,7 @@ export function DealReserveStep() {
                 ) : null}
                 <p>Indicative monthly payment: {NOT_AVAILABLE}.</p>
                 <p>
-                  {feeLabel} refundable reservation fee. {hold}.
+                  {feeLabel} card authorisation · not charged. {hold}.
                 </p>
               </div>
             </article>

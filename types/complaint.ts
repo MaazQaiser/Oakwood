@@ -1,6 +1,8 @@
 import type { Lead, LeadIdentity, LeadSource } from "@/types/lead";
 import type { SupportComplaintCategory } from "@/types/support";
 
+export type ProblemWithCarNeed = "put-right" | "warranty" | "thirty-day";
+
 export interface SupportComplaintInput {
   name: string;
   email: string;
@@ -10,6 +12,12 @@ export interface SupportComplaintInput {
   locationSlug?: string;
   existingReference?: string;
   source?: string;
+  registration?: string;
+  stockId?: string;
+  resolutionPreference?: string;
+  preferredContactTime?: string;
+  photoNotes?: string;
+  need?: ProblemWithCarNeed;
 }
 
 export interface SupportComplaintRecord {
@@ -23,6 +31,12 @@ export interface SupportComplaintRecord {
   description: string;
   locationSlug?: string;
   existingReference?: string;
+  registration?: string;
+  stockId?: string;
+  resolutionPreference?: string;
+  preferredContactTime?: string;
+  photoNotes?: string;
+  need?: ProblemWithCarNeed;
   source: string;
   crmPayload: Lead;
 }

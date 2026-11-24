@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AppProviders } from "@/components/layout/AppProviders";
 import { CursorHydrationGuard } from "@/components/layout/CursorHydrationGuard";
+import { GuaranteeStrip } from "@/components/layout/GuaranteeStrip";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SkipLink } from "@/components/layout/SkipLink";
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <CursorHydrationGuard />
         <AppProviders initialFinance={initialFinance}>
           <SkipLink />
+          <GuaranteeStrip />
           <SiteHeader />
           <main
             id="main-content"

@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
-import { Container, Grid, Section, Stack } from "@/components/layout/Container";
+import { Container, Section, Stack } from "@/components/layout/Container";
 import { PageBanner, PageBannerScope } from "@/components/layout/PageBanner";
-import { AftersalesHero } from "@/components/aftersales/AftersalesHero";
-import { LocationCard } from "@/components/locations/LocationCard";
 import { LocationContactCta } from "@/components/locations/LocationContactCta";
 import { LocationDetails } from "@/components/locations/LocationDetails";
 import { LocationHeroActions } from "@/components/locations/LocationHero";
 import { LocationRelatedLinks } from "@/components/locations/LocationRelatedLinks";
+import { LocationsHub, type HubShowroom } from "@/components/locations/LocationsHub";
 import { LocationServices } from "@/components/locations/LocationServices";
 import { LocationStock } from "@/components/locations/LocationStock";
 import { DirectionsCTA } from "@/components/locations/DirectionsCTA";
@@ -14,13 +13,23 @@ import { OpeningHours } from "@/components/locations/OpeningHours";
 import { ReviewSummary } from "@/components/trust/ReviewSummary";
 import { TrustViewTracker } from "@/components/trust/TrustViewTracker";
 import { Button } from "@/components/ui/Button";
-import { showroomProfiles } from "@/config/locations";
-import { getLocationStockUrl, getLocationUrl, routes } from "@/config/routes";
+import { formatShowroomAddress, showroomProfiles } from "@/config/locations";
+import {
+  getContactUrl,
+  getLocationStockUrl,
+  getLocationUrl,
+  getVehicleUrl,
+  routes,
+} from "@/config/routes";
+import { MAX_ADVANCE, pricePackage } from "@/lib/finance/interest-free";
+import { getDirectionsUrl } from "@/lib/locations/directions";
 import { listLocationStock } from "@/lib/locations/stock";
+import { locationStockImage } from "@/lib/media/stock";
 import { getReviewFeed } from "@/lib/reviews/provider";
 import { createBreadcrumbs, createLocalBusinessJsonLd } from "@/lib/seo";
 import type { LocationUrlVariant } from "@/config/routes";
 import type { ShowroomProfile } from "@/types/locations";
+import type { Vehicle } from "@/types/vehicle";
 
 function JsonLd({ data }: { data: object }) {
   return (
@@ -43,38 +52,54 @@ function PageShell({
   );
 }
 
+function isInterestFreeReady(vehicle: Vehicle): boolean {
+  return (vehicle.cashPrice + pricePackage(vehicle).total) / 2 <= MAX_ADVANCE;
+}
+
+function toHubShowroom(profile: ShowroomProfile): HubShowroom {
+  const vehicles = listLocationStock(profile.slug).filter(
+    (vehicle) => vehicle.category === "car",
+  );
+  const stock = [...vehicles]
+    .sort((a, b) => a.monthlyPayment - b.monthlyPayment)
+    .slice(0, 6)
+    .map((vehicle) => ({
+      stockId: vehicle.stockId,
+      href: getVehicleUrl(vehicle),
+      title: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+      image: vehicle.image ?? "/images/vehicle-placeholder.svg",
+      transmission: vehicle.transmission,
+      mileage: vehicle.mileage,
+      monthly: vehicle.monthlyPayment,
+      interestFree: isInterestFreeReady(vehicle),
+    }));
+
+  return {
+    slug: profile.slug as HubShowroom["slug"],
+    name: profile.name,
+    href: getLocationUrl(profile.slug),
+    address: formatShowroomAddress(profile),
+    telephone: profile.telephone,
+    photo: locationStockImage(profile.slug),
+    directionsHref: getDirectionsUrl(profile),
+    bookHref: getContactUrl({ topic: `visit-${profile.slug}` }),
+    stockHref: getLocationStockUrl(profile.slug),
+    stockCount: vehicles.length,
+    stock,
+  };
+}
+
 export function LocationsHubPage() {
+  const breadcrumbs = createBreadcrumbs([
+    { label: "Home", href: routes.home },
+    { label: "Locations", href: routes.locations },
+  ]);
+
   return (
-    <PageShell
-      breadcrumbs={[
-        { label: "Home", href: routes.home },
-        { label: "Locations", href: routes.locations },
-      ]}
-    >
+    <>
       <TrustViewTracker page="hub" />
-      <AftersalesHero
-        title="Find your nearest Oakwood"
-        description="Oakwood has showrooms in Bury and Chorley. Choose a location to see cars, services and how to visit."
-        primary={{ href: routes.usedCars, label: "View cars" }}
-        secondary={{ href: routes.contact, label: "Contact us" }}
-      />
-      <Section>
-        <Container>
-          <Grid columns="two">
-            {showroomProfiles.map((profile) => (
-              <LocationCard
-                key={profile.slug}
-                profile={profile}
-                href={getLocationUrl(profile.slug)}
-              />
-            ))}
-          </Grid>
-          <div className="mt-12">
-            <LocationRelatedLinks current={routes.locations} />
-          </div>
-        </Container>
-      </Section>
-    </PageShell>
+      <LocationsHub breadcrumbs={breadcrumbs} showrooms={showroomProfiles.map(toHubShowroom)} />
+    </>
   );
 }
 

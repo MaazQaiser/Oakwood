@@ -2,13 +2,9 @@
 
 import { FinancialNumber } from "@/components/finance/FinancePrimitives";
 import { StatusDisclosureLink } from "@/components/finance/StatusDisclosureLink";
-import { Button } from "@/components/ui/Button";
-import { IconArrow } from "@/components/ui/icons";
 import { useVehicleDeal } from "@/components/vehicle/VehicleDealProvider";
-import { getEligibilityUrl } from "@/config/routes";
 import { FINANCE_CALCULATOR_CONFIG } from "@/lib/finance/calculator-config";
 import { formatApr, formatPounds, formatTerm } from "@/lib/format/money";
-import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
 function Segment({
@@ -69,19 +65,6 @@ export function VdpV2FinancePreview() {
           <p className="mt-1.5 text-[13px] leading-[18px] text-[#34445B]">
             Check a preview finance profile to see illustrative monthly payments.
           </p>
-          <Button
-            href={getEligibilityUrl()}
-            size="sm"
-            className="btn-compact mt-3 flex min-h-12 w-full items-center justify-between gap-3 rounded-lg bg-[#0875D1] px-4 py-2 text-left text-[14px] font-semibold text-white"
-            onClick={() =>
-              trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
-            }
-          >
-            <span className="min-w-0 flex-1 leading-snug">Continue to finance check</span>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[#0875D1]">
-              <IconArrow className="h-4 w-4" />
-            </span>
-          </Button>
         </div>
       </section>
     );
@@ -207,20 +190,6 @@ export function VdpV2FinancePreview() {
           {financeType === "pcp" ? "PCP" : "HP"} illustration. No credit decision on this
           page. <StatusDisclosureLink />
         </p>
-
-        <Button
-          href={getEligibilityUrl()}
-          size="sm"
-          className="btn-compact mt-3 flex min-h-12 w-full items-center justify-between gap-3 rounded-lg bg-[#0875D1] px-4 py-2 text-left text-[14px] font-semibold text-white hover:bg-[#066bb8]"
-          onClick={() =>
-            trackEvent(analyticsEvents.financeCtaClicked, { action: "apply" })
-          }
-        >
-          <span className="min-w-0 flex-1 leading-snug">Continue to finance check</span>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[#0875D1]">
-            <IconArrow className="h-4 w-4" />
-          </span>
-        </Button>
       </div>
     </section>
   );

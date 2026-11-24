@@ -21,6 +21,7 @@ export type FinanceIntentSlug =
   | "ccj"
   | "self-employed"
   | "first-time-buyer"
+  | "0-percent"
   | "hp"
   | "pcp";
 

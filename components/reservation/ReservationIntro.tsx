@@ -127,7 +127,6 @@ export function ReservationIntro({ model }: { model: ReservationPageModel }) {
             <ReservationSummary
               amount={model.amount}
               holdDurationDays={model.holdDurationDays}
-              refundable={model.refundable}
               appliedToPurchase={model.appliedToPurchase}
             />
           </div>
@@ -140,7 +139,6 @@ export function ReservationIntro({ model }: { model: ReservationPageModel }) {
           <ReservationSummary
             amount={model.amount}
             holdDurationDays={model.holdDurationDays}
-            refundable={model.refundable}
             appliedToPurchase={model.appliedToPurchase}
           />
           {blocked ? (

@@ -62,6 +62,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/*
+ * Any author display rule beats the UA stylesheet's [hidden], which silently
+ * leaves "hidden" panels in the layout and in the tab order.
+ */
+[hidden] {
+  display: none !important;
+}
+
 html[data-oak-journey] footer {
   display: none;
 }
@@ -443,6 +451,17 @@ select {
 body[data-vehicle-lightbox] [data-oak-header-shell] {
   visibility: hidden;
   pointer-events: none;
+}
+
+@keyframes oak-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

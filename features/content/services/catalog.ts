@@ -41,7 +41,8 @@ export function getModelStock(
       vehicle.makeSlug === makeSlug &&
       vehicle.modelSlug === modelSlug &&
       vehicle.availability !== "sold" &&
-      vehicle.availability !== "expired",
+      vehicle.availability !== "expired" &&
+      vehicle.availability !== "reserved",
   );
 }
 
@@ -122,7 +123,8 @@ export function getModelsByBodyStyle(
       (vehicle) =>
         vehicle.bodyStyle.toLowerCase() === bodyStyle.toLowerCase() &&
         vehicle.availability !== "sold" &&
-        vehicle.availability !== "expired",
+        vehicle.availability !== "expired" &&
+        vehicle.availability !== "reserved",
     )
     .forEach((vehicle) => {
       const key = `${vehicle.makeSlug}:${vehicle.modelSlug}`;
@@ -185,7 +187,8 @@ export function bodyStyleValues(bodyStyle: string, category: VehicleCategory = "
     (vehicle) =>
       vehicle.bodyStyle.toLowerCase() === bodyStyle.toLowerCase() &&
       vehicle.availability !== "sold" &&
-      vehicle.availability !== "expired",
+      vehicle.availability !== "expired" &&
+      vehicle.availability !== "reserved",
   );
 
   return {

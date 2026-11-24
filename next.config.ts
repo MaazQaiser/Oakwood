@@ -12,6 +12,34 @@ const nextConfig: NextConfig = {
         destination: "/help",
         permanent: true,
       },
+      {
+        source: "/aftersales",
+        destination: "/service",
+        permanent: true,
+      },
+      {
+        source: "/deposit-rules",
+        destination: "/legal/reservation",
+        permanent: true,
+      },
+      {
+        source: "/request-a-refund",
+        destination: "/help",
+        permanent: true,
+      },
+      {
+        source: "/complaints",
+        destination: "/problem-with-your-car",
+        permanent: true,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/used-cars/:band(under-\\d+|over-\\d+)",
+        destination: "/used-cars/price/:band",
+      },
     ];
   },
 };

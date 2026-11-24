@@ -45,7 +45,7 @@ export function VehicleTalkCards({ vehicle }: { vehicle: VehicleDetail }) {
       <h2 id="talk-heading" className="sr-only">
         Speak to Oakwood
       </h2>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+      <div className="grid grid-cols-1 gap-2">
         {cards.map((card, index) => {
           const featured = index === 0;
           return (
@@ -53,7 +53,7 @@ export function VehicleTalkCards({ vehicle }: { vehicle: VehicleDetail }) {
               key={card.id}
               href={card.href}
               className={cn(
-                "group flex min-h-14 flex-row items-center gap-3 rounded-[16px] px-3 py-2.5 no-underline transition sm:px-4",
+                "group flex min-h-14 flex-row items-center gap-3 rounded-[16px] px-4 py-2.5 no-underline transition",
                 featured
                   ? "bg-[#002852] text-white hover:bg-[#001c3d]"
                   : "bg-white text-[#002852] shadow-[0_6px_18px_rgba(16,40,72,0.06)] ring-1 ring-[#E7EEF4] hover:ring-[#C9D6E2]",

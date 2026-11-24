@@ -1,0 +1,1146 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Oakwood Negative Equity</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap">
+<style>
+/* One page, no steps. Everything live from the first paint, seeded with a worked
+   example the engine computes so it can never drift from the real rates. */
+:root{
+  --bg:#FFFFFF; --surface:#F4F6F8; --panel:#0B2A45; --panel-2:#113A5C;
+  --fg:#42454E; --fg-strong:#1E2129; --fg-muted:#656B75;
+  --accent:#0061A2; --accent-text:#00719F; --brand:#009CE0;
+  --line:#E2E6EA; --input:#767C85; --success:#12805B; --warn:#8A5A00; --red:#B3261E;
+  --on-panel-muted:#A9C3D8;
+  --shadow:0 1px 2px rgba(16,32,48,.06),0 6px 20px rgba(16,32,48,.07);
+  --display:"Barlow Semi Condensed",ui-sans-serif,system-ui,sans-serif;
+  --body:"Barlow",ui-sans-serif,system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171C; --surface:#1D2026; --panel:#0C2338; --panel-2:#103149;
+  --fg:#D4D8DE; --fg-strong:#F2F4F6; --fg-muted:#949BA6;
+  --accent:#3A9FDE; --accent-text:#62B8EC; --line:#2C3038; --input:#7E858F;
+  --success:#45B38A; --warn:#D9A441; --red:#E8705F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.34); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#15171C; --surface:#1D2026; --panel:#0C2338; --panel-2:#103149;
+  --fg:#D4D8DE; --fg-strong:#F2F4F6; --fg-muted:#949BA6;
+  --accent:#3A9FDE; --accent-text:#62B8EC; --line:#2C3038; --input:#7E858F;
+  --success:#45B38A; --warn:#D9A441; --red:#E8705F;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.34); color-scheme:dark;
+}
+*{box-sizing:border-box}
+/* Any author display rule beats the UA stylesheet's [hidden], which silently
+   leaves "hidden" panels in the layout and in the tab order. */
+[hidden]{display:none!important}
+body{background:var(--surface);color:var(--fg);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+.shell{max-width:430px;margin:0 auto;background:var(--bg);min-height:100%;padding-bottom:40px}
+@media (min-width:520px){body{padding-block:20px}.shell{border-radius:18px;overflow:hidden;box-shadow:var(--shadow);min-height:0}}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;text-wrap:balance;color:var(--fg-strong);font-weight:700}
+p{margin:0} ul{list-style:none;margin:0;padding:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.num{font-variant-numeric:tabular-nums}
+.note{background:var(--panel-2);color:#fff;padding-block:9px;font-size:12.5px}
+
+.hero{background:linear-gradient(165deg,var(--panel),var(--panel-2));color:#fff;padding-block:24px 22px}
+.hero .kick{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--on-panel-muted);font-weight:700}
+.hero h1{color:#fff;font-size:31px;line-height:1.08;margin-top:7px}
+.hero h1 em{font-style:normal;color:var(--brand)}
+.hero .lede{font-size:15px;color:var(--on-panel-muted);margin-top:11px;line-height:1.55}
+.hbadge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);border-radius:999px;padding:7px 13px;margin-top:16px;
+  font-size:13px;font-weight:600}
+.hbadge b{font-family:var(--display);font-size:18px}
+
+.sect{padding-block:24px;border-top:1px solid var(--line)}
+.sect h2{font-size:22px;line-height:1.15}
+.lede2{font-size:14.5px;color:var(--fg-muted);margin-top:7px;line-height:1.5}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);margin-bottom:6px}
+
+.fg{margin-top:16px}
+.fg .t{font-size:13px;font-weight:700;color:var(--fg-strong)}
+.fg .h{font-size:12.5px;color:var(--fg-muted);margin-top:2px;line-height:1.4}
+.inp{width:100%;min-height:50px;border-radius:9px;border:1px solid var(--input);background:var(--bg);
+  padding:0 12px;font:600 16px var(--body);margin-top:9px;font-variant-numeric:tabular-nums}
+.inp::placeholder{color:var(--fg-muted);font-weight:500;letter-spacing:.04em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btnp{width:100%;min-height:50px;border-radius:9px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;margin-top:9px}
+input[type=range]{width:100%;margin-top:11px;accent-color:var(--accent)}
+.rng{display:flex;justify-content:space-between;font-size:12px;color:var(--fg-muted);font-weight:600;margin-top:3px}
+
+.link{display:block;width:100%;text-align:left;margin-top:11px;font-size:13.5px;font-weight:700;
+  color:var(--accent-text);text-decoration:underline;text-underline-offset:3px;min-height:28px}
+.est{background:var(--surface);border-radius:13px;padding:15px;margin-top:12px}
+.est>b{display:block;font-size:15.5px;color:var(--fg-strong)}
+.est>p{font-size:13px;color:var(--fg-muted);margin-top:6px;line-height:1.5}
+.estr{background:var(--bg);border-radius:10px;padding:13px;margin-top:12px;box-shadow:inset 0 0 0 1px var(--line)}
+.estr .ek{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--fg-muted)}
+.estr .ev{font-family:var(--display);font-size:33px;font-weight:700;line-height:1;margin-top:3px;color:var(--fg-strong)}
+.estr .es{font-size:12.5px;color:var(--fg-muted);margin-top:6px;line-height:1.45}
+
+/* between the bad news and the good news: you are normal, and there is room above you */
+.proof{background:var(--surface);border-radius:13px;padding:14px;margin-top:12px}
+.proof .pb{font-size:14.5px;color:var(--fg-strong);font-weight:700;line-height:1.35}
+.proof .ps{font-size:12.5px;color:var(--fg-muted);margin-top:6px;line-height:1.5}
+.proof .pm{display:flex;gap:14px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+.proof .pm div{flex:1;min-width:0}
+.proof .pm b{display:block;font-family:var(--display);font-size:19px;font-weight:700;color:var(--fg-strong);
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.proof .pm span{display:block;font-size:11.5px;color:var(--fg-muted);line-height:1.3;margin-top:3px}
+
+/* turns the anxiety into a number of choices, right after the bad news */
+.fits{display:flex;align-items:center;gap:13px;background:rgba(0,97,162,.07);border-radius:13px;
+  padding:14px;margin-top:12px;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.fits .fn{font-family:var(--display);font-size:40px;font-weight:700;line-height:1;color:var(--accent-text);flex:none}
+.fits .ft{flex:1;min-width:0}
+.fits .ft b{display:block;font-size:15px;color:var(--fg-strong);line-height:1.25}
+.fits .ft span{font-size:12.5px;color:var(--fg-muted);line-height:1.4}
+.fits button{flex:none;min-height:40px;padding:0 14px;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px}
+
+.exbar{display:flex;align-items:flex-start;gap:9px;background:var(--surface);border-radius:10px;padding:11px 12px;margin-top:14px}
+.exbar svg{flex:none;margin-top:2px;color:var(--accent-text)}
+.exbar span{font-size:12.5px;line-height:1.45;color:var(--fg-muted)}
+.exbar b{color:var(--fg-strong)}
+
+.eq{border-radius:13px;padding:15px;margin-top:14px}
+.eq.neg{background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--warn)}
+.eq.pos{background:rgba(18,128,91,.1);box-shadow:inset 0 0 0 1.5px var(--success)}
+.eq .ek{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700}
+.eq.neg .ek{color:var(--warn)} .eq.pos .ek{color:var(--success)}
+.eq .ev{font-family:var(--display);font-size:40px;font-weight:700;line-height:1;margin-top:4px;color:var(--fg-strong)}
+.eq .es{font-size:13px;color:var(--fg-muted);margin-top:6px;line-height:1.5}
+.eqr{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:3px 0;color:var(--fg-muted)}
+.eqr b{color:var(--fg-strong);font-weight:600}
+.eqr.line{border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+
+.picker{width:100%;min-height:64px;border-radius:10px;border:1px solid var(--input);background:var(--bg);
+  margin-top:9px;display:flex;align-items:center;gap:12px;padding:0 13px;text-align:left}
+.picker .pt{flex:1;min-width:0}
+.picker .pt b{display:block;font-size:15.5px;color:var(--fg-strong);line-height:1.2}
+.picker .pt span{font-size:12.5px;color:var(--fg-muted)}
+.picker .pc{flex:none;display:flex;align-items:center;gap:3px;font-size:13.5px;font-weight:700;color:var(--accent-text)}
+
+/* cover, the interest free page's package rows with a length to pick */
+.pr{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.pr:last-child{border-bottom:0}
+.pl{flex:1;min-width:0}
+.pl b{display:block;font-size:15px;color:var(--fg-strong);line-height:1.25}
+.pl>span{display:block;font-size:12.5px;color:var(--fg-muted);line-height:1.4;margin-top:1px}
+.pv{flex:none;font-family:var(--display);font-size:20px;font-weight:700;color:var(--fg-strong);
+  font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
+.pv.off{color:var(--fg-muted);font-size:13px;font-family:var(--body);font-weight:600}
+.tog{flex:none;width:48px;height:29px;border-radius:999px;background:var(--line);position:relative;transition:background .18s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;
+  transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tog[data-on="1"]{background:var(--accent)}
+.tog[data-on="1"]::after{transform:translateX(19px)}
+.yrs{display:flex!important;gap:6px;margin-top:9px}
+.yrs button{flex:1;min-height:36px;border-radius:7px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);
+  font-size:13px;font-weight:600;color:var(--fg)}
+.yrs button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:none}
+.cvtot{display:flex;justify-content:space-between;gap:12px;margin-top:13px;padding-top:12px;border-top:2px solid var(--line);
+  font-weight:700;color:var(--fg-strong);font-size:15px}
+.cvtot b{font-family:var(--display);font-size:21px}
+
+.seg{display:flex;background:var(--surface);border-radius:10px;padding:4px;margin-top:14px}
+.seg button{flex:1;min-height:42px;border-radius:7px;font-weight:700;font-size:14.5px;color:var(--accent-text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.quote{background:linear-gradient(160deg,var(--panel),var(--panel-2));color:#fff;border-radius:14px;padding:18px 16px;margin-top:14px}
+.quote .qk{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-panel-muted);font-weight:700}
+.quote .qbig{font-family:var(--display);font-size:50px;font-weight:700;line-height:1;margin-top:4px}
+.quote .qsub{font-size:13.5px;color:var(--on-panel-muted);margin-top:6px;line-height:1.45}
+.agr{background:rgba(255,255,255,.08);border-radius:11px;padding:13px;margin-top:13px}
+.agr .an{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.agr .an b{font-size:14.5px}
+.agr .an .am{font-family:var(--display);font-size:24px;font-weight:700}
+.agr .ar{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--on-panel-muted);padding:3px 0;margin-top:3px}
+.agr .ar b{color:#fff;font-weight:600}
+.qacts{display:grid;gap:8px;margin-top:14px}
+.qacts button{min-height:50px;border-radius:9px;font-weight:700;font-size:15.5px}
+.qacts .q1{background:#fff;color:#0B2A45}
+.qacts .q2{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.qacts .q3{min-height:42px;color:#fff;font-size:14px;text-decoration:underline;text-underline-offset:3px;opacity:.9}
+.qnote{font-size:12px;color:var(--on-panel-muted);line-height:1.45;text-align:center;padding:2px 4px}
+.qnote b{color:#fff}
+.qnote2{font-size:11.5px;color:var(--on-panel-muted);text-align:center}
+
+/* contact block */
+.ctc{margin-top:14px}
+.ctch{font-size:13px;font-weight:700;color:var(--fg-strong)}
+.ctcs{font-size:12.5px;color:var(--fg-muted);margin-top:3px;line-height:1.45}
+.ctg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.ctg a,.ctg button{display:flex;align-items:center;gap:9px;min-height:54px;border-radius:10px;padding:0 12px;
+  background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);color:var(--fg-strong);text-decoration:none;
+  font-size:14px;font-weight:700;text-align:left}
+.ctg .big{grid-column:1/-1;background:var(--accent);color:#fff;box-shadow:none;min-height:56px;font-size:15.5px}
+.ctg svg{flex:none}
+.ctg .wa{color:#fff;background:#1EA952;box-shadow:none}
+.ctg span{display:block;font-size:11.5px;font-weight:600;opacity:.75;margin-top:1px}
+.ctg i{font-style:normal;flex:1;min-width:0}
+
+/* booking */
+.bk{background:var(--surface);border-radius:13px;padding:16px;margin-top:12px;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.bk>b{display:block;font-size:16px;color:var(--fg-strong)}
+.bk>p{font-size:13px;color:var(--fg-muted);margin-top:6px;line-height:1.5}
+.bl{font-size:11px;font-weight:700;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.07em;margin-top:14px}
+.brow{display:flex;gap:7px;overflow-x:auto;margin-top:7px;scrollbar-width:none}
+.brow::-webkit-scrollbar{display:none}
+.brow button{flex:none;min-height:42px;padding:0 14px;border-radius:9px;background:var(--bg);
+  box-shadow:inset 0 0 0 1px var(--line);font-size:13.5px;font-weight:600;color:var(--fg);white-space:nowrap}
+.brow button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:none}
+.brow button span{display:block;font-size:11px;opacity:.7;font-weight:600}
+.bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px}
+.bgrid button{min-height:40px;border-radius:8px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);
+  font-size:13px;font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+.bgrid button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:none}
+.bk input{width:100%;min-height:48px;border-radius:9px;border:1px solid var(--input);background:var(--bg);
+  padding:0 12px;font:600 16px var(--body);margin-top:8px}
+
+/* one capture panel, three reasons to open it */
+.cap{background:var(--surface);border-radius:13px;padding:16px;margin-top:12px;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.cap b{display:block;font-size:16px;color:var(--fg-strong)}
+.cap p{font-size:13px;color:var(--fg-muted);margin-top:6px;line-height:1.5}
+.cap .cg{display:grid;gap:8px;margin-top:12px}
+.cap input{width:100%;min-height:48px;border-radius:9px;border:1px solid var(--input);background:var(--bg);padding:0 12px;font:600 16px var(--body)}
+.capx{display:block;width:100%;text-align:center;margin-top:10px;font-size:13px;font-weight:600;color:var(--fg-muted);min-height:26px}
+.capok{display:flex;gap:10px;align-items:flex-start;background:rgba(18,128,91,.1);border-radius:13px;padding:15px;margin-top:12px;
+  box-shadow:inset 0 0 0 1.5px var(--success)}
+.capok svg{flex:none;margin-top:2px;color:var(--success)}
+.capok b{display:block;font-size:15px;color:var(--fg-strong)}
+.capok span{font-size:13px;color:var(--fg-muted);line-height:1.5}
+
+.blocked{background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--warn);border-radius:13px;padding:16px;margin-top:14px}
+.blocked .bk{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--warn)}
+.blocked h3{font-size:18px;margin-top:5px}
+.blocked p{font-size:13.5px;color:var(--fg);margin-top:8px;line-height:1.5}
+.fix{display:grid;gap:8px;margin-top:13px}
+.fix button{min-height:48px;border-radius:9px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:10px;font-weight:600;font-size:14px;
+  color:var(--fg-strong);text-align:left}
+.fix button b{color:var(--accent-text);white-space:nowrap}
+
+.ltv{margin-top:13px}
+.ltvh{display:flex;justify-content:space-between;font-size:12.5px;color:var(--fg-muted);font-weight:600}
+.ltvh b{color:var(--fg-strong)}
+.bar{height:9px;border-radius:999px;background:var(--line);margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--success);transition:width .25s,background .25s}
+.bar i.hot{background:var(--warn)} .bar i.over{background:var(--red)}
+.ltvn{font-size:12px;color:var(--fg-muted);margin-top:6px;line-height:1.45}
+
+.honest{background:var(--surface);border-radius:13px;padding:15px;margin-top:18px}
+.honest b{display:block;font-size:15px;color:var(--fg-strong)}
+.honest p{font-size:13.5px;color:var(--fg-muted);line-height:1.55;margin-top:7px}
+.hard{background:#FFF8E8;border-radius:13px;padding:15px;margin-top:16px;box-shadow:inset 0 0 0 1.5px rgba(138,90,0,.3)}
+:root[data-theme="dark"] .hard{background:rgba(217,164,65,.09)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hard{background:rgba(217,164,65,.09)}}
+.hard .hk{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--warn)}
+.hard p{font-size:13.5px;line-height:1.55;color:var(--fg);margin-top:9px}
+
+.cl{display:grid;gap:9px;margin-top:12px}
+.cl div{display:flex;gap:10px;font-size:13.5px;line-height:1.45;color:var(--fg)}
+.cl div svg{flex:none;margin-top:3px;color:var(--accent-text)}
+.rep{background:var(--surface);border-radius:11px;padding:14px;margin-top:13px;font-size:12.5px;line-height:1.6;color:var(--fg-muted)}
+.rep b{color:var(--fg-strong)}
+.rep .rr{display:flex;justify-content:space-between;gap:12px;padding:2px 0}
+.small{font-size:11.5px;color:var(--fg-muted);line-height:1.55;margin-top:13px}
+
+.scrim{position:fixed;inset:0;background:rgba(8,20,32,.55);z-index:40;opacity:0;transition:opacity .2s}
+.scrim.on{opacity:1}
+.sheet{position:fixed;inset:0;z-index:41;background:var(--bg);display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.3,.9,.3,1)}
+@media (min-width:520px){.sheet{max-width:430px;margin:0 auto;border-radius:16px 16px 0 0;top:24px}}
+.sheet.on{transform:none}
+.sh{display:flex;align-items:center;gap:12px;padding:14px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));
+  border-bottom:1px solid var(--line);padding-top:calc(14px + env(safe-area-inset-top,0px))}
+.sh h2{font-size:21px;flex:1}
+.ib{width:34px;height:34px;border-radius:50%;background:var(--surface);color:var(--fg-strong);display:grid;place-items:center;flex:none}
+.sfilt{padding-block:12px;border-bottom:1px solid var(--line);background:var(--surface);max-height:62vh;overflow-y:auto}
+.more{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:40px;margin-top:10px;
+  border-radius:8px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);font-size:13px;font-weight:700;color:var(--accent-text)}
+.more svg{transition:transform .2s}
+.more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.read{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;align-items:center}
+.read .rl{font-size:11.5px;font-weight:700;color:var(--fg-muted)}
+.read .rc{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;padding:4px 7px 4px 10px;border-radius:999px}
+.read .rc span[data-drop]{opacity:.8;font-size:15px;line-height:1;cursor:pointer}
+.read .eg{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);color:var(--accent-text);font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px}
+.aff{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.af label{display:block;font-size:11px;font-weight:700;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.07em}
+.af input{width:100%;min-height:44px;border-radius:8px;border:1px solid var(--input);background:var(--bg);
+  padding:0 10px;font:700 15px var(--body);margin-top:5px;font-variant-numeric:tabular-nums}
+.fl{font-size:11px;font-weight:700;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.07em;margin-top:12px}
+.fchips{display:flex;gap:7px;overflow-x:auto;margin-top:6px;scrollbar-width:none;padding-bottom:1px}
+.fchips::-webkit-scrollbar{display:none}
+.fchips button{flex:none;min-height:36px;padding:0 13px;border-radius:999px;background:var(--bg);
+  box-shadow:inset 0 0 0 1px var(--line);font-size:13px;font-weight:600;color:var(--fg);white-space:nowrap}
+.fchips button[aria-pressed="true"]{background:var(--accent);color:#fff;box-shadow:none}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+.srow span{font-size:13px;font-weight:700;color:var(--fg-strong)}
+.srow select{min-height:36px;border-radius:8px;border:1px solid var(--line);background:var(--bg);padding:0 8px;font-size:12.5px;font-weight:600;color:var(--fg)}
+.sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-block:10px}
+.prw{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:11px 0;border-bottom:1px solid var(--line)}
+.prw .pi{width:66px;height:50px;border-radius:8px;background:linear-gradient(145deg,#8FA6B8,#4C6174);flex:none;position:relative}
+.prw .pi .ok{position:absolute;inset:auto 3px 3px auto;background:var(--warn);color:#fff;font-size:10px;font-weight:700;
+  width:16px;height:16px;border-radius:50%;display:grid;place-items:center}
+.prw .px{flex:1;min-width:0}
+.prw .px b{display:block;font-size:14.5px;color:var(--fg-strong);line-height:1.2}
+.prw .px span{font-size:12.5px;color:var(--fg-muted)}
+.prw .pp{text-align:right;flex:none}
+.prw .pp b{display:block;font-family:var(--display);font-size:19px;font-weight:700;color:var(--fg-strong)}
+.prw .pp span{font-size:11.5px;color:var(--fg-muted)}
+.prw[aria-pressed="true"]{background:rgba(0,97,162,.06)}
+.pempty{text-align:center;padding:28px 10px;color:var(--fg-muted);font-size:14px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+  <div class="note gut"><b>Prototype.</b> Cars are illustrative. Valuations, equity, both agreements and the 150% test calculate live.</div>
+
+  <section class="hero gut">
+    <div class="kick">Negative equity</div>
+    <h1>Owe more than<br>your car is <em>worth?</em></h1>
+    <p class="lede">Most people do at some point, and most dealers will not tell you how to get out of it. We will. Settle what is left on your old agreement, take the car you actually want, and see both payments before you commit to anything.</p>
+    <div class="hbadge">We can usually cover up to <b>150%</b> of the new car</div>
+  </section>
+
+  <section class="sect gut">
+    <div class="eyebrow">Your car now</div>
+    <h2>What is it worth, and what do you owe?</h2>
+    <p class="lede2">Your settlement figure is on your finance agreement, or a phone call to your lender away. It is what it would take to clear the agreement today.</p>
+    <div class="fg">
+      <div class="two" style="margin-top:9px">
+        <input class="inp" id="pxR" placeholder="REG" style="margin-top:0;text-transform:uppercase">
+        <input class="inp" id="pxM" inputmode="numeric" placeholder="Mileage" style="margin-top:0">
+      </div>
+      <button class="btnp" id="pxGo">Value my car</button>
+    </div>
+    <div class="fg">
+      <div class="t">Settlement figure</div>
+      <div class="h">What your lender says would clear the agreement today.</div>
+      <input class="inp" id="setl" inputmode="numeric" placeholder="£0">
+      <button class="link" id="estGo">I do not know my settlement figure</button>
+    </div>
+
+    <div class="est" id="est" hidden>
+      <b>We can work it out closely enough</b>
+      <p>Three things off your agreement or your bank statement. This is an estimate, not a quote, and we will confirm the real figure with your lender before anything is signed.</p>
+      <div class="aff" style="margin-top:12px">
+        <div class="af"><label for="eM">Monthly payment</label><input id="eM" inputmode="numeric" placeholder="£0"></div>
+        <div class="af"><label for="eN">Payments left</label><input id="eN" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="af" style="margin-top:9px"><label for="eB">Final or balloon payment, if you have one</label>
+        <input id="eB" inputmode="numeric" placeholder="Leave blank if none"></div>
+      <div id="estOut"></div>
+      <button class="btnp" id="estUse" hidden>Use this figure</button>
+    </div>
+
+    <div id="eqBox"></div>
+    <div id="proof"></div>
+    <div id="fits"></div>
+    <div id="exNote"></div>
+  </section>
+
+  <section class="sect gut">
+    <div class="eyebrow">Your next car</div>
+    <h2>Pick anything in stock</h2>
+    <p class="lede2">Every car, both showrooms, nothing excluded. Search by what you want to pay a month and we will show you only what fits.</p>
+    <button class="picker" id="openPick">
+      <span class="pt"><b id="pickName"></b><span id="pickSub"></span></span>
+      <span class="pc">Change<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+    </button>
+    <div class="fg">
+      <div class="t">Cash deposit</div>
+      <div class="h" id="depH">Optional. Anything you put in reduces both agreements.</div>
+      <input type="range" id="depR" min="0" max="10000" step="100" value="0">
+      <div class="rng"><span class="num">£0</span><span class="num" id="depMax">£10,000</span></div>
+      <input class="inp num" id="depI">
+    </div>
+  </section>
+
+  <section class="sect gut">
+    <div class="eyebrow">Cover</div>
+    <h2>Add what you want, leave what you do not</h2>
+    <p class="lede2">All optional, and priced the same whether you finance with us or pay cash. Pick how long you want each one to run.</p>
+    <div id="pk"></div>
+    <div class="cvtot"><span>Cover total</span><b class="num" id="cvTot">£0</b></div>
+  </section>
+
+  <section class="sect gut">
+    <h2>Your quote</h2>
+    <p class="lede2">Two agreements, because that is what you will sign. Both shown in full.</p>
+    <div class="seg">
+      <button data-prod="hp" aria-pressed="true">Hire Purchase</button>
+      <button data-prod="pcp">PCP</button>
+    </div>
+    <div id="quote"></div>
+    <div id="ctc" class="ctc"></div>
+    <div id="cap"></div>
+    <div class="ltv" id="ltv"></div>
+
+    <div class="honest">
+      <b>Worth understanding before you do this</b>
+      <p>Carrying negative equity into a new agreement means you start the new car owing more than it is worth. That is not a reason not to do it, and for most people changing car is the right call, but you should know it rather than find out in two years.</p>
+      <p>Two things shorten it: putting cash in now, and choosing a car that holds its value. A shorter term on the settlement loan costs more each month and far less overall.</p>
+    </div>
+
+    <div class="hard">
+      <div class="hk"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16h.01"/></svg> Before you apply</div>
+      <p>Covering negative equity needs a strong credit history, and there are <b>two agreements</b>, so the lender will run <b>two full credit searches</b>. Both leave a footprint on your file that other lenders can see, whether you are accepted or not.</p>
+      <p>If you are not sure where you stand, check your rate first. That is a soft search and leaves no mark.</p>
+    </div>
+  </section>
+
+  <section class="sect gut">
+    <h2>The conditions</h2>
+    <div class="cl">
+      <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Up to 150% of the new car's price</b> across both agreements combined.</span></div>
+      <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Two separate agreements.</b> The car on Hire Purchase or PCP, the settlement on its own loan at a lower rate.</span></div>
+      <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>A strong credit history is required</b> and both applications are a full credit search.</span></div>
+      <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>The settlement loan never runs longer than the car agreement.</b></span></div>
+      <div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Your valuation holds for 7 days</b>, subject to us seeing the car.</span></div>
+    </div>
+    <div id="reps"></div>
+    <p class="small">Oakwood Motor Company Ltd is a credit broker, not a lender. Finance is subject to status and affordability. Applicants must be 18 or over and a UK resident. Written quotations available on request.</p>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="pick" hidden>
+  <div class="sh"><h2>Choose a car</h2>
+    <button class="ib" id="pickX" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="sfilt gut">
+    <input class="inp" id="pq" placeholder="Try: automatic suv under £300 a month" autocomplete="off" style="margin-top:0">
+    <div class="read" id="pRead"></div>
+    <div class="aff">
+      <div class="af"><label for="pBud">Most per month</label><input id="pBud" inputmode="numeric" placeholder="Any"></div>
+      <div class="af"><label for="pDep">Deposit</label><input id="pDep" inputmode="numeric"></div>
+    </div>
+    <div class="fchips" id="fFit" style="margin-top:10px"></div>
+    <div class="fchips" id="fBud" style="margin-top:7px"></div>
+    <button class="more" id="pMore"><span id="pMoreT">More filters</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div id="pAdv" hidden>
+      <div class="fl">Agreement</div>
+      <div class="fchips" id="fProd"></div>
+      <div class="fl">Gearbox</div>
+      <div class="fchips" id="fTrans"></div>
+      <div class="fl">Fuel</div>
+      <div class="fchips" id="fFuel"></div>
+      <div class="fl">Body</div>
+      <div class="fchips" id="fBody"></div>
+    </div>
+    <div class="srow"><span id="pCount"></span>
+      <select id="pSort">
+        <option value="mlo">Monthly, low to high</option>
+        <option value="mhi">Monthly, high to low</option>
+        <option value="plo">Price, low to high</option>
+        <option value="phi">Price, high to low</option>
+        <option value="yhi">Newest year</option>
+        <option value="milo">Lowest mileage</option>
+      </select>
+    </div>
+  </div>
+  <div class="sb gut" id="pList"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var CAR_APR=0.129, NE_APR=0.099, MAX_LTV=1.50, YEAR=2026;
+var MIN_ADV=3000;        /* no lender writes an agreement below this */
+var PCP_GFV_MAX=0.75;    /* balloon must sit well under the advance or the monthly collapses */
+var MAXAGE_END=15, MAXMILES_END=150000, TERMS=[24,36,48,60,72,84];
+
+var CARS=[
+{y:2016,mk:"Vauxhall",md:"Astra",dv:"1.4T SRi",p:6995,mi:72400,f:"Petrol",tr:"Manual",b:"Hatchback",lo:"Chorley"},
+{y:2017,mk:"Mercedes-Benz",md:"A Class",dv:"A180d SE",p:10495,mi:58900,f:"Diesel",tr:"Automatic",b:"Hatchback",lo:"Chorley"},
+{y:2021,mk:"Vauxhall",md:"Corsa",dv:"1.2 SE Premium",p:9995,mi:24600,f:"Petrol",tr:"Manual",b:"Hatchback",lo:"Chorley"},
+{y:2020,mk:"Ford",md:"Focus",dv:"1.0 EcoBoost Titanium",p:11995,mi:38400,f:"Petrol",tr:"Manual",b:"Hatchback",lo:"Bury"},
+{y:2019,mk:"SEAT",md:"Leon",dv:"1.5 TSI EVO FR",p:12495,mi:45600,f:"Petrol",tr:"Manual",b:"Hatchback",lo:"Bury"},
+{y:2019,mk:"Volkswagen",md:"Golf",dv:"1.5 TSI Match",p:13495,mi:42100,f:"Petrol",tr:"Manual",b:"Hatchback",lo:"Bury"},
+{y:2020,mk:"Peugeot",md:"3008",dv:"1.5 BlueHDi Allure",p:13995,mi:47200,f:"Diesel",tr:"Manual",b:"SUV",lo:"Chorley"},
+{y:2020,mk:"Skoda",md:"Octavia",dv:"1.5 TSI SE L",p:13995,mi:41800,f:"Petrol",tr:"Manual",b:"Estate",lo:"Chorley"},
+{y:2020,mk:"Ford",md:"Puma",dv:"1.0 EcoBoost ST-Line",p:14495,mi:33800,f:"Petrol",tr:"Manual",b:"SUV",lo:"Chorley"},
+{y:2018,mk:"BMW",md:"3 Series",dv:"320d M Sport",p:14995,mi:61200,f:"Diesel",tr:"Automatic",b:"Saloon",lo:"Bury"},
+{y:2023,mk:"MG",md:"MG4 EV",dv:"Long Range SE",p:15995,mi:14200,f:"Electric",tr:"Automatic",b:"Hatchback",lo:"Chorley"},
+{y:2021,mk:"Hyundai",md:"Tucson",dv:"1.6 T-GDi SE Connect",p:16995,mi:29700,f:"Petrol",tr:"Manual",b:"SUV",lo:"Bury"},
+{y:2022,mk:"Toyota",md:"Corolla",dv:"1.8 Hybrid Icon Tech",p:17495,mi:24900,f:"Hybrid",tr:"Automatic",b:"Estate",lo:"Bury"},
+{y:2022,mk:"Nissan",md:"Qashqai",dv:"1.3 DiG-T Acenta Premium",p:17995,mi:28300,f:"Petrol",tr:"Automatic",b:"SUV",lo:"Chorley"},
+{y:2021,mk:"Audi",md:"A3",dv:"35 TFSI Sport",p:18995,mi:31400,f:"Petrol",tr:"Automatic",b:"Hatchback",lo:"Bury"},
+{y:2023,mk:"Cupra",md:"Born",dv:"58kWh V2",p:19995,mi:17600,f:"Electric",tr:"Automatic",b:"Hatchback",lo:"Bury"},
+{y:2020,mk:"Ford",md:"Kuga",dv:"1.5 EcoBoost ST-Line",p:20000,mi:30100,f:"Petrol",tr:"Manual",b:"SUV",lo:"Bury"},
+{y:2023,mk:"Kia",md:"Niro EV",dv:"64.8kWh '3'",p:21995,mi:19800,f:"Electric",tr:"Automatic",b:"SUV",lo:"Bury"},
+{y:2022,mk:"Tesla",md:"Model 3",dv:"Long Range",p:24995,mi:26500,f:"Electric",tr:"Automatic",b:"Saloon",lo:"Bury"},
+{y:2022,mk:"Volvo",md:"XC40",dv:"B4 Plus Dark",p:26995,mi:22400,f:"Petrol",tr:"Automatic",b:"SUV",lo:"Bury"}
+];
+CARS.forEach(function(c,i){c.id=i});
+
+function digits(v){return +String(v).replace(/[^\d]/g,"")||0}
+function money(n){return "£"+Math.round(n).toLocaleString("en-GB")}
+function money2(n){return "£"+n.toLocaleString("en-GB",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function i_(r){return Math.pow(1+r,1/12)-1}
+function pay(cr,n,r){var i=i_(r);return cr*i/(1-Math.pow(1+i,-n))}
+function pcpPay(cr,n,g,r){var i=i_(r);return (cr-g/Math.pow(1+i,n))*i/(1-Math.pow(1+i,-n))}
+function maxTerm(c){
+  var cap=Math.min(84,(MAXAGE_END-(YEAR-c.y))*12,((MAXMILES_END-c.mi)/10000)*12), best=24;
+  TERMS.forEach(function(t){if(t<=cap)best=t});
+  return best;
+}
+function gfvOf(c,n,miles){
+  var fa=(YEAR-c.y)+n/12, f=Math.max(0.10,0.62*Math.pow(0.84,fa-3));
+  f-=((miles-8000)/1000)*0.008;
+  return Math.max(500,Math.round(c.p*Math.max(0.08,f)/50)*50);
+}
+
+/* Cover, priced exactly as the interest free page, with a length to pick. */
+var PREMIUM=["BMW","Audi","Mercedes-Benz","Volvo","Tesla","Cupra"];
+function base3(c){
+  var w = c.p<10000?1600 : c.p<15000?2100 : c.p<20000?2500 : c.p<25000?2800 : 3400;
+  var s = c.f==="Electric"?900 : (PREMIUM.indexOf(c.mk)>-1?1650:1200);
+  return {w:w,s:s};
+}
+var YR_W={1:0.40,2:0.68,3:1.00}, YR_S={1:0.37,2:0.70,3:1.00}, MOT={1:125,2:240,3:350}, SUPA=599;
+function priceOf(c,id,yrs){
+  var b=base3(c);
+  if(id==="w") return Math.round(b.w*YR_W[yrs]/10)*10;
+  if(id==="s") return Math.round(b.s*YR_S[yrs]/10)*10;
+  if(id==="m") return MOT[yrs];
+  return SUPA;
+}
+var PRODUCTS=[
+ {id:"w",n:"AA Warranty",d:"Mechanical cover backed by the AA, with AA breakdown included",term:true},
+ {id:"s",n:"Service Plan",d:"Manufacturer schedule, at our own workshops",term:true},
+ {id:"m",n:"MOT Plan",d:"Test fee covered each year, with a reminder three weeks before",term:true},
+ {id:"g",n:"Supagard",d:"Paint and interior protection, applied before you collect",term:false}
+];
+function coverFor(c){
+  var t=0;
+  PRODUCTS.forEach(function(p){ if(S.cover[p.id]) t+=priceOf(c,p.id,S.cover[p.id]); });
+  return t;
+}
+function coverTotal(){ return coverFor(car()); }
+
+/* Seeded with a worked example so the page is live from the first paint.
+   `own` flips the moment the customer puts their own figures in. */
+var S={car:10,px:{r:"",v:8000},setl:11500,dep:500,prod:"hp",cover:{w:0,s:0,m:0,g:0},own:false};
+function car(){return CARS[S.car]}
+function equity(){
+  var v=S.px?S.px.v:0;
+  return {val:v,setl:S.setl,neg:Math.max(0,S.setl-v),pos:Math.max(0,v-S.setl),known:!!S.px&&S.setl>0};
+}
+
+/* One gate. Every component reads `reason` rather than deciding for itself,
+   so the bar, the quote, the blocked state and both examples cannot disagree. */
+function quoteFor(carId,prod,cover,dep,e){
+  var c=CARS[carId];
+  var total=c.p+cover;
+  var deposit=dep+e.pos;
+  var carAdv=Math.max(0,total-deposit);
+  var ne=e.neg;
+  var n=prod==="pcp"?Math.min(60,maxTerm(c)):maxTerm(c), neN=Math.min(60,n);
+  var gfv=prod==="pcp"?gfvOf(c,n,8000):0;
+
+  var reason="ok";
+  if(carAdv+ne>c.p*MAX_LTV) reason="ltv";
+  else if(carAdv<MIN_ADV) reason="small";
+  else if(prod==="pcp"&&gfv>carAdv*PCP_GFV_MAX) reason="pcp";
+
+  var ok=reason==="ok";
+  var carM=ok?(prod==="pcp"?pcpPay(carAdv,n,gfv,CAR_APR):pay(carAdv,n,CAR_APR)):0;
+  var neM=ok&&ne>0?pay(ne,neN,NE_APR):0;
+  var borrow=carAdv+ne, ltv=c.p?borrow/c.p:0;
+  return {c:c,e:e,cover:cover,total:total,deposit:deposit,carAdv:carAdv,ne:ne,n:n,neN:neN,gfv:gfv,
+    carM:carM,neM:neM,m:carM+neM,borrow:borrow,ltv:ltv,reason:reason,ok:ok};
+}
+function quote(){ return quoteFor(S.car,S.prod,coverTotal(),S.dep,equity()); }
+
+/* Early settlement is the present value of what is left, less a statutory rebate,
+   plus a deferment period. We do not know their rate, so we assume one and round
+   up: overstating is safe, understating builds a deal that collapses when the
+   lender's real figure lands. */
+var EST_APR=0.109, EST_DEFER=1.0125;
+function estimate(m,n,bal){
+  if(!(m>0&&n>0)) return null;
+  var i=i_(EST_APR), pv=m*(1-Math.pow(1+i,-n))/i;
+  if(bal>0) pv+=bal/Math.pow(1+i,n);
+  return Math.ceil(pv*EST_DEFER/50)*50;
+}
+function estBox(){
+  var m=digits($("#eM").value), n=digits($("#eN").value), bal=digits($("#eB").value);
+  var v=estimate(m,n,bal);
+  if(v===null){ $("#estOut").innerHTML=""; $("#estUse").hidden=true; return; }
+  $("#estOut").innerHTML='<div class="estr"><div class="ek">Roughly</div>'+
+    '<div class="ev num">'+money(v)+'</div>'+
+    '<p class="es">Based on '+n+' payment'+(n>1?"s":"")+' of '+money(m)+
+    (bal>0?' and a '+money(bal)+' final payment':'')+
+    '. The real figure will differ a little either way. We will get it from your lender for you.</p></div>';
+  $("#estUse").hidden=false;
+  $("#estUse").dataset.v=v;
+}
+
+/* PLACEHOLDERS. Both figures must be real and evidenced before this goes live.
+   These are financial promotion claims under CONC 3.3.1R, so keep whatever
+   report produced them. */
+var PROOF={typLo:2000, typHi:6000, most:17400};
+function proofBox(){
+  var e=equity();
+  if(!e.known||e.neg<=0){ $("#proof").innerHTML=""; return; }
+  var n=e.neg, line;
+  if(n>PROOF.most){
+    /* No comparison we can honestly make, so say that rather than stay silent. */
+    $("#proof").innerHTML='<div class="proof"><div class="pb">'+money(n)+
+      ' is more than we have settled in one go before.</div>'+
+      '<p class="ps">That does not make it impossible, but it is not something a calculator '+
+      'should decide. Worth a conversation.</p></div>';
+    return;
+  }
+  if(n<PROOF.typLo) line=money(n)+' is at the lower end of what we deal with every week.';
+  else if(n<=PROOF.typHi) line=money(n)+' puts you right in the middle of where most of our customers are.';
+  else line=money(n)+' is higher than most, and comfortably inside what we have done.';
+  $("#proof").innerHTML='<div class="proof"><div class="pb">'+line+'</div>'+
+    '<p class="ps">Negative equity is ordinary here. It is most of what we sort out.</p>'+
+    '<div class="pm"><div><b>'+money(PROOF.typLo)+' to '+money(PROOF.typHi)+'</b>'+
+      '<span>Where most of the people we help sit</span></div>'+
+    '<div><b>'+money(PROOF.most)+'</b><span>Most we have settled on one deal</span></div></div></div>';
+}
+
+/* Turns the bad news into a number of choices, in the same breath. */
+function fitCount(){
+  var e=equity(); if(!e.known) return 0;
+  var n=0;
+  CARS.forEach(function(c){ if(quoteFor(c.id,S.prod,coverFor(c),S.dep,e).ok) n++ });
+  return n;
+}
+function fitsBox(){
+  var e=equity();
+  if(!e.known||e.neg<=0){ $("#fits").innerHTML=""; return; }
+  var n=fitCount();
+  if(!n){
+    $("#fits").innerHTML='<div class="fits" style="box-shadow:inset 0 0 0 1.5px var(--warn);background:var(--surface)">'+
+      '<span class="ft"><b>Nothing in stock fits this on its own</b>'+
+      '<span>That does not make it impossible. It usually means a bit of cash or a different lender. Let us look at it.</span></span>'+
+      '<button data-human>Talk to us</button></div>';
+    return;
+  }
+  $("#fits").innerHTML='<div class="fits"><span class="fn num">'+n+'</span>'+
+    '<span class="ft"><b>cars in stock work with your '+money(e.neg)+'</b>'+
+    '<span>Your settlement is already covered in every one of them.</span></span>'+
+    '<button data-onlyfit>See them</button></div>';
+}
+
+/* ---------- render ---------- */
+function eqBox(){
+  var e=equity();
+  if(!e.known){ $("#eqBox").innerHTML=""; $("#exNote").innerHTML=""; return; }
+  if(e.neg>0){
+    $("#eqBox").innerHTML='<div class="eq neg"><div class="ek">Negative equity</div>'+
+      '<div class="ev num">'+money(e.neg)+'</div>'+
+      '<p class="es">You owe '+money(e.setl)+' and the car is worth '+money(e.val)+
+      '. That difference is what we would settle for you on its own agreement.</p>'+
+      '<div class="eqr line"><span>Your car is worth</span><b class="num">'+money(e.val)+'</b></div>'+
+      '<div class="eqr"><span>You owe</span><b class="num">'+money(e.setl)+'</b></div></div>';
+  } else {
+    $("#eqBox").innerHTML='<div class="eq pos"><div class="ek">You have equity</div>'+
+      '<div class="ev num">'+money(e.pos)+'</div>'+
+      '<p class="es">Good news. Your car is worth more than you owe, so '+money(e.pos)+
+      ' goes straight into the deposit on your next one.</p></div>';
+  }
+  $("#exNote").innerHTML = S.own ? "" :
+    '<div class="exbar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>'+
+    '<span>These are <b>example figures</b> so you can see how it works. Put your own reg, mileage and settlement in and everything below updates.</span></div>';
+}
+
+function coverBox(){
+  var c=car();
+  $("#pk").innerHTML=PRODUCTS.map(function(p){
+    var yrs=S.cover[p.id], on=!!yrs;
+    return '<div class="pr"><span class="pl"><b>'+p.n+(on&&p.term?", "+yrs+" year"+(yrs>1?"s":""):"")+'</b>'+
+      '<span>'+p.d+'</span>'+
+      (on&&p.term?'<span class="yrs">'+[1,2,3].map(function(y){
+        return '<button data-yr="'+p.id+'" data-y="'+y+'" aria-pressed="'+(yrs===y)+'">'+y+' yr</button>';
+      }).join("")+'</span>':'')+
+      '</span>'+
+      '<span class="pv'+(on?'':' off')+' num">'+(on?money(priceOf(c,p.id,yrs)):"Not added")+'</span>'+
+      '<button class="tog" data-tog="'+p.id+'" data-on="'+(on?1:0)+'" aria-label="'+(on?"Remove ":"Add ")+p.n+'"></button>'+
+    '</div>';
+  }).join("");
+  $("#cvTot").textContent=money(coverTotal());
+}
+
+/* The nearest car in price that clears the gate. Takes everything it needs as
+   arguments so it can be tested and cannot drift out of step with quoteFor. */
+function bestAlt(carId,prod,dep,e){
+  var here=CARS[carId].p, best=null, bd=Infinity;
+  CARS.forEach(function(x){
+    if(x.id===carId) return;
+    if(!quoteFor(x.id,prod,coverFor(x),dep,e).ok) return;
+    var d=Math.abs(x.p-here);
+    if(d<bd){bd=d;best=x.id}
+  });
+  return best;
+}
+var BLOCK={
+  ltv:{k:"Over the limit",h:"This car cannot carry it"},
+  small:{k:"Too little to finance",h:"You barely need finance here"},
+  pcp:{k:"Wrong product",h:"PCP does not work on this one"}
+};
+function renderQuote(){
+  var q=quote(), cover=q.cover;
+  if(!q.ok){
+    var b=BLOCK[q.reason], body="", fix="", e=q.e;
+    /* A fix is only offered once it has been run through the same engine and
+       come back clear. No button promises an outcome the quote will not produce. */
+    function offer(ok,attr,label,hint){ if(ok) fix+='<button '+attr+'>'+label+' <b>'+hint+'</b></button>'; }
+
+    if(q.reason==="ltv"){
+      body='<p>Together the two agreements come to '+money(q.borrow)+' against a '+money(q.c.p)+
+        ' car, which is '+(q.ltv*100).toFixed(0)+'% of its value. We can usually go to 150%.</p>';
+      if(q.ne>q.c.p*MAX_LTV)
+        body+='<p>Your '+money(q.ne)+' is already more than 150% of this car on its own, so no deposit will fix it. '+
+          'A <b>dearer</b> car can actually help here, because the limit is a share of what the car is worth.</p>';
+      var need=Math.ceil((q.borrow-q.c.p*MAX_LTV)/50)*50;
+      offer(need>0&&S.dep+need<=q.total&&quoteFor(S.car,S.prod,cover,S.dep+need,e).ok,
+        'data-fixdep="'+need+'"','Put in '+money(need)+' more deposit','brings it inside 150%');
+      offer(cover>0&&quoteFor(S.car,S.prod,0,S.dep,e).ok,'data-fixcov','Take the cover off',money(cover));
+      var alt=bestAlt(S.car,S.prod,S.dep,e);
+      if(alt!==null) offer(true,'data-fixcar="'+alt+'"',
+        'Try the '+CARS[alt].mk+' '+CARS[alt].md+' instead',money(CARS[alt].p));
+    }
+
+    if(q.reason==="small"){
+      body='<p>Your deposit'+(e.pos>0?' and equity':'')+' covers all but '+money(q.carAdv)+
+        ' of the car. Lenders will not write an agreement that small.</p>'+
+        (q.ne>0
+          ? '<p>Put less in, so there is something to finance, or pay the car outright and take the settlement loan on its own.</p>'
+          : '<p>Pay the balance and the car is yours. There is nothing here worth paying interest on.</p>');
+      var cut=Math.ceil((MIN_ADV-q.carAdv)/50)*50;
+      offer(cut>0&&S.dep>=cut&&quoteFor(S.car,S.prod,cover,S.dep-cut,e).ok,
+        'data-fixdep="-'+cut+'"','Keep '+money(cut)+' of your deposit back','makes it financeable');
+      var up=bestAlt(S.car,S.prod,S.dep,e);
+      if(up!==null) offer(true,'data-fixcar="'+up+'"',
+        'Look at the '+CARS[up].mk+' '+CARS[up].md,money(CARS[up].p));
+    }
+
+    if(q.reason==="pcp"){
+      body='<p>On PCP part of the car is deferred to a final payment. Here that would be '+money(q.gfv)+
+        ' against a '+money(q.carAdv)+' advance, which leaves almost nothing to spread. '+
+        'Hire Purchase is the cheaper product for you on this deal.</p>';
+      offer(quoteFor(S.car,"hp",cover,S.dep,e).ok,'data-fixhp','Switch to Hire Purchase',q.n+' months');
+    }
+
+    if(q.ne>0&&q.ne<=PROOF.most)
+      body+='<p style="color:var(--fg-muted)">For what it is worth, '+money(q.ne)+
+        ' is well inside what we settle regularly. It is this car that will not carry it, not you.</p>';
+    if(!fix) body+='<p>Nothing we can change on this page gets this one over the line, '+
+      'but that is the calculator talking, not a person. A lot of these still get done.</p>';
+    fix+='<button data-cap="human">Ask us to look at it anyway <b>no credit search</b></button>';
+
+    $("#quote").innerHTML='<div class="blocked"><div class="bk">'+b.k+'</div><h3>'+b.h+'</h3>'+
+      body+(fix?'<div class="fix">'+fix+'</div>':'')+'</div>';
+  } else {
+    $("#quote").innerHTML='<div class="quote"><div class="qk">Your total monthly</div>'+
+      '<div class="qbig num">'+money2(q.m)+'</div>'+
+      '<p class="qsub">Across both agreements. '+(S.prod==="pcp"?"PCP":"Hire Purchase")+' on the car over '+q.n+
+      ' months'+(q.ne>0?', settlement loan over '+q.neN+' months':'')+'.</p>'+
+      '<div class="agr"><div class="an"><b>1. The car</b><span class="am num">'+money2(q.carM)+'</span></div>'+
+        '<div class="ar"><span>Cash price'+(q.cover?' with cover':'')+'</span><b class="num">'+money(q.total)+'</b></div>'+
+        '<div class="ar"><span>Deposit</span><b class="num">'+money(q.deposit)+'</b></div>'+
+        '<div class="ar"><span>Amount of credit</span><b class="num">'+money(q.carAdv)+'</b></div>'+
+        '<div class="ar"><span>Term and rate</span><b>'+q.n+' months at 12.9% APR</b></div>'+
+        (q.gfv?'<div class="ar"><span>Final payment</span><b class="num">'+money(q.gfv)+'</b></div>':'')+
+      '</div>'+
+      (q.ne>0?'<div class="agr"><div class="an"><b>2. The settlement loan</b><span class="am num">'+money2(q.neM)+'</span></div>'+
+        '<div class="ar"><span>Clears your old agreement</span><b class="num">'+money(q.ne)+'</b></div>'+
+        '<div class="ar"><span>Term and rate</span><b>'+q.neN+' months at 9.9% APR</b></div>'+
+        '<div class="ar"><span>Cheaper than the car rate</span><b style="color:#6FD3AC">9.9% v 12.9%</b></div>'+
+      '</div>':'')+
+      /* Soft search leads the pair on purpose. On a deal this uncertain, sending
+         people straight to two hard searches manufactures declines. */
+      '<div class="qacts">'+
+        '<button class="q1" data-cap="soft">Check my rate, no credit footprint</button>'+
+        '<button class="q2" data-cap="apply">Apply for this now</button>'+
+        '<p class="qnote">Applying runs <b>two full credit searches</b>, one for each agreement. Checking your rate runs none.</p>'+
+        '<button class="q3" data-cap="save">Email this quote to me</button>'+
+        '<p class="qnote2">Your '+money(q.e.val)+' valuation holds for 7 days.</p>'+
+      '</div></div>';
+  }
+  var pct=Math.min(100,q.ltv/MAX_LTV*100);
+  var cls=q.ltv>MAX_LTV?"over":(q.ltv>MAX_LTV*0.9?"hot":"");
+  $("#ltv").innerHTML='<div class="ltvh"><span>Borrowing against the car</span><b class="num">'+(q.ltv*100).toFixed(0)+'% of '+money(q.c.p)+'</b></div>'+
+    '<div class="bar"><i class="'+cls+'" style="width:'+pct+'%"></i></div>'+
+    '<p class="ltvn">'+(q.reason==="ltv"
+      ? 'Over our 150% limit. Reduce what you are borrowing or choose a different car.'
+      : q.ok
+        ? (q.ltv>=MAX_LTV-0.02
+            ? 'Right on our 150% limit. Anything more and it will not fit, so the figures above are the most we can stretch to on this car.'
+            : 'Our limit is 150%. You are at '+(q.ltv*100).toFixed(0)+'%, so there is room.')
+        : 'This part is fine. The 150% limit is not what is holding this deal up.')+'</p>';
+  reps(q);
+}
+
+function reps(q){
+  /* No quote, no example. An example quoting a rate on a deal we would decline
+     is the thing that gets a finance page pulled. */
+  if(!q.ok){
+    $("#reps").innerHTML='<div class="rep">Build a quote above and the representative example for '+
+      'each agreement will appear here in full.</div>';
+    return;
+  }
+  var r1='<div class="rep"><b>Representative example, the car</b>'+
+    '<div class="rr"><span>Cash price of goods</span><b class="num">'+money(q.total)+'</b></div>'+
+    '<div class="rr"><span>Deposit</span><b class="num">'+money(q.deposit)+'</b></div>'+
+    '<div class="rr"><span>Total amount of credit</span><b class="num">'+money(q.carAdv)+'</b></div>'+
+    '<div class="rr"><span>Duration</span><b>'+q.n+' months</b></div>'+
+    '<div class="rr"><span>Monthly payment</span><b class="num">'+money2(q.carM)+'</b></div>'+
+    (q.gfv?'<div class="rr"><span>Optional final payment</span><b class="num">'+money(q.gfv)+'</b></div>':'')+
+    '<div class="rr"><span>Rate of interest</span><b>12.9% fixed</b></div>'+
+    '<div class="rr"><span>Total charge for credit</span><b class="num">'+money(q.carM*q.n+q.gfv-q.carAdv)+'</b></div>'+
+    '<div class="rr"><span>Total amount payable</span><b class="num">'+money(q.carM*q.n+q.gfv+q.deposit)+'</b></div>'+
+    '<div class="rr"><span>Representative</span><b>12.9% APR</b></div></div>';
+  var r2=q.ne>0?'<div class="rep"><b>Representative example, the settlement loan</b>'+
+    '<div class="rr"><span>Total amount of credit</span><b class="num">'+money(q.ne)+'</b></div>'+
+    '<div class="rr"><span>Duration</span><b>'+q.neN+' months</b></div>'+
+    '<div class="rr"><span>Monthly payment</span><b class="num">'+money2(q.neM)+'</b></div>'+
+    '<div class="rr"><span>Rate of interest</span><b>9.9% fixed</b></div>'+
+    '<div class="rr"><span>Total charge for credit</span><b class="num">'+money(q.neM*q.neN-q.ne)+'</b></div>'+
+    '<div class="rr"><span>Total amount payable</span><b class="num">'+money(q.neM*q.neN)+'</b></div>'+
+    '<div class="rr"><span>Representative</span><b>9.9% APR</b></div></div>':'';
+  $("#reps").innerHTML=r1+r2;
+}
+
+/* PLACEHOLDERS. Swap these four for the real routing before this goes near a customer. */
+var CONTACT={
+  tel:"+44161REPLACE", waNum:"44161REPLACE", smsNum:"+44161REPLACE",
+  sites:["Bury","Chorley"]
+};
+var SLOTS=["09:30","10:30","11:30","12:30","14:00","15:00","16:00","17:00"];
+var B={site:0,day:0,time:null};
+
+/* Whoever picks this up should already have the deal in front of them, so the
+   quote travels inside the message rather than starting from "how can I help". */
+function quoteText(){
+  var q=quote(), c=q.c, l=[];
+  l.push("Hi Oakwood, I am looking at the "+c.y+" "+c.mk+" "+c.md+" at "+money(c.p)+".");
+  if(q.ne>0) l.push("I have around "+money(q.ne)+" of negative equity on my current car.");
+  if(q.ok) l.push("Your site quoted me "+money2(q.m)+" a month in total, "+
+    (S.prod==="pcp"?"PCP":"Hire Purchase")+" over "+q.n+" months"+
+    (q.ne>0?" plus the settlement loan over "+q.neN:"")+".");
+  else l.push("Your site could not quote it, so I would like someone to look at it.");
+  return l.join(" ");
+}
+function dayLabel(d){
+  var t=new Date(); t.setDate(t.getDate()+d);
+  if(d===0) return {a:"Today",b:t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
+  if(d===1) return {a:"Tomorrow",b:t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
+  return {a:t.toLocaleDateString("en-GB",{weekday:"short"}),b:t.toLocaleDateString("en-GB",{day:"numeric",month:"short"})};
+}
+function ctcBox(){
+  var q=quote(), msg=encodeURIComponent(quoteText());
+  $("#ctc").innerHTML='<div class="ctch">'+(q.ok?"Rather talk it through?":"Want a person to look at this?")+'</div>'+
+    '<p class="ctcs">'+(q.ok
+      ? "Whichever you pick, your quote goes with it, so nobody asks you to start again."
+      : "The calculator works to one set of rules. We have more room than it does.")+'</p>'+
+    '<div class="ctg">'+
+      '<button class="big" data-book><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'+
+        '<i>Book an appointment<span>Bury or Chorley, pick your time</span></i></button>'+
+      '<button data-cap="callback"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 012-2h2.5l2 5-2 1.5a12 12 0 006 6L15 13.5l5 2V18a2 2 0 01-2 2A15 15 0 013 5z"/><path d="M14 3l6 6M20 3v6h-6" opacity=".55"/></svg>'+
+        '<i>Call me back<span>Pick a time</span></i></button>'+
+      '<a href="tel:'+CONTACT.tel+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 012-2h2.5l2 5-2 1.5a12 12 0 006 6L15 13.5l5 2V18a2 2 0 01-2 2A15 15 0 013 5z"/></svg>'+
+        '<i>Call us now<span>Open 7 days</span></i></a>'+
+      '<a class="wa" href="https://wa.me/'+CONTACT.waNum+'?text='+msg+'" target="_blank" rel="noopener"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.8 14.03c-.24.68-1.2 1.26-1.97 1.42-.53.11-1.21.2-3.51-.75-2.95-1.22-4.84-4.21-4.99-4.4-.14-.2-1.19-1.58-1.19-3.02s.76-2.14 1.03-2.44c.27-.3.58-.37.78-.37h.56c.18 0 .42-.07.66.5.24.58.83 2.02.9 2.17.07.15.12.32.02.52-.1.2-.15.32-.3.49s-.31.38-.44.51c-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.3 2.36 1.45.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.71.81 2 .96.3.15.49.22.56.34.07.13.07.73-.17 1.41z"/></svg>'+
+        '<i>WhatsApp<span>Quote attached</span></i></a>'+
+      '<a href="sms:'+CONTACT.smsNum+'?&body='+msg+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4 9.5 9.5 0 01-2.8-.4L3 21l1.6-4.6A8.3 8.3 0 013 11.5a8.4 8.4 0 019-8.4 8.4 8.4 0 019 8.4z"/></svg>'+
+        '<i>Text us<span>Quote attached</span></i></a>'+
+    '</div>';
+}
+function bookBox(open){
+  if(!open){ capBox(""); return; }
+  var d=dayLabel(B.day);
+  $("#cap").innerHTML='<div class="bk"><b>Book an appointment</b>'+
+    '<p>Bring the car you are part exchanging and we will get the real settlement figure from your lender while you are here.</p>'+
+    '<div class="bl">Showroom</div><div class="brow">'+
+      CONTACT.sites.map(function(n,i){return '<button data-bs="'+i+'" aria-pressed="'+(B.site===i)+'">'+n+'</button>'}).join("")+
+    '</div>'+
+    '<div class="bl">Day</div><div class="brow">'+
+      [0,1,2,3,4,5,6].map(function(i){var l=dayLabel(i);
+        return '<button data-bd="'+i+'" aria-pressed="'+(B.day===i)+'">'+l.a+'<span>'+l.b+'</span></button>'}).join("")+
+    '</div>'+
+    '<div class="bl">Time</div><div class="bgrid">'+
+      SLOTS.map(function(t){return '<button data-bt="'+t+'" aria-pressed="'+(B.time===t)+'">'+t+'</button>'}).join("")+
+    '</div>'+
+    (B.time?'<input placeholder="Full name"><input placeholder="Mobile" type="tel" inputmode="tel">'+
+      '<button class="btnp" data-cap="done">Book '+(B.day<2?d.a:d.a+' '+d.b)+' at '+B.time+', '+CONTACT.sites[B.site]+'</button>'
+      :'<p class="ctcs" style="margin-top:12px">Pick a time to carry on.</p>')+
+    '<button class="capx" data-cap="">Not now</button></div>';
+}
+
+var CAPS={
+  soft:{b:"Check your rate in 60 seconds",
+        p:"A soft search. It tells you where you stand on both agreements and leaves no mark on your file, whatever the answer.",
+        f:["Full name","Mobile","Email"],cta:"Check my rate"},
+  apply:{b:"Apply for this deal",
+        p:"Two full credit searches, one for each agreement. Both leave a footprint other lenders can see, whether you are accepted or not.",
+        f:["Full name","Mobile","Email"],cta:"Submit my application"},
+  save:{b:"We will email you this quote",
+        p:"Useful if you are off to find your real settlement figure. The quote holds for 7 days and you can pick it straight back up.",
+        f:["Email"],cta:"Send it over"},
+  callback:{b:"When suits you?",
+        p:"Tell us when and we will ring then, not whenever it happens to suit us. Your quote comes up on screen when we call.",
+        f:["Full name","Mobile","Best time, eg this evening"],cta:"Ask us to call"},
+  human:{b:"Let us look at it properly",
+        p:"The calculator works to one set of rules. A person has more room than that, and a lot of these get done. No obligation, no credit search.",
+        f:["Full name","Mobile"],cta:"Ask us to call"}
+};
+function capBox(k){
+  if(!k){ $("#cap").innerHTML=""; return; }
+  if(k==="done"){
+    $("#cap").innerHTML='<div class="capok"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'+
+      '<span><b>Got it, thank you</b><span>Someone will come back to you today. Prototype, so nothing was actually sent.</span></span></div>';
+    return;
+  }
+  var c=CAPS[k];
+  $("#cap").innerHTML='<div class="cap"><b>'+c.b+'</b><p>'+c.p+'</p><div class="cg">'+
+    c.f.map(function(f){return '<input placeholder="'+f+'" '+
+      (f==="Email"?'type="email" inputmode="email"':f==="Mobile"?'type="tel" inputmode="tel"':'')+'>'}).join("")+
+    '<button class="btnp" style="margin-top:0" data-cap="done">'+c.cta+'</button></div>'+
+    '<button class="capx" data-cap="">Not now</button></div>';
+}
+
+function pickLabel(){
+  var c=car();
+  $("#pickName").textContent=c.y+" "+c.mk+" "+c.md;
+  $("#pickSub").textContent=c.dv+" · "+money(c.p)+" · "+c.lo;
+}
+function render(){
+  var q=quote();
+  $("#depR").max=Math.min(10000,Math.max(500,q.total));
+  $("#depR").value=Math.min(S.dep,+$("#depR").max);
+  $("#depMax").textContent=money(+$("#depR").max);
+  if(document.activeElement!==$("#depI")) $("#depI").value=money(S.dep);
+  if(document.activeElement!==$("#setl")) $("#setl").value=S.setl?money(S.setl):"";
+  $("#depH").innerHTML = equity().pos>0
+    ? "Your "+money(equity().pos)+" of equity is already in. Anything extra reduces both agreements."
+    : "Optional. Anything you put in reduces both agreements.";
+  pickLabel(); eqBox(); proofBox(); fitsBox(); coverBox(); renderQuote(); ctcBox();
+  if(!$("#cap").querySelector(".capok")) capBox("");
+}
+
+/* ---------- picker ---------- */
+var P={q:"",body:"",trans:"",fuel:"",budget:null,sort:"mlo",tokens:[],fromQ:{},more:false,fit:false};
+var ALIAS={vw:"volkswagen",merc:"mercedes",mercs:"mercedes",beemer:"bmw",bimmer:"bmw",bm:"bmw",
+  hatch:"hatchback","4x4":"suv",crossover:"suv"};
+var BODYW={suv:"SUV","4x4":"SUV",crossover:"SUV",hatchback:"Hatchback",hatch:"Hatchback",
+  estate:"Estate",saloon:"Saloon",sedan:"Saloon"};
+var TRANSW={automatic:"Automatic",auto:"Automatic",autos:"Automatic",manual:"Manual",manuals:"Manual",stick:"Manual"};
+var FUELW={electric:"Electric",ev:"Electric",evs:"Electric",petrol:"Petrol",petrols:"Petrol",
+  diesel:"Diesel",diesels:"Diesel",hybrid:"Hybrid",hybrids:"Hybrid"};
+
+/* Reads a plain English query and pulls out the hard filters,
+   leaving the rest as tokens that must each match the car somewhere. */
+function parseQuery(raw){
+  var found={}, s=" "+raw.toLowerCase().replace(/[,]/g," ").replace(/\s+/g," ")+" ";
+  var bm=s.match(/(?:under|below|max|upto|up to)?\s*£?\s*(\d{2,4})\s*(?:a month|pm|per month|p\/m|\/m|month|monthly|mth)/);
+  if(bm){ found.budget=+bm[1]; s=s.replace(bm[0]," "); }
+  var dm=s.match(/£?\s*(\d{1,3})\s*k\s*(?:deposit|down)/)||s.match(/£?\s*(\d{3,6})\s*(?:deposit|down)/);
+  if(dm){ found.dep=dm[0].indexOf("k")>-1?+dm[1]*1000:+dm[1]; s=s.replace(dm[0]," "); }
+  var rest=[];
+  s.trim().split(" ").filter(Boolean).forEach(function(w){
+    w=w.replace(/^£/,"");
+    if(TRANSW[w]&&!found.trans){found.trans=TRANSW[w];return}
+    if(BODYW[w]&&!found.body){found.body=BODYW[w];return}
+    if(FUELW[w]&&!found.fuel){found.fuel=FUELW[w];return}
+    rest.push(ALIAS[w]||w);
+  });
+  found.tokens=rest; return found;
+}
+function applyQuery(raw){
+  P.q=raw; var f=parseQuery(raw);
+  ["trans","body","fuel","budget"].forEach(function(k){
+    if(f[k]!==undefined&&f[k]!==null){P[k]=f[k];P.fromQ[k]=true}
+    else if(P.fromQ[k]){P[k]=(k==="budget")?null:"";P.fromQ[k]=false}
+  });
+  if(f.dep!=null){S.dep=f.dep;P.fromQ.dep=true}
+  if(P.trans||P.fuel||P.body) P.more=true;   /* never hide a filter the query just set */
+  P.tokens=f.tokens;
+}
+var RLAB={ltv:"over 150%",small:"too little to finance",pcp:"HP only"};
+function monthlyFor(c){
+  var q=quoteFor(c.id,S.prod,coverFor(c),S.dep,equity());
+  return {m:q.m,ok:q.ok,reason:q.reason,n:q.n};
+}
+function pickMatches(){
+  var list=CARS.filter(function(c){
+    if(P.tokens.length){
+      var hay=(c.y+" "+c.mk+" "+c.md+" "+c.dv+" "+c.f+" "+c.b+" "+c.tr+" "+c.lo).toLowerCase();
+      for(var i=0;i<P.tokens.length;i++){ if(hay.indexOf(P.tokens[i])<0) return false; }
+    }
+    if(P.body&&c.b!==P.body) return false;
+    if(P.trans&&c.tr!==P.trans) return false;
+    if(P.fuel&&c.f!==P.fuel) return false;
+    if(P.fit&&!monthlyFor(c).ok) return false;
+    if(P.budget){ var r=monthlyFor(c); if(!r.ok||r.m>P.budget) return false; }
+    return true;
+  });
+  /* Cars we cannot finance sort to the bottom, never to the top on a zero monthly. */
+  function byM(dir){ return function(a,b){
+    var x=monthlyFor(a), y=monthlyFor(b);
+    if(x.ok!==y.ok) return x.ok?-1:1;
+    return dir*(x.m-y.m);
+  }}
+  return list.sort(({
+    mlo:byM(1), mhi:byM(-1),
+    plo:function(a,b){return a.p-b.p}, phi:function(a,b){return b.p-a.p},
+    yhi:function(a,b){return b.y-a.y}, milo:function(a,b){return a.mi-b.mi}
+  })[P.sort]);
+}
+var BUDS=[200,300,400,500,600];
+function buildPick(){
+  var bodies=[],fuels=[];
+  CARS.forEach(function(c){if(bodies.indexOf(c.b)<0)bodies.push(c.b);if(fuels.indexOf(c.f)<0)fuels.push(c.f)});
+
+  $("#fFit").innerHTML=equity().neg>0
+    ? '<button data-pfit aria-pressed="'+P.fit+'">Only cars that work with my '+money(equity().neg)+'</button>'
+    : "";
+  $("#fBud").innerHTML='<button data-pbud="" aria-pressed="'+(!P.budget)+'">Any</button>'+
+    BUDS.map(function(v){return '<button data-pbud="'+v+'" aria-pressed="'+(P.budget===v)+'">Under £'+v+'</button>'}).join("");
+  $("#fProd").innerHTML=[["hp","Hire Purchase"],["pcp","PCP"]].map(function(x){
+    return '<button data-pprod="'+x[0]+'" aria-pressed="'+(S.prod===x[0])+'">'+x[1]+'</button>'}).join("");
+  $("#fTrans").innerHTML='<button data-ptr="" aria-pressed="'+(!P.trans)+'">Any</button>'+
+    ["Manual","Automatic"].map(function(x){return '<button data-ptr="'+x+'" aria-pressed="'+(P.trans===x)+'">'+x+'</button>'}).join("");
+  $("#fFuel").innerHTML='<button data-pf="" aria-pressed="'+(!P.fuel)+'">Any</button>'+
+    fuels.map(function(x){return '<button data-pf="'+x+'" aria-pressed="'+(P.fuel===x)+'">'+x+'</button>'}).join("");
+  $("#fBody").innerHTML='<button data-pb="" aria-pressed="'+(!P.body)+'">Any</button>'+
+    bodies.map(function(x){return '<button data-pb="'+x+'" aria-pressed="'+(P.body===x)+'">'+x+'</button>'}).join("");
+
+  var read=[];
+  if(P.fromQ.trans&&P.trans) read.push({k:"trans",t:P.trans});
+  if(P.fromQ.body&&P.body) read.push({k:"body",t:P.body});
+  if(P.fromQ.fuel&&P.fuel) read.push({k:"fuel",t:P.fuel});
+  if(P.fromQ.budget&&P.budget) read.push({k:"budget",t:"Under "+money(P.budget)+" a month"});
+  if(P.fromQ.dep&&S.dep) read.push({k:"dep",t:money(S.dep)+" deposit"});
+  P.tokens.forEach(function(tk){read.push({k:"tok",t:tk})});
+  $("#pRead").innerHTML = read.length
+    ? '<span class="rl">Reading that as</span>'+read.map(function(r){
+        return '<span class="rc">'+(r.k==="tok"?'<b>'+r.t+'</b>':r.t)+
+          (r.k==="tok"?'':' <span data-drop="'+r.k+'">×</span>')+'</span>'}).join("")
+    : '<span class="rl">Try</span>'+["automatic suv","electric","under £300 a month","bmw","£2k deposit"]
+        .map(function(e){return '<button class="eg" data-eg="'+e+'">'+e+'</button>'}).join("");
+
+  if(document.activeElement!==$("#pDep")) $("#pDep").value=money(S.dep);
+  if(document.activeElement!==$("#pBud")) $("#pBud").value=P.budget?money(P.budget):"";
+  $("#pSort").value=P.sort;
+
+  /* Secondary filters stay folded so stock is on screen without scrolling,
+     but the button has to say when something is hiding under it. */
+  var nAdv=(P.trans?1:0)+(P.fuel?1:0)+(P.body?1:0)+(S.prod==="pcp"?1:0);
+  $("#pAdv").hidden=!P.more;
+  $("#pMore").setAttribute("aria-expanded",P.more?"true":"false");
+  $("#pMoreT").textContent=P.more?"Fewer filters":(nAdv?nAdv+" filter"+(nAdv>1?"s":"")+" on":"More filters");
+
+  var list=pickMatches();
+  $("#pCount").textContent=list.length+(list.length===1?" car fits":" cars fit");
+  if(!list.length){
+    /* Say which filters are doing it, including the ones folded out of sight. */
+    var on=[];
+    if(P.fit) on.push("only cars that cover your settlement");
+    if(P.budget) on.push("under "+money(P.budget)+" a month");
+    if(P.trans) on.push(P.trans.toLowerCase());
+    if(P.fuel) on.push(P.fuel.toLowerCase());
+    if(P.body) on.push(P.body.toLowerCase());
+    P.tokens.forEach(function(t){on.push('"'+t+'"')});
+    $("#pList").innerHTML='<p class="pempty">Nothing fits that yet.'+
+      (on.length?'<br><br>You are asking for <b>'+on.join("</b>, <b>")+'</b>.':'')+
+      '<br><br>Raise your monthly budget, add to your deposit, or start again.</p>'+
+      '<button class="btnp" id="pClear" style="margin-top:0">Clear all filters</button>';
+    return;
+  }
+  $("#pList").innerHTML=list.map(function(c){
+    var r=monthlyFor(c);
+    return '<button class="prw" data-pcar="'+c.id+'" aria-pressed="'+(c.id===S.car)+'">'+
+      '<span class="pi">'+(r.ok?'':'<span class="ok">!</span>')+'</span>'+
+      '<span class="px"><b>'+c.y+' '+c.mk+' '+c.md+'</b><span>'+c.dv+'<br>'+c.tr+' · '+c.mi.toLocaleString("en-GB")+' miles · '+c.lo+'</span></span>'+
+      '<span class="pp"><b class="num">'+(r.ok?money(r.m):"—")+'</b><span>'+
+        (r.ok?'a month, '+r.n+'mo':RLAB[r.reason])+'<br>'+money(c.p)+'</span></span>'+
+    '</button>';
+  }).join("");
+}
+function openPick(){ buildPick(); $("#scrim").hidden=false; $("#pick").hidden=false;
+  requestAnimationFrame(function(){$("#scrim").classList.add("on");$("#pick").classList.add("on")}) }
+function closePick(){ $("#scrim").classList.remove("on"); $("#pick").classList.remove("on");
+  setTimeout(function(){$("#scrim").hidden=true;$("#pick").hidden=true},260) }
+function setProd(p){
+  S.prod=p;
+  document.querySelectorAll("[data-prod]").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.prod===p)});
+}
+
+/* ---------- events ---------- */
+$("#setl").addEventListener("input",function(){S.setl=digits(this.value);S.own=true;render()});
+$("#depR").addEventListener("input",function(){S.dep=+this.value;render()});
+$("#depI").addEventListener("input",function(){S.dep=digits(this.value);render()});
+$("#depI").addEventListener("blur",function(){this.value=money(S.dep)});
+$("#pq").addEventListener("input",function(){applyQuery(this.value);buildPick();render()});
+$("#pBud").addEventListener("input",function(){var v=digits(this.value);P.budget=v||null;P.fromQ.budget=false;buildPick()});
+$("#pDep").addEventListener("input",function(){S.dep=digits(this.value);P.fromQ.dep=false;buildPick();render()});
+$("#pDep").addEventListener("blur",function(){this.value=money(S.dep)});
+$("#pSort").addEventListener("change",function(){P.sort=this.value;buildPick()});
+["#eM","#eN","#eB"].forEach(function(id){$(id).addEventListener("input",estBox)});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closePick()});
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-tog],[data-yr],[data-prod],[data-pcar],[data-pb],[data-ptr],[data-pf],[data-pbud],[data-pprod],[data-eg],[data-drop],[data-fixdep],[data-fixcar],[data-fixcov],[data-fixhp],[data-pfit],[data-onlyfit],[data-human],[data-cap],[data-book],[data-bs],[data-bd],[data-bt],#pxGo,#openPick,#pickX,#pMore,#pClear,#estGo,#estUse,#scrim");
+  if(!t) return;
+  if(t.id==="openPick"){openPick();return}
+  if(t.id==="pickX"||t.id==="scrim"){closePick();return}
+  if(t.id==="pMore"){P.more=!P.more;buildPick();return}
+  if(t.hasAttribute("data-pfit")){P.fit=!P.fit;buildPick();return}
+  if(t.hasAttribute("data-onlyfit")){P.fit=true;openPick();return}
+  if(t.hasAttribute("data-book")){B.time=null;bookBox(true);
+    window.scrollTo({top:$("#cap").offsetTop-90,behavior:"smooth"});return}
+  if(t.dataset.bs!==undefined){B.site=+t.dataset.bs;bookBox(true);return}
+  if(t.dataset.bd!==undefined){B.day=+t.dataset.bd;bookBox(true);return}
+  if(t.dataset.bt!==undefined){B.time=t.dataset.bt;bookBox(true);return}
+  if(t.dataset.cap!==undefined){capBox(t.dataset.cap);
+    if(t.dataset.cap) window.scrollTo({top:$("#cap").offsetTop-90,behavior:"smooth"});return}
+  if(t.hasAttribute("data-human")){capBox("human");
+    window.scrollTo({top:$("#cap").offsetTop-90,behavior:"smooth"});return}
+  if(t.id==="estGo"){var e=$("#est");e.hidden=!e.hidden;if(!e.hidden)$("#eM").focus();return}
+  if(t.id==="estUse"){S.setl=+t.dataset.v;S.own=true;$("#est").hidden=true;render();
+    window.scrollTo({top:$("#eqBox").offsetTop-80,behavior:"smooth"});return}
+  if(t.id==="pClear"){
+    P.body=P.trans=P.fuel=""; P.budget=null; P.tokens=[]; P.fromQ={}; P.q=""; P.fit=false;
+    $("#pq").value=""; buildPick(); return}
+  if(t.dataset.pcar!==undefined&&t.dataset.pcar!==""){S.car=+t.dataset.pcar;closePick();render();return}
+  if(t.dataset.drop){var k=t.dataset.drop;
+    if(k==="dep"){S.dep=0;render()} else if(k==="budget"){P.budget=null} else {P[k]=""}
+    P.fromQ[k]=false; buildPick(); return}
+  if(t.dataset.pb!==undefined){P.body=t.dataset.pb;P.fromQ.body=false;buildPick();return}
+  if(t.dataset.ptr!==undefined){P.trans=t.dataset.ptr;P.fromQ.trans=false;buildPick();return}
+  if(t.dataset.pf!==undefined){P.fuel=t.dataset.pf;P.fromQ.fuel=false;buildPick();return}
+  if(t.dataset.pbud!==undefined){P.budget=t.dataset.pbud?+t.dataset.pbud:null;P.fromQ.budget=false;buildPick();return}
+  if(t.dataset.pprod){setProd(t.dataset.pprod);buildPick();render();return}
+  if(t.dataset.eg){$("#pq").value=t.dataset.eg;applyQuery(t.dataset.eg);buildPick();render();return}
+  if(t.dataset.prod){setProd(t.dataset.prod);render();return}
+  if(t.dataset.tog){var id=t.dataset.tog; S.cover[id]=S.cover[id]?0:(id==="g"?1:3); render(); return}
+  if(t.dataset.yr){S.cover[t.dataset.yr]=+t.dataset.y;render();return}
+  if(t.dataset.fixdep!==undefined){S.dep=Math.max(0,S.dep+(+t.dataset.fixdep));render();return}
+  if(t.dataset.fixcar!==undefined){S.car=+t.dataset.fixcar;render();return}
+  if(t.hasAttribute("data-fixcov")){S.cover={w:0,s:0,m:0,g:0};render();return}
+  if(t.hasAttribute("data-fixhp")){setProd("hp");render();return}
+  if(t.id==="pxGo"){
+    var r=$("#pxR").value.trim(), m=digits($("#pxM").value);
+    if(!r||!m) return;
+    S.px={r:r.toUpperCase(),v:Math.max(500,Math.round((11500-m/11)/50)*50)};
+    S.own=true; render();
+    window.scrollTo({top:$("#eqBox").offsetTop-80,behavior:"smooth"});
+    return;
+  }
+});
+
+render();
+})();
+</script>
+
+</body></html>

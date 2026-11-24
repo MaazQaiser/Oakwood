@@ -24,6 +24,7 @@ import {
 import { reservationCopy } from "@/lib/reservation/copy";
 import { reservationConfig } from "@/config/reservation";
 import { SOFT_SEARCH_DISCLAIMER } from "@/lib/eligibility/copy";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 import { deliverySections, howItWorksCopy, howItWorksSteps } from "@/lib/trust/content";
 import type {
   SupportComplaintCategory,
@@ -74,7 +75,8 @@ export const supportComplaintCategories: Array<{
   { value: "finance", label: "Finance" },
   { value: "reservation", label: "Reservation" },
   { value: "part-exchange", label: "Part exchange" },
-  { value: "aftersales", label: "Servicing, MOT or warranty" },
+  { value: "aftersales", label: "Servicing or MOT" },
+  { value: "warranty", label: "Warranty" },
   { value: "delivery", label: "Delivery or collection" },
   { value: "other", label: "Something else" },
 ];
@@ -92,6 +94,7 @@ export const supportFaqCategories: Array<{
   { value: "servicing", label: "Servicing" },
   { value: "mot", label: "MOT" },
   { value: "warranty", label: "Warranty" },
+  { value: "guarantee", label: "30 Day Guarantee" },
   { value: "journey", label: "Your journey" },
 ];
 
@@ -134,12 +137,12 @@ export const supportPathways: SupportPathway[] = [
   {
     href: routes.warranty,
     title: "Warranty",
-    body: "Available cars include a 12-month warranty.",
+    body: "Available cars include a 6-month warranty.",
   },
   {
-    href: routes.complaints,
-    title: "Complaints",
-    body: "Raise a complaint online or by phone.",
+    href: routes.problemWithYourCar,
+    title: "Problem with your car?",
+    body: "Raise a complaint, warranty claim or 30 day request online.",
   },
 ];
 
@@ -159,14 +162,14 @@ export const supportFaqs: SupportFaqItem[] = [
     "journey",
     "Do I need an account to check finance or send a message?",
     "No account is required to check finance eligibility or to send Oakwood a message.",
-    { href: getEligibilityUrl(), hrefLabel: "Check my eligibility" },
+    { href: getEligibilityUrl(), hrefLabel: "Check my rate" },
   ),
   faq(
     "eligibility-credit-score",
     "finance",
     "Does checking my eligibility affect my credit score?",
     `${SOFT_SEARCH_DISCLAIMER} A regulated finance application happens later, when you build a deal on a specific vehicle.`,
-    { href: getEligibilityUrl(), hrefLabel: "Check my eligibility" },
+    { href: getEligibilityUrl(), hrefLabel: "Check my rate" },
   ),
   ...financeHubFaqs.map((item, index) =>
     faq(
@@ -223,14 +226,14 @@ export const supportFaqs: SupportFaqItem[] = [
     "reservation-amount",
     "reservation",
     `How does the ${reservationAmount} reservation work?`,
-    `Pay ${reservationAmount} to hold the vehicle while you complete your purchase. ${reservationCopy.fullyRefundable}. ${reservationCopy.appliedToPurchase} The vehicle is held for ${holdPeriod}.`,
+    `We place a ${reservationAmount} card authorisation to hold the vehicle while you complete your purchase. ${reservationCopy.cardAuthorisation}. ${reservationCopy.appliedToPurchase} The vehicle is held for ${holdPeriod}.`,
     { href: routes.reserve, hrefLabel: "Reserve a car" },
   ),
   faq(
-    "reservation-refund",
+    "reservation-cancel",
     "reservation",
-    "Can I get a refund on a reservation?",
-    `${reservationCopy.payAbove} ${reservationCopy.requestRefund} The vehicle is released once the refund request is submitted.`,
+    "Can I cancel a reservation?",
+    `${reservationCopy.payAbove} ${reservationCopy.cancelReservation} ${reservationCopy.cancelSupporting}`,
   ),
   faq(
     "reservation-expired",
@@ -272,6 +275,12 @@ export const supportFaqs: SupportFaqItem[] = [
     faq(`warranty-${index + 1}`, "warranty", item.question, item.answer, {
       href: routes.warranty,
       hrefLabel: "Warranty",
+    }),
+  ),
+  ...guaranteeCopy.faqs.map((item) =>
+    faq(`guarantee-${item.id}`, "guarantee", item.question, item.answer, {
+      href: routes.thirtyDayGuarantee,
+      hrefLabel: "30 Day Guarantee",
     }),
   ),
 ];

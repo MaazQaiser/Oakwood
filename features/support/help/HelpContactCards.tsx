@@ -20,7 +20,7 @@ export function HelpContactCards() {
       aria-labelledby="help-contact-heading"
       className="scroll-mt-[calc(var(--oak-header-height)+1rem)] px-[var(--oak-page-x)] pb-16 lg:px-0 lg:pb-20"
     >
-      <div className="mx-auto w-full max-w-[var(--oak-width-wide)] lg:px-[var(--oak-page-x)] max-[480px]:max-w-[350px]">
+      <div className="mx-auto w-full max-w-[var(--oak-width-wide)] lg:px-[var(--oak-page-x)]">
         <div className="rounded-[32px] bg-[#ECF3F8] p-6 sm:p-8 lg:p-10">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -101,8 +101,11 @@ export function HelpContactCards() {
 
           <p className="mt-6 text-sm text-secondary">
             Unhappy with something?{" "}
-            <a href={routes.complaints} className="font-semibold text-primary">
-              Raise a complaint
+            <a
+              href={routes.problemWithYourCar}
+              className="font-semibold text-primary"
+            >
+              Problem with your car?
             </a>{" "}
             online or by phone.
           </p>

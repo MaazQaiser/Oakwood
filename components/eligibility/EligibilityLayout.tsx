@@ -107,7 +107,7 @@ export function EligibilityLayout({
       >
         <div
           className={cn(
-            "mx-auto flex w-full max-w-[32rem] flex-1 flex-col",
+            "mx-auto flex w-full max-w-[32rem] max-md:max-w-[var(--oak-width-content)] flex-1 flex-col",
             pinFooter && "min-h-0",
           )}
         >

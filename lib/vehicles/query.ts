@@ -1,4 +1,5 @@
 import { mockVehicles } from "@/lib/mock/data";
+import { isReservedUsedCarsMakeSlug } from "@/lib/vehicles/reserved-segments";
 import { getVehicleBySlug, getVehicleByStockId } from "@/lib/vehicles/slug";
 import type { Vehicle, VehicleCategory } from "@/types/vehicle";
 
@@ -23,7 +24,7 @@ export function listMakes(category: VehicleCategory): string[] {
     new Set(
       listVehicles(category).map((vehicle) => vehicle.makeSlug),
     ),
-  );
+  ).filter((slug) => category !== "car" || !isReservedUsedCarsMakeSlug(slug));
 }
 
 export function listModels(category: VehicleCategory, makeSlug: string): string[] {

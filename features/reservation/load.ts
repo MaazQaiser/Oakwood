@@ -43,9 +43,8 @@ export interface ReservationPageModel {
   amount: number;
   currency: string;
   holdDurationDays: number;
-  refundWindowDays: number;
-  refundable: boolean;
   appliedToPurchase: boolean;
+  captureMode: typeof reservationConfig.captureMode;
   dealSnapshot?: ReservationDealSnapshot;
   dealChanged?: boolean;
   existingReservationStockId?: string;
@@ -54,7 +53,6 @@ export interface ReservationPageModel {
   reservedAtIso?: string;
   expiresAtIso?: string;
   emailMasked?: string;
-  refundRequestedAtIso?: string;
   financeAllRoutesUnavailable?: boolean;
   reconciliationRequired: boolean;
   paymentFailed: boolean;
@@ -89,6 +87,8 @@ function toVehicleSummary(vehicle: Vehicle): DealVehicleSummary {
     imageSrc: image?.src ?? "/images/vehicle-placeholder.svg",
     imageAlt: image?.alt ?? `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
     availability: vehicle.availability,
+    guaranteeEligible: vehicle.guaranteeEligible,
+    saleType: vehicle.saleType,
   };
 }
 
@@ -169,9 +169,8 @@ function emptyModel(_stockId: string, vehicle?: Vehicle): ReservationPageModel {
     amount: reservationConfig.amount,
     currency: reservationConfig.currency,
     holdDurationDays: reservationConfig.holdDurationDays,
-    refundWindowDays: reservationConfig.refundWindowDays,
-    refundable: reservationConfig.refundable,
     appliedToPurchase: reservationConfig.appliedToPurchase,
+    captureMode: reservationConfig.captureMode,
     reconciliationRequired: false,
     paymentFailed: false,
     confirming: false,
@@ -208,9 +207,8 @@ function toPageModel(
     amount: record.amount,
     currency: record.currency,
     holdDurationDays: record.holdDurationDays,
-    refundWindowDays: reservationConfig.refundWindowDays,
-    refundable: reservationConfig.refundable,
     appliedToPurchase: reservationConfig.appliedToPurchase,
+    captureMode: reservationConfig.captureMode,
     dealSnapshot: record.dealSnapshot,
     dealChanged: vehicle ? dealHasChanged(record.dealSnapshot, vehicle) : false,
     reference: record.reference,
@@ -218,7 +216,6 @@ function toPageModel(
     reservedAtIso: record.reservedAtIso,
     expiresAtIso: record.expiresAtIso,
     emailMasked: maskEmail(record.email),
-    refundRequestedAtIso: record.refund?.requestedAtIso,
     financeAllRoutesUnavailable: record.financeAllRoutesUnavailable,
     reconciliationRequired: status.reconciliationRequired,
     paymentFailed: status.paymentFailed,
@@ -264,9 +261,7 @@ function applyVehicleSold(
   }
   const next = patchReservation(record.id, {
     stockState: "sold",
-    paymentState: reservationConfig.sameDayRefundOnVehicleUnavailable
-      ? "refunded"
-      : "refund_pending",
+    paymentState: "released",
   });
   if (next) {
     releaseStock(record.vehicleStockId, record.id);
@@ -285,19 +280,16 @@ async function applyFinanceUnavailable(
   if (
     !eligibility ||
     isSessionExpired(eligibility) ||
-    eligibility.outcome !== "alternative" ||
-    !reservationConfig.sameDayRefundOnFinanceUnavailable
+    eligibility.outcome !== "alternative"
   ) {
     return record;
   }
-  if (reservationConfig.releaseStockOnRefundRequest) {
-    releaseStock(record.vehicleStockId, record.id);
-  }
+  releaseStock(record.vehicleStockId, record.id);
   return (
     patchReservation(record.id, {
       financeAllRoutesUnavailable: true,
-      stockState: "refund_requested",
-      paymentState: "refunded",
+      stockState: "expired",
+      paymentState: "released",
     }) ?? record
   );
 }

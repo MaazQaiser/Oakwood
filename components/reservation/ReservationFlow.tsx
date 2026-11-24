@@ -5,8 +5,6 @@ import { ReservationPayment } from "@/components/reservation/ReservationPayment"
 import { ReservationConfirmation } from "@/components/reservation/ReservationConfirmation";
 import { PaymentError } from "@/components/reservation/PaymentError";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
-import { RefundRequest } from "@/components/reservation/RefundRequest";
-import { RefundConfirmation } from "@/components/reservation/RefundConfirmation";
 import { ReservationVehicleSummary } from "@/components/reservation/ReservationVehicleSummary";
 import { ReservationDealSummary } from "@/components/reservation/ReservationDealSummary";
 import { ReservationTerms } from "@/components/reservation/ReservationTerms";
@@ -76,8 +74,8 @@ function ReservationPin({ model }: { model: ReservationPageModel }) {
         </div>
       ) : null}
       <p className="mt-3 text-caption text-white/70">
-        Refundable · held for {formatHoldPeriod(model.holdDurationDays)} after
-        payment is confirmed
+        Card authorisation · held for {formatHoldPeriod(model.holdDurationDays)}{" "}
+        after payment is confirmed
       </p>
     </div>
   );
@@ -189,26 +187,11 @@ function ReservationFlowBody({
     );
   }
 
-  if (step === "refund") {
-    const showForm = model.phase === "RESERVED";
-    return (
-      <Section>
-        <Container width="narrow">
-          {showForm ? (
-            <RefundRequest model={model} />
-          ) : (
-            <RefundConfirmation model={model} />
-          )}
-        </Container>
-      </Section>
-    );
-  }
-
   return (
     <Section>
       <Container width="wide">
         <ReservationIntro model={model} />
-        <p className="sr-only">{reservationCopy.fullyRefundable}</p>
+        <p className="sr-only">{reservationCopy.cardAuthorisation}</p>
         <p className="sr-only">{payBelowCopy(model.holdDurationDays)}</p>
       </Container>
     </Section>

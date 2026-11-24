@@ -75,7 +75,7 @@ export function MonthlyPayment({
     return (
       <div>
         <p className="text-caption text-muted">Monthly payment</p>
-        <p className="mt-1 text-h3 text-muted">Check my eligibility</p>
+        <p className="mt-1 text-h3 text-muted">Check my rate</p>
       </div>
     );
   }

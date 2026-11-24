@@ -19,6 +19,8 @@ import {
   supportRoutes,
 } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
 import { heldForCopy, reservationCopy } from "@/lib/reservation/copy";
 import {
   formatReservationDate,
@@ -37,7 +39,6 @@ function mergeStatus(
     reference: status.reference,
     reservedAtIso: status.reservedAtIso,
     expiresAtIso: status.expiresAtIso,
-    refundRequestedAtIso: status.refundRequestedAtIso,
     financeAllRoutesUnavailable: status.financeAllRoutesUnavailable,
     reconciliationRequired: status.reconciliationRequired,
     paymentFailed: status.paymentFailed,
@@ -146,6 +147,9 @@ export function ReservationConfirmation({
           </Link>
           .
         </p>
+        <p className="mt-3 text-body-sm text-muted">
+          {reservationCopy.guaranteeEmailSnippet}
+        </p>
       </header>
       <ReservationVehicleSummary
         vehicle={vehicle}
@@ -191,6 +195,17 @@ export function ReservationConfirmation({
             Confirmation sent to {current.emailMasked}
           </p>
         ) : null}
+        {isVehicleGuaranteeEligible(vehicle) ? (
+          <p className="mt-4 text-body-sm text-secondary">
+            {guaranteeCopy.confirmationEmail}{" "}
+            <Link
+              href={routes.thirtyDayGuaranteeRequest}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Guarantee request form
+            </Link>
+          </p>
+        ) : null}
       </section>
       <section aria-labelledby="next-steps-heading">
         <h2 id="next-steps-heading" className="text-h3">
@@ -222,10 +237,7 @@ export function ReservationConfirmation({
           Continue your purchase
         </Button>
         <Button href={getReserveUrl(vehicle.stockId, "manage")} variant="secondary">
-          View my reservation
-        </Button>
-        <Button href={getReserveUrl(vehicle.stockId, "refund")} variant="secondary">
-          Request a deposit refund
+          View or cancel reservation
         </Button>
         <Button
           href={supportRoutes.bookingEnquiry}

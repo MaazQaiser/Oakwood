@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { Suspense } from "react";
+import { DeliveryMoveCarBanner } from "@/components/trust/DeliveryMoveCarBanner";
 import { AftersalesHero } from "@/components/aftersales/AftersalesHero";
 import { LocationCard } from "@/components/locations/LocationCard";
 import { LocationRelatedLinks } from "@/components/locations/LocationRelatedLinks";
@@ -109,7 +111,7 @@ export function AboutPage() {
       <TrustViewTracker page="about" />
       <TrustHero
         copy={aboutCopy}
-        primary={{ href: getEligibilityUrl(), label: "Check my eligibility" }}
+        primary={{ href: getEligibilityUrl(), label: "Check my rate" }}
         secondary={{ href: routes.usedCars, label: "Browse cars" }}
       />
       <Section>
@@ -172,7 +174,7 @@ export function AboutPage() {
                 />
                 <TrustSignal
                   title="Warranty"
-                  copy="Available cars include a 12-month warranty."
+                  copy="Available cars include a 6-month warranty."
                   href={routes.warranty}
                 />
               </Grid>
@@ -210,7 +212,7 @@ export function HowItWorksPage() {
       <TrustViewTracker page="how-it-works" />
       <TrustHero
         copy={howItWorksCopy}
-        primary={{ href: getEligibilityUrl(), label: "Check my eligibility" }}
+        primary={{ href: getEligibilityUrl(), label: "Check my rate" }}
         secondary={{ href: routes.usedCars, label: "Browse cars" }}
       />
       <Section>
@@ -238,7 +240,7 @@ export function WhatToExpectPage() {
       <TrustViewTracker page="what-to-expect" />
       <TrustHero
         copy={whatToExpectCopy}
-        primary={{ href: getEligibilityUrl(), label: "Check my eligibility" }}
+        primary={{ href: getEligibilityUrl(), label: "Check my rate" }}
         secondary={{ href: routes.usedCars, label: "Browse cars" }}
       />
       <Section>
@@ -267,7 +269,7 @@ export function ReviewsPageView() {
       <TrustHero
         copy={reviewsCopy}
         primary={{ href: routes.locations, label: "Our locations" }}
-        secondary={{ href: getEligibilityUrl(), label: "Check my eligibility" }}
+        secondary={{ href: getEligibilityUrl(), label: "Check my rate" }}
       />
       <Section>
         <Container>
@@ -355,6 +357,9 @@ export function DeliveryPage() {
       />
       <Section>
         <Container>
+          <Suspense fallback={null}>
+            <DeliveryMoveCarBanner />
+          </Suspense>
           <ContentSections sections={deliverySections} />
           <div className="mt-8">
             <Alert title="Delivery charges" tone="info">

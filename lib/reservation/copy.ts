@@ -2,9 +2,10 @@ import {
   formatHoldPeriod,
   reservationAmountLabel,
 } from "@/lib/reservation/format";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 
 export function introSupportingCopy(amount: number): string {
-  return `Pay ${reservationAmountLabel(amount)} to hold this vehicle while you complete your purchase.`;
+  return `We place a ${reservationAmountLabel(amount)} card authorisation to hold this vehicle while you complete your purchase. The money is not taken.`;
 }
 
 export function heldForCopy(days: number): string {
@@ -12,32 +13,33 @@ export function heldForCopy(days: number): string {
 }
 
 export function payHeadingCopy(amount: number): string {
-  return `Pay ${reservationAmountLabel(amount)} to reserve`;
+  return `Authorise ${reservationAmountLabel(amount)} to reserve`;
 }
 
 export function payBelowCopy(days: number): string {
-  return `Your reservation will hold this vehicle for ${formatHoldPeriod(days)} and the reservation amount will be applied to your purchase.`;
+  return `We place a card authorisation for the reservation amount. It is not charged unless you complete your purchase. The vehicle is held for ${formatHoldPeriod(days)}.`;
 }
 
 export function howItWorksSteps(amount: number, days: number): string[] {
   return [
-    `Pay ${reservationAmountLabel(amount)}`,
+    `We authorise ${reservationAmountLabel(amount)} on your card (not charged)`,
     `We hold the vehicle for ${formatHoldPeriod(days)}`,
-    "Your reservation is applied to the purchase",
-    "You can request a refund",
-    "If the vehicle becomes unavailable, your reservation is refunded",
+    "The reservation is applied to your purchase if you go ahead",
+    "Cancel your reservation any time from the manage page — we release the authorisation",
+    "If the vehicle becomes unavailable, we release the authorisation",
   ];
 }
 
 export const reservationCopy = {
   entryHeading: "Reserve a car",
-  entryBody: `Reservations start from a car. Pay ${reservationAmountLabel()} to hold a vehicle while you complete the purchase.`,
+  entryBody: `Reservations start from a car. Authorise ${reservationAmountLabel()} on your card to hold a vehicle while you complete the purchase. The money is not taken.`,
   introHeading: "Reserve this car",
-  fullyRefundable: "Fully refundable",
-  appliedToPurchase: "Your reservation is applied to the purchase price.",
-  requestRefund: "Request a refund if you change your mind.",
-  amountPayableToday: "Amount payable today",
-  payAbove: "Your reservation is fully refundable.",
+  cardAuthorisation: "Card authorisation only — not charged",
+  appliedToPurchase: "Your reservation is applied to the purchase price if you proceed.",
+  cancelReservation: "Cancel your reservation any time from the manage page.",
+  amountPayableToday: "Authorisation today",
+  payAbove:
+    "We only place a card authorisation. The reservation amount is not taken unless you complete the purchase.",
   processing: "Processing your reservation...",
   confirming: "Confirming your reservation...",
   successHeading: "Your car is reserved.",
@@ -45,38 +47,45 @@ export const reservationCopy = {
   notReserved: "Your vehicle has not been reserved.",
   paymentFailedHeading: "We couldn't process your payment.",
   stripeUnavailable:
-    "We couldn't take payment just now. Your car has not been reserved. You can try again.",
+    "We couldn't complete the card authorisation just now. Your car has not been reserved. You can try again.",
   paymentReassurance:
-    "Fully refundable. After payment is confirmed, the car is held for the reservation period under the reservation terms.",
+    "Card authorisation only. After it is confirmed, the car is held for the reservation period under the reservation terms.",
   cardFallback:
     "Card details are entered in Stripe. Oakwood does not store your card number.",
   concurrent:
     "Sorry, this vehicle has just been reserved by another customer.",
   reconciliation:
-    "We've received your payment, but couldn't complete the reservation.",
+    "We've received your authorisation, but couldn't complete the reservation.",
   reconciliationSupport:
-    "Your payment is being reviewed and we'll make sure this is resolved.",
+    "Your authorisation is being reviewed and we'll make sure this is resolved.",
   expiredHeading: "This reservation has expired.",
-  expiredSupporting: "The vehicle is available again.",
+  expiredSupporting:
+    "The vehicle is available again. We have released the card authorisation.",
+  cancelledHeading: "Your reservation has been cancelled.",
+  cancelledSupporting:
+    "The vehicle is available again. We have released the card authorisation.",
   soldHeading: "This vehicle is no longer available.",
-  soldSupporting: "Your reservation will be refunded.",
+  soldSupporting:
+    "We have released the card authorisation. Nothing was charged.",
   financeUnavailableHeading:
     "We couldn't find a finance option for this vehicle.",
-  financeUnavailableSupporting: "Your reservation will be refunded.",
-  refundHeading: "Request your reservation refund?",
-  refundSupporting:
-    "Your vehicle will be released once the refund request is submitted.",
+  financeUnavailableSupporting:
+    "We have released the card authorisation. Nothing was charged.",
+  cancelHeading: "Cancel your reservation?",
+  cancelSupporting:
+    "We'll release the card authorisation and make the vehicle available again.",
   intercept:
     "Before you go, would you like to speak to the Oakwood team?",
-  continueRefund: "Continue with refund",
-  refundSubmitted: "Your refund request has been submitted.",
-  refundReceived: "We've received your request.",
-  alreadyRefundRequested: "We've already received your refund request.",
+  continueCancel: "Cancel reservation",
+  cancelSubmitted: "Your reservation has been cancelled.",
+  cancelReceived: "We've released the card authorisation.",
+  alreadyCancelled: "This reservation has already been cancelled.",
   dealChanged:
     "Your deal has changed. Return to Deal Builder to review it before reserving.",
   termsUnpublished:
     "A dedicated reservation-terms page is not yet published. The summary on this page is the customer-facing explanation until that URL is confirmed.",
   confirmingTimeout:
-    "This is taking longer than usual. We have received your payment request and will confirm by email.",
+    "This is taking longer than usual. We have received your authorisation request and will confirm by email.",
   lookupMissing: "Enter your email and reservation reference to view it.",
+  guaranteeEmailSnippet: guaranteeCopy.confirmationEmail,
 } as const;

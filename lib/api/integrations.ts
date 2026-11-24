@@ -19,13 +19,29 @@ export const financeProviderIntegration: IntegrationBoundary = {
 export const autoconvertIntegration: IntegrationBoundary = {
   name: "autoconvert",
   implemented: false,
-  purpose: "Eligibility journey routing.",
+  purpose:
+    "Eligibility journey routing. Interest free applications must be flagged as the 0% product so they are never proposed at a standard rate.",
 };
 
 export const eskimoIntegration: IntegrationBoundary = {
   name: "eskimo",
   implemented: false,
-  purpose: "CRM lead and customer record payload.",
+  purpose:
+    "CRM lead and customer record payload. Interest free hard-search acknowledgements are stored with a timestamp against the lead.",
+};
+
+export const guaranteeEskimoIntegration: IntegrationBoundary = {
+  name: "eskimo-guarantee",
+  implemented: false,
+  purpose:
+    "Guarantee return reason codes, return rate by car and salesperson, and aftersales alerts.",
+};
+
+export const guaranteeLenderIntegration: IntegrationBoundary = {
+  name: "guarantee-lender-settlement",
+  implemented: false,
+  purpose:
+    "Day 15 to 30 finance agreement settlement, commission clawback, and exchange handoff.",
 };
 
 export const vAutoStockIntegration: IntegrationBoundary = {

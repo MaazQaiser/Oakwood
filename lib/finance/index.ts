@@ -8,3 +8,8 @@ export {
   getRepresentativeFinanceExample,
   getZeroPercentLabel,
 } from "./representative-example";
+export {
+  FINANCE_RATE_CTA,
+  getFinanceRateCtaSupportingLine,
+  getFinanceRateReturnedHeading,
+} from "./rate-cta";

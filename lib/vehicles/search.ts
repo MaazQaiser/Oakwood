@@ -12,6 +12,7 @@ import {
   getModelName,
 } from "@/lib/vehicles/labels";
 import { interpretNaturalLanguage } from "@/lib/vehicles/natural-language";
+import { hasVehiclePriceDrop } from "@/lib/vehicles/browse-segments";
 import { listVehicles } from "@/lib/vehicles/query";
 import type { Vehicle, VehicleCategory } from "@/types/vehicle";
 
@@ -141,9 +142,14 @@ export function filterVehicles(
   const colours = splitFilterValues(query.colour);
   const affordable = query.affordable === "1";
   const zeroRoadTax = query.road_tax === "0";
+  const priceDropsOnly = query.price_drops === "1";
 
   return vehicles.filter((vehicle) => {
-    if (vehicle.availability === "sold" || vehicle.availability === "expired") {
+    if (
+      vehicle.availability === "sold" ||
+      vehicle.availability === "expired" ||
+      vehicle.availability === "reserved"
+    ) {
       return false;
     }
     if (query.make && vehicle.makeSlug !== query.make.toLowerCase()) {
@@ -222,6 +228,9 @@ export function filterVehicles(
     ) {
       return false;
     }
+    if (priceDropsOnly && !hasVehiclePriceDrop(vehicle)) {
+      return false;
+    }
     return true;
   });
 }
@@ -252,6 +261,20 @@ export function sortVehicles(
         return a.cashPrice - b.cashPrice;
       case "price_desc":
         return b.cashPrice - a.cashPrice;
+      case "price_drop": {
+        const aDrop = hasVehiclePriceDrop(a)
+          ? (a.previousPrice ?? a.cashPrice) - a.cashPrice
+          : 0;
+        const bDrop = hasVehiclePriceDrop(b)
+          ? (b.previousPrice ?? b.cashPrice) - b.cashPrice
+          : 0;
+        if (bDrop !== aDrop) {
+          return bDrop - aDrop;
+        }
+        const aDropped = a.priceDroppedAt ?? "";
+        const bDropped = b.priceDroppedAt ?? "";
+        return bDropped.localeCompare(aDropped);
+      }
       case "mileage":
         return a.mileage - b.mileage;
       case "newest":

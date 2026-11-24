@@ -31,7 +31,7 @@ export function CalculatorEducation() {
             <p className="mt-2 text-body-sm text-muted">
               {CALCULATOR_ELIGIBILITY_EXPLAIN}{" "}
               <Link href={getEligibilityUrl()} className="text-primary">
-                Check my eligibility
+                Check my rate
               </Link>
             </p>
           </Card>

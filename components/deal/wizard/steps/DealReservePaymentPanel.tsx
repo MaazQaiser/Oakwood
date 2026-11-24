@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { Lock } from "lucide-react";
 import { Checkbox, Field, Input } from "@/components/forms/FormControls";
+import { GuaranteeTermsCheckbox } from "@/components/guarantee/GuaranteeTermsCheckbox";
 import { Alert } from "@/components/ui/Alert";
 import { useDealBuilder } from "@/components/deal/DealBuilderProvider";
 import { DealResultHero } from "@/components/deal/wizard/DealResultHero";
@@ -62,6 +63,8 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [simulateFail, setSimulateFail] = useState(false);
+  const [guaranteeTermsAccepted, setGuaranteeTermsAccepted] = useState(false);
+  const [guaranteeTermsError, setGuaranteeTermsError] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
   const amountLabel = reservationAmountLabel(reservationConfig.amount);
@@ -112,6 +115,14 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
 
   function runMockPayment(source: "card" | "apple" | "google") {
     if (phase === "loading") return;
+
+    if (!guaranteeTermsAccepted) {
+      setGuaranteeTermsError(
+        "Read and accept the 30 Day Guarantee terms to continue.",
+      );
+      return;
+    }
+    setGuaranteeTermsError("");
 
     if (source === "card") {
       const found = validateCard();
@@ -352,6 +363,16 @@ export function DealReservePaymentPanel({ onBack }: { onBack: () => void }) {
                 />
               </Field>
             </div>
+            <GuaranteeTermsCheckbox
+              checked={guaranteeTermsAccepted}
+              error={guaranteeTermsError}
+              onChange={(checked) => {
+                setGuaranteeTermsAccepted(checked);
+                if (checked) {
+                  setGuaranteeTermsError("");
+                }
+              }}
+            />
             <Checkbox
               id={failId}
               checked={simulateFail}

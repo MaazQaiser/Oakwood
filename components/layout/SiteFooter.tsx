@@ -45,7 +45,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
           {groups.map((group) => (
             <div key={group.id} className="min-w-0">
               <h2 className="text-label text-ink">{group.label}</h2>
@@ -53,9 +53,20 @@ export function SiteFooter() {
                 {visibleItems(group.children).map((item) =>
                   item.href ? (
                     <li key={item.id}>
-                      <Link href={item.href} className={linkClass}>
-                        {item.label}
-                      </Link>
+                      {item.external ? (
+                        <a
+                          href={item.href}
+                          className={linkClass}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link href={item.href} className={linkClass}>
+                          {item.label}
+                        </Link>
+                      )}
                     </li>
                   ) : null,
                 )}

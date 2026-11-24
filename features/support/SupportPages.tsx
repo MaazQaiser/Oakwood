@@ -158,11 +158,14 @@ export function SupportContactPage({
         links={[
           { href: routes.help, label: "Help and support" },
           { href: routes.locations, label: "Locations" },
-          { href: routes.aftersales, label: "Aftersales" },
+          { href: routes.service, label: "Servicing" },
           { href: routes.finance, label: "Car finance" },
           { href: getUsedCarsUrl(), label: "Used cars" },
           { href: routes.howItWorks, label: "Buying a car" },
-          { href: routes.complaints, label: "Complaints" },
+          {
+            href: routes.problemWithYourCar,
+            label: "Problem with your car?",
+          },
         ]}
       />
       <SupportStickyCta
@@ -193,14 +196,14 @@ export function SupportFaqPage() {
         links={[
           { href: routes.contact, label: "Contact Oakwood" },
           { href: routes.finance, label: "Car finance" },
-          { href: getEligibilityUrl(), label: "Check my eligibility" },
+          { href: getEligibilityUrl(), label: "Check my rate" },
           { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
           { href: getFinanceIntentUrl("hp"), label: "How HP works" },
           { href: getFinanceIntentUrl("pcp"), label: "How PCP works" },
           { href: getFinanceIntentUrl("bad-credit"), label: "Bad credit finance" },
           { href: getUsedCarsUrl(), label: "Used cars" },
           { href: routes.partExchange, label: "Part exchange" },
-          { href: routes.aftersales, label: "Aftersales" },
+          { href: routes.service, label: "Servicing" },
         ]}
       />
       <SupportStickyCta href={routes.contact} label="Contact Oakwood" telephone={telephone} />
@@ -209,7 +212,7 @@ export function SupportFaqPage() {
 }
 
 export function SupportComplaintsPage({
-  canonicalPath = routes.complaints,
+  canonicalPath = routes.problemWithYourCar,
 }: {
   canonicalPath?: string;
 }) {
@@ -219,7 +222,7 @@ export function SupportComplaintsPage({
     <PageShell
       breadcrumbs={createBreadcrumbs([
         { label: "Home", href: routes.home },
-        { label: "Complaints", href: routes.complaints },
+        { label: "Problem with your car?", href: routes.problemWithYourCar },
       ])}
     >
       <SupportViewTracker page="complaint" />

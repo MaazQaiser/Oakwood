@@ -11,7 +11,12 @@ import { FinanceIntentViewTracker } from "@/features/finance/intent/components/F
 import { FinanceRelatedLinks } from "@/features/finance/intent/components/FinanceRelatedLinks";
 import { FinanceStep } from "@/features/finance/intent/components/FinanceStep";
 import { hpPcpComparison } from "@/lib/finance/intent/content";
-import { FINANCE_INTENT_ELIGIBILITY_SUPPORTING } from "@/lib/finance/intent/copy";
+import {
+  FINANCE_INTENT_ELIGIBILITY_SUPPORTING,
+  OAKWOOD_OWN_COPY_REVIEW_NOTICE,
+} from "@/lib/finance/intent/copy";
+import { showPreviewNotices } from "@/lib/env/preview";
+import { Alert } from "@/components/ui/Alert";
 import { createFaqJsonLd } from "@/lib/seo/json-ld";
 import { createBreadcrumbs } from "@/lib/seo";
 import type { FinanceIntentPageContent } from "@/types/finance-intent";
@@ -51,6 +56,15 @@ export function FinanceIntentPage({
         secondary={content.secondaryCta}
         breadcrumbs={breadcrumbs}
       />
+      {showPreviewNotices() && content.oakwoodOwnCopyReview ? (
+        <section className="bg-page-canvas pb-4">
+          <div className="mx-auto w-full max-w-3xl px-[var(--oak-page-x)]">
+            <Alert title="Oakwood copy review pending" tone="warning">
+              {OAKWOOD_OWN_COPY_REVIEW_NOTICE}
+            </Alert>
+          </div>
+        </section>
+      ) : null}
       <FinanceExplainer block={content.whatThisMeans} headingId="what-this-means" />
       <FinanceExplainer block={content.howOakwoodHelps} headingId="how-oakwood-helps" />
       <FinanceExplainer block={content.eligibility} headingId="eligibility" />
@@ -76,7 +90,7 @@ export function FinanceIntentPage({
         links={[
           ...content.related,
           { href: routes.finance, label: "Car finance" },
-          { href: getEligibilityUrl(), label: "Check my eligibility" },
+          { href: getEligibilityUrl(), label: "Check my rate" },
           { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
           { href: getUsedCarsUrl(), label: "Used cars" },
           { href: getUsedVansUrl(), label: "Used vans" },

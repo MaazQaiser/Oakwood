@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { Field, Input } from "@/components/forms/FormControls";
+import { GuaranteeTermsCheckbox } from "@/components/guarantee/GuaranteeTermsCheckbox";
 import { StripePaymentElement } from "@/components/reservation/StripePaymentElement";
 import { ReservationProcessing } from "@/components/reservation/ReservationProcessing";
 import { submitReservationPaymentAction } from "@/features/reservation/actions";
 import { routes, getDealUrl, getReserveUrl, supportRoutes } from "@/config/routes";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import { emailError, telephoneError } from "@/lib/aftersales/validation";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
 import {
   payBelowCopy,
   payHeadingCopy,
@@ -36,6 +38,8 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
   const [emailMessage, setEmailMessage] = useState<string>();
   const [phoneMessage, setPhoneMessage] = useState<string>();
   const [error, setError] = useState<string | null>(null);
+  const [guaranteeTermsAccepted, setGuaranteeTermsAccepted] = useState(false);
+  const [guaranteeTermsError, setGuaranteeTermsError] = useState("");
   const [submitting, startTransition] = useTransition();
   const [processing, setProcessing] = useState(false);
   const vehicle = model.vehicle;
@@ -47,6 +51,7 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
 
   const stockId = vehicle.stockId;
   const busy = submitting || processing;
+  const showGuaranteeTick = isVehicleGuaranteeEligible(vehicle);
 
   function contactReady() {
     const nextName = name.trim().length < 2 ? "Enter your name." : undefined;
@@ -63,59 +68,77 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
       return;
     }
     setError(null);
+    if (showGuaranteeTick && !guaranteeTermsAccepted) {
+      setGuaranteeTermsError(
+        "Confirm you have read the 30 Day Guarantee terms.",
+      );
+      return;
+    }
+    setGuaranteeTermsError("");
     if (!contactReady()) {
       return;
     }
     trackEvent(analyticsEvents.reservationPaymentSubmitted, { stockId });
     setProcessing(true);
     startTransition(() => {
-      void submitReservationPaymentAction({ email, name, telephone }).then(
-        (result) => {
-          setProcessing(false);
-          if (!result.ok) {
-            if (result.reason === "conflict") {
-              trackEvent(analyticsEvents.reservationConcurrentConflict, {
-                stockId,
-              });
-              setError(reservationCopy.concurrent);
-              return;
-            }
-            if (result.reason === "unavailable") {
-              setError(reservationCopy.soldHeading);
-              return;
-            }
-            if (result.reason === "invalid_email") {
-              setEmailMessage("Enter a valid email address.");
-              return;
-            }
-            if (result.reason === "invalid_contact") {
-              setError("Enter your name and a phone number.");
-              return;
-            }
-            if (result.reason === "stripe_unavailable") {
-              trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
-              setError(reservationCopy.stripeUnavailable);
-              return;
-            }
+      void submitReservationPaymentAction({
+        email,
+        name,
+        telephone,
+        guaranteeTermsAccepted: showGuaranteeTick
+          ? guaranteeTermsAccepted
+          : undefined,
+      }).then((result) => {
+        setProcessing(false);
+        if (!result.ok) {
+          if (result.reason === "conflict") {
+            trackEvent(analyticsEvents.reservationConcurrentConflict, {
+              stockId,
+            });
+            setError(reservationCopy.concurrent);
+            return;
+          }
+          if (result.reason === "unavailable") {
+            setError(reservationCopy.soldHeading);
+            return;
+          }
+          if (result.reason === "invalid_email") {
+            setEmailMessage("Enter a valid email address.");
+            return;
+          }
+          if (result.reason === "invalid_contact") {
+            setError("Enter your name and a phone number.");
+            return;
+          }
+          if (result.reason === "guarantee_terms") {
+            setGuaranteeTermsError(
+              "Confirm you have read the 30 Day Guarantee terms.",
+            );
+            return;
+          }
+          if (result.reason === "stripe_unavailable") {
+            trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
             setError(reservationCopy.stripeUnavailable);
             return;
           }
-          if (
-            result.status.phase === "RESERVED" &&
-            result.status.paymentState === "paid"
-          ) {
-            trackEvent(analyticsEvents.reservationPaymentSucceeded, { stockId });
-            router.push(getReserveUrl(stockId, "success"));
-            return;
-          }
-          if (result.status.paymentFailed) {
-            trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
-            router.push(getReserveUrl(stockId, "failed"));
-            return;
-          }
-          setError(reservationCopy.notReserved);
-        },
-      );
+          setError(reservationCopy.stripeUnavailable);
+          return;
+        }
+        if (
+          result.status.phase === "RESERVED" &&
+          result.status.paymentState === "paid"
+        ) {
+          trackEvent(analyticsEvents.reservationPaymentSucceeded, { stockId });
+          router.push(getReserveUrl(stockId, "success"));
+          return;
+        }
+        if (result.status.paymentFailed) {
+          trackEvent(analyticsEvents.reservationPaymentFailed, { stockId });
+          router.push(getReserveUrl(stockId, "failed"));
+          return;
+        }
+        setError(reservationCopy.notReserved);
+      });
     });
   }
 
@@ -138,7 +161,7 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
         </div>
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Reservation</dt>
-          <dd>{amountLabel} · refundable</dd>
+          <dd>{amountLabel} · authorisation only</dd>
         </div>
         <div className="flex justify-between gap-4 border-t border-border pt-2">
           <dt className="text-label">{reservationCopy.amountPayableToday}</dt>
@@ -191,6 +214,20 @@ export function ReservationPayment({ model }: { model: ReservationPageModel }) {
           />
         </Field>
       </div>
+
+      {showGuaranteeTick ? (
+        <GuaranteeTermsCheckbox
+          className="mt-6"
+          checked={guaranteeTermsAccepted}
+          error={guaranteeTermsError}
+          onChange={(checked) => {
+            setGuaranteeTermsAccepted(checked);
+            if (checked) {
+              setGuaranteeTermsError("");
+            }
+          }}
+        />
+      ) : null}
 
       <div className="mt-6">
         <StripePaymentElement

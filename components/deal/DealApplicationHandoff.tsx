@@ -131,7 +131,7 @@ export function DealApplicationHandoff({ model }: { model: DealPageModel }) {
               Start regulated application
             </Button>
           ) : !model.finance.hasProfile ? (
-            <Button href={getEligibilityUrl()}>Check my eligibility</Button>
+            <Button href={getEligibilityUrl()}>Check my rate</Button>
           ) : (
             <Button href={getDealUrl(model.dealId)}>Return to deal</Button>
           )}

@@ -42,6 +42,8 @@ function toVehicleSummary(vehicle: Vehicle): DealVehicleSummary {
     imageSrc: image?.src ?? "/images/vehicle-placeholder.svg",
     imageAlt: image?.alt ?? `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
     availability: vehicle.availability,
+    guaranteeEligible: vehicle.guaranteeEligible,
+    saleType: vehicle.saleType,
   };
 }
 

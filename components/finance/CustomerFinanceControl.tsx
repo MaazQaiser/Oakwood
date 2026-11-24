@@ -7,7 +7,7 @@ import { Modal } from "@/components/ui/Dialogs";
 import { Slider } from "@/components/forms/FormControls";
 import { PersonalisedPricingIndicator } from "@/components/finance/FinancePrimitives";
 import { useCustomerFinance } from "@/features/eligibility/CustomerFinanceProvider";
-import { headerPrimaryAction } from "@/config/navigation";
+import { financeCta } from "@/config/navigation";
 import { getSearchUrl, routes } from "@/config/routes";
 import { formatApr, formatPounds } from "@/lib/format/money";
 
@@ -46,7 +46,7 @@ export function CustomerFinanceControl() {
     }
     return {
       href: routes.eligibilityQuestions,
-      label: "Check my eligibility",
+      label: financeCta.anonymousLabel,
     };
   }, [pathname, personalised]);
 
@@ -64,9 +64,11 @@ export function CustomerFinanceControl() {
             <span className="hidden xl:inline">Your finance: {formatApr(apr)}</span>
           </Button>
         ) : null}
-        <Button href={headerPrimaryAction.href} className="btn-compact">
-          {headerPrimaryAction.label}
-        </Button>
+        {eligibilityAction ? (
+          <Button href={eligibilityAction.href} className="btn-compact">
+            {eligibilityAction.label}
+          </Button>
+        ) : null}
       </div>
       <Modal
         open={assumptionsOpen}

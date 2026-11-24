@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { PageBanner } from "@/components/layout/PageBanner";
-import { FinancePersonalisationBanner } from "@/components/search/FinancePersonalisationBanner";
 import { SearchHeroActions } from "@/components/search/SearchHeroActions";
+import { routes } from "@/config/routes";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 import type { InventoryPageContext } from "@/lib/vehicles/inventory";
-import { cn } from "@/lib/cn";
 import { getSearchCopy } from "@/lib/vehicles/searchCopy";
 
 export function SearchHeader({
@@ -19,12 +20,17 @@ export function SearchHeader({
       breadcrumbs={context.breadcrumbs}
       hideTitle
     >
+      <p className="mb-3 max-w-3xl text-body-sm text-secondary">
+        {guaranteeCopy.searchIntro}{" "}
+        <Link
+          href={routes.thirtyDayGuarantee}
+          className="text-primary underline-offset-4 hover:underline"
+        >
+          {guaranteeCopy.programmeName}
+        </Link>
+      </p>
+      {/* Rate CTA sits after the sixth result — never above the first car. */}
       {copy.showHeroActions ? <SearchHeroActions copy={copy} /> : null}
-      <FinancePersonalisationBanner
-        copy={copy}
-        unboxed
-        className={cn(copy.showHeroActions && "mt-6")}
-      />
     </PageBanner>
   );
 }

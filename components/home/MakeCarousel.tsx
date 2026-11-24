@@ -149,7 +149,7 @@ export function MakeCarousel({
       : 0;
 
   return (
-    <div className="mx-auto w-full lg:max-w-[var(--oak-width-content)]">
+    <div className="mx-auto w-full max-w-[var(--oak-width-content)]">
       <div className="flex items-center justify-between gap-4 px-[var(--oak-page-x)]">
         <h2 className="text-h3 text-navy">Browse by make</h2>
         <div className="flex shrink-0 gap-2">

@@ -15,6 +15,7 @@ import {
 } from "@/features/reservation/store";
 import { reservationConfig } from "@/config/reservation";
 import { routes } from "@/config/routes";
+import { buildGuaranteeTermsDocument } from "@/lib/guarantee/terms";
 import { analyticsIntegrations } from "@/lib/api/integrations";
 import {
   CALCULATOR_APPLICATION_EXPLAIN,
@@ -388,13 +389,13 @@ export const regulatoryDocument: LegalDocument = {
       title: "Complaints",
       paragraphs: [
         COMPLAINTS_PROCEDURE_PENDING,
-        "Raise a complaint on the complaints page. That page is the source of truth for complaint handling on this website.",
+        "Raise a complaint on Problem with your car?. That page is the source of truth for complaint handling on this website.",
       ],
     },
   ],
   related: related([
     { href: routes.finance, label: "Car finance" },
-    { href: routes.complaints, label: "Complaints" },
+    { href: routes.problemWithYourCar, label: "Problem with your car?" },
     { href: routes.privacyPolicy, label: "Privacy policy" },
   ]),
 };
@@ -461,7 +462,7 @@ export const vehiclePurchaseDocument: LegalDocument = {
       id: "cancellation",
       title: "Cancellation",
       paragraphs: [
-        "Reservation refund and expiry behaviour is described on the cancellation and refund page using published reservation copy.",
+        "Reservation cancellation, expiry and authorisation release are described on the cancellation and refund page using published reservation copy.",
         "Approved purchase-cancellation clauses and statutory-rights wording are not in the legal content source.",
       ],
     },
@@ -480,7 +481,7 @@ export const reservationDocument: LegalDocument = {
   path: routes.reservationTerms,
   canonicalPath: routes.reservationTerms,
   metaTitle: "Reservation terms",
-  metaDescription: `How an Oakwood vehicle reservation works, including the ${amount} reservation, hold period and refund request copy already used on this website.`,
+  metaDescription: `How an Oakwood vehicle reservation works, including the ${amount} card authorisation, hold period and cancellation copy already used on this website.`,
   hubLabel: "Reservation terms",
   hubDescription: `How the ${amount} reservation works, using the live reservation configuration and published reservation copy.`,
   intro: introSupportingCopy(reservationConfig.amount),
@@ -493,11 +494,11 @@ export const reservationDocument: LegalDocument = {
       id: "amount",
       title: `The ${amount} reservation`,
       paragraphs: [
-        `Pay ${amount} to hold this vehicle while you complete your purchase.`,
-        reservationCopy.fullyRefundable + ".",
+        `We place a ${amount} card authorisation to hold this vehicle while you complete your purchase. The money is not taken.`,
+        reservationCopy.cardAuthorisation + ".",
         reservationCopy.appliedToPurchase,
         `The vehicle is held for ${hold}.`,
-        "All payments, whether made by cash, card, or BACS, will be processed within 3–5 days.",
+        "If you cancel or the reservation expires, we release the authorisation. Nothing is charged.",
       ],
     },
     {
@@ -509,12 +510,12 @@ export const reservationDocument: LegalDocument = {
       ),
     },
     {
-      id: "refund-request",
-      title: "Requesting a refund",
+      id: "cancel-reservation",
+      title: "Cancel a reservation",
       paragraphs: [
         reservationCopy.payAbove,
-        reservationCopy.requestRefund,
-        reservationCopy.refundSupporting,
+        reservationCopy.cancelReservation,
+        reservationCopy.cancelSupporting,
       ],
     },
     {
@@ -522,9 +523,9 @@ export const reservationDocument: LegalDocument = {
       title: "If the reservation expires",
       paragraphs: [
         `${reservationCopy.expiredHeading} ${reservationCopy.expiredSupporting}`,
-        reservationConfig.automaticRefundOnExpiry
-          ? "The live reservation configuration refunds automatically when a reservation expires."
-          : "The live reservation configuration does not enable automatic refund on expiry.",
+        reservationConfig.autoReleaseOnExpiry
+          ? "The live reservation configuration releases the authorisation automatically when a reservation expires."
+          : "The live reservation configuration does not enable automatic release on expiry.",
       ],
     },
     {
@@ -532,9 +533,7 @@ export const reservationDocument: LegalDocument = {
       title: "If the vehicle becomes unavailable",
       paragraphs: [
         `${reservationCopy.soldHeading} ${reservationCopy.soldSupporting}`,
-        reservationConfig.sameDayRefundOnVehicleUnavailable
-          ? "The live reservation configuration enables a same-day refund when the vehicle becomes unavailable."
-          : "The live reservation configuration does not enable a same-day refund when the vehicle becomes unavailable.",
+        "If the vehicle becomes unavailable, the card authorisation is released. Nothing is charged.",
       ],
     },
     {
@@ -542,15 +541,12 @@ export const reservationDocument: LegalDocument = {
       title: "If finance cannot be found",
       paragraphs: [
         `${reservationCopy.financeUnavailableHeading} ${reservationCopy.financeUnavailableSupporting}`,
-        reservationConfig.sameDayRefundOnFinanceUnavailable
-          ? "The live reservation configuration enables a same-day refund when finance cannot be found for the vehicle."
-          : "The live reservation configuration does not enable a same-day refund when finance cannot be found.",
+        "If finance cannot be found for the vehicle, we release the card authorisation. Nothing is charged.",
       ],
     },
   ],
   related: related([
-    { href: routes.depositRules, label: "Deposit rules" },
-    { href: routes.requestRefund, label: "Request a refund" },
+    { href: routes.help, label: "Help and support" },
     { href: routes.cancellationRefund, label: "Cancellation and refund" },
     { href: routes.vehiclePurchaseTerms, label: "Vehicle purchase terms" },
     { href: routes.usedCars, label: "Used cars" },
@@ -564,22 +560,22 @@ export const cancellationDocument: LegalDocument = {
   canonicalPath: routes.cancellationRefund,
   metaTitle: "Cancellation and refund",
   metaDescription:
-    "How Oakwood reservation refunds, expiry and unavailable-vehicle cases are described in the published reservation copy.",
+    "How Oakwood reservation cancellation, expiry and unavailable-vehicle cases are described in the published reservation copy.",
   hubLabel: "Cancellation and refund",
   hubDescription:
-    "Reservation refund, expiry and unavailable-vehicle cases from the published reservation journey.",
+    "Reservation cancellation, expiry and unavailable-vehicle cases from the published reservation journey.",
   missing: [
     "Approved statutory cancellation rights and refund timelines outside the reservation journey.",
     "Approved distance-selling cooling-off wording.",
   ],
   sections: [
     {
-      id: "reservation-refund",
-      title: "Reservation refund request",
+      id: "reservation-cancel",
+      title: "Cancel a reservation",
       paragraphs: [
         reservationCopy.payAbove,
-        reservationCopy.refundHeading,
-        reservationCopy.refundSupporting,
+        reservationCopy.cancelHeading,
+        reservationCopy.cancelSupporting,
       ],
     },
     {
@@ -707,6 +703,8 @@ function deliveryCopyMeta(): string {
   return "Collection from Oakwood Bury or Chorley, and delivery information where Oakwood has published it.";
 }
 
+export const guaranteeDocument: LegalDocument = buildGuaranteeTermsDocument();
+
 export const legalDocuments: LegalDocument[] = [
   termsDocument,
   privacyDocument,
@@ -718,6 +716,7 @@ export const legalDocuments: LegalDocument[] = [
   distanceSellingDocument,
   regulatoryDocument,
   accessibilityDocument,
+  guaranteeDocument,
 ];
 
 export const legalHubItems: LegalHubItem[] = [
@@ -727,10 +726,10 @@ export const legalHubItems: LegalHubItem[] = [
     description: document.hubDescription,
   })),
   {
-    href: routes.complaints,
-    label: "Complaints",
+    href: routes.problemWithYourCar,
+    label: "Problem with your car?",
     description:
-      "How to raise a complaint. The complaints page is the source of truth for complaint handling.",
+      "How to raise a complaint, warranty claim or 30 day request. That page is the source of truth for complaint handling.",
   },
 ];
 
@@ -749,4 +748,5 @@ export const nestedLegalSlugs = [
   "reservation",
   "cancellation-refund",
   "delivery",
+  "30-day-guarantee",
 ] as const;

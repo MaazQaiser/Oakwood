@@ -1,7 +1,6 @@
 "use server";
 
 import { withSessionPersistence } from "@/lib/session/persist";
-import { reservationConfig } from "@/config/reservation";
 import { calculateDeal } from "@/lib/deal/calculate";
 import { DEAL_PROVIDER_CONFIG } from "@/lib/deal/provider-config";
 import { stripeIntegration } from "@/lib/api/integrations";
@@ -26,7 +25,6 @@ import {
   writeReservationCookie,
 } from "@/features/reservation/session";
 import type { ReservationDealSnapshot } from "@/types/reservation";
-import type { RefundReasonCode } from "@/types/reservation";
 import type { Vehicle } from "@/types/vehicle";
 import {
   toStatusSnapshot,
@@ -133,6 +131,7 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
   name?: string;
   telephone?: string;
   idempotencyKey?: string;
+  guaranteeTermsAccepted?: boolean;
 }): Promise<
   | { ok: true; status: ReservationStatusSnapshot }
   | {
@@ -143,6 +142,7 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
         | "conflict"
         | "invalid_email"
         | "invalid_contact"
+        | "guarantee_terms"
         | "already_requested"
         | "stripe_unavailable";
       status?: ReservationStatusSnapshot;
@@ -174,8 +174,20 @@ export const submitReservationPaymentAction = withSessionPersistence(async funct
     return { ok: false, reason: "unavailable", status: toStatusSnapshot(record) };
   }
 
+  const needsGuaranteeTick =
+    vehicle.guaranteeEligible !== false &&
+    vehicle.saleType !== "trade" &&
+    vehicle.saleType !== "sold_as_seen";
+  if (needsGuaranteeTick && !input.guaranteeTermsAccepted) {
+    return { ok: false, reason: "guarantee_terms", status: toStatusSnapshot(record) };
+  }
+
   if (isStockLockedByOther(record.vehicleStockId, record.id)) {
     return { ok: false, reason: "conflict", status: toStatusSnapshot(record) };
+  }
+
+  if (needsGuaranteeTick && input.guaranteeTermsAccepted) {
+    patchReservation(record.id, { guaranteeTermsAccepted: true });
   }
 
   const paymentsLive =
@@ -200,24 +212,10 @@ export const pollReservationAction = withSessionPersistence(async function pollR
   return toStatusSnapshot(record);
 });
 
-export const requestReservationRefundAction = withSessionPersistence(async function requestReservationRefundAction(input: {
-  reason: RefundReasonCode;
-}): Promise<
+export const cancelReservationAction = withSessionPersistence(async function cancelReservationAction(): Promise<
   | { ok: true; status: ReservationStatusSnapshot; already?: boolean }
-  | { ok: false; reason: "session" | "not_reserved" | "invalid_reason" }
+  | { ok: false; reason: "session" | "not_reserved" }
 > {
-  const allowed: RefundReasonCode[] = [
-    "cheaper_elsewhere",
-    "finance_elsewhere",
-    "changed_mind",
-    "unable_to_attend",
-    "px_offer_too_low",
-    "other",
-  ];
-  if (!allowed.includes(input.reason)) {
-    return { ok: false, reason: "invalid_reason" };
-  }
-
   const bound = await getBoundReservation();
   if (!bound) {
     return { ok: false, reason: "session" };
@@ -225,7 +223,10 @@ export const requestReservationRefundAction = withSessionPersistence(async funct
 
   let record: ReservationRecord = applyDueTransitions(bound);
 
-  if (record.stockState === "refund_requested" || record.stockState === "refunded") {
+  if (
+    record.stockState === "expired" &&
+    (record.paymentState === "released" || record.paymentState === "refunded")
+  ) {
     return { ok: true, already: true, status: toStatusSnapshot(record) };
   }
 
@@ -233,18 +234,12 @@ export const requestReservationRefundAction = withSessionPersistence(async funct
     return { ok: false, reason: "not_reserved" };
   }
 
-  if (reservationConfig.releaseStockOnRefundRequest) {
-    releaseStock(record.vehicleStockId, record.id);
-  }
+  releaseStock(record.vehicleStockId, record.id);
 
   record =
     patchReservation(record.id, {
-      stockState: "refund_requested",
-      paymentState: "refund_pending",
-      refund: {
-        reason: input.reason,
-        requestedAtIso: new Date().toISOString(),
-      },
+      stockState: "expired",
+      paymentState: "released",
     }) ?? record;
 
   return { ok: true, status: toStatusSnapshot(record) };

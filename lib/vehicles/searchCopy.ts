@@ -58,12 +58,12 @@ const CAR_COPY: SearchCopy = {
   requestLabel: "Request a car",
   showNotify: true,
   showHeroActions: false,
-  heroPrimary: "Check my eligibility",
+  heroPrimary: "Check my rate",
   heroSecondary: "Browse cars",
   bannerTitle: "Know your budget before you shop.",
   bannerBody:
     "Check a preview finance profile in around 60 seconds. No live credit search runs until the provider is connected.",
-  bannerCta: "Check my eligibility",
+  bannerCta: "Check my rate",
   personalisedTitle: "Your finance profile is ready",
   personalisedBody:
     "Cars are shown with your personalised monthly figures. Based on your current finance profile.",
@@ -105,11 +105,11 @@ const VAN_COPY: SearchCopy = {
   showNotify: false,
   // Keep false so the banner is the only hero eligibility CTA (no duplicate buttons).
   showHeroActions: false,
-  heroPrimary: "Check my eligibility",
+  heroPrimary: "Check my rate",
   heroSecondary: "Browse vans",
   bannerTitle: "Know what you could afford",
   bannerBody: "Check your finance eligibility before you browse.",
-  bannerCta: "Check my eligibility",
+  bannerCta: "Check my rate",
   personalisedTitle: "Your finance profile is ready",
   personalisedBody:
     "Vans are shown with your personalised monthly figures. Based on your current finance profile.",

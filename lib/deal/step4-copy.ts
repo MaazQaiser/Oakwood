@@ -9,7 +9,7 @@ const hold = () => formatHoldPeriod(reservationConfig.holdDurationDays);
 
 export const STEP4_HUB_RESERVE = () => `Reserve this car for ${amount()}`;
 export const STEP4_HUB_RESERVE_HINT = () =>
-  `Fully refundable. We hold the car for ${hold()}.`;
+  `Card authorisation only — not charged. We hold the car for ${hold()}.`;
 export const STEP4_HUB_APPLY = "Apply for finance";
 export const STEP4_HUB_APPLY_HINT =
   "Apply on this page. Your deal stays with you, and an advisor confirms your rate by phone.";
@@ -25,7 +25,7 @@ export const STEP4_HUB_CALL_BACK_HINT =
 
 export const STEP4_RESERVE_TITLE = () => `Reserve for ${amount()}`;
 export const STEP4_RESERVE_REFUNDABLE =
-  "Fully refundable reservation fee, applied to your purchase.";
+  "Card authorisation only — not charged. Applied to your purchase if you proceed.";
 export const STEP4_RESERVE_HOLD = () =>
   `We hold this car for ${hold()} and take it off sale while you finish.`;
 export const STEP4_RESERVE_MOCK =
@@ -38,7 +38,7 @@ export const STEP4_RESERVE_SUCCESS_TITLE = "Your car is reserved";
 export const STEP4_RESERVE_SUCCESS_BODY = () =>
   `You're holding this car for ${hold()}. An Oakwood advisor will call shortly to confirm next steps.`;
 export const STEP4_RESERVE_REFUND_INFO = () =>
-  `Fully refundable within ${hold()} via the link in your confirmation email. The ${amount()} is applied to your purchase if you proceed.`;
+  `Cancel any time from the manage link in your confirmation email. We release the authorisation and nothing is charged. The ${amount()} is applied to your purchase if you proceed.`;
 
 export const STEP4_TD_TITLE = "Book a test drive";
 export const STEP4_TD_SUBMIT =

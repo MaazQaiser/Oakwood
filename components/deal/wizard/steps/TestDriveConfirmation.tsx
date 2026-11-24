@@ -279,7 +279,7 @@ export function TestDriveConfirmation({
         <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
           <p className="text-label">Reserve this car</p>
           <p className="mt-1 text-body-sm text-muted">
-            {reservationCopy.fullyRefundable}. Holds the car for{" "}
+            {reservationCopy.cardAuthorisation}. Holds the car for{" "}
             {formatHoldPeriod(reservationConfig.holdDurationDays)}. The{" "}
             {reservationAmountLabel(reservationConfig.amount)} is applied to the
             purchase.

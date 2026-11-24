@@ -109,6 +109,35 @@ export function IconWarrantyBadge(props: IconProps) {
   );
 }
 
+/** 30 Day Guarantee mark. */
+export function IconGuaranteeBadge(props: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+      width="40"
+      height="40"
+      {...props}
+    >
+      <rect width="40" height="40" rx="12" fill="#E6F4FB" />
+      <path
+        d="M20 9.5 28 12.8v7.6c0 5.5-3.5 9-8 10.8-4.5-1.8-8-5.3-8-10.8v-7.6L20 9.5Z"
+        stroke="#0061A2"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.8 20.2 18.6 23l5.6-6"
+        stroke="#0061A2"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /** Stock count / cars available. */
 export function IconProofStock(props: IconProps) {
   return (

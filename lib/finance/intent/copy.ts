@@ -40,6 +40,9 @@ export const FINANCE_INTENT_CALCULATOR = "Finance calculator";
 export const CMS_FINANCE_INTENT_NOTICE =
   "Long-form finance education, FAQs and SEO fields will be editable in the finance content source when it is connected. These pages currently use typed Oakwood journey copy only.";
 
+export const OAKWOOD_OWN_COPY_REVIEW_NOTICE =
+  "This page uses Oakwood-authored journey copy. Compliance has not yet signed off the final wording for publication.";
+
 export const FINANCE_INTENT_DISCLAIMERS = [
   DEAL_ILLUSTRATION_REPRESENTATIVE,
   INDICATIVE_DISCLAIMER,

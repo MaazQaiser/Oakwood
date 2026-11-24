@@ -60,7 +60,7 @@ export function FinanceProfileContext() {
         only.
         <div className="mt-3">
           <Button href={getEligibilityUrl()} size="sm">
-            Check my eligibility
+            Check my rate
           </Button>
         </div>
       </Alert>

@@ -21,7 +21,8 @@ export type ReservationPaymentState =
   | "paid"
   | "failed"
   | "refund_pending"
-  | "refunded";
+  | "refunded"
+  | "released";
 
 export type ReservationUiPhase =
   | "AVAILABLE"
@@ -34,14 +35,6 @@ export type ReservationUiPhase =
   | "SOLD"
   | "UNAVAILABLE"
   | "ERROR";
-
-export type RefundReasonCode =
-  | "cheaper_elsewhere"
-  | "finance_elsewhere"
-  | "changed_mind"
-  | "unable_to_attend"
-  | "px_offer_too_low"
-  | "other";
 
 export type MockPaymentOutcome =
   | "succeed"
@@ -82,7 +75,3 @@ export interface ReservationDealSnapshot {
   monthlyPayment: number;
 }
 
-export interface ReservationRefundRequest {
-  reason: RefundReasonCode;
-  requestedAt: string;
-}

@@ -19,9 +19,12 @@ import type { SupportFaqCategory, SupportFaqItem } from "@/types/support";
 export function FAQAccordion({
   items,
   heading = "Questions",
+  hideEmptyCategories = false,
 }: {
   items: SupportFaqItem[];
   heading?: string;
+  /** When true, only show category chips that exist in `items`. Hide the row if one or fewer. */
+  hideEmptyCategories?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<SupportFaqCategory | "all">("all");
@@ -42,6 +45,15 @@ export function FAQAccordion({
     window.addEventListener("hashchange", openFromHash);
     return () => window.removeEventListener("hashchange", openFromHash);
   }, []);
+
+  const availableCategories = useMemo(() => {
+    const present = new Set(items.map((item) => item.category));
+    const filtered = supportFaqCategories.filter((item) => present.has(item.value));
+    return hideEmptyCategories ? filtered : supportFaqCategories;
+  }, [hideEmptyCategories, items]);
+
+  const showCategoryRow =
+    !hideEmptyCategories || availableCategories.length > 1;
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -78,35 +90,45 @@ export function FAQAccordion({
             />
           </Field>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="FAQ categories">
-          <Button
-            type="button"
-            size="sm"
-            variant={category === "all" ? "primary" : "secondary"}
-            onClick={() => {
-              setCategory("all");
-              trackEvent(analyticsEvents.faqCategorySelected, { category: "all" });
-            }}
+        {showCategoryRow ? (
+          <div
+            className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="FAQ categories"
           >
-            All
-          </Button>
-          {supportFaqCategories.map((item) => (
             <Button
-              key={item.value}
               type="button"
               size="sm"
-              variant={category === item.value ? "primary" : "secondary"}
+              className="shrink-0"
+              variant={category === "all" ? "primary" : "secondary"}
               onClick={() => {
-                setCategory(item.value);
+                setCategory("all");
                 trackEvent(analyticsEvents.faqCategorySelected, {
-                  category: item.value,
+                  category: "all",
                 });
               }}
             >
-              {item.label}
+              All
             </Button>
-          ))}
-        </div>
+            {availableCategories.map((item) => (
+              <Button
+                key={item.value}
+                type="button"
+                size="sm"
+                className="shrink-0"
+                variant={category === item.value ? "primary" : "secondary"}
+                onClick={() => {
+                  setCategory(item.value);
+                  trackEvent(analyticsEvents.faqCategorySelected, {
+                    category: item.value,
+                  });
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        ) : null}
         {visible.length === 0 ? (
           <div className="mt-8">
             <p className="text-body text-muted">{FAQ_EMPTY}</p>

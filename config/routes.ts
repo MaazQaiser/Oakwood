@@ -24,8 +24,7 @@ export type ReservationStep =
   | "payment"
   | "success"
   | "failed"
-  | "manage"
-  | "refund";
+  | "manage";
 
 export type EligibilityStep = "start" | "questions" | "result" | "resume";
 
@@ -62,11 +61,15 @@ export const routes = {
 
   finance: "/finance.php",
   financeCalculator: "/finance.php/calculator",
+  interestFree: "/finance.php/interest-free",
+  negativeEquity: "/finance.php/negative-equity",
 
   eligibility: "/finance-eligibility",
   eligibilityQuestions: "/finance-eligibility/questions",
   eligibilityResult: "/finance-eligibility/result",
   eligibilityResume: "/finance-eligibility/resume",
+  /** Capture an existing personal loan offer for sales to try to beat. */
+  beatLoanOffer: "/beat-my-offer",
 
   deal: "/deal",
   dealResume: "/deal/resume",
@@ -79,11 +82,14 @@ export const routes = {
 
   aftersales: "/aftersales",
   service: "/service",
+  servicing: "/service",
+  servicingPlans: "/servicing/plans",
   servicingAudi: "/servicing-audi.php",
   mot: "/mot",
   warranty: "/warranty",
   warrantyClaims: "/warranty-claims",
   booking: "/booking",
+  protection: "/protection",
 
   about: "/about.php",
   ourGarage: "/our-garage.php",
@@ -96,9 +102,17 @@ export const routes = {
   help: "/help",
   faq: "/faq",
   complaints: "/complaints",
-  depositRules: "/deposit-rules",
-  requestRefund: "/request-a-refund",
+  problemWithYourCar: "/problem-with-your-car",
   electricCars: "/electric-cars",
+  thirtyDayGuarantee: "/30-day-guarantee",
+  thirtyDayGuaranteeRequest: "/30-day-guarantee/request",
+  guaranteeRequests: "/guarantee-requests",
+  pricePromise: "/price-promise",
+  careers: "/careers",
+  offers: "/offers",
+  priceDrops: "/used-cars/price-drops",
+  usedCarsAutomatic: "/used-cars/automatic",
+  cheapToRun: "/used-cars/cheap-to-run",
 
   getAQuote: "/get-a-quote.php",
   bookingEnquiry: "/booking_enquiry.php",
@@ -118,11 +132,40 @@ export const routes = {
   reservationTerms: "/legal/reservation",
   cancellationRefund: "/legal/cancellation-refund",
   deliveryTerms: "/legal/delivery",
+  thirtyDayGuaranteeTerms: "/legal/30-day-guarantee",
 
   designSystem: "/design-system",
 } as const;
 
 export type ConfirmedRoute = (typeof routes)[keyof typeof routes];
+
+/**
+ * SellCarInstant handoff. Final landing page and UTMs pending Appifest confirmation.
+ * Do not invent a live destination — keep this config-driven.
+ */
+export const sciConfig = {
+  baseUrl: "https://www.sellcarinstant.com/",
+  utmSource: "oakwood",
+  utmMedium: "website",
+  utmCampaign: "sell-my-car",
+  pending: true as const,
+  notes:
+    "SCI is live. Confirm the landing page and that UTMs carry across so Oakwood gets credit for the lead.",
+} as const;
+
+export function getSciUrl(options?: {
+  utmContent?: string;
+}): string {
+  const params = new URLSearchParams({
+    utm_source: sciConfig.utmSource,
+    utm_medium: sciConfig.utmMedium,
+    utm_campaign: sciConfig.utmCampaign,
+  });
+  if (options?.utmContent) {
+    params.set("utm_content", options.utmContent);
+  }
+  return `${sciConfig.baseUrl}?${params.toString()}`;
+}
 
 export const pendingRoutes = {
   preparationStandards: {
@@ -134,6 +177,63 @@ export const pendingRoutes = {
       "Trust/process page. SEO URL not confirmed. Live content is on /our-garage.php.",
   },
 } as const satisfies Record<string, PendingRoute>;
+
+export const MONTHLY_BUDGET_BANDS = [
+  "under-200",
+  "under-300",
+  "under-400",
+  "under-500",
+  "over-500",
+] as const;
+
+export type MonthlyBudgetBand = (typeof MONTHLY_BUDGET_BANDS)[number];
+
+export const CASH_BUDGET_BANDS = [
+  "under-7500",
+  "under-10000",
+  "under-15000",
+  "under-20000",
+  "over-20000",
+] as const;
+
+export type CashBudgetBand = (typeof CASH_BUDGET_BANDS)[number];
+
+/** Reserved make-segment slugs that must never collide with brand pages. */
+export const USED_CARS_RESERVED_SEGMENTS = [
+  "monthly",
+  "body",
+  "fuel",
+  "automatic",
+  "cheap-to-run",
+  "price-drops",
+  "price",
+  "location",
+  "showroom",
+] as const;
+
+export function getMonthlyBudgetUrl(band: MonthlyBudgetBand | string): string {
+  return `${routes.usedCars}/monthly/${slugify(band)}`;
+}
+
+export function getCashBudgetUrl(band: CashBudgetBand | string): string {
+  return `${routes.usedCars}/${slugify(band)}`;
+}
+
+export function getBodyTypeUrl(type: string): string {
+  return `${routes.usedCars}/body/${slugify(type)}`;
+}
+
+export function getFuelTypeUrl(fuel: string): string {
+  return `${routes.usedCars}/fuel/${slugify(fuel)}`;
+}
+
+export function getOfferUrl(slug: string): string {
+  return `${routes.offers}/${slugify(slug)}`;
+}
+
+export function getShowroomStockUrl(location: string): string {
+  return getLocationStockUrl(location);
+}
 
 export function getUsedCarsUrl(): string {
   return routes.usedCars;
@@ -248,7 +348,14 @@ export function getCompareUrl(stockIds?: string[]): string {
 }
 
 export function getFinanceIntentUrl(intent: FinanceIntentSlug | string): string {
+  if (intent === "0-percent") {
+    return routes.interestFree;
+  }
   return `${routes.finance}/${slugify(intent)}`;
+}
+
+export function getInterestFreeUrl(): string {
+  return routes.interestFree;
 }
 
 export function getFinanceCalculatorUrl(options?: { stockId?: string }): string {
@@ -353,8 +460,6 @@ export function getReserveUrl(
       return `${base}/failed`;
     case "manage":
       return `${base}/manage`;
-    case "refund":
-      return `${base}/refund`;
     default:
       return base;
   }
@@ -412,7 +517,35 @@ export function getBookingUrl(options?: {
 }
 
 export function getBookingListUrl(): string {
-  return `${routes.aftersales}#your-bookings`;
+  return `${routes.service}#your-bookings`;
+}
+
+export function getDeliveryAndCollectionUrl(options?: {
+  context?: "move-car";
+  stockId?: string;
+  from?: string;
+  to?: string;
+}): string {
+  if (!options) {
+    return routes.deliveryAndCollection;
+  }
+
+  const searchParams = new URLSearchParams();
+  if (options.context) {
+    searchParams.set("context", options.context);
+  }
+  if (options.stockId) {
+    searchParams.set("stock", options.stockId);
+  }
+  if (options.from) {
+    searchParams.set("from", options.from);
+  }
+  if (options.to) {
+    searchParams.set("to", options.to);
+  }
+
+  const query = searchParams.toString();
+  return query ? `${routes.deliveryAndCollection}?${query}` : routes.deliveryAndCollection;
 }
 
 export const legalRoutes = {
@@ -444,7 +577,8 @@ export const supportRoutes = {
   contact: routes.contact,
   faq: routes.help,
   help: routes.help,
-  complaints: routes.complaints,
+  complaints: routes.problemWithYourCar,
+  problemWithYourCar: routes.problemWithYourCar,
   complaintProcedure: routes.complaintProcedure,
   getAQuote: routes.getAQuote,
   bookingEnquiry: routes.bookingEnquiry,

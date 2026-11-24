@@ -42,7 +42,7 @@ export function ReservationCTA({
         Reserve this car for {amount}
       </h2>
         <p className="mt-2 text-body-sm text-muted">
-          {reservationCopy.fullyRefundable}. Holds the vehicle for {hold}.
+          {reservationCopy.cardAuthorisation}. Holds the vehicle for {hold}.
         </p>
         <p className="mt-3">
           <a
@@ -65,7 +65,7 @@ export function ReservationCTA({
           className="w-full sm:w-auto"
         />
         <p className="mt-2 text-caption text-muted">
-          {reservationCopy.fullyRefundable}
+          {reservationCopy.cardAuthorisation}
           {` · ${hold} hold`}
         </p>
       </div>

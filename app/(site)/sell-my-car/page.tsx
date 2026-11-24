@@ -1,14 +1,10 @@
-import { SellMyCarExperience } from "@/components/part-exchange/SellMyCarExperience";
-import { routes } from "@/config/routes";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import { redirect } from "next/navigation";
+import { getSciUrl } from "@/config/routes";
 
-export const metadata = createPageMetadata({
-  title: "Find out what your car is worth",
-  description:
-    "Get an estimated part-exchange valuation using just your registration and mileage.",
-  path: routes.sellMyCar,
-});
-
+/**
+ * Site map v2: sell-only customers leave Oakwood for SellCar Instant.
+ * Part exchange stays on /partex.php and /valuation.
+ */
 export default function Page() {
-  return <SellMyCarExperience />;
+  redirect(getSciUrl({ utmContent: "sell-my-car-page" }));
 }

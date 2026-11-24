@@ -63,8 +63,8 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
               {[
                 { label: "Reservation", value: amount },
                 { label: "Hold", value: hold },
-                { label: "Refundable", value: "Fully" },
-                { label: "Payments clear", value: "3–5 days" },
+                { label: "Charged", value: "No" },
+                { label: "Authorisation", value: "Released on cancel" },
               ].map((item) => (
                 <div key={item.label} className="bg-[#001c3d] px-4 py-4 sm:px-5">
                   <p className="text-[0.68rem] font-semibold tracking-[0.12em] text-[#8EBFDF] uppercase">
@@ -135,22 +135,16 @@ export function LegalDocumentView({ document }: { document: LegalDocument }) {
                         ))}
                       </div>
                     ))}
-                    {isReservation && section.id === "refund-request" ? (
-                      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                    {isReservation && section.id === "cancel-reservation" ? (
+                      <div className="mt-6">
                         <Link
-                          href={routes.requestRefund}
+                          href={routes.help}
                           className="inline-flex min-h-12 items-center gap-3 self-start rounded-[14px] bg-[#002852] py-1.5 pr-1.5 pl-5 text-white no-underline hover:bg-[#001c3d]"
                         >
-                          <span className="text-button">Request a refund</span>
+                          <span className="text-button">Manage your reservation</span>
                           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-white text-[#002852]">
                             <IconArrow width={16} height={16} />
                           </span>
-                        </Link>
-                        <Link
-                          href={routes.depositRules}
-                          className="inline-flex min-h-12 items-center self-start rounded-[14px] bg-[#ECF3F8] px-5 text-button text-[#002852] no-underline hover:bg-[#E7F1F8]"
-                        >
-                          Deposit rules
                         </Link>
                       </div>
                     ) : null}

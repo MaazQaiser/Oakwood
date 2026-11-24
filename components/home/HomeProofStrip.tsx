@@ -1,18 +1,22 @@
 import {
   IconAaBadge,
   IconGoogleReview,
+  IconGuaranteeBadge,
   IconProofLocations,
   IconProofStock,
   IconWarrantyBadge,
 } from "@/components/home/HomeProofIcons";
 import { cn } from "@/lib/cn";
 import { HOME_PROOF_ITEMS } from "@/lib/home/copy";
+import { homeStockProofLead } from "@/lib/home/inventory";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 import { mockReviews } from "@/lib/mock/home";
 
 const PROOF_ICONS = {
   reviews: IconGoogleReview,
   aa: IconAaBadge,
   warranty: IconWarrantyBadge,
+  guarantee: IconGuaranteeBadge,
   stock: IconProofStock,
   locations: IconProofLocations,
 } as const;
@@ -53,13 +57,14 @@ export function HomeProofStrip({ className }: { className?: string }) {
     <ul
       aria-label="Oakwood at a glance"
       className={cn(
-        "my-4 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:my-6 md:grid-cols-5 md:gap-3",
+        "my-4 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:my-6 md:grid-cols-3 lg:grid-cols-6 md:gap-3",
         className,
       )}
     >
       {HOME_PROOF_ITEMS.map((point) => {
         const Icon = PROOF_ICONS[point.id];
         const isReviews = point.id === "reviews";
+        const isStock = point.id === "stock";
         return (
           <li
             key={point.id}
@@ -77,11 +82,15 @@ export function HomeProofStrip({ className }: { className?: string }) {
                     : "text-[0.95rem] md:text-base",
                 )}
               >
-                {isReviews ? mockReviews.rating.toFixed(1) : point.lead}
+                {isReviews
+                  ? mockReviews.rating.toFixed(1)
+                  : isStock
+                    ? homeStockProofLead()
+                    : point.lead}
               </p>
               {isReviews ? <GoogleStars rating={mockReviews.rating} /> : null}
               <p className="m-0 mt-1 text-[0.7rem] leading-snug text-secondary md:text-xs">
-                {point.detail}
+                {point.id === "guarantee" ? guaranteeCopy.proofDetail : point.detail}
               </p>
             </div>
           </li>

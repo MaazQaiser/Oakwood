@@ -1,4 +1,8 @@
 import { getBookingUrl, routes } from "@/config/routes";
+import {
+  OAKWOOD_WARRANTY_AVAILABLE,
+  OAKWOOD_WARRANTY_META_DESCRIPTION,
+} from "@/lib/warranty/copy";
 import type { AftersalesFaqItem, AftersalesPageCopy } from "@/types/aftersales";
 
 export const aftersalesHubCopy: AftersalesPageCopy = {
@@ -43,11 +47,9 @@ export const motPageCopy: AftersalesPageCopy = {
 export const warrantyPageCopy: AftersalesPageCopy = {
   eyebrow: "Warranty",
   title: "Oakwood warranty",
-  description:
-    "Available cars include a 12-month warranty. Claim details are listed with the vehicle.",
+  description: OAKWOOD_WARRANTY_AVAILABLE,
   metaTitle: "Warranty",
-  metaDescription:
-    "Learn how Oakwood's 12-month vehicle warranty works, what to expect, and how to make a claim.",
+  metaDescription: OAKWOOD_WARRANTY_META_DESCRIPTION,
 };
 
 export const aftersalesServices = [
@@ -144,7 +146,7 @@ export const motFailCopy =
   "If a vehicle fails its MOT, it may need repair and a retest before it can be used on the road, except in limited circumstances such as travelling to a pre-arranged repair or retest. Oakwood will explain the next step if we carry out the test.";
 
 export const warrantyCoverage = {
-  summary: "Available cars include a 12-month warranty.",
+  summary: OAKWOOD_WARRANTY_AVAILABLE,
   expect:
     "Cover is for listed mechanical and electrical items during the warranty period. Work is carried out through Oakwood or an authorised repairer.",
   howToUse:
@@ -211,8 +213,7 @@ export const motFaqs: AftersalesFaqItem[] = [
 export const warrantyFaqs: AftersalesFaqItem[] = [
   {
     question: "Do Oakwood cars include a warranty?",
-    answer:
-      "Available cars include a 12-month warranty. Claim details are listed with the vehicle.",
+    answer: OAKWOOD_WARRANTY_AVAILABLE,
   },
   {
     question: "What does the warranty cover?",

@@ -90,7 +90,7 @@ export function VehicleViewingCard({ vehicle }: { vehicle: VehicleDetail }) {
             <div className="mt-4 rounded-lg border border-border bg-page-tint p-4">
               <p className="text-label">Reserve this car</p>
               <p className="mt-1 text-body-sm text-muted">
-                {reservationCopy.fullyRefundable}. Holds the car for{" "}
+                {reservationCopy.cardAuthorisation}. Holds the car for{" "}
                 {formatHoldPeriod(reservationConfig.holdDurationDays)}. The{" "}
                 {reservationAmountLabel(reservationConfig.amount)} is applied to
                 the purchase.

@@ -25,9 +25,9 @@ export function reservationStepRedirect(
     return null;
   }
 
-  if (model.phase === "REFUND_REQUESTED" || model.phase === "REFUNDED") {
-    if (step === "payment" || step === "success" || step === "refund") {
-      return step === "refund" ? null : getReserveUrl(stockId, "manage");
+  if (model.phase === "EXPIRED" && model.paymentState === "released") {
+    if (step === "payment" || step === "success") {
+      return getReserveUrl(stockId, "manage");
     }
   }
 
@@ -36,10 +36,6 @@ export function reservationStepRedirect(
   }
 
   if (step === "success" && model.phase === "AVAILABLE" && !model.reconciliationRequired) {
-    return getReserveUrl(stockId);
-  }
-
-  if (step === "refund" && model.phase === "AVAILABLE") {
     return getReserveUrl(stockId);
   }
 

@@ -16,6 +16,7 @@ export type SupportComplaintCategory =
   | "reservation"
   | "part-exchange"
   | "aftersales"
+  | "warranty"
   | "delivery"
   | "other";
 
@@ -29,7 +30,8 @@ export type SupportFaqCategory =
   | "servicing"
   | "mot"
   | "warranty"
-  | "journey";
+  | "journey"
+  | "guarantee";
 
 export interface SupportFaqItem {
   id: string;

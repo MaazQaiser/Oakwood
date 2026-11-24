@@ -71,12 +71,20 @@ export function getInventoryContext(
     });
   }
 
+  if (locked.browse && options?.basePath) {
+    breadcrumbs.push({
+      label: locked.browse.breadcrumbLabel,
+      href: options.basePath,
+    });
+  }
+
   if (variant === "search" && breadcrumbs.length === 2) {
     breadcrumbs.push({ label: "Search", href: routes.search });
   }
 
-  const title =
-    variant === "search" && !locked.make && !locked.location
+  const title = locked.browse?.title
+    ? locked.browse.title
+  : variant === "search" && !locked.make && !locked.location
       ? getSearchHeading(options?.query, category)
       : getInventoryTitle(locked, category);
 
@@ -91,8 +99,9 @@ export function getInventoryContext(
   const searchAction =
     category === "van" || variant === "search" ? basePath : routes.search;
 
-  const description =
-    !locked.make && !locked.model && !locked.location
+  const description = locked.browse?.description
+    ? locked.browse.description
+    : !locked.make && !locked.model && !locked.location
       ? copy.landingDescription
       : getSeoCopy({
           title,

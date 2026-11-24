@@ -64,11 +64,34 @@ export interface Provenance {
   notes?: string;
 }
 
+export interface AaChecklistItem {
+  category: string;
+  check: string;
+  result: "Pass" | "Advisory" | "Fail" | "N/A";
+}
+
+export interface VehicleCheckItem {
+  label: string;
+  value: string;
+}
+
+export interface VehicleCheck {
+  summary: string;
+  items: VehicleCheckItem[];
+}
+
 export interface InspectionRecord {
   available: boolean;
   summary: string;
   completedOn?: string;
   inspector?: string;
+  result?: "Pass" | "Fail";
+  checklist?: AaChecklistItem[];
+}
+
+export interface PricePosition {
+  amountBelowAverage: number;
+  comparableCount: number;
 }
 
 export interface BatteryHealth {
@@ -144,9 +167,18 @@ export interface VehicleFinanceIllustration {
   totalPayable: number;
 }
 
+export interface EvRunningCostsPreview {
+  realRangeMiles: number;
+  wltpRangeMiles?: number;
+  costPerMilePence: number;
+}
+
 export interface VehicleDetail extends Vehicle {
   images: VehicleImage[];
   video?: VehicleVideo;
+  vehicleCheck?: VehicleCheck;
+  evRunningCosts?: EvRunningCostsPreview;
+  pricePosition?: PricePosition;
   mot: MotHistory;
   motStatus: MotStatus;
   recalls: RecallStatus;

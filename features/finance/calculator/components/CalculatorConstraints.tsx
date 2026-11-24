@@ -36,7 +36,7 @@ export function CalculatorConstraints({
             {CALCULATOR_TRY_AGAIN}
           </Button>
           <Button href={getEligibilityUrl()} variant="secondary" size="sm">
-            Check my eligibility
+            Check my rate
           </Button>
         </div>
       </Alert>

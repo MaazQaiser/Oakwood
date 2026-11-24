@@ -125,7 +125,7 @@ export function VehiclePrice() {
               trackEvent(analyticsEvents.financeCtaClicked, { action: "eligibility" })
             }
           >
-            Check my eligibility
+            Check my rate
           </Button>
         ) : null}
         {displayState === "personalised" || displayState === "ineligible" ? (

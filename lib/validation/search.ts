@@ -4,6 +4,7 @@ export const SEARCH_SORTS = [
   "monthly_desc",
   "price_asc",
   "price_desc",
+  "price_drop",
   "mileage",
   "newest",
   "recent",
@@ -37,6 +38,7 @@ export interface SearchQuery {
   sort?: string;
   page?: string;
   need?: string;
+  price_drops?: string;
   min_range?: string;
   max_charge?: string;
   road_tax?: string;
@@ -48,6 +50,15 @@ export interface LockedFilters {
   model?: string;
   location?: string;
   fuel?: string;
+  body_style?: string;
+  transmission?: string;
+  /** Always applied segment filters (monthly/cash bands, price drops). */
+  lockedQuery?: Partial<SearchQuery>;
+  browse?: {
+    title: string;
+    description?: string;
+    breadcrumbLabel: string;
+  };
 }
 
 const SEARCH_KEYS: Array<keyof SearchQuery> = [
@@ -76,6 +87,7 @@ const SEARCH_KEYS: Array<keyof SearchQuery> = [
   "sort",
   "page",
   "need",
+  "price_drops",
   "min_range",
   "max_charge",
   "road_tax",
@@ -156,16 +168,59 @@ export function mergeSearchQuery(
   return next;
 }
 
+const LOCKED_QUERY_KEYS = new Set<keyof SearchQuery>([
+  "monthly_min",
+  "monthly_max",
+  "monthly",
+  "min_price",
+  "max_price",
+  "price_drops",
+  "body_style",
+  "transmission",
+  "fuel",
+]);
+
+export function isLockedSearchKey(
+  key: keyof SearchQuery,
+  locked: LockedFilters = {},
+): boolean {
+  if (key === "make" && locked.make) {
+    return true;
+  }
+  if (key === "model" && locked.model) {
+    return true;
+  }
+  if (key === "location" && locked.location) {
+    return true;
+  }
+  if (key === "fuel" && locked.fuel) {
+    return true;
+  }
+  if (key === "body_style" && locked.body_style) {
+    return true;
+  }
+  if (key === "transmission" && locked.transmission) {
+    return true;
+  }
+  if (!locked.lockedQuery) {
+    return false;
+  }
+  return LOCKED_QUERY_KEYS.has(key) && locked.lockedQuery[key] !== undefined;
+}
+
 export function applyLockedFilters(
   query: SearchQuery,
   locked: LockedFilters,
 ): SearchQuery {
   return {
     ...query,
+    ...(locked.lockedQuery ?? {}),
     ...(locked.make ? { make: locked.make } : {}),
     ...(locked.model ? { model: locked.model } : {}),
     ...(locked.location ? { location: locked.location } : {}),
     ...(locked.fuel ? { fuel: locked.fuel } : {}),
+    ...(locked.body_style ? { body_style: locked.body_style } : {}),
+    ...(locked.transmission ? { transmission: locked.transmission } : {}),
   };
 }
 
@@ -191,6 +246,15 @@ export function buildSearchHref(
       return;
     }
     if (key === "fuel" && locked.fuel) {
+      return;
+    }
+    if (key === "body_style" && locked.body_style) {
+      return;
+    }
+    if (key === "transmission" && locked.transmission) {
+      return;
+    }
+    if (isLockedSearchKey(key, locked)) {
       return;
     }
 

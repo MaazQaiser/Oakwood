@@ -94,6 +94,7 @@ export const hpPcpComparison: FinanceComparisonRow[] = [
 const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
   "bad-credit": {
     slug: "bad-credit",
+    oakwoodOwnCopyReview: true,
     eyebrow: "Finance",
     h1: "Car finance with bad credit",
     intro:
@@ -159,7 +160,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     related: related([
       { href: getFinanceIntentUrl("no-deposit"), label: "No deposit finance" },
       { href: getFinanceIntentUrl("ccj"), label: "Finance with a CCJ" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
     ]),
   },
@@ -230,7 +231,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     related: related([
       { href: routes.partExchange, label: "Part exchange your car" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getFinanceIntentUrl("bad-credit"), label: "Finance with bad credit" },
     ]),
     secondaryCta: {
@@ -241,6 +242,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
   },
   ccj: {
     slug: "ccj",
+    oakwoodOwnCopyReview: true,
     eyebrow: "Finance",
     h1: "Car finance with a CCJ",
     intro:
@@ -305,13 +307,14 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     ],
     related: related([
       { href: getFinanceIntentUrl("bad-credit"), label: "Finance with bad credit" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getUsedCarsUrl(), label: "Browse used cars" },
       { href: routes.contact, label: "Contact Oakwood" },
     ]),
   },
   "self-employed": {
     slug: "self-employed",
+    oakwoodOwnCopyReview: true,
     eyebrow: "Finance",
     h1: "Car finance for self-employed drivers",
     intro:
@@ -375,7 +378,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
       },
     ],
     related: related([
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getFinanceIntentUrl("first-time-buyer"), label: "First-time buyers" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
       { href: getUsedVansUrl(), label: "Browse used vans" },
@@ -383,6 +386,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
   },
   "first-time-buyer": {
     slug: "first-time-buyer",
+    oakwoodOwnCopyReview: true,
     eyebrow: "Finance",
     h1: "Car finance for first-time buyers",
     intro:
@@ -453,12 +457,83 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     related: related([
       { href: getFinanceIntentUrl("hp"), label: "How HP works" },
       { href: getFinanceIntentUrl("pcp"), label: "How PCP works" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
     ]),
     secondaryCta: {
       href: getFinanceCalculatorUrl(),
       label: "Finance calculator",
+      event: "calculator",
+    },
+  },
+  "0-percent": {
+    slug: "0-percent",
+    eyebrow: "Finance",
+    h1: "0% on any car",
+    intro:
+      "0% APR on any car in stock over 12 or 18 months, with at least half the total price as a deposit and a maximum of £10,000 of credit. The Oakwood Package is included.",
+    metaTitle: "0% interest free car finance",
+    metaDescription:
+      "0% APR on any car in stock over 12 or 18 months. Maximum £10,000 credit, at least half the total price as deposit. Oakwood Package included.",
+    whatThisMeans: {
+      title: "What 0% finance means",
+      paragraphs: [
+        "0% APR means no interest is charged on the amount financed when the deal qualifies: advance at or under £10,000, deposit at least half the total price, term 12 or 18 months.",
+        "Oakwood is a credit broker, not a lender. Finance is subject to status and affordability.",
+      ],
+    },
+    howOakwoodHelps: {
+      title: "How Oakwood offers interest free",
+      paragraphs: [
+        "Every car in stock can qualify. Build a live quote on the interest free page — nothing is hardcoded.",
+        "Beyond 18 months the page shows Hire Purchase at the representative APR with an Oakwood deposit contribution.",
+      ],
+    },
+    eligibility: {
+      title: "Eligibility",
+      paragraphs: [
+        "Interest free credit is only available to customers with a strong credit history. A full application leaves a hard search footprint.",
+        "If you are unsure, check your rate first with a soft search.",
+      ],
+    },
+    education: {
+      title: "Things to weigh up",
+      cards: [
+        {
+          title: "£10,000 credit cap",
+          body: "This is the condition that governs most deals. On totals over £20,000 the deposit will be more than half.",
+        },
+        {
+          title: "Term length",
+          body: "Interest free runs to 18 months. Longer terms switch to Hire Purchase at the representative APR.",
+        },
+        {
+          title: "Package included",
+          body: "The Oakwood Package is priced per car and sold at the same price whether you finance or not.",
+        },
+      ],
+    },
+    faqs: [
+      {
+        question: "Is 0% available on every car?",
+        answer:
+          "Yes, any car in stock can qualify if the deposit, advance and term meet the conditions. Subject to lender status.",
+      },
+      {
+        question: "Does checking eligibility affect my credit score?",
+        answer:
+          "The eligibility check uses a soft search, which does not affect your credit file.",
+      },
+    ],
+    related: related([
+      { href: getFinanceIntentUrl("no-deposit"), label: "No deposit finance" },
+      { href: getFinanceIntentUrl("hp"), label: "How HP works" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
+      { href: `${routes.offers}/winter-finance-event`, label: "Current offers" },
+    ]),
+    secondaryCta: {
+      href: getEligibilityUrl(),
+      label: "Check my rate",
       event: "calculator",
     },
   },
@@ -538,7 +613,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     related: related([
       { href: getFinanceIntentUrl("pcp"), label: "How PCP works" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getUsedCarsUrl(), label: "Browse used cars" },
     ]),
     secondaryCta: {
@@ -623,7 +698,7 @@ const pages: Record<FinanceIntentSlug, FinanceIntentPageContent> = {
     related: related([
       { href: getFinanceIntentUrl("hp"), label: "How HP works" },
       { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
-      { href: getEligibilityUrl(), label: "Check my eligibility" },
+      { href: getEligibilityUrl(), label: "Check my rate" },
       { href: getUsedCarsUrl(), label: "Browse used cars" },
     ]),
     secondaryCta: {
@@ -663,7 +738,7 @@ export const financeHubFaqs: FinanceFaqItem[] = [
 ];
 
 export const financeHubRelated: FinanceRelatedLink[] = [
-  { href: getEligibilityUrl(), label: "Check my eligibility" },
+  { href: getEligibilityUrl(), label: "Check my rate" },
   { href: getFinanceCalculatorUrl(), label: "Finance calculator" },
   { href: getUsedCarsUrl(), label: "Used cars" },
   { href: getUsedVansUrl(), label: "Used vans" },
@@ -682,6 +757,7 @@ export const financeHubGuides: Array<{
   { slug: "ccj", title: "Car finance with a CCJ", description: "A CCJ is part of credit history. It is not an automatic yes or no on this website." },
   { slug: "self-employed", title: "Finance if you are self-employed", description: "Check eligibility as a self-employed customer without a made-up document list." },
   { slug: "first-time-buyer", title: "Finance for first-time buyers", description: "Start with monthly affordability, deposit, term, and HP versus PCP." },
+  { slug: "0-percent", title: "0% finance", description: "What promotional 0% APR means on used cars — and what Oakwood can show before application." },
   { slug: "hp", title: "How HP works", description: "Hire Purchase: deposit, monthly payments, term, ownership and total payable." },
   { slug: "pcp", title: "How PCP works", description: "Personal Contract Purchase: mileage, optional final payment, and how it differs from HP." },
 ];

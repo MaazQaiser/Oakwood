@@ -5,6 +5,7 @@ import { IconClose } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 import { formatPounds } from "@/lib/format/money";
 import type { LockedFilters, SearchQuery } from "@/lib/validation/search";
+import { isLockedSearchKey } from "@/lib/validation/search";
 import { splitFilterValues } from "@/lib/validation/search";
 import {
   getLocationName,
@@ -75,32 +76,41 @@ export function getFilterChips(
     });
   }
 
-  splitFilterValues(query.body_style).forEach((value) => {
+  splitFilterValues(query.body_style ?? locked.body_style).forEach((value) => {
     chips.push({
       id: `body-${value}`,
       label: value,
+      locked: Boolean(locked.body_style),
       relaxed: isRelaxed(relaxedKeys, ["body_style"]),
-      onRemove: () => onRemove("body_style", value),
+      onRemove: locked.body_style
+        ? undefined
+        : () => onRemove("body_style", value),
     });
   });
 
-  splitFilterValues(query.fuel).forEach((value) => {
+  splitFilterValues(query.fuel ?? locked.fuel).forEach((value) => {
     chips.push({
       id: `fuel-${value}`,
       label: value,
+      locked: Boolean(locked.fuel),
       relaxed: isRelaxed(relaxedKeys, ["fuel"]),
-      onRemove: () => onRemove("fuel", value),
+      onRemove: locked.fuel ? undefined : () => onRemove("fuel", value),
     });
   });
 
-  splitFilterValues(query.transmission).forEach((value) => {
-    chips.push({
-      id: `transmission-${value}`,
-      label: value,
-      relaxed: isRelaxed(relaxedKeys, ["transmission"]),
-      onRemove: () => onRemove("transmission", value),
-    });
-  });
+  splitFilterValues(query.transmission ?? locked.transmission).forEach(
+    (value) => {
+      chips.push({
+        id: `transmission-${value}`,
+        label: value,
+        locked: Boolean(locked.transmission),
+        relaxed: isRelaxed(relaxedKeys, ["transmission"]),
+        onRemove: locked.transmission
+          ? undefined
+          : () => onRemove("transmission", value),
+      });
+    },
+  );
 
   splitFilterValues(query.location).forEach((value) => {
     chips.push({
@@ -125,29 +135,53 @@ export function getFilterChips(
   });
 
   if (query.min_price || query.max_price) {
+    const priceLocked =
+      isLockedSearchKey("min_price", locked) ||
+      isLockedSearchKey("max_price", locked);
     chips.push({
       id: "price",
       label: `${query.min_price ? formatPounds(Number(query.min_price)) : "Any"} — ${query.max_price ? formatPounds(Number(query.max_price)) : "Any"}`,
+      locked: priceLocked,
       relaxed: isRelaxed(relaxedKeys, ["min_price", "max_price"]),
-      onRemove: () => {
-        onRemove("min_price");
-        onRemove("max_price");
-      },
+      onRemove: priceLocked
+        ? undefined
+        : () => {
+            onRemove("min_price");
+            onRemove("max_price");
+          },
     });
   }
 
   const monthlyMin = query.monthly_min;
   const monthlyMax = query.monthly_max ?? query.monthly;
   if (monthlyMin || monthlyMax) {
+    const monthlyLocked =
+      isLockedSearchKey("monthly_min", locked) ||
+      isLockedSearchKey("monthly_max", locked) ||
+      isLockedSearchKey("monthly", locked);
     chips.push({
       id: "monthly",
       label: `${monthlyMin ? formatPounds(Number(monthlyMin)) : "Any"}–${monthlyMax ? formatPounds(Number(monthlyMax)) : "Any"}/month`,
+      locked: monthlyLocked,
       relaxed: isRelaxed(relaxedKeys, ["monthly_min", "monthly_max", "monthly"]),
-      onRemove: () => {
-        onRemove("monthly_min");
-        onRemove("monthly_max");
-        onRemove("monthly");
-      },
+      onRemove: monthlyLocked
+        ? undefined
+        : () => {
+            onRemove("monthly_min");
+            onRemove("monthly_max");
+            onRemove("monthly");
+          },
+    });
+  }
+
+  if (query.price_drops === "1") {
+    chips.push({
+      id: "price-drops",
+      label: "Price drops",
+      locked: isLockedSearchKey("price_drops", locked),
+      onRemove: isLockedSearchKey("price_drops", locked)
+        ? undefined
+        : () => onRemove("price_drops"),
     });
   }
 

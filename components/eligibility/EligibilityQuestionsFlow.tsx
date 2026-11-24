@@ -422,7 +422,7 @@ export function EligibilityQuestionsFlow() {
             <EligibilityNavigation
               onBack={() => void goBack()}
               onContinue={() => void submit()}
-              continueLabel="Check my eligibility"
+              continueLabel="Check my rate"
             />
           </>
         }

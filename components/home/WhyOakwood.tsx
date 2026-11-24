@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeftRight, PiggyBank } from "lucide-react";
 import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
 import { HomeRepresentativeExample } from "@/components/home/HomeRepresentativeExample";
 import { SectionIntro } from "@/components/home/SectionIntro";
@@ -49,7 +50,7 @@ export function WhyOakwood() {
                 Flexible finance that starts with your budget
               </h3>
               <p className="mt-4 text-[0.98rem] leading-relaxed text-secondary">
-                Check eligibility and see a personalised finance profile. Monthly
+                Check your rate and see a personalised finance profile. Monthly
                 figures before a full application are illustrations.
               </p>
               {preview ? (
@@ -74,7 +75,7 @@ export function WhyOakwood() {
                   href={routes.eligibility}
                   className="text-primary-secondary no-underline hover:underline"
                 >
-                  Check eligibility
+                  Check my rate
                 </Link>
               </div>
             </div>
@@ -136,13 +137,17 @@ export function WhyOakwood() {
           </div>
 
           <article className="flex flex-col rounded-[28px] bg-page-tint p-7">
-            <PiggyIcon />
+            <PiggyBank
+              aria-hidden
+              className="h-8 w-8 text-navy"
+              strokeWidth={1.6}
+            />
             <h3 className="mt-5 text-xl font-semibold text-navy">Clear pricing</h3>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Each car shows a cash price and an example monthly payment together, so you can compare before you enquire.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
-              Check eligibility when you want those monthly figures to follow your finance profile.
+              Check your rate when you want those monthly figures to follow your finance profile.
             </p>
             <Link
               href={routes.usedCars}
@@ -153,7 +158,11 @@ export function WhyOakwood() {
           </article>
 
           <article className="flex flex-col rounded-[28px] bg-[#ECF3F8] p-7">
-            <ExchangeIcon />
+            <ArrowLeftRight
+              aria-hidden
+              className="h-8 w-8 text-navy"
+              strokeWidth={1.6}
+            />
             <h3 className="mt-5 text-xl font-semibold text-navy">Part exchange</h3>
             <p className="mt-3 text-sm leading-relaxed text-secondary">
               Get a valuation you can put towards your deposit. The online figure is an estimate.
@@ -185,32 +194,3 @@ export function WhyOakwood() {
   );
 }
 
-function PiggyIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-[#002852]">
-      <rect x="3.5" y="6" width="17" height="12" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M13.7 9.15c0-1.1-.85-1.85-2-1.85-1.2 0-2 .75-2 1.9 0 1 .45 1.65 1.15 2L9.9 14.75h4.4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9.7 11.5h3.55"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function ExchangeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-8 w-8 text-[#002852]">
-      <path d="M7 8h10l-2.2-2.2M17 16H7l2.2 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M16.8 8a6.2 6.2 0 0 1-9.4 7.2M7.2 16A6.2 6.2 0 0 1 16.6 8.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}

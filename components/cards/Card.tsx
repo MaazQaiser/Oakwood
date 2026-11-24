@@ -11,6 +11,11 @@ import { IconArrow } from "@/components/ui/icons";
 import { VehicleAvailabilityBadge } from "@/components/vehicle/VehicleAvailabilityBadge";
 import { formatNumber, formatPounds } from "@/lib/format/money";
 import { getVehicleUrl } from "@/config/routes";
+import { isVehicleGuaranteeEligible } from "@/lib/guarantee/eligibility";
+import {
+  hasVehiclePriceDrop,
+  vehiclePriceDropAmount,
+} from "@/lib/vehicles/browse-segments";
 import type { Vehicle } from "@/types/vehicle";
 import {
   PRICE_VIEW_TOTAL,
@@ -120,6 +125,8 @@ export function VehicleCard({
     "vehicle-card-link text-ink no-underline hover:text-primary focus-visible:outline-none after:absolute after:inset-0 after:z-[1] after:rounded-2xl after:content-['']";
   const imageLabel = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const monthlyAmount = monthly ?? vehicle.monthlyPayment;
+  const priceDrop = hasVehiclePriceDrop(vehicle);
+  const dropAmount = priceDrop ? vehiclePriceDropAmount(vehicle) : 0;
   const availabilityLabel =
     vehicle.availability === "reserved"
       ? "Reserved"
@@ -161,11 +168,21 @@ export function VehicleCard({
             className="object-cover"
           />
         </div>
-        {vehicle.availability !== "available" ? (
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          {priceDrop ? (
+            <span className="inline-flex items-center rounded-full bg-success-soft px-2.5 py-1 text-caption font-semibold text-success">
+              Price drop {formatPounds(dropAmount)}
+            </span>
+          ) : null}
+          {vehicle.availability !== "available" ? (
             <VehicleAvailabilityBadge availability={vehicle.availability} />
-          </div>
-        ) : null}
+          ) : null}
+          {isVehicleGuaranteeEligible(vehicle) ? (
+            <span className="inline-flex items-center rounded-full bg-navy px-2.5 py-1 text-caption font-semibold text-white">
+              30 Day Guarantee
+            </span>
+          ) : null}
+        </div>
         {toolbar && !featured ? (
           <div className="absolute right-3 top-3 z-[2]">{toolbar}</div>
         ) : null}

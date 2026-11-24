@@ -5,6 +5,8 @@ import type { MockPaymentOutcome } from "@/types/reservation";
  * Stripe integration boundary.
  * No secret keys live here. Card data is never collected by Oakwood UI.
  * Replace MockStripeAdapter with the live Stripe PaymentIntent + webhook flow.
+ * When `immediateCapture` is false, create PaymentIntents with
+ * `capture_method: "manual"` so Oakwood only authorises the card.
  */
 export interface CreatePaymentIntentInput {
   reservationId: string;
@@ -44,6 +46,8 @@ export function createStripeAdapter() {
     amount: reservationConfig.amount,
     currency: reservationConfig.currency,
     immediateCapture: reservationConfig.immediateCapture,
+    captureMode: reservationConfig.captureMode,
+    captureMethod: reservationConfig.immediateCapture ? "automatic" : "manual",
   };
 }
 

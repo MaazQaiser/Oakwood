@@ -26,6 +26,7 @@ export const SORT_OPTIONS: Array<{ value: SearchSort; label: string }> = [
   { value: "monthly_desc", label: "Monthly payment: high to low" },
   { value: "price_asc", label: "Cash price: low to high" },
   { value: "price_desc", label: "Cash price: high to low" },
+  { value: "price_drop", label: "Biggest price drop" },
   { value: "mileage", label: "Lowest mileage" },
   { value: "newest", label: "Newest cars" },
   { value: "recent", label: "Recently added" },

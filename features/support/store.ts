@@ -7,20 +7,6 @@ import { MARKETING_CONSENT_WORDING } from "@/lib/eligibility/copy";
 
 const enquiries = new Map<string, SupportEnquiryRecord>();
 const complaints = new Map<string, SupportComplaintRecord>();
-const staffRefunds = new Map<
-  string,
-  {
-    id: string;
-    createdAt: number;
-    reference: string;
-    customerName: string;
-    registration: string;
-    salesExecutive?: string;
-    paymentMethod: "bacs" | "card";
-    reason: string;
-  }
->();
-
 function opaqueId(): string {
   return randomBytes(16).toString("hex");
 }
@@ -172,13 +158,20 @@ export function createSupportComplaint(
     description: input.description,
     locationSlug: input.locationSlug,
     existingReference: input.existingReference,
+    registration: input.registration,
+    stockId: input.stockId,
+    resolutionPreference: input.resolutionPreference,
+    preferredContactTime: input.preferredContactTime,
+    photoNotes: input.photoNotes,
+    need: input.need,
     source: input.source ?? "complaints",
     crmPayload: toLead({
       name: input.name,
       email: input.email,
       telephone: input.telephone,
       source: input.source ?? "complaints",
-      requestedAction: "complaint",
+      stockId: input.stockId,
+      requestedAction: input.need === "put-right" ? "put-right" : "complaint",
     }),
   };
   complaints.set(id, record);
@@ -186,25 +179,3 @@ export function createSupportComplaint(
   return record;
 }
 
-export function createStaffRefundRequest(input: {
-  customerName: string;
-  registration: string;
-  salesExecutive?: string;
-  paymentMethod: "bacs" | "card";
-  reason: string;
-}): { reference: string } {
-  const id = opaqueId();
-  const record = {
-    id,
-    createdAt: Date.now(),
-    reference: reference(id, "RFN"),
-    customerName: input.customerName,
-    registration: input.registration,
-    salesExecutive: input.salesExecutive,
-    paymentMethod: input.paymentMethod,
-    reason: input.reason,
-  };
-  staffRefunds.set(id, record);
-  void eskimoIntegration.implemented;
-  return { reference: record.reference };
-}

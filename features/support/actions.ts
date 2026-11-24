@@ -13,11 +13,9 @@ import {
 } from "@/lib/support/validation";
 import {
   createCallbackLead,
-  createStaffRefundRequest,
   createSupportComplaint,
   createSupportEnquiry,
 } from "@/features/support/store";
-import { validateStaffRefundForm } from "@/lib/support/refund-form";
 import { nameError, telephoneError } from "@/lib/aftersales/validation";
 import { getShowroomProfile } from "@/config/locations";
 import {
@@ -25,7 +23,9 @@ import {
   getNextOpenDays,
   getSalesTimeSlots,
 } from "@/lib/deal/opening-status";
+import { lookupCustomerSaleByRegistration } from "@/lib/support/customer-sale";
 import type { SupportComplaintInput } from "@/types/complaint";
+import type { CustomerSaleRecord } from "@/lib/support/customer-sale";
 import type { SupportEnquiryInput } from "@/types/enquiry";
 
 export async function submitSupportEnquiry(
@@ -74,33 +74,18 @@ export async function submitSupportEnquiry(
   }
 }
 
-export async function submitStaffRefundRequest(input: {
-  customerName: string;
-  registration: string;
-  salesExecutive?: string;
-  paymentMethod: "bacs" | "card";
-  accountNumber?: string;
-  sortCode?: string;
-  cardNumber?: string;
-  cardExpiry?: string;
-  reason: string;
-}): Promise<{ ok: true; reference: string } | { ok: false; error: string }> {
-  try {
-    const invalid = validateStaffRefundForm(input);
-    if (invalid) {
-      return { ok: false, error: invalid };
-    }
-    const record = createStaffRefundRequest({
-      customerName: input.customerName.trim(),
-      registration: input.registration.trim().toUpperCase(),
-      salesExecutive: input.salesExecutive?.trim() || undefined,
-      paymentMethod: input.paymentMethod,
-      reason: input.reason.trim(),
-    });
-    return { ok: true, reference: record.reference };
-  } catch {
-    return { ok: false, error: "We couldn't submit this refund request." };
+export async function lookupCustomerSale(
+  registration: string,
+): Promise<{ ok: true; sale: CustomerSaleRecord } | { ok: false; error: string }> {
+  const sale = lookupCustomerSaleByRegistration(registration);
+  if (!sale) {
+    return {
+      ok: false,
+      error:
+        "We couldn't find that registration on our records. Check it matches the V5, or call us.",
+    };
   }
+  return { ok: true, sale };
 }
 
 export async function submitSupportComplaint(

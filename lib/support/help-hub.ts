@@ -1,4 +1,5 @@
 import { routes } from "@/config/routes";
+import { guaranteeCopy } from "@/lib/guarantee/copy";
 
 export type HelpTopicId =
   | "all"
@@ -9,6 +10,7 @@ export type HelpTopicId =
   | "delivery"
   | "servicing"
   | "warranty"
+  | "guarantee"
   | "contact";
 
 export interface HelpTopicLink {
@@ -60,7 +62,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     id: "finance",
     name: "Finance",
     blurb: "Eligibility, the calculator, HP and PCP, deposits and credit history.",
-    serviceLinks: [{ label: "Check my eligibility", href: routes.eligibility }],
+    serviceLinks: [{ label: "Check my rate", href: routes.eligibility }],
   },
   {
     id: "partex",
@@ -77,11 +79,10 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "reservations",
     name: "Reservations",
-    blurb: "Holding a car for £99, refunds and what happens if plans change.",
+    blurb: "£49 card authorisation, 5-day hold, and how to cancel.",
     serviceLinks: [
-      { label: "Deposit rules", href: routes.depositRules },
-      { label: "Request a refund", href: routes.requestRefund },
       { label: "Reservation terms", href: routes.reservationTerms },
+      { label: "Help and support", href: routes.help },
     ],
   },
   {
@@ -102,8 +103,23 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: "warranty",
     name: "Warranty",
-    blurb: "Your 12-month warranty and how to make a claim.",
-    serviceLinks: [{ label: "Start a warranty claim", href: routes.warrantyClaims }],
+    blurb: "Your 6-month warranty and how to make a claim.",
+    serviceLinks: [
+      {
+        label: "Report a problem with your car",
+        href: routes.problemWithYourCar,
+      },
+    ],
+  },
+  {
+    id: "guarantee",
+    name: "30 Day Guarantee",
+    blurb: guaranteeCopy.subheadline,
+    serviceLinks: [
+      { label: "30 Day Guarantee", href: routes.thirtyDayGuarantee },
+      { label: "Request form", href: routes.thirtyDayGuaranteeRequest },
+      { label: "Full terms", href: routes.thirtyDayGuaranteeTerms },
+    ],
   },
   {
     id: "contact",
@@ -124,11 +140,19 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "See how it works", href: "/how-it-works", verified: false },
   },
   {
+    id: "need-account",
+    topicId: "buying",
+    question: "Do I need an account?",
+    answer:
+      "No account is needed to check finance eligibility, browse cars, reserve online or send us a message.",
+    link: { label: "Check my rate", href: routes.eligibility, verified: true },
+  },
+  {
     id: "buy-account",
     topicId: "buying",
     question: "Do I need an account to check finance or send a message?",
     answer: "No. You don't need an account to check your finance eligibility or to send us a message.",
-    link: { label: "Check my eligibility", href: "/finance-eligibility", verified: true },
+    link: { label: "Check my rate", href: "/finance-eligibility", verified: true },
   },
   {
     id: "buy-vehicle",
@@ -138,6 +162,14 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "Browse used cars", href: "/used-cars", verified: false },
   },
   {
+    id: "view-a-car",
+    topicId: "buying",
+    question: "Where can I view a car?",
+    answer:
+      "Cars are at Oakwood Bury (BL8 1SW) and Oakwood Chorley (PR6 9RG). Each vehicle page shows which showroom has the car.",
+    link: { label: "Find a showroom", href: routes.locations, verified: false },
+  },
+  {
     id: "buy-where",
     topicId: "buying",
     question: "Where can I see the cars?",
@@ -145,12 +177,22 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "Find a showroom", href: "/locations", verified: false },
   },
   {
+    id: "credit-score",
+    topicId: "finance",
+    group: "Checking eligibility",
+    question: "Does checking my eligibility affect my credit score?",
+    answer:
+      "No. Checking eligibility uses a soft search, which doesn't affect your credit file. A full finance application, with a harder search, only happens later, when you build a deal on a specific car.",
+    link: { label: "Check my rate", href: routes.eligibility, verified: true },
+    needsConfirm: true,
+  },
+  {
     id: "elig-credit",
     topicId: "finance",
     group: "Checking eligibility",
     question: "Does checking my eligibility affect my credit score?",
     answer: "No. Checking eligibility uses a soft search, which doesn't affect your credit file. A full finance application, with a harder search, only happens later, when you build a deal on a specific car.",
-    link: { label: "Check my eligibility", href: "/finance-eligibility", verified: true },
+    link: { label: "Check my rate", href: "/finance-eligibility", verified: true },
     needsConfirm: true,
   },
   {
@@ -235,6 +277,15 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "How PCP works", href: "/finance.php/pcp", verified: false },
   },
   {
+    id: "hp-or-pcp",
+    topicId: "finance",
+    group: "HP and PCP",
+    question: "Should I choose HP or PCP?",
+    answer:
+      "Neither is better for everyone. HP is simpler: you own the car at the end and there's no final payment. PCP often has lower monthly payments because of the optional final payment, and includes a mileage limit. Compare both on the car you like.",
+    link: { label: "Compare HP and PCP", href: "/finance.php/pcp", verified: false },
+  },
+  {
     id: "hp-vs-pcp",
     topicId: "finance",
     group: "HP and PCP",
@@ -308,6 +359,14 @@ export const HELP_FAQS: HelpFaq[] = [
     needsConfirm: true,
   },
   {
+    id: "how-valued",
+    topicId: "partex",
+    question: "How is my part-exchange car valued?",
+    answer:
+      "Use Sell My Car or the part-exchange journey on site for an estimate. The final figure is confirmed after we inspect your car and it may change.",
+    link: { label: "Value my car", href: routes.sellMyCar, verified: false },
+  },
+  {
     id: "px-deposit",
     topicId: "partex",
     question: "How does my part-exchange value affect my deposit?",
@@ -319,34 +378,45 @@ export const HELP_FAQS: HelpFaq[] = [
     topicId: "partex",
     question: "Can my part exchange replace a cash deposit?",
     answer: "Yes. Positive equity from your part exchange can be used instead of, or as well as, a cash deposit.",
-    link: { label: "Value my car", href: "/sell-my-car", verified: false },
+    link: { label: "Part exchange", href: routes.partExchange, verified: true },
   },
   {
     id: "px-change",
     topicId: "partex",
     question: "Will my part-exchange valuation change?",
     answer: "The online valuation is an estimate. Your final offer is confirmed after we inspect the car, and it may change.",
-    link: { label: "Value my car", href: "/sell-my-car", verified: false },
+    link: { label: "Part exchange", href: routes.partExchange, verified: true },
+  },
+  {
+    id: "reserve-online",
+    topicId: "reservations",
+    question: "Can I reserve a car online?",
+    answer:
+      "Yes. Start from the vehicle page, complete the reservation step, and we hold the car while you finish your purchase.",
+    link: { label: "Reservation terms", href: routes.reservationTerms, verified: true },
   },
   {
     id: "res-99",
     topicId: "reservations",
-    question: "How does the £99 reservation work?",
-    answer: "Pay £99 to hold a car for 48 hours while you complete your purchase. It's fully refundable, and it comes off the purchase price.",
+    question: "How does the £49 reservation work?",
+    answer:
+      "We place a £49 card authorisation to hold a car for 5 days while you complete your purchase. The money is not taken, and it is applied to the purchase price if you go ahead.",
     link: { label: "Reserve a car", href: "/reserve", verified: false },
   },
   {
     id: "res-refund",
     topicId: "reservations",
-    question: "Can I get a refund on my reservation?",
-    answer: "Yes. Your reservation is fully refundable. Request a refund if you change your mind; the car is released once you submit the request.",
+    question: "Can I cancel my reservation?",
+    answer:
+      "Yes. Open your reservation from the manage link and choose Cancel reservation. We release the card authorisation and the car becomes available again.",
     link: { label: "Reservation terms", href: "/legal/reservation", verified: false },
   },
   {
     id: "res-expire",
     topicId: "reservations",
     question: "What happens when my reservation expires?",
-    answer: "After 48 hours the reservation ends and the car becomes available to other buyers again.",
+    answer:
+      "After 5 days the reservation ends, we release the card authorisation, and the car becomes available to other buyers again.",
     link: { label: "Reservation terms", href: "/legal/reservation", verified: false },
     needsConfirm: true,
   },
@@ -354,8 +424,22 @@ export const HELP_FAQS: HelpFaq[] = [
     id: "res-gone",
     topicId: "reservations",
     question: "What if the car I reserved becomes unavailable?",
-    answer: "If the car is no longer available, your £99 reservation is refunded.",
+    answer:
+      "If the car is no longer available, we release the £49 card authorisation. Nothing is charged.",
     link: { label: "Cancellation and refund terms", href: "/legal/cancellation-refund", verified: false },
+  },
+  {
+    id: "delivery",
+    topicId: "delivery",
+    question: "How does delivery work?",
+    answer:
+      "You can collect from Oakwood Bury or Chorley, or arrange delivery where available. We confirm options and documents when your purchase is agreed.",
+    link: {
+      label: "Delivery and collection",
+      href: routes.deliveryAndCollection,
+      verified: false,
+    },
+    needsConfirm: true,
   },
   {
     id: "del-options",
@@ -406,6 +490,15 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "Audi servicing", href: "/servicing-audi.php", verified: false },
   },
   {
+    id: "mot-due",
+    topicId: "servicing",
+    group: "MOT",
+    question: "When is my MOT due?",
+    answer:
+      "Most cars need their first MOT by the third anniversary of first registration, then every year. Check your V5 or MOT certificate for the exact date.",
+    link: { label: "MOT at Oakwood", href: routes.mot, verified: false },
+  },
+  {
     id: "mot-when",
     topicId: "servicing",
     group: "MOT",
@@ -433,7 +526,8 @@ export const HELP_FAQS: HelpFaq[] = [
     id: "war-incl",
     topicId: "warranty",
     question: "Do Oakwood cars come with a warranty?",
-    answer: "Yes. Every car we sell comes with a 12-month warranty. Claim details are provided with your car.",
+    answer:
+      "Yes. Every car we sell comes with a 6-month in house warranty included. Claim details are provided with your car.",
     link: { label: "About our warranty", href: "/warranty", verified: false },
   },
   {
@@ -444,11 +538,27 @@ export const HELP_FAQS: HelpFaq[] = [
     link: { label: "About our warranty", href: "/warranty", verified: false },
   },
   {
+    id: "warranty-claim",
+    topicId: "warranty",
+    question: "How do I make a warranty claim?",
+    answer:
+      "Use the problem-with-your-car form and choose warranty fault. Include your registration and what has failed.",
+    link: {
+      label: "Report a warranty fault",
+      href: `${routes.problemWithYourCar}?need=warranty`,
+      verified: true,
+    },
+  },
+  {
     id: "war-claim",
     topicId: "warranty",
     question: "How do I make a warranty claim?",
     answer: "Start a claim online, or contact us with your vehicle details.",
-    link: { label: "Start a warranty claim", href: "/warranty-claims", verified: true },
+    link: {
+      label: "Start a warranty claim",
+      href: `${routes.problemWithYourCar}?need=warranty`,
+      verified: true,
+    },
   },
   {
     id: "war-photos",
@@ -457,6 +567,14 @@ export const HELP_FAQS: HelpFaq[] = [
     answer: "Yes. After we receive your claim, we may ask you to send photos of the issue.",
     link: { label: "Start a warranty claim", href: "/warranty-claims", verified: true },
     needsConfirm: true,
+  },
+  {
+    id: "contact-you",
+    topicId: "contact",
+    question: "How do I contact you?",
+    answer:
+      "Call Bury on 0161 762 1000 or Chorley on 01257 826 530, Mon–Sat 09:00–18:00, or send a message any time.",
+    link: { label: "Contact Oakwood", href: routes.contact, verified: true },
   },
   {
     id: "con-hours",
@@ -477,9 +595,26 @@ export const HELP_FAQS: HelpFaq[] = [
     topicId: "contact",
     question: "How do I make a complaint?",
     answer: "Use the complaint form or call us. Include enough detail for us to understand what happened, plus your order or reservation reference if you have one. We'll review it and contact you using the details you give.",
-    link: { label: "Raise a complaint", href: "/complaints", verified: true },
+    link: {
+      label: "Problem with your car?",
+      href: routes.problemWithYourCar,
+      verified: true,
+    },
     needsConfirm: true,
-  }
+  },
+  ...guaranteeCopy.faqs.map(
+    (item): HelpFaq => ({
+      id: `guar-${item.id}`,
+      topicId: "guarantee",
+      question: item.question,
+      answer: item.answer,
+      link: {
+        label: "30 Day Guarantee",
+        href: routes.thirtyDayGuarantee,
+        verified: true,
+      },
+    }),
+  ),
 ];
 
 export const HELP_CONTACT_CARDS: HelpContactCard[] = [
@@ -508,7 +643,10 @@ export const HELP_CONTACT_CARDS: HelpContactCard[] = [
     id: "claim",
     title: "Report a problem with your car",
     body: "Bought from us and something's not right? Start a warranty claim with your vehicle details.",
-    cta: { label: "Start a claim", href: routes.warrantyClaims },
+    cta: {
+      label: "Start a report",
+      href: routes.problemWithYourCar,
+    },
   },
 ];
 

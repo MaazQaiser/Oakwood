@@ -14,9 +14,7 @@ export function createBreadcrumbs(
   return items;
 }
 
-/**
- * Sitemap generation is deferred until the SEO/GEO specification is supplied.
- */
+/** @deprecated Prefer app/sitemap.ts */
 export function getSitemapPlaceholder(): [] {
   return [];
 }

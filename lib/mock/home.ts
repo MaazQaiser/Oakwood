@@ -7,8 +7,28 @@ export interface FeaturedVehicle extends Vehicle {
 }
 
 export const featuredVehicles: FeaturedVehicle[] = mockVehicles
-  .filter((vehicle) => vehicle.category === "car")
+  .filter(
+    (vehicle) =>
+      vehicle.category === "car" &&
+      vehicle.availability !== "sold" &&
+      vehicle.availability !== "expired" &&
+      vehicle.availability !== "reserved",
+  )
   .slice(0, 6)
+  .map((vehicle) => ({
+    ...vehicle,
+    monthly: vehicle.monthlyPayment,
+  }));
+
+export const homeElectricVehicles: FeaturedVehicle[] = mockVehicles
+  .filter(
+    (vehicle) =>
+      vehicle.category === "car" &&
+      vehicle.fuelType === "Electric" &&
+      vehicle.availability !== "sold" &&
+      vehicle.availability !== "expired",
+  )
+  .slice(0, 4)
   .map((vehicle) => ({
     ...vehicle,
     monthly: vehicle.monthlyPayment,

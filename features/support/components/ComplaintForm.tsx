@@ -21,16 +21,31 @@ import {
   SUPPORT_CRM_NOTICE,
   SUPPORT_PRIVACY_NOTE,
 } from "@/lib/support/copy";
+import type { ProblemWithCarNeed } from "@/types/complaint";
 import type { SupportComplaintCategory } from "@/types/support";
 
 const DESCRIPTION_MAX = 1500;
 
-export function ComplaintForm({ telephone }: { telephone?: string }) {
+export function ComplaintForm({
+  telephone,
+  defaultCategory,
+  lockCategory,
+  source = "complaints",
+  hiddenNeed,
+}: {
+  telephone?: string;
+  defaultCategory?: SupportComplaintCategory;
+  lockCategory?: boolean;
+  source?: string;
+  hiddenNeed?: ProblemWithCarNeed;
+}) {
   const started = useRef(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telephoneValue, setTelephoneValue] = useState("");
-  const [category, setCategory] = useState<SupportComplaintCategory | "">("");
+  const [category, setCategory] = useState<SupportComplaintCategory | "">(
+    defaultCategory ?? "",
+  );
   const [locationSlug, setLocationSlug] = useState("");
   const [existingReference, setExistingReference] = useState("");
   const [description, setDescription] = useState("");
@@ -62,7 +77,8 @@ export function ComplaintForm({ telephone }: { telephone?: string }) {
       description,
       locationSlug: locationSlug || undefined,
       existingReference: existingReference || undefined,
-      source: "complaints",
+      source,
+      need: hiddenNeed,
     });
     setBusy(false);
     if (result.ok) {
@@ -136,6 +152,7 @@ export function ComplaintForm({ telephone }: { telephone?: string }) {
             id="complaint-category"
             name="category"
             required
+            disabled={lockCategory}
             value={category}
             onChange={(event) => {
               markStarted();

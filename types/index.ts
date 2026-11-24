@@ -26,7 +26,6 @@ export type {
   ReservationState,
   ReservationStockState,
   ReservationUiPhase,
-  RefundReasonCode,
 } from "./reservation";
 export type {
   Location,

@@ -2,7 +2,6 @@ import { Container } from "@/components/layout/Container";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchExperience } from "@/components/search/SearchExperience";
 import { SearchSeoContent } from "@/components/search/SearchSeoContent";
-import { FinanceSearchCTA } from "@/components/search/FinanceSearchCTA";
 import {
   applyLockedFilters,
   parseSearchQuery,
@@ -58,7 +57,6 @@ export function VehicleSearchPage({
         </Container>
       </section>
       <SearchSeoContent context={context} />
-      <FinanceSearchCTA basePath={context.basePath} category={category} />
     </>
   );
 }

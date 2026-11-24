@@ -7,12 +7,10 @@ import {
 export function ReservationSummary({
   amount,
   holdDurationDays,
-  refundable,
   appliedToPurchase,
 }: {
   amount: number;
   holdDurationDays: number;
-  refundable: boolean;
   appliedToPurchase: boolean;
 }) {
   return (
@@ -25,7 +23,7 @@ export function ReservationSummary({
       </h2>
       <dl className="mt-4 space-y-3 text-body">
         <div className="flex justify-between gap-4">
-          <dt className="text-muted">Reservation amount</dt>
+          <dt className="text-muted">Authorisation</dt>
           <dd className="text-label">{reservationAmountLabel(amount)}</dd>
         </div>
         <div className="flex justify-between gap-4">
@@ -33,8 +31,8 @@ export function ReservationSummary({
           <dd className="text-label">{formatHoldPeriod(holdDurationDays)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt className="text-muted">Refundable</dt>
-          <dd className="text-label">{refundable ? "Yes" : "See terms"}</dd>
+          <dt className="text-muted">Charged today</dt>
+          <dd className="text-label">No</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Applied to purchase</dt>
@@ -42,10 +40,10 @@ export function ReservationSummary({
         </div>
       </dl>
       <ul className="mt-5 space-y-2 text-body-sm">
-        <li>{reservationCopy.fullyRefundable}</li>
+        <li>{reservationCopy.cardAuthorisation}</li>
         <li>{reservationCopy.appliedToPurchase}</li>
         <li>{`Your car is held for ${formatHoldPeriod(holdDurationDays)}.`}</li>
-        <li>{reservationCopy.requestRefund}</li>
+        <li>{reservationCopy.cancelReservation}</li>
       </ul>
     </section>
   );

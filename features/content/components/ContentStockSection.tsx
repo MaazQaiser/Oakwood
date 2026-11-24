@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { VehicleCard } from "@/components/cards/Card";
 import { Grid } from "@/components/layout/Container";
-import { FinancePersonalisationBanner } from "@/components/search/FinancePersonalisationBanner";
+import { FinanceRateCta } from "@/components/finance/FinanceRateCta";
 import { analyticsEvents, trackEvent } from "@/lib/analytics";
 import {
   CONTENT_NO_STOCK_BODY,
@@ -12,7 +12,6 @@ import {
   CONTENT_STOCK_HEADING,
   CONTENT_VIEW_MODEL,
 } from "@/lib/content/copy";
-import { getSearchCopy } from "@/lib/vehicles/searchCopy";
 import { getVehicleUrl } from "@/config/routes";
 import type { Vehicle } from "@/types/vehicle";
 
@@ -68,9 +67,6 @@ export function ContentStockSection({
       <h2 id="content-stock-heading" className="text-h2">
         {CONTENT_STOCK_HEADING}
       </h2>
-      <div className="mt-4">
-        <FinancePersonalisationBanner copy={getSearchCopy("car")} />
-      </div>
       <Grid columns="cards" className="mt-6">
         {vehicles.slice(0, 6).map((vehicle, index) => (
           <VehicleCard
@@ -94,6 +90,11 @@ export function ContentStockSection({
           />
         ))}
       </Grid>
+      {vehicles.length >= 6 ? (
+        <div className="mt-6">
+          <FinanceRateCta variant="full" source="content_stock" />
+        </div>
+      ) : null}
       <div className="mt-6">
         <Button
           href={stockHref}

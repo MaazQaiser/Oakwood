@@ -119,13 +119,13 @@ export function DealPaymentLayer() {
         ) : null}
       </div>
       <p className="mt-3 text-caption text-white/70">
-        Decision in seconds. Deposit fully refundable.
+        Decision in seconds. {reservationCopy.cardAuthorisation}.
       </p>
       {displayState === "representative" ? (
         <p className="mt-3 text-caption text-white/65">
           Representative example. {financeLabel} · {formatTerm(term)} ·{" "}
           {formatPounds(totalDeposit)} deposit. Reserve for {amount}.{" "}
-          {reservationCopy.fullyRefundable}. Holds for {hold}.{" "}
+          {reservationCopy.cardAuthorisation}. Holds for {hold}.{" "}
           <StatusDisclosureLink />
         </p>
       ) : null}

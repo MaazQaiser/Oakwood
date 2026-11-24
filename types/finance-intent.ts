@@ -55,6 +55,8 @@ export interface FinanceIntentPageContent {
     label: string;
     event: "calculator" | "browse" | "px";
   };
+  /** Show staging notice that Oakwood copy awaits compliance review. */
+  oakwoodOwnCopyReview?: boolean;
 }
 
 export interface FinanceHubContent {

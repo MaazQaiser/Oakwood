@@ -5,6 +5,7 @@ import {
   type ReactElement,
   type ReactNode,
   type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
 } from "react";
 import { cn } from "@/lib/cn";
 
@@ -82,6 +83,25 @@ export function Select({
     >
       {children}
     </select>
+  );
+}
+
+export function Textarea({
+  className,
+  error,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & { error?: boolean }) {
+  return (
+    <textarea
+      className={cn(
+        controlClass,
+        "min-h-28 py-3",
+        error && "border-danger",
+        className,
+      )}
+      aria-invalid={error || undefined}
+      {...props}
+    />
   );
 }
 
