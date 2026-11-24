@@ -14,7 +14,7 @@ import {
   IconPhone,
 } from "@/components/ui/icons";
 import { showroomProfiles } from "@/config/locations";
-import { getContactUrl, getModelUrl } from "@/config/routes";
+import { getContactUrl, getVehicleUrl } from "@/config/routes";
 import {
   ANNUAL_MILEAGES,
   CASH_PRICE_CAPS,
@@ -30,6 +30,7 @@ import { REPRESENTATIVE_APR } from "@/lib/finance/interest-free";
 import { formatApr, formatPounds } from "@/lib/format/money";
 import { toTelHref } from "@/lib/format/phone";
 import { vehicleCardImage } from "@/lib/media/stock";
+import { vehicleForRunningCost } from "@/lib/running-costs/stock-link";
 import {
   budgetSteps,
   formatEfficiency,
@@ -134,7 +135,7 @@ function ChipRow({ label, children }: { label: string; children: ReactNode }) {
       <div
         role="group"
         aria-label={label}
-        className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mt-2 flex w-full min-w-0 flex-wrap gap-2"
       >
         {children}
       </div>
@@ -195,6 +196,7 @@ function CarCard({
   onToggle: () => void;
 }) {
   const costs = monthlyRunningCosts(car, driver);
+  const vehicle = vehicleForRunningCost(car);
   const breakdown = [
     [`Finance, ${runningCostTerm(car)} months at ${formatApr(REPRESENTATIVE_APR * 100)}`, costs.finance],
     [`Insurance, indication for ${driver.age}`, costs.insurance],
@@ -281,7 +283,7 @@ function CarCard({
 
       <div className="mt-auto grid grid-cols-2 gap-2 p-4 pt-3">
         <Link
-          href={getModelUrl(car.make, car.model)}
+          href={vehicle ? getVehicleUrl(vehicle) : "/used-cars"}
           className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-[#002852] text-button text-white no-underline hover:bg-[#001c3d]"
         >
           See this car

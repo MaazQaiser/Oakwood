@@ -67,8 +67,8 @@ export function ProblemWithYourCarPage({
   initialNeed?: string;
   telephone?: string;
 }) {
-  const [selected, setSelected] = useState<ProblemWithCarNeed | undefined>(() =>
-    parseNeed(initialNeed),
+  const [selected, setSelected] = useState<ProblemWithCarNeed>(
+    () => parseNeed(initialNeed) ?? "put-right",
   );
 
   const breadcrumbs = useMemo(
@@ -111,7 +111,7 @@ export function ProblemWithYourCarPage({
                     active
                       ? "border-transparent shadow-[0_18px_40px_rgba(0,40,82,0.16)]"
                       : "border-border/80 shadow-[0_10px_28px_rgba(0,40,82,0.04)] hover:border-primary/30",
-                    !active && choice.tone === "navy" && "bg-[var(--oak-navy)] text-white",
+                    !active && choice.tone === "navy" && "bg-white text-ink",
                     !active && choice.tone === "soft" && "bg-[var(--oak-surface-soft)] text-ink",
                     !active && choice.tone === "surface" && "bg-white text-ink",
                     active && "bg-[var(--oak-navy)] text-white",
@@ -122,7 +122,7 @@ export function ProblemWithYourCarPage({
                     <span
                       className={cn(
                         "font-[family-name:var(--oak-font-numeric)] text-[1.75rem] font-semibold leading-none",
-                        active || choice.tone === "navy"
+                        active
                           ? "text-white/30"
                           : "text-primary/25",
                       )}
@@ -132,7 +132,7 @@ export function ProblemWithYourCarPage({
                     <span
                       className={cn(
                         "grid h-11 w-11 place-items-center rounded-[14px] transition",
-                        active || choice.tone === "navy"
+                        active
                           ? "bg-white/12 text-white"
                           : "bg-white text-primary",
                       )}
@@ -144,7 +144,7 @@ export function ProblemWithYourCarPage({
                   <p
                     className={cn(
                       "mt-6 text-caption font-semibold uppercase tracking-[0.12em]",
-                      active || choice.tone === "navy"
+                      active
                         ? "text-white/65"
                         : "text-primary",
                     )}
@@ -154,7 +154,7 @@ export function ProblemWithYourCarPage({
                   <h2
                     className={cn(
                       "mt-2 text-h4",
-                      active || choice.tone === "navy" ? "text-white" : "text-ink",
+                      active ? "text-white" : "text-ink",
                     )}
                   >
                     {choice.title}
@@ -162,7 +162,7 @@ export function ProblemWithYourCarPage({
                   <p
                     className={cn(
                       "mt-3 flex-1 text-body-sm leading-relaxed",
-                      active || choice.tone === "navy"
+                      active
                         ? "text-white/85"
                         : "text-muted",
                     )}
@@ -172,7 +172,7 @@ export function ProblemWithYourCarPage({
                   <span
                     className={cn(
                       "mt-5 inline-flex items-center gap-1.5 text-body-sm font-semibold",
-                      active || choice.tone === "navy"
+                      active
                         ? "text-white"
                         : "text-primary",
                     )}

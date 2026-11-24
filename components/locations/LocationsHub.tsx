@@ -99,11 +99,14 @@ function OpenNowPill({ state }: { state: OpenState | null }) {
 function PostcodeChecker({
   result,
   onCheck,
+  onEdit,
 }: {
   result: NearestShowroomResult | null;
   onCheck: (postcode: string) => void;
+  onEdit: () => void;
 }) {
   const [postcode, setPostcode] = useState("");
+  const invalid = result?.status === "invalid";
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -111,7 +114,7 @@ function PostcodeChecker({
   }
 
   return (
-    <form onSubmit={submit} className={cn(cardClass, "max-w-xl p-5 sm:p-6")}>
+    <form onSubmit={submit} className={cn(cardClass, "max-w-xl p-5 sm:p-6")} noValidate>
       <label htmlFor="hub-postcode" className="block text-lg font-semibold text-[#002852]">
         Which one is nearer?
       </label>
@@ -122,11 +125,21 @@ function PostcodeChecker({
         <input
           id="hub-postcode"
           value={postcode}
-          onChange={(event) => setPostcode(event.target.value)}
+          onChange={(event) => {
+            setPostcode(event.target.value);
+            if (invalid) onEdit();
+          }}
           placeholder="e.g. BL1 4AB"
           autoComplete="postal-code"
           maxLength={9}
-          className="min-h-12 min-w-0 flex-1 rounded-[14px] border border-[#D0D5DD] bg-white px-4 text-base font-semibold uppercase text-[#002852] placeholder:font-normal placeholder:normal-case placeholder:text-[#98A2B3] focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/25"
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? "hub-postcode-error" : undefined}
+          className={cn(
+            "min-h-12 min-w-0 flex-1 rounded-[14px] border bg-white px-4 text-base font-semibold uppercase text-[#002852] placeholder:font-normal placeholder:normal-case placeholder:text-[#98A2B3] focus:outline-none focus:ring-[3px]",
+            invalid
+              ? "border-danger focus:border-danger focus:ring-danger/25"
+              : "border-[#D0D5DD] focus:border-primary focus:ring-primary/25",
+          )}
         />
         <button
           type="submit"
@@ -136,8 +149,10 @@ function PostcodeChecker({
         </button>
       </div>
       <div aria-live="polite" className="text-sm leading-relaxed text-[#3d4f63]">
-        {result?.status === "invalid" ? (
-          <p className="mt-3">Enter a postcode and we will work it out.</p>
+        {invalid ? (
+          <p id="hub-postcode-error" className="mt-3 text-caption text-danger" role="alert">
+            Enter a valid UK postcode.
+          </p>
         ) : null}
         {result?.status === "unknown" ? (
           <p className="mt-3">
@@ -166,8 +181,8 @@ function PostcodeChecker({
 
 function HoursTable({ day }: { day: number | null }) {
   const rows = [
-    { label: "Monday to Saturday", hours: "09:00 to 18:00", today: day !== null && day >= 1 },
-    { label: "Sunday", hours: "10:00 to 17:00", today: day === 0 },
+    { label: "Monday to Saturday", hours: "09:00 to 18:00", today: day !== null && day >= 1, showToday: false },
+    { label: "Sunday", hours: "10:00 to 17:00", today: day === 0, showToday: true },
   ];
   return (
     <dl className="mt-4 rounded-[16px] bg-[#F7FAFC] px-4 py-3 text-sm">
@@ -181,7 +196,7 @@ function HoursTable({ day }: { day: number | null }) {
         >
           <dt>
             {row.label}
-            {row.today ? " (today)" : null}
+            {row.today && row.showToday ? " (today)" : null}
           </dt>
           <dd className={cn("mt-0.5 whitespace-nowrap tabular-nums", row.today ? "text-primary" : "text-[#002852]")}>
             {row.hours}
@@ -417,7 +432,11 @@ export function LocationsHub({
       >
         <OpenNowPill state={openState} />
         <div className="mt-6">
-          <PostcodeChecker result={result} onCheck={check} />
+          <PostcodeChecker
+            result={result}
+            onCheck={check}
+            onEdit={() => setResult(null)}
+          />
         </div>
       </PageBanner>
 

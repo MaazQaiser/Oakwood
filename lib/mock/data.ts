@@ -1,4 +1,5 @@
 import { vehicleCardImage } from "@/lib/media/stock";
+import { runningCostCatalogueAdditions } from "@/lib/mock/running-cost-vehicles";
 import { buildVehicleSlug } from "@/lib/vehicles/slug";
 import type { Vehicle } from "@/types/vehicle";
 
@@ -48,7 +49,7 @@ const bolton = {
   regionSlug: "greater-manchester",
 } as const;
 
-export const mockVehicles: Vehicle[] = [
+const stockVehicles: Vehicle[] = [
   createVehicle({
     stockId: "7848117",
     category: "car",
@@ -935,6 +936,11 @@ export const mockVehicles: Vehicle[] = [
     guaranteeEligible: false,
     saleType: "sold_as_seen",
   }),
+];
+
+export const mockVehicles: Vehicle[] = [
+  ...stockVehicles,
+  ...runningCostCatalogueAdditions(stockVehicles),
 ];
 
 export const mockBlogPosts = [
