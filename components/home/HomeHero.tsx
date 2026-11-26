@@ -1,25 +1,32 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { HomeFinanceStrip } from "@/components/home/HomeFinanceStrip";
+import { HomeHeroOffers } from "@/components/home/HomeHeroOffers";
 import { HomeProofStrip } from "@/components/home/HomeProofStrip";
-import { HomeSearchBar } from "@/components/home/HomeSearchBar";
-import { routes } from "@/config/routes";
-import { cn } from "@/lib/cn";
 import {
-  HOME_HERO_DESCRIPTION,
-  HOME_HERO_HEADING,
-  HOME_PART_EXCHANGE,
-  HOME_PART_EXCHANGE_SUPPORT,
-} from "@/lib/home/copy";
+  HomeQuickSearch,
+  HomeSearchBar,
+  type QuickFilters,
+} from "@/components/home/HomeSearchBar";
+import { cn } from "@/lib/cn";
+import { HOME_HERO_DESCRIPTION, HOME_HERO_HEADING } from "@/lib/home/copy";
 
 export function HomeHero() {
+  const [quick, setQuick] = useState<QuickFilters>({
+    bodyStyle: "",
+    fuel: "",
+    transmission: "",
+  });
+
   return (
     <>
-      <CurrentHero />
+      <CurrentHero quick={quick} />
       <Container className="flex flex-col gap-5 pb-8 pt-6 sm:gap-6 lg:gap-8 lg:pb-10 lg:pt-8">
+        <HomeQuickSearch value={quick} onChange={setQuick} />
+        <HomeHeroOffers />
         <HomeProofStrip />
         {/* One finance claims line + eligibility CTA; footer CTA is the second. */}
         {/* Rate CTA lives at the foot of the homepage only — not in the hero. */}
@@ -29,7 +36,7 @@ export function HomeHero() {
   );
 }
 
-function CurrentHero() {
+function CurrentHero({ quick }: { quick: QuickFilters }) {
   return (
     <section
       className={cn(
@@ -84,24 +91,12 @@ function CurrentHero() {
 
           {/* Mobile Spacing mock: title → search → copy. Desktop photo is absolute. */}
           <div className="relative mt-6 w-full md:mt-5 lg:mt-6">
-            <HomeSearchBar className="relative z-20" compact />
+            <HomeSearchBar className="relative z-20" compact quick={quick} />
           </div>
 
           <p className="mt-5 max-w-[22rem] text-[0.95rem] leading-relaxed text-muted md:hidden">
             {HOME_HERO_DESCRIPTION}
           </p>
-
-          <div className="relative z-10 mt-6 md:mt-8">
-            <Link
-              href={routes.partExchange}
-              className="text-base font-semibold text-navy underline-offset-2 no-underline hover:underline"
-            >
-              {HOME_PART_EXCHANGE}
-            </Link>
-            <p className="mt-1.5 text-[0.95rem] font-medium leading-snug text-primary">
-              {HOME_PART_EXCHANGE_SUPPORT}
-            </p>
-          </div>
         </div>
       </div>
     </section>

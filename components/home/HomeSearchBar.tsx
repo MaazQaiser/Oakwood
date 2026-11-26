@@ -18,23 +18,35 @@ import {
   HOME_HERO_FILTER_SELECT_MAKE,
   HOME_HERO_FILTER_SELECT_MODEL,
   HOME_HERO_PRIMARY,
+  HOME_HERO_QUICK_BODY,
+  HOME_HERO_QUICK_FUEL,
+  HOME_HERO_QUICK_GEARBOX,
+  HOME_HERO_QUICK_SEARCH,
 } from "@/lib/home/copy";
 import type { SearchQuery } from "@/lib/validation/search";
 import { homeFindCarCtaLabel } from "@/lib/home/inventory";
 import { getMakes, getModels } from "@/lib/vehicles/labels";
+import { BODY_TYPES, FUEL_TYPES, TRANSMISSIONS } from "@/lib/vehicles/search";
 
 const fieldClass =
   "min-h-12! w-full min-w-0 rounded-2xl! border-[#D7E0E8]! bg-white! px-3! py-2.5! pr-9! text-sm! leading-normal! font-medium text-ink!";
+
+const quickFieldClass = cn(
+  fieldClass,
+  "max-md:px-1.5! max-md:pr-4! max-md:![background-position:right_0.3rem_center] max-md:![background-size:0.85rem]",
+);
 
 type PriceMode = "monthly" | "total";
 
 export function HomeSearchBar({
   className,
   compact = false,
+  quick,
 }: {
   className?: string;
   /** 15% smaller floating box for desktop / overlapping mobile hero */
   compact?: boolean;
+  quick?: QuickFilters;
 }) {
   const router = useRouter();
   const [value, setValue] = useState("");
@@ -53,10 +65,13 @@ export function HomeSearchBar({
     if (value.trim()) next.q = value.trim();
     if (make) next.make = make;
     if (model) next.model = model;
+    if (quick?.bodyStyle) next.body_style = quick.bodyStyle;
+    if (quick?.fuel) next.fuel = quick.fuel;
+    if (quick?.transmission) next.transmission = quick.transmission;
     if (mode === "monthly" && monthlyMax) next.monthly_max = monthlyMax;
     if (mode === "total" && maxPrice) next.max_price = maxPrice;
     return next;
-  }, [value, make, model, mode, monthlyMax, maxPrice]);
+  }, [value, make, model, quick, mode, monthlyMax, maxPrice]);
 
   function submitSearch() {
     trackEvent(analyticsEvents.searchSubmitted, {
@@ -211,6 +226,98 @@ export function HomeSearchBar({
         </button>
       </div>
     </form>
+  );
+}
+
+export type QuickFilters = {
+  bodyStyle: string;
+  fuel: string;
+  transmission: string;
+};
+
+export function HomeQuickSearch({
+  value,
+  onChange,
+  className,
+}: {
+  value: QuickFilters;
+  onChange: (next: QuickFilters) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[28px] border border-[#E4EBF1] bg-white px-2.5 py-4 shadow-[0_12px_28px_rgba(0,16,40,0.08)] sm:px-5",
+        className,
+      )}
+    >
+      <p className="text-center text-sm font-semibold text-[#5d6b7a]">
+        {HOME_HERO_QUICK_SEARCH}
+      </p>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <QuickSelect
+          id="home-quick-body"
+          label={HOME_HERO_QUICK_BODY}
+          value={value.bodyStyle}
+          placeholder="Body"
+          options={BODY_TYPES}
+          onChange={(bodyStyle) => onChange({ ...value, bodyStyle })}
+        />
+        <QuickSelect
+          id="home-quick-fuel"
+          label={HOME_HERO_QUICK_FUEL}
+          value={value.fuel}
+          placeholder="Fuel"
+          options={FUEL_TYPES}
+          onChange={(fuel) => onChange({ ...value, fuel })}
+        />
+        <QuickSelect
+          id="home-quick-gearbox"
+          label={HOME_HERO_QUICK_GEARBOX}
+          value={value.transmission}
+          placeholder="Gearbox"
+          options={TRANSMISSIONS}
+          onChange={(transmission) => onChange({ ...value, transmission })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function QuickSelect({
+  id,
+  label,
+  value,
+  placeholder,
+  options,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  options: readonly string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="min-w-0">
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <Select
+        id={id}
+        className={quickFieldClass}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </Select>
+    </div>
   );
 }
 

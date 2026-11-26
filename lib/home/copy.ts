@@ -31,6 +31,10 @@ export const HOME_HERO_FILTER_MAX_PRICE = "Max total price";
 export const HOME_HERO_FILTER_MAX_MONTHLY = "Monthly budget";
 export const HOME_HERO_FILTER_SELECT_MAKE = "Select make";
 export const HOME_HERO_FILTER_SELECT_MODEL = "Select model";
+export const HOME_HERO_QUICK_SEARCH = "Quick Search";
+export const HOME_HERO_QUICK_BODY = "Body type";
+export const HOME_HERO_QUICK_FUEL = "Fuel";
+export const HOME_HERO_QUICK_GEARBOX = "Gearbox";
 export const HOME_HERO_FILTER_CTA = "Show all cars";
 export const HOME_HERO_CHIP_UNDER_10K = "Under £10k";
 export const HOME_HERO_CHIP_SUV = "SUV";
@@ -38,12 +42,20 @@ export const HOME_HERO_CHIP_AUTOMATIC = "Automatic";
 export const HOME_HERO_CHIP_SEVEN = "7 seater";
 export const HOME_HERO_PX_PROMPT = "Part exchange? Value your car free";
 export const HOME_HERO_PX_REG = "ENTER REG";
-export const HOME_HERO_PX_CTA = "Value it";
+export const HOME_HERO_PX_CTA = "Get valuation";
 export const HOME_HERO_PX_VALUATION = "Get a free, instant valuation:";
 export const HOME_HERO_PX_QUOTE = "Start my part exchange quote";
 export const HOME_PART_EXCHANGE = "Part exchange";
 export const HOME_PART_EXCHANGE_SUPPORT =
   "Get a valuation for your current car";
+export const HOME_HERO_RATES_BODY =
+  "Our free eligibility check gives you a personalised result in minutes, with no impact on your credit score.";
+export const HOME_HERO_RATES_CTA = "Get my finance quote";
+export const HOME_HERO_PX_CARD_HEADING = "Sell or part exchange your car";
+export const HOME_HERO_PX_CARD_SUPPORT =
+  "Get a free, instant valuation for your car.";
+export const HOME_HERO_PX_REG_LABEL = "Enter your registration";
+export const HOME_HERO_PX_REG_PLACEHOLDER = "e.g. AB66 PEP";
 
 export const HOME_PROOF_ITEMS = [
   {
